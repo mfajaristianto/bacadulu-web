@@ -15,8 +15,10 @@ class JurnalForm
                 TextInput::make('judul')
                     ->required(),
                 Textarea::make('deskripsi')
+                    ->default(null)
                     ->columnSpanFull(),
-                TextInput::make('file_pdf'),
+                TextInput::make('file_pdf')
+                    ->default(null),
             ]);
     }
 }

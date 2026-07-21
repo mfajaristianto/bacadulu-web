@@ -2,52 +2,55 @@
 
 namespace App\Filament\Resources\Jurnals;
 
-use App\Filament\Resources\Jurnals\Pages\ListJurnals;
 use App\Filament\Resources\Jurnals\Pages\CreateJurnal;
 use App\Filament\Resources\Jurnals\Pages\EditJurnal;
+use App\Filament\Resources\Jurnals\Pages\ListJurnals;
 use App\Models\Jurnal;
-use Filament\Forms\Form;
-use Filament\Forms\Components\TextInput;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Table;
 
 class JurnalResource extends Resource
 {
     protected static ?string $model = Jurnal::class;
 
-    // Menambahkan tipe data eksplisit agar intelephense tidak error P1077
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    public static function form(Form $form): Form
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('judul')
                     ->required()
                     ->maxLength(255),
-                    
+
                 RichEditor::make('deskripsi'),
-                
+
                 FileUpload::make('file_pdf')
                     ->label('File Jurnal (PDF)')
                     ->directory('jurnal-pdf')
                     ->acceptedFileTypes(['application/pdf'])
                     ->required(),
-            ]);
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('judul')->searchable(),
-                TextColumn::make('created_at')->dateTime(),
+                TextColumn::make('judul')
+                    ->searchable(),
+
+                TextColumn::make('created_at')
+                    ->dateTime(),
             ])
             ->filters([
                 //
