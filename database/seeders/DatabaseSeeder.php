@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash; // Tambahkan baris ini
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +16,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Buat akun admin utama untuk semua device/tim
+        User::updateOrCreate(
+            ['email' => 'admin@bacadulu.com'],
+            [
+                'name' => 'Admin Utama',
+                'password' => Hash::make('password123'),
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // (Opsional) Jika ingin tetap membuat user test bawaan Laravel, biarkan baris di bawah aktif:
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
     }
 }
