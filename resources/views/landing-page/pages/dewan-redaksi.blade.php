@@ -1,8 +1,10 @@
+@extends('layouts.app')
+
+@section('content')
 <section class="py-20 w-full bg-slate-50">
     <div class="max-w-5xl mx-auto px-6">
         <h2 class="text-3xl font-bold text-center text-slate-900 mb-12">Dewan Redaksi</h2>
         
-        <!-- Grid Dipaksa 2 Kolom di Desktop -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             @php
@@ -28,3 +30,4 @@
         </div>
     </div>
 </section>
+@endsection
