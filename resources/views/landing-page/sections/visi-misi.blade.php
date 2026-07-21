@@ -20,7 +20,7 @@
                         <span class="text-orange-500 text-xl">🎯</span> Visi Kami
                     </h3>
                     <p class="text-xs text-slate-500 mt-2 leading-relaxed">
-                        Menjadi penerbit dan media literasi akademis terintegrasi nomor satu di Indonesia yang ramah, tepercaya, dan unggul dalam mendukung ekosistem penelitian nasional.
+                        Menjadi penyedia utama pendidikan dan pelatihan berbasis informasi yang berkualitas, membangun budaya literasi yang kuat untuk mendukung pembelajaran berkelanjutan, serta menjadi pusat referensi unggulan dalam pengembangan literasi dan keahlian melalui pelatihan berbasis data.
                     </p>
                 </div>
 
@@ -30,9 +30,10 @@
                         <span class="text-orange-500 text-xl">⚡</span> Misi Kami
                     </h3>
                     <ul class="text-xs text-slate-500 mt-2 space-y-2 list-disc list-inside leading-relaxed">
-                        <li>Memberikan layanan penerbitan berstandar ISBN dan HAKI nasional yang terjangkau bagi para akademisi.</li>
-                        <li>Mengembangkan program pelatihan menulis naskah yang mudah dipahami bagi semua kalangan.</li>
-                        <li>Mengoptimalkan sistem distribusi fisik dan digital (E-book) secara global.</li>
+                        <li>Menyediakan informasi yang objektif dan netral.</li>
+                        <li>Menyediakan informasi yang up to date atau terkini</li>
+                        <li>Menyediakan informasi yang valid dan akurat.</li>
+                        <li>Menyediakan data dan informasi yang dapat digunakan dalam pengambilan keputusan bagi berbagai stakeholder.</li>
                     </ul>
                 </div>
             </div>
