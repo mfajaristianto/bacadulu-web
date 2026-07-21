@@ -38,7 +38,7 @@
     <!-- Komponen Navbar Utama -->
     <x-navbar />
 
-    <!-- Area Konten Utama -->x
+    <!-- Area Konten Utama -->
     <main class="flex-grow w-full block h-auto clear-both">
         @yield('content')
     </main>
