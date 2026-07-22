@@ -4,6 +4,18 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\JurnalController;
+use App\Http\Controllers\InformationController;
+use App\Http\Controllers\PublisherController;
+use App\Http\Controllers\DataArticleController;
+use App\Http\Controllers\ConferenceController;
+
+Route::get('/conference', [ConferenceController::class, 'index'])->name('conference.index');
+
+Route::get('/data-article', [DataArticleController::class, 'index'])->name('data-article.index');
+
+Route::get('/publisher', [PublisherController::class, 'index'])->name('publisher.index');
+
+Route::get('/information', [InformationController::class, 'index'])->name('information.index');
 
 Route::get('/jurnal', [JurnalController::class, 'index']);
 
