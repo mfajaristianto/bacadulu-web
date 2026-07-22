@@ -9,15 +9,22 @@ use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\DataArticleController;
 use App\Http\Controllers\ConferenceController;
 
-Route::get('/conference', [ConferenceController::class, 'index'])->name('conference.index');
+// --- KATALOG BACA ROUTES ---
+Route::get('/information', [InformationController::class, 'index'])->name('informasi');
 
-Route::get('/data-article', [DataArticleController::class, 'index'])->name('data-article.index');
+Route::get('/articles', [DataArticleController::class, 'index'])->name('articles');
 
-Route::get('/publisher', [PublisherController::class, 'index'])->name('publisher.index');
+// Jika konsultasi belum ada controllernya, bisa diarahkan langsung ke view:
+Route::get('/konsultasi', function () {
+    return view('landing-page.pages.konsultasi');
+})->name('konsultasi');
 
-Route::get('/information', [InformationController::class, 'index'])->name('information.index');
+Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal');
 
-Route::get('/jurnal', [JurnalController::class, 'index']);
+Route::get('/conference', [ConferenceController::class, 'index'])->name('conference');
+
+Route::get('/publisher', [PublisherController::class, 'index'])->name('publisher');
+
 
 // 1. Halaman Utama (Home)
 Route::get('/', function () {
@@ -51,19 +58,13 @@ Route::get('/portofolio/bookstore', function () {
 })->name('portofolio.bookstore');
 
 
-// 4. Jurnal (Halaman Terpisah)
-Route::get('/jurnal-bacadulu', function () { 
-    return view('landing-page.pages.jurnal'); 
-})->name('jurnal');
-
-
-// 5. HAKI (Halaman Terpisah berdasarkan jenis)
+// 4. HAKI (Halaman Terpisah berdasarkan jenis)
 Route::get('/haki/daftar/{jenis}', function ($jenis) { 
     return view('landing-page.pages.haki', ['jenis' => $jenis]); 
 })->name('haki.daftar');
 
 
-// 6. Cek Resi (Halaman Terpisah)
+// 5. Cek Resi (Halaman Terpisah)
 Route::get('/cek-resi', function () { 
     return view('landing-page.pages.cek-resi'); 
 })->name('cek-resi');
