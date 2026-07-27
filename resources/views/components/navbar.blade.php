@@ -51,18 +51,10 @@
             Bookstore
         </a>
 
-        <!-- HAKI -->
-        <div class="relative group">
-          <button class="px-3 py-2 rounded-lg !text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50] transition duration-200 flex items-center gap-1 focus:outline-none !no-underline font-bold whitespace-nowrap">
-            <span>HAKI</span>
-            <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
-          <div class="absolute left-0 hidden group-hover:block bg-white shadow-xl rounded-lg mt-0 py-2 w-56 border border-gray-100 z-50">
-            <a href="{{ route('haki.daftar', 'buku-ajar') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#f05a42] !no-underline font-semibold whitespace-nowrap">Daftar Buku Ajar</a>
-            <a href="{{ route('haki.daftar', 'buku-referensi') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#f05a42] !no-underline font-semibold whitespace-nowrap">Daftar Buku Referensi</a>
-            <a href="{{ route('haki.daftar', 'monograf') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#f05a42] !no-underline font-semibold whitespace-nowrap">Daftar Monograf</a>
-          </div>
-        </div>
+        <!-- HAKI (Tunggal / Tanpa Dropdown) -->
+        <a href="{{ route('haki.index') }}" class="px-3 py-2 rounded-lg transition duration-200 !no-underline whitespace-nowrap {{ request()->routeIs('haki.index') ? 'bg-[#1e1e50]/10 !text-[#1e1e50]' : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]' }}">
+            HAKI
+        </a>
 
         <!-- Cek Resi & Kirim Naskah -->
         <div class="flex items-center space-x-1">
@@ -107,12 +99,8 @@
 
       <a href="{{ route('portofolio.bookstore') }}" class="block text-gray-600 py-2 px-3 !no-underline border-t pt-2">Bookstore</a>
 
-      <div class="border-t pt-2">
-        <span class="text-[11px] text-gray-400 uppercase block px-3 mb-1">HAKI</span>
-        <a href="{{ route('haki.daftar', 'buku-ajar') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Daftar Buku Ajar</a>
-        <a href="{{ route('haki.daftar', 'buku-referensi') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Daftar Buku Referensi</a>
-        <a href="{{ route('haki.daftar', 'monograf') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Daftar Monograf</a>
-      </div>
+      <!-- HAKI Mobile (Tunggal) -->
+      <a href="{{ route('haki.index') }}" class="block text-gray-600 py-2 px-3 !no-underline border-t pt-2">HAKI</a>
 
       <div class="border-t pt-2 flex flex-col space-y-2 pb-2">
         <a href="{{ route('cek-resi') }}" class="block text-gray-600 py-1 px-3 !no-underline">Cek Resi</a>

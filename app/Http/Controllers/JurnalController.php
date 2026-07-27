@@ -9,8 +9,6 @@ class JurnalController extends Controller
     public function index()
     {
         $jurnals = Jurnal::all(); // Mengambil semua data dari database
-        return view('jurnal', compact('jurnals')); // Mengirim data ke file bernama jurnal.blade.php
+        return view('landing-page.pages.jurnal', compact('jurnals')); // Diubah ke sini
     }
 }
-
-?>

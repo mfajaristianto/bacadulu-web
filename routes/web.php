@@ -8,6 +8,13 @@ use App\Http\Controllers\InformationController;
 use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\DataArticleController;
 use App\Http\Controllers\ConferenceController;
+use App\Http\Controllers\HakiController;
+use App\Http\Controllers\ShipmentController;
+
+Route::get('/cek-resi', [ShipmentController::class, 'index'])->name('cek-resi');
+Route::post('/cek-resi', [ShipmentController::class, 'track'])->name('cek-resi.track');
+
+Route::get('/haki', [HakiController::class, 'index'])->name('haki.index');
 
 // --- KATALOG BACA ROUTES ---
 Route::get('/information', [InformationController::class, 'index'])->name('informasi');

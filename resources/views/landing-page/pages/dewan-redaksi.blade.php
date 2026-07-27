@@ -1,5 +1,3 @@
-
-
 @extends('layouts.app')
 
 @section('content')
@@ -86,15 +84,10 @@
                 <p class="text-slate-500 text-sm">{{ $n['desc'] }}</p>
             </div>
             @endforeach
-
         </div>
     </div>
 </section>
 
-<<<<<<< HEAD
-@push('scripts')
-<style>
-=======
 {{-- ================= TEAM BACADULU ================= --}}
 <section id="team-bacadulu" class="scroll-mt-20 relative py-24 w-full overflow-hidden bg-gradient-to-b from-white to-orange-50/40">
 
@@ -204,7 +197,6 @@
         scroll-behavior: smooth;
     }
 
->>>>>>> a35793b (perbaiki navbar)
     .fade-in-card {
         opacity: 0;
         transform: translateY(30px);
@@ -214,40 +206,23 @@
         opacity: 1;
         transform: translateY(0);
     }
-<<<<<<< HEAD
-=======
 
     .tab-link.active {
         color: #ea580c;
         background-color: #fff7ed;
     }
->>>>>>> a35793b (perbaiki navbar)
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-<<<<<<< HEAD
-        const cards = document.querySelectorAll('.fade-in-card');
-
-        const observer = new IntersectionObserver((entries) => {
-=======
         // Fade-in animation
         const cards = document.querySelectorAll('.fade-in-card');
         const cardObserver = new IntersectionObserver((entries) => {
->>>>>>> a35793b (perbaiki navbar)
             entries.forEach((entry, index) => {
                 if (entry.isIntersecting) {
                     setTimeout(() => {
                         entry.target.classList.add('visible');
                     }, index * 100);
-<<<<<<< HEAD
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
-
-        cards.forEach(card => observer.observe(card));
-=======
                     cardObserver.unobserve(entry.target);
                 }
             });
@@ -270,7 +245,6 @@
         }, { threshold: 0.4 });
 
         sections.forEach(section => tabObserver.observe(section));
->>>>>>> a35793b (perbaiki navbar)
     });
 </script>
 @endpush

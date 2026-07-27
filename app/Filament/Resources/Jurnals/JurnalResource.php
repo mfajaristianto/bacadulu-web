@@ -16,7 +16,6 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class JurnalResource extends Resource
 {
@@ -37,40 +36,20 @@ class JurnalResource extends Resource
                 // 1. File Upload untuk Dokumen PDF Jurnal
                 FileUpload::make('file_pdf')
                     ->label('File Jurnal (PDF)')
+                    ->disk('public')
                     ->directory('jurnal-pdf')
                     ->acceptedFileTypes(['application/pdf'])
                     ->required(),
 
-                // 2. File Upload untuk Cover Gambar (Otomatis Ubah ke WebP & Auto-Compress)
+                // 2. File Upload Cover Gambar
                 FileUpload::make('gambar')
                     ->label('Cover / Gambar Jurnal')
                     ->image()
+                    ->disk('public')
                     ->directory('jurnal-images')
-                    ->maxSize(10240) // Batas maksimal 10 MB untuk orang awam
-                    ->saveUploadedFileUsing(function ($file) {
-                        $filename = 'jurnal_' . time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.webp';
-                        $filePath = $file->getRealPath();
-                        $info = getimagesize($filePath);
-                        $mime = $info['mime'];
-
-                        if ($mime == 'image/jpeg') {
-                            $image = imagecreatefromjpeg($filePath);
-                        } elseif ($mime == 'image/png') {
-                            $image = imagecreatefrompng($filePath);
-                        } elseif ($mime == 'image/webp') {
-                            $image = imagecreatefromwebp($filePath);
-                        } else {
-                            // Kalau format lain di luar itu, simpan secara normal
-                            return $file->storePubliclyAs('jurnal-images', $filename, 'public');
-                        }
-
-                        // Kompres otomatis jadi WebP dengan kualitas 75%
-                        $destination = storage_path('app/public/jurnal-images/' . $filename);
-                        imagewebp($image, $destination, 75);
-                        imagedestroy($image);
-
-                        return 'jurnal-images/' . $filename;
-                    }),
+                    ->visibility('public')
+                    ->maxSize(10240)
+                    ->panelLayout('compact'),
             ])
             ->columns(1);
     }
