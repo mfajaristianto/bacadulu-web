@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Information; // <-- Perhatikan tambahan \Information di belakangnya
+namespace App\Filament\Resources\Information;
 
 use App\Filament\Resources\Information\Pages\CreateInformation;
 use App\Filament\Resources\Information\Pages\EditInformation;
 use App\Filament\Resources\Information\Pages\ListInformation;
-use App\Models\Information; // <-- Model Information-nya
+use App\Models\Information;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -48,14 +48,26 @@ class InformationResource extends Resource
                         $info = getimagesize($filePath);
                         $mime = $info['mime'];
 
-                        if ($mime == 'image/jpeg') { $image = imagecreatefromjpeg($filePath); }
-                        elseif ($mime == 'image/png') { $image = imagecreatefrompng($filePath); }
-                        elseif ($mime == 'image/webp') { $image = imagecreatefromwebp($filePath); }
-                        else { return $file->storePubliclyAs('uploads/information', $filename, 'public'); }
+                        // Pastikan folder penyimpanan tujuan sudah ada secara otomatis
+                        $destinationPath = storage_path('app/public/uploads/information');
+                        if (!file_exists($destinationPath)) {
+                            mkdir($destinationPath, 0755, true);
+                        }
 
-                        $destination = storage_path('app/public/uploads/information/' . $filename);
+                        if ($mime == 'image/jpeg') { 
+                            $image = imagecreatefromjpeg($filePath); 
+                        } elseif ($mime == 'image/png') { 
+                            $image = imagecreatefrompng($filePath); 
+                        } elseif ($mime == 'image/webp') { 
+                            $image = imagecreatefromwebp($filePath); 
+                        } else { 
+                            return $file->storePubliclyAs('uploads/information', $filename, 'public'); 
+                        }
+
+                        $destination = $destinationPath . '/' . $filename;
                         imagewebp($image, $destination, 75);
                         imagedestroy($image);
+                        
                         return 'uploads/information/' . $filename;
                     }),
             ])
