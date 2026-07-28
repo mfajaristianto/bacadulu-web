@@ -30,6 +30,9 @@ COPY . .
 RUN chown -R www-data:www-data /var/www/html \
     && a2enmod rewrite
 
+# Fix conflict More than one MPM loaded di Apache
+RUN a2dismod mpm_event mpm_worker && a2enmod mpm_prefork
+
 # Ubah konfigurasi Apache agar mengarah ke folder public Laravel
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
