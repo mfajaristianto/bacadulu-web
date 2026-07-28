@@ -25,8 +25,8 @@
           </button>
           <div class="absolute left-0 hidden group-hover:block bg-white shadow-xl rounded-lg mt-0 py-2 w-52 border border-gray-100 z-50">
             <a href="{{ route('tentang.dewan-redaksi') }}#team-bacadulu" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Team BacaDulu</a>
-            <a href="{{ route('tentang.dewan-redaksi') }}#visi-misi" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Visi & Misi</a>
             <a href="{{ route('tentang.dewan-redaksi') }}#nilai-perusahaan" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Nilai Perusahaan</a>
+            <a href="{{ route('tentang.dewan-redaksi') }}#visi-misi" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Visi & Misi</a>
           </div>
         </div>
         

@@ -40,12 +40,6 @@
                 <div class="space-y-6">
                     <div>
                         <h5 class="text-white font-semibold text-sm mb-2 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-[#ffaa00]"></span> Palma Tower
-                        </h5>
-                        <p class="text-xs text-gray-400 leading-relaxed">TB Simatupang, JL. RA Kartini II-S Kav. 6, RT.6/RW.14, Pd. Pinang, Kec. Kebayoran Lama, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12310</p>
-                    </div>
-                    <div>
-                        <h5 class="text-white font-semibold text-sm mb-2 flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-[#ffaa00]"></span> The Manhattan Square
                         </h5>
                         <p class="text-xs text-gray-400 leading-relaxed">Jl. TB Simatupang, RT.3/RW.3, Cilandak Tim., Ps. Minggu, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12560</p>
@@ -95,28 +89,11 @@
                     @php $currentLocale = app()->getLocale(); @endphp
                     <option value="{{ url('lang/id') }}" {{ $currentLocale == 'id' ? 'selected' : '' }} class="bg-[#1a1a30] text-white">Bahasa Indonesia (ID)</option>
                     <option value="{{ url('lang/en') }}" {{ $currentLocale == 'en' ? 'selected' : '' }} class="bg-[#1a1a30] text-white">English (EN)</option>
-                    <option value="{{ url('lang/zh') }}" {{ $currentLocale == 'zh' ? 'selected' : '' }} class="bg-[#1a1a30] text-white">China (ZH)</option>
-                    <option value="{{ url('lang/ja') }}" {{ $currentLocale == 'ja' ? 'selected' : '' }} class="bg-[#1a1a30] text-white">Japan (JA)</option>
-                    <option value="{{ url('lang/ko') }}" {{ $currentLocale == 'ko' ? 'selected' : '' }} class="bg-[#1a1a30] text-white">South Korea (KO)</option>
                 </select>
             </div>
             <p class="text-xs text-gray-500">Copyright © {{ now()->year }} BacaDulu. All rights reserved.</p>
             <div class="hidden sm:block w-16"></div>
         </div>
-    </div>
-
-    <!-- FLOATING SPEED DIAL -->
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-4">
-        <div id="contactMenu" class="flex flex-col items-center gap-4 opacity-0 pointer-events-none translate-y-5 transition-all duration-300 ease-out">
-            <a href="tel:6281315717719" class="w-12 h-12 bg-[#10e383] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 overflow-hidden aspect-square"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M21.384 17.791c-1.207-1.207-2.766-1.207-3.973 0l-1.127 1.127c-.23.23-.585.281-.873.124-2.128-1.155-4.512-3.539-5.667-5.667-.156-.288-.106-.643.124-.873l1.127-1.127c1.207-1.207 1.207-2.766 0-3.973l-2.254-2.254c-1.207-1.207-2.766-1.207-3.973 0L3.513 6.304c-1.207 1.207-1.42 2.973-.564 4.54 1.701 3.111 4.75 6.16 7.861 7.861 1.567.856 3.333.643 4.54-.564l1.127-1.127c1.207-1.207 1.207-2.766 0-3.973l-2.254-2.254z"/></svg></a>
-            <a href="https://wa.me/6281315717719" target="_blank" class="w-12 h-12 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 overflow-hidden aspect-square"><img src="{{ asset('img/waa.jpg') }}" alt="WhatsApp" class="w-full h-full object-cover"></a>
-            <a href="https://www.instagram.com/bacaduluofficial/" target="_blank" class="w-12 h-12 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 overflow-hidden aspect-square"><svg class="w-6 h-6 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-            <a href="mailto:support@bacadulu.com" class="w-12 h-12 bg-[#ff4b5c] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200 overflow-hidden aspect-square"><svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>
-        </div>
-        <button id="fabToggle" onclick="toggleContactMenu()" class="bg-[#ffaa00] text-[#111122] flex items-center justify-center shadow-2xl transition-all duration-300 focus:outline-none" style="width: 56px !important; height: 56px !important; border-radius: 9999px !important; overflow: hidden !important; aspect-ratio: 1/1 !important;" title="Hubungi Kami">
-            <svg id="chatIcon" class="w-6 h-6 fill-current transition-all duration-300" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-            <svg id="closeIcon" class="w-6 h-6 fill-none stroke-current stroke-2 transition-all duration-300 transform scale-0 absolute" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
     </div>
 
     <!-- JAVASCRIPT -->
