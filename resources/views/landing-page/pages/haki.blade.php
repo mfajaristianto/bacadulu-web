@@ -5,8 +5,8 @@
 
     <!-- Header Section dengan Animasi Masuk -->
     <div class="text-center mb-5 hki-fade-header">
-        <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">Layanan Resmi HKI</span>
-        <h1 class="fw-bold display-5 mt-3 text-dark">Pendaftaran HKI Buku &amp; Jurnal</h1>
+        <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">Layanan Resmi HAKI</span>
+        <h1 class="fw-bold display-5 mt-3 text-dark">Pendaftaran HAKI Buku &amp; Jurnal</h1>
         <p class="text-muted lead mx-auto" style="max-width:640px;">
             Dari naskah buku ajar sampai jurnal ilmiah, satu atap untuk melindungi hak cipta karya tulis Anda secara sah dan profesional berdasarkan <span class="fw-semibold text-dark">UU No. 28 Tahun 2014</span>.
         </p>
@@ -48,7 +48,7 @@
                 <div class="card-body p-0">
                     <div class="d-flex align-items-center mb-3">
                         <div class="fs-3 me-3 p-2 bg-success bg-opacity-10 rounded-3 text-success">🛡️</div>
-                        <h4 class="fw-bold text-dark mb-0">Legalitas Penunjang HKI</h4>
+                        <h4 class="fw-bold text-dark mb-0">Legalitas Penunjang HAKI</h4>
                     </div>
                     <p class="text-muted small mb-3">Selain hak cipta utama, elemen legalitas berikut krusial untuk penguatan publikasi:</p>
                     
@@ -188,7 +188,7 @@
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <h3 class="fw-bold mb-3 text-dark">Kenapa Dosen &amp; Peneliti Wajib Daftarkan HKI?</h3>
                 <p class="text-muted mb-0">
-                    Pendaftaran HKI untuk buku maupun jurnal memberikan poin penting untuk pemenuhan BKD (Beban Kerja Dosen), kenaikan jabatan fungsional (Lektor, Lektor Kepala, Guru Besar), serta akreditasi institusi.
+                    Pendaftaran HAKI untuk buku maupun jurnal memberikan poin penting untuk pemenuhan BKD (Beban Kerja Dosen), kenaikan jabatan fungsional (Lektor, Lektor Kepala, Guru Besar), serta akreditasi institusi.
                 </p>
             </div>
             <div class="col-lg-6">
