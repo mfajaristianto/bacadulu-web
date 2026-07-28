@@ -38,4 +38,5 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 # Jalankan composer install
 RUN composer install --optimize-autoloader --no-dev
 
-EXPOSE 80
+# Perintah untuk menjalankan Apache agar kontainer tetap menyala
+CMD ["apache2-foreground"]
