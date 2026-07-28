@@ -1,20 +1,22 @@
 FROM php:8.2-apache
 
-# Install dependencies yang sering dibutuhkan Laravel
+# Install dependencies yang dibutuhkan
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libicu-dev \
+    libzip-dev \
     zip \
     unzip
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Install PHP extensions termasuk intl dan zip
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd intl zip
 
 # Install Composer terbaru & izinkan superuser
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
