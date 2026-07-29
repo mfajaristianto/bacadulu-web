@@ -5,7 +5,8 @@
                 <span class="text-orange-600 text-xs font-bold tracking-widest uppercase">Academic Bookstore</span>
                 <h2 class="text-3xl font-extrabold text-slate-900 mt-2">Terbitan Terbaru Kami</h2>
             </div>
-            <a href="#" class="text-orange-600 hover:text-orange-700 font-bold text-sm flex items-center gap-1 transition-all duration-200 mt-4 md:mt-0">
+            <!-- Tombol diarahkan ke /portofolio/bookstore -->
+            <a href="/portofolio/bookstore" class="text-orange-600 hover:text-orange-700 font-bold text-sm flex items-center gap-1 transition-all duration-200 mt-4 md:mt-0">
                 <span>Lihat Seluruh Koleksi</span>
                 <svg class="w-4 h-4 stroke-current stroke-2" fill="none" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
             </a>

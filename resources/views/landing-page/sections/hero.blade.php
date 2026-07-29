@@ -30,18 +30,6 @@
                 <span class="text-sm">Hubungi via WhatsApp</span>
             </a>
         </div>
-
-        <!-- SISI KANAN -->
-        <div class="lg:col-span-5 flex justify-center lg:justify-end animate-fade-in-up delay-300">
-            <div class="relative w-full max-w-md bg-white border border-slate-100 p-6 rounded-3xl shadow-xl shadow-slate-900/20 overflow-hidden group">
-                <h3 class="text-lg font-bold text-slate-950 mb-1">Lacak Status Naskah</h3>
-                <p class="text-xs text-slate-500 mb-6">Masukkan ID Naskah Anda.</p>
-                <div class="flex gap-2 mb-6">
-                    <input type="text" placeholder="Contoh: BD-2026-042" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs outline-none">
-                    <button class="bg-orange-500 text-white font-extrabold px-4 py-3 rounded-xl text-xs hover:bg-orange-600 transition-colors">Cari</button>
-                </div>
-            </div>
-        </div>
     </div>
 </section>
 

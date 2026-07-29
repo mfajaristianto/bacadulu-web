@@ -148,9 +148,10 @@
   .price small{font-weight:400;color:var(--ink-muted);font-size:11px;display:block;text-decoration:line-through;}
   .add-btn{
     width:36px;height:36px;border-radius:9px;border:none;background:var(--cream);
-    color:var(--orange);font-size:18px;cursor:pointer;font-weight:700;transition:background .15s;
+    color:var(--orange);font-size:18px;cursor:pointer;font-weight:700;transition:background .15s, transform .15s;
   }
   .add-btn:hover{background:var(--brand-gradient);color:var(--white);}
+  .add-btn.added{transform:scale(0.85);}
   .rating{font-size:12px;color:var(--gold);margin-bottom:8px;}
   .rating span{color:var(--ink-muted);}
 
@@ -183,6 +184,81 @@
   .cta-banner p{color:var(--ink-muted);font-size:14px;max-width:420px;}
   .cta-banner .cta-btn{background:var(--brand-gradient);color:var(--navy-deep);}
   .cta-banner .cta-btn:hover{filter:brightness(0.94);}
+
+  /* ---------- CART: floating button ---------- */
+  .cart-fab{
+    position:fixed;right:26px;bottom:26px;z-index:1200;
+    width:58px;height:58px;border-radius:50%;border:none;
+    background:var(--navy);color:var(--white);font-size:24px;cursor:pointer;
+    box-shadow:0 12px 28px rgba(36,27,82,0.35);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .15s;
+  }
+  .cart-fab:hover{transform:translateY(-2px);}
+  .cart-fab .cart-count{
+    position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;padding:0 5px;
+    background:var(--brand-gradient);color:var(--white);
+    font-size:11px;font-weight:700;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 2px var(--white);
+  }
+  .cart-count.hide{display:none;}
+  .cart-count.pop{animation:cartPop .3s ease;}
+  @keyframes cartPop{0%{transform:scale(1);}50%{transform:scale(1.35);}100%{transform:scale(1);}}
+
+  /* ---------- CART: overlay + drawer ---------- */
+  .cart-overlay{
+    position:fixed;inset:0;background:rgba(23,15,56,0.45);
+    opacity:0;pointer-events:none;transition:opacity .25s;z-index:1300;
+  }
+  .cart-overlay.show{opacity:1;pointer-events:auto;}
+
+  .cart-drawer{
+    position:fixed;top:0;right:0;height:100vh;width:400px;max-width:92vw;
+    background:var(--white);z-index:1400;
+    box-shadow:-18px 0 40px rgba(23,15,56,0.18);
+    transform:translateX(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);
+    display:flex;flex-direction:column;
+  }
+  .cart-drawer.open{transform:translateX(0);}
+  .cart-drawer-head{
+    padding:22px 24px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .cart-drawer-head h3{font-size:18px;font-weight:700;}
+  .cart-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-muted);line-height:1;}
+  .cart-items{flex:1;overflow-y:auto;padding:16px 24px;}
+  .cart-empty{color:var(--ink-muted);font-size:14px;text-align:center;padding:60px 0;}
+  .cart-item{
+    display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);
+  }
+  .cart-item .ci-info{flex:1;min-width:0;}
+  .cart-item .ci-title{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:2px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cart-item .ci-author{font-size:12px;color:var(--ink-muted);margin-bottom:8px;}
+  .cart-item .ci-row{display:flex;align-items:center;justify-content:space-between;}
+  .qty-ctrl{display:flex;align-items:center;gap:8px;}
+  .qty-ctrl button{
+    width:26px;height:26px;border-radius:6px;border:1px solid var(--border);
+    background:var(--cream);cursor:pointer;font-size:14px;font-weight:700;color:var(--navy);
+  }
+  .qty-ctrl span{font-size:13px;font-weight:600;min-width:16px;text-align:center;}
+  .ci-price{font-size:13.5px;font-weight:700;color:var(--navy);}
+  .ci-remove{background:none;border:none;color:var(--orange-dark);font-size:12px;cursor:pointer;text-decoration:underline;}
+
+  .cart-drawer-foot{padding:20px 24px 24px;border-top:1px solid var(--border);}
+  .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .cart-total-row span:first-child{font-size:14px;color:var(--ink-muted);}
+  .cart-total-row strong{font-size:19px;color:var(--navy);}
+  .checkout-wa-btn{
+    width:100%;padding:13px;border-radius:10px;border:none;cursor:pointer;
+    background:#25D366;color:var(--white);font-weight:700;font-size:14.5px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    font-family:'Poppins',sans-serif;transition:filter .15s;
+  }
+  .checkout-wa-btn:hover{filter:brightness(0.95);}
+  .checkout-wa-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .cart-note{font-size:11.5px;color:var(--ink-muted);text-align:center;margin-top:10px;line-height:1.5;}
 
   @media (max-width:960px){
     .grid{grid-template-columns:repeat(2,1fr);}
@@ -244,16 +320,43 @@
   <button class="cta-btn">Kirim Naskah</button>
 </div>
 
+<!-- ============ KERANJANG ============ -->
+<button class="cart-fab" id="cartFab" title="Buka keranjang">
+  🛒
+  <span class="cart-count hide" id="cartCount">0</span>
+</button>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-head">
+    <h3>Keranjang Anda</h3>
+    <button class="cart-close" id="cartClose">✕</button>
+  </div>
+  <div class="cart-items" id="cartItemsWrap"></div>
+  <div class="cart-drawer-foot">
+    <div class="cart-total-row">
+      <span>Total</span>
+      <strong id="cartTotalText">Rp 0</strong>
+    </div>
+    <button class="checkout-wa-btn" id="checkoutBtn" disabled>
+      💬 Checkout via WhatsApp
+    </button>
+    <p class="cart-note">Pesanan akan diteruskan ke tim kami lewat WhatsApp untuk konfirmasi stok, ongkir, dan pembayaran.</p>
+  </div>
+</div>
+
 <script>
+/* ---------- Data buku (priceNum ditambahkan untuk kebutuhan hitung total) ---------- */
 const books = [
-  {title:"Jejak yang Tertinggal", author:"Rani Ardhita", penerbit:"Rekacipta Media", price:"Rp 89.000", strike:"Rp 110.000", cat:"Fiksi", color:"#EF5843", badge:"best", rating:"4.9"},
-  {title:"Filosofi Secangkir Kopi", author:"Bagas Wirawan", penerbit:"Pena Semesta", price:"Rp 76.500", cat:"Non-Fiksi", color:"#241B52", badge:"baru", rating:"4.7"},
-  {title:"Menulis untuk Hidup", author:"Sari Kusuma", penerbit:"Aksara Baru", price:"Rp 65.000", cat:"Pengembangan Diri", color:"#F7AA35", badge:"ebook", rating:"4.8"},
-  {title:"Negeri di Ufuk Senja", author:"Dimas Prakoso", penerbit:"Rekacipta Media", price:"Rp 95.000", cat:"Fiksi", color:"#372A6E", rating:"4.6"},
-  {title:"Strategi Bisnis Kecil", author:"Yusuf Hakim", penerbit:"Cerdas Finansial", price:"Rp 82.000", cat:"Bisnis", color:"#C6432F", badge:"best", rating:"4.9"},
-  {title:"Petualangan Kancil Cerdik", author:"Nadia Putri", penerbit:"Pelangi Anak", price:"Rp 45.000", cat:"Anak & Remaja", color:"#EF5843", badge:"baru", rating:"5.0"},
-  {title:"Ruang Sunyi", author:"Alia Maheswari", penerbit:"Pena Semesta", price:"Rp 70.000", cat:"Fiksi", color:"#241B52", rating:"4.5"},
-  {title:"Investasi untuk Pemula", author:"Reza Firmansyah", penerbit:"Cerdas Finansial", price:"Rp 88.000", cat:"Bisnis", color:"#F7AA35", badge:"ebook", rating:"4.7"},
+  {title:"Jejak yang Tertinggal", author:"Rani Ardhita", penerbit:"Rekacipta Media", price:"Rp 89.000", priceNum:89000, strike:"Rp 110.000", cat:"Fiksi", color:"#EF5843", badge:"best", rating:"4.9"},
+  {title:"Filosofi Secangkir Kopi", author:"Bagas Wirawan", penerbit:"Pena Semesta", price:"Rp 76.500", priceNum:76500, cat:"Non-Fiksi", color:"#241B52", badge:"baru", rating:"4.7"},
+  {title:"Menulis untuk Hidup", author:"Sari Kusuma", penerbit:"Aksara Baru", price:"Rp 65.000", priceNum:65000, cat:"Pengembangan Diri", color:"#F7AA35", badge:"ebook", rating:"4.8"},
+  {title:"Negeri di Ufuk Senja", author:"Dimas Prakoso", penerbit:"Rekacipta Media", price:"Rp 95.000", priceNum:95000, cat:"Fiksi", color:"#372A6E", rating:"4.6"},
+  {title:"Strategi Bisnis Kecil", author:"Yusuf Hakim", penerbit:"Cerdas Finansial", price:"Rp 82.000", priceNum:82000, cat:"Bisnis", color:"#C6432F", badge:"best", rating:"4.9"},
+  {title:"Petualangan Kancil Cerdik", author:"Nadia Putri", penerbit:"Pelangi Anak", price:"Rp 45.000", priceNum:45000, cat:"Anak & Remaja", color:"#EF5843", badge:"baru", rating:"5.0"},
+  {title:"Ruang Sunyi", author:"Alia Maheswari", penerbit:"Pena Semesta", price:"Rp 70.000", priceNum:70000, cat:"Fiksi", color:"#241B52", rating:"4.5"},
+  {title:"Investasi untuk Pemula", author:"Reza Firmansyah", penerbit:"Cerdas Finansial", price:"Rp 88.000", priceNum:88000, cat:"Bisnis", color:"#F7AA35", badge:"ebook", rating:"4.7"},
 ];
 
 const categories = ["Semua","Fiksi","Non-Fiksi","Bisnis","Pengembangan Diri","Anak & Remaja"];
@@ -289,7 +392,7 @@ function bookCard(b){
       <div class="rating">★★★★★ <span>${b.rating}</span></div>
       <div class="row">
         <div class="price">${b.price}${strikeHtml}</div>
-        <button class="add-btn" title="Tambah ke keranjang">+</button>
+        <button class="add-btn" title="Tambah ke keranjang" data-title="${b.title}">+</button>
       </div>
     </div>
   </div>`;
@@ -312,6 +415,165 @@ document.querySelectorAll('.chip').forEach(chip=>{
     });
   });
 });
+
+/* ================= KERANJANG ================= */
+
+// GANTI nomor ini dengan nomor WhatsApp toko/admin Baca Dulu Bookstore
+const STORE_WA_NUMBER = "6281315717719";
+
+const CART_KEY = "bacadulu_cart";
+let cart = [];
+try {
+  cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+} catch (e) {
+  cart = [];
+}
+
+function formatRupiah(n){
+  return "Rp " + n.toLocaleString("id-ID");
+}
+
+function saveCart(){
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  updateCartBadge();
+  renderCartItems();
+}
+
+function addToCart(title){
+  const book = books.find(b => b.title === title);
+  if (!book) return;
+  const existing = cart.find(i => i.title === title);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ title: book.title, author: book.author, priceNum: book.priceNum, qty: 1 });
+  }
+  saveCart();
+  bumpCartCount();
+}
+
+function changeQty(title, delta){
+  const item = cart.find(i => i.title === title);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) {
+    cart = cart.filter(i => i.title !== title);
+  }
+  saveCart();
+}
+
+function removeFromCart(title){
+  cart = cart.filter(i => i.title !== title);
+  saveCart();
+}
+
+function cartTotal(){
+  return cart.reduce((sum, i) => sum + (i.priceNum * i.qty), 0);
+}
+
+function cartItemCount(){
+  return cart.reduce((sum, i) => sum + i.qty, 0);
+}
+
+function updateCartBadge(){
+  const countEl = document.getElementById('cartCount');
+  const count = cartItemCount();
+  countEl.textContent = count;
+  countEl.classList.toggle('hide', count === 0);
+  document.getElementById('checkoutBtn').disabled = count === 0;
+}
+
+function bumpCartCount(){
+  const countEl = document.getElementById('cartCount');
+  countEl.classList.remove('pop');
+  void countEl.offsetWidth;
+  countEl.classList.add('pop');
+}
+
+function renderCartItems(){
+  const wrap = document.getElementById('cartItemsWrap');
+  const totalText = document.getElementById('cartTotalText');
+
+  if (cart.length === 0) {
+    wrap.innerHTML = `<p class="cart-empty">Keranjang masih kosong.<br>Yuk pilih buku dari katalog di atas.</p>`;
+  } else {
+    wrap.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="ci-info">
+          <div class="ci-title">${item.title}</div>
+          <div class="ci-author">${item.author}</div>
+          <div class="ci-row">
+            <div class="qty-ctrl">
+              <button data-action="dec" data-title="${item.title}">−</button>
+              <span>${item.qty}</span>
+              <button data-action="inc" data-title="${item.title}">+</button>
+            </div>
+            <div class="ci-price">${formatRupiah(item.priceNum * item.qty)}</div>
+          </div>
+          <button class="ci-remove" data-action="remove" data-title="${item.title}">Hapus</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  totalText.textContent = formatRupiah(cartTotal());
+
+  // Delegasi event tombol qty/hapus (karena elemen ini dibuat ulang tiap render)
+  wrap.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const title = btn.dataset.title;
+      const action = btn.dataset.action;
+      if (action === 'inc') changeQty(title, 1);
+      if (action === 'dec') changeQty(title, -1);
+      if (action === 'remove') removeFromCart(title);
+    });
+  });
+}
+
+function openCart(){
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('cartOverlay').classList.add('show');
+}
+
+function closeCart(){
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('cartOverlay').classList.remove('show');
+}
+
+function checkoutViaWhatsApp(){
+  if (cart.length === 0) return;
+
+  const lines = cart.map((item, idx) =>
+    `${idx + 1}. ${item.title} (${item.qty}x) - ${formatRupiah(item.priceNum * item.qty)}`
+  ).join("\n");
+
+  const message =
+    `Halo, saya ingin pesan buku berikut dari Baca Dulu Bookstore:\n\n` +
+    `${lines}\n\n` +
+    `Total: ${formatRupiah(cartTotal())}\n\n` +
+    `Mohon info ongkir dan cara pembayarannya. Terima kasih.`;
+
+  const url = `https://wa.me/${STORE_WA_NUMBER}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+}
+
+// Tombol "+" tambah ke keranjang di tiap kartu buku
+document.querySelectorAll('.add-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    addToCart(btn.dataset.title);
+    btn.classList.add('added');
+    setTimeout(() => btn.classList.remove('added'), 150);
+  });
+});
+
+document.getElementById('cartFab').addEventListener('click', openCart);
+document.getElementById('cartClose').addEventListener('click', closeCart);
+document.getElementById('cartOverlay').addEventListener('click', closeCart);
+document.getElementById('checkoutBtn').addEventListener('click', checkoutViaWhatsApp);
+
+// Inisialisasi tampilan keranjang saat halaman dimuat (baca dari localStorage)
+updateCartBadge();
+renderCartItems();
 </script>
 
 </body>

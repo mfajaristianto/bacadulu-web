@@ -42,7 +42,7 @@
                         <h5 class="text-white font-semibold text-sm mb-2 flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-[#ffaa00]"></span> The Manhattan Square
                         </h5>
-                        <p class="text-xs text-gray-400 leading-relaxed">Jl. TB Simatupang, RT.3/RW.3, Cilandak Tim., Ps. Minggu, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12560</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">JI. TB Simatupang, Lt 12, RT.3/RW.3, Cilandak Tim., Ps. Minggu, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta.</p>
                     </div>
                 </div>
             </div>
