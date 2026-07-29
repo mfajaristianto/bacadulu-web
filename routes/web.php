@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -10,6 +9,7 @@ use App\Http\Controllers\DataArticleController;
 use App\Http\Controllers\ConferenceController;
 use App\Http\Controllers\HakiController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\TeamController;
 
 Route::get('/cek-resi', [ShipmentController::class, 'index'])->name('cek-resi');
 Route::post('/cek-resi', [ShipmentController::class, 'track'])->name('cek-resi.track');
@@ -77,11 +77,16 @@ Route::get('/cek-resi', function () {
 })->name('cek-resi');
 
 
+// 6. Detail Biografi Tim
+Route::get('/team/{slug}', [TeamController::class, 'show'])->name('team.show');
+
+
 // Action Ganti Bahasa
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['id', 'en', 'zh', 'ja', 'ko'])) {
         Session::put('locale', $locale);
         App::setLocale($locale);
     }
+
     return redirect()->back();
 });

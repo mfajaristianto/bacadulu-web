@@ -26,95 +26,38 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
             @php
-            $data = [
-                [
-                    'nama' => 'J. Ferdinand H. Pardede, S.Kom., M.M., Mc.E.Dev., MAPPI (Cert.)',
-                    'jabatan' => ['Founder Bacadulu', 'FDI Partners', 'Penilai Independen Pasar Modal (OJK)'],
-                    // 'pendidikan' => ['Magister Ekonomika Pembangunan UGM', 'Magister Manajemen (M.M.)', 'Sarjana Komputer (S.Kom.) – Manajemen Informatika'],
-                    'img' => 'img/pak Ferdinand.jpg',
-                    'scholar' => null,
-                ],
-                [
-                    'nama' => 'Lie Sia Widjaja, S.E., M.M., MAPPI',
-                    'jabatan' => ['Partner / Rekan di Kantor Jasa Penilai Publik (KJPP)', 'Penilai Publik Berizin (Kemenkeu RI)'],
-                    // 'pendidikan' => ['Magister Manajemen (M.M.), Konsentrasi Keuangan', 'Sarjana Ekonomi (S.E.), Jurusan Akuntansi'],
-                    'img' => 'img/lie sia.jpg',
-                    'scholar' => null,
-                ],
-                [
-                    'nama' => 'Erik Nugraha',
-                    'jabatan' => ['Associate Partner – BacaDulu (PT Bina Cendikia Academy)', 'Editor-in-Chief / Editor – BISMA: Business', 'Principal Contact / Editorial Team'],
-                    // 'pendidikan' => ['Sarjana (S1)', 'Magister (S2)', 'Kandidat Doktor Ilmu Ekonomi (S3)'],
-                    'img' => 'img/pak_erik_Nugraha.jpg',
-                    'scholar' => null,
-                ],
-                [
-                    'nama' => 'Dr. Audita Setiawan, S.E., M.M',
-                    'jabatan' => [
-                        'Kepala Biro SDM di (USB) YPKP Bandung',
-                        'Associate Partner (Firma / Konsultan)',
-                        'Dosen Tetap Fakultas Ekonomi & Bisnis USB YPKP',
-                    ],
-                    // 'pendidikan' => ['Sarjana Ekonomi (S.E.)', 'Magister Manajemen (M.M.)', 'Doktor (Dr.) Ilmu Ekonomi'],
-                    'img' => 'img/audita.jpg',
-                    'scholar' => null,
-                ],
-                [
-                    'nama' => 'Lucky Nugroho',
-                    'jabatan' => [
-                        'Kepala Biro SDM di (USB) YPKP Bandung',
-                        'Associate Partner (Firma / Konsultan)',
-                        'Dosen Tetap Fakultas Ekonomi & Bisnis USB YPKP',
-                    ],
-                    // 'pendidikan' => ['Sarjana Ekonomi (S.E.)', 'Magister Manajemen (M.M.)', 'Doktor (Dr.) Ilmu Ekonomi'],
-                    'img' => 'img/audita.jpg',
-                    'scholar' => null,
-                ],
-                [
-                    'nama' => 'Yananto Putra',
-                    'jabatan' => [
-                        'Kepala Biro SDM di (USB) YPKP Bandung',
-                        'Associate Partner (Firma / Konsultan)',
-                        'Dosen Tetap Fakultas Ekonomi & Bisnis USB YPKP',
-                    ],
-                    // 'pendidikan' => ['Sarjana Ekonomi (S.E.)', 'Magister Manajemen (M.M.)', 'Doktor (Dr.) Ilmu Ekonomi'],
-                    'img' => 'img/audita.jpg',
-                    'scholar' => null,
-                ],
-            ];
+            $data = config('team.members');
             @endphp
 
             @foreach($data as $item)
-            <div class="fade-in-card bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg shadow-orange-900/5 border border-white/60 overflow-hidden hover:shadow-2xl hover:shadow-orange-900/10 hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row group">
+            <div class="fade-in-card bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg shadow-orange-900/5 border border-white/60 overflow-hidden hover:shadow-2xl hover:shadow-orange-900/10 hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row md:h-[210px] group">
 
-                <div class="relative w-full md:w-2/5 aspect-square md:aspect-auto overflow-hidden">
+                <a href="{{ route('team.show', $item['slug']) }}" class="relative w-full md:w-2/5 aspect-square md:aspect-auto overflow-hidden block bg-orange-100">
                     <img src="{{ asset($item['img']) }}"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                          class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div style="display:none" class="absolute inset-0 items-center justify-center bg-orange-100 text-orange-500 text-4xl font-extrabold">
+                        {{ collect(explode(' ', $item['nama']))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('') }}
+                    </div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
                     @if($item['scholar'])
-                    <a href="{{ $item['scholar'] }}" target="_blank"
+                    <a href="{{ $item['scholar'] }}" target="_blank" onclick="event.stopPropagation()"
                        class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm text-slate-900 text-xs font-bold uppercase px-4 py-2 rounded-full hover:bg-white transition">
                         Google Scholar
                     </a>
                     @endif
-                </div>
+                </a>
 
-                <div class="flex-1 p-6 flex flex-col justify-center">
-                    <h3 class="text-xl font-bold text-slate-900 mb-1">{{ $item['nama'] }}</h3>
-
-                    @if(!empty($item['jabatan']))
-                    <div class="flex flex-wrap gap-2 mb-3">
-                        @foreach($item['jabatan'] as $jab)
-                        <span class="text-orange-700 text-xs font-semibold uppercase bg-orange-50/80 border border-orange-200 px-2.5 py-1 rounded-full">
-                            {{ $jab }}
-                        </span>
-                        @endforeach
-                    </div>
-                    @endif
+                <div class="flex-1 p-6 flex flex-col justify-center overflow-hidden">
+                    <a href="{{ route('team.show', $item['slug']) }}">
+                        <h3 class="text-xl font-bold text-slate-900 mb-1 hover:text-orange-600 transition-colors line-clamp-3">
+                            {{ $item['nama'] }}
+                        </h3>
+                    </a>
 
                     @if(!empty($item['pendidikan']))
-                    <p class="text-slate-600 text-sm">
+                    <p class="text-slate-600 text-sm line-clamp-2">
                         <span class="font-semibold text-slate-800">Pendidikan Terakhir:</span> {{ implode(', ', $item['pendidikan']) }}
                     </p>
                     @endif
