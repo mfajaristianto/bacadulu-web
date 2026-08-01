@@ -35,7 +35,7 @@ return [
             'nama' => 'Erik Nugraha',
             'jabatan' => ['Associate Partner – BacaDulu (PT Bina Cendikia Academy)', 'Editor-in-Chief / Editor – BISMA: Business', 'Principal Contact / Editorial Team'],
             'pendidikan' => [],
-            'img' => 'img/pak_erik_Nugraha.jpg',
+            'img' => 'img/pak_erik.jpg',
             'scholar' => null,
             'bio' => 'Tuliskan biografi singkat di sini.',
         ],
@@ -52,29 +52,15 @@ return [
             'scholar' => null,
             'bio' => 'Tuliskan biografi singkat di sini.',
         ],
+    
         [
-            'slug' => 'lucky-nugroho',
-            'nama' => 'Lucky Nugroho',
+            'slug' => 'yananto-m-putra',
+            'nama' => 'Yananto M. Putra',
             'jabatan' => [
-                'Kepala Biro SDM di (USB) YPKP Bandung',
-                'Associate Partner (Firma / Konsultan)',
-                'Dosen Tetap Fakultas Ekonomi & Bisnis USB YPKP',
+                'belum diketahui'
             ],
             'pendidikan' => [],
-            'img' => 'img/',
-            'scholar' => null,
-            'bio' => 'Tuliskan biografi singkat di sini.',
-        ],
-        [
-            'slug' => 'yananto-putra',
-            'nama' => 'Yananto Putra',
-            'jabatan' => [
-                'Kepala Biro SDM di (USB) YPKP Bandung',
-                'Associate Partner (Firma / Konsultan)',
-                'Dosen Tetap Fakultas Ekonomi & Bisnis USB YPKP',
-            ],
-            'pendidikan' => [],
-            'img' => 'img/',
+            'img' => 'img/Pak_Yana.jpg',
             'scholar' => null,
             'bio' => 'Tuliskan biografi singkat di sini.',
         ],

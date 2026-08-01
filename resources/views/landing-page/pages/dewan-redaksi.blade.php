@@ -1,3 +1,4 @@
+<!-- TESTMARKER123 -->
 @extends('layouts.app')
 
 @section('content')
@@ -23,50 +24,93 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        @php
+$data = config('team.members');
+$pimpinan = array_slice($data, 0, 2);
+$anggota  = array_slice($data, 2);
+@endphp
 
-            @php
-            $data = config('team.members');
-            @endphp
-
-            @foreach($data as $item)
-            <div class="fade-in-card bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg shadow-orange-900/5 border border-white/60 overflow-hidden hover:shadow-2xl hover:shadow-orange-900/10 hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row md:h-[210px] group">
-
-                <a href="{{ route('team.show', $item['slug']) }}" class="relative w-full md:w-2/5 aspect-square md:aspect-auto overflow-hidden block bg-orange-100">
-                    <img src="{{ asset($item['img']) }}"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    <div style="display:none" class="absolute inset-0 items-center justify-center bg-orange-100 text-orange-500 text-4xl font-extrabold">
-                        {{ collect(explode(' ', $item['nama']))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('') }}
-                    </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-
-                    @if($item['scholar'])
-                    <a href="{{ $item['scholar'] }}" target="_blank" onclick="event.stopPropagation()"
-                       class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm text-slate-900 text-xs font-bold uppercase px-4 py-2 rounded-full hover:bg-white transition">
-                        Google Scholar
-                    </a>
-                    @endif
-                </a>
-
-                <div class="flex-1 p-6 flex flex-col justify-center overflow-hidden">
-                    <a href="{{ route('team.show', $item['slug']) }}">
-                        <h3 class="text-xl font-bold text-slate-900 mb-1 hover:text-orange-600 transition-colors line-clamp-3">
-                            {{ $item['nama'] }}
-                        </h3>
-                    </a>
-
-                    @if(!empty($item['pendidikan']))
-                    <p class="text-slate-600 text-sm line-clamp-2">
-                        <span class="font-semibold text-slate-800">Pendidikan Terakhir:</span> {{ implode(', ', $item['pendidikan']) }}
-                    </p>
-                    @endif
-                </div>
-
+{{-- BARIS ATAS: Pimpinan --}}
+<div class="grid grid-cols-2 gap-5 max-w-lg mx-auto mb-6">
+    @foreach($pimpinan as $item)
+    <div class="fade-in-card group">
+        <a href="{{ route('team.show', $item['slug']) }}"
+           class="relative block w-full aspect-square overflow-hidden rounded-xl bg-orange-100 ring-1 ring-orange-100 group-hover:ring-2 group-hover:ring-orange-400 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-orange-900/15">
+            <img src="{{ asset($item['img']) }}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+            <div style="display:none" class="absolute inset-0 items-center justify-center bg-orange-100 text-orange-500 text-3xl font-extrabold">
+                {{ collect(explode(' ', $item['nama']))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('') }}
             </div>
-            @endforeach
 
+            {{-- Overlay interaktif saat hover --}}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3">
+                <span class="text-white text-xs font-bold uppercase tracking-wide flex items-center gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    Lihat Profil
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </span>
+            </div>
+        </a>
+
+        <div class="pt-3 text-center">
+            @if(!empty($item['jabatan']))
+            <p class="text-slate-500 text-xs mb-0.5">
+                {{ is_array($item['jabatan']) ? implode(', ', $item['jabatan']) : $item['jabatan'] }}
+            </p>
+            @endif
+            <a href="{{ route('team.show', $item['slug']) }}">
+                <h3 class="text-sm font-bold text-slate-900 group-hover:text-orange-600 transition-colors">
+                    {{ $item['nama'] }}
+                </h3>
+            </a>
+            @if($item['scholar'])
+            <a href="{{ $item['scholar'] }}" target="_blank"
+               class="inline-block mt-1 text-orange-500 text-[10px] font-bold uppercase hover:text-orange-700 transition">
+                Google Scholar
+            </a>
+            @endif
         </div>
+    </div>
+    @endforeach
+</div>
+
+{{-- BARIS BAWAH: Anggota tim --}}
+<div class="grid grid-cols-3 gap-5 max-w-2xl mx-auto">
+    @foreach($anggota as $item)
+    <div class="fade-in-card group">
+        <a href="{{ route('team.show', $item['slug']) }}"
+           class="relative block w-full aspect-square overflow-hidden rounded-xl bg-orange-100 ring-1 ring-orange-100 group-hover:ring-2 group-hover:ring-orange-400 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-orange-900/15">
+            <img src="{{ asset($item['img']) }}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+            <div style="display:none" class="absolute inset-0 items-center justify-center bg-orange-100 text-orange-500 text-2xl font-extrabold">
+                {{ collect(explode(' ', $item['nama']))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode('') }}
+            </div>
+
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-2">
+                <span class="text-white text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    Lihat Profil
+                </span>
+            </div>
+        </a>
+
+        <div class="pt-2 text-center">
+            @if(!empty($item['jabatan']))
+            <p class="text-slate-500 text-[11px] mb-0.5 line-clamp-1">
+                {{ is_array($item['jabatan']) ? implode(', ', $item['jabatan']) : $item['jabatan'] }}
+            </p>
+            @endif
+            <a href="{{ route('team.show', $item['slug']) }}">
+                <h3 class="text-xs font-bold text-slate-900 group-hover:text-orange-600 transition-colors leading-tight">
+                    {{ $item['nama'] }}
+                </h3>
+            </a>
+        </div>
+    </div>
+    @endforeach
+</div>
     </div>
 </section>
 
