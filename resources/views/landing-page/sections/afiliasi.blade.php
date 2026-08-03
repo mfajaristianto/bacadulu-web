@@ -17,6 +17,7 @@
         ['src' => 'BRIN.svg',               'alt' => 'Badan Riset dan Inovasi Nasional'],
         ['src' => 'Fermartian.jpg',         'alt' => 'FERMARTIAN INVESTAMA KORPORA'],
         ['src' => 'Fdi.jpg',                'alt' => 'FDI PARTNERS'],
+        ['src' => 'SMKN 2.jpg',             'alt' => 'SMKN 2 JAKARTA'],
         ['src' => 'IKAPI.jpg',              'alt' => 'Ikatan Penerbit Indonesia'],
         ['src' => 'LLDIKTI.jpg',            'alt' => 'Lembaga Layanan Pendidikan Tinggi Wilayah III'],
         ['src' => 'Kemnaker.jpg',           'alt' => 'Kementerian Ketenagakerjaan Republik Indonesia'],

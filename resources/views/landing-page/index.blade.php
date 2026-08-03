@@ -11,6 +11,8 @@
     @include('landing-page.sections.katalog')
 
     @include('landing-page.sections.kalkulator')
+
+    @include('landing-page.sections.CTA home')
   
     @include('landing-page.sections.afiliasi')
 
