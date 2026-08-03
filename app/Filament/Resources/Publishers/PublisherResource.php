@@ -17,12 +17,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
 
 class PublisherResource extends Resource
 {
@@ -47,30 +46,10 @@ class PublisherResource extends Resource
                 FileUpload::make('logo_or_cover')
                     ->label('Logo / Cover Publisher')
                     ->image()
+                    ->disk('public')
                     ->directory('publisher-images')
-                    ->maxSize(10240)
-                    ->saveUploadedFileUsing(function ($file) {
-                        $filename = 'publisher_' . time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.webp';
-                        $filePath = $file->getRealPath();
-                        $info = getimagesize($filePath);
-                        $mime = $info['mime'];
-
-                        if ($mime == 'image/jpeg') {
-                            $image = imagecreatefromjpeg($filePath);
-                        } elseif ($mime == 'image/png') {
-                            $image = imagecreatefrompng($filePath);
-                        } elseif ($mime == 'image/webp') {
-                            $image = imagecreatefromwebp($filePath);
-                        } else {
-                            return $file->storePubliclyAs('publisher-images', $filename, 'public');
-                        }
-
-                        $destination = storage_path('app/public/publisher-images/' . $filename);
-                        imagewebp($image, $destination, 75);
-                        imagedestroy($image);
-
-                        return 'publisher-images/' . $filename;
-                    }),
+                    ->visibility('public')
+                    ->maxSize(10240),
             ])
             ->columns(1);
     }

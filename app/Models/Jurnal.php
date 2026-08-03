@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Jurnal extends Model
 {
-    protected $fillable = ['judul', 'deskripsi', 'file_pdf'];
+    protected $fillable = [
+        'judul',
+        'deskripsi',
+        'file_pdf',
+        'gambar',
+    ];
 }

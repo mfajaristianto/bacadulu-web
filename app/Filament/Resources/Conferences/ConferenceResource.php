@@ -59,6 +59,12 @@ class ConferenceResource extends Resource
                         $info = getimagesize($filePath);
                         $mime = $info['mime'];
 
+                        // Pastikan folder tujuan sudah ada, kalau belum, buat otomatis
+                        $destinationPath = storage_path('app/public/conference-posters');
+                        if (!file_exists($destinationPath)) {
+                            mkdir($destinationPath, 0755, true);
+                        }
+
                         if ($mime == 'image/jpeg') {
                             $image = imagecreatefromjpeg($filePath);
                         } elseif ($mime == 'image/png') {
@@ -69,7 +75,7 @@ class ConferenceResource extends Resource
                             return $file->storePubliclyAs('conference-posters', $filename, 'public');
                         }
 
-                        $destination = storage_path('app/public/conference-posters/' . $filename);
+                        $destination = $destinationPath . '/' . $filename;
                         imagewebp($image, $destination, 75);
                         imagedestroy($image);
 

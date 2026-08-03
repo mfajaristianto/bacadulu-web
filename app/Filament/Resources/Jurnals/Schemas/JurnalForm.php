@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Jurnals\Schemas;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
@@ -12,13 +13,21 @@ class JurnalForm
     {
         return $schema
             ->components([
-                TextInput::make('judul')
-                    ->required(),
-                Textarea::make('deskripsi')
-                    ->default(null)
-                    ->columnSpanFull(),
-                TextInput::make('file_pdf')
-                    ->default(null),
+    TextInput::make('judul')
+        ->required(),
+
+    Textarea::make('deskripsi')
+        ->columnSpanFull(),
+
+    FileUpload::make('gambar')
+        ->image()
+        ->directory('jurnals')
+        ->disk('public'),
+
+    FileUpload::make('file_pdf')
+        ->acceptedFileTypes(['application/pdf'])
+        ->directory('jurnals/pdf')
+        ->disk('public'),
             ]);
     }
 }
