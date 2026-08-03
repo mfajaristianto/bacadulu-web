@@ -27,6 +27,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandLogo(asset('img/bacadulu-logo.jpg'))
+            ->brandLogoHeight('7rem')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
