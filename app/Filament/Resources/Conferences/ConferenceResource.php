@@ -23,7 +23,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
 
 class ConferenceResource extends Resource
 {
@@ -51,36 +50,11 @@ class ConferenceResource extends Resource
                 FileUpload::make('poster')
                     ->label('Poster Conference')
                     ->image()
+                    ->disk('public')
                     ->directory('conference-posters')
+                    ->visibility('public') // <--- Tambahan agar akses filenya diizinkan oleh Cloudinary
                     ->maxSize(10240)
-                    ->saveUploadedFileUsing(function ($file) {
-                        $filename = 'conference_' . time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.webp';
-                        $filePath = $file->getRealPath();
-                        $info = getimagesize($filePath);
-                        $mime = $info['mime'];
-
-                        // Pastikan folder tujuan sudah ada, kalau belum, buat otomatis
-                        $destinationPath = storage_path('app/public/conference-posters');
-                        if (!file_exists($destinationPath)) {
-                            mkdir($destinationPath, 0755, true);
-                        }
-
-                        if ($mime == 'image/jpeg') {
-                            $image = imagecreatefromjpeg($filePath);
-                        } elseif ($mime == 'image/png') {
-                            $image = imagecreatefrompng($filePath);
-                        } elseif ($mime == 'image/webp') {
-                            $image = imagecreatefromwebp($filePath);
-                        } else {
-                            return $file->storePubliclyAs('conference-posters', $filename, 'public');
-                        }
-
-                        $destination = $destinationPath . '/' . $filename;
-                        imagewebp($image, $destination, 75);
-                        imagedestroy($image);
-
-                        return 'conference-posters/' . $filename;
-                    }),
+                    ->required(),
             ])
             ->columns(1);
     }

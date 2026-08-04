@@ -4,6 +4,29 @@ return [
 
     'members' => [
         [
+            'slug' => 'lucky-nugroho',
+            'nama' => 'Dr. Lucky Nugroho, S.E., M.M., M.Ak., M.Sc.',
+            'jabatan' => [
+                'Sekretaris Program Studi Magister Akuntansi UMB',
+                'Lektor Kepala (Associate Professor)',
+                'Co-Founder BMT Ahsana Berkah Sentosa',
+            ],
+            'pendidikan' => [
+                // 'Advanced Master in Microfinance – Université Libre de Bruxelles, Belgia',
+                // 'Doktor (Dr.) Islamic Economics and Finance – Universitas Trisakti',
+                // 'Magister Akuntansi (M.Ak.)',
+                // 'Magister Manajemen (M.M.)',
+                // 'Sarjana Ekonomi (S.E.)',
+            ],
+            'img' => 'img/pak lucky.jpg',
+            'scholar' => null,
+            'bio' => 'Dr. Lucky Nugroho, S.E., M.M., M.Ak., M.Sc. adalah seorang akademisi, peneliti, dan praktisi senior yang memiliki keahlian mendalam di bidang Akuntansi Syariah, Perbankan Syariah, Microfinance, dan Keuangan Berkelanjutan (Sustainability Finance).
+            Saat ini, beliau mengemban amanah akademis sebagai Sekretaris Program Studi Magister Akuntansi sekaligus Dosen Tetap dengan jabatan fungsional Lektor Kepala (Associate Professor) di Universitas Mercu Buana, Jakarta. Dedikasinya di dunia pendidikan juga terwujud melalui perannya sebagai dosen tamu di berbagai universitas terkemuka seperti Universitas Padjadjaran dan Universitas Trisakti.
+            Di ranah praktisi dan profesional, Dr. Lucky memiliki rekam jejak panjang selama lebih dari dua dekade di industri perbankan nasional. Beliau pernah menduduki posisi strategis, di antaranya sebagai Portfolio Senior Manager bidang Asset and Liabilities Management (ALM) di PT Bank Syariah Indonesia Tbk (BSI), Corporate Planning Counterpart di PT Bank Syariah Mandiri, serta Analyst Officer di PT Bank Rakyat Indonesia (Persero) Tbk.
+            Selain aktif di industri keuangan formal, beliau memiliki jiwa kewirausahaan sosial yang kuat. Hal ini dibuktikan melalui perannya sebagai Co-Founder Lembaga Keuangan Mikro Syariah (BMT) Ahsana Berkah Sentosa, serta Founder bacadulu.net, sebuah platform edukasi yang mengelola jurnal-jurnal ilmiah seperti Journal of Sharia Economics and Business Innovation (SEBI).
+            Dr. Lucky menempuh pendidikan tinggi lintas disiplin di dalam dan luar negeri, termasuk meraih gelar Advanced Master in Microfinance dari Université Libre de Bruxelles, Belgia, serta gelar Doktor di bidang Islamic Economics and Finance dari Universitas Trisakti. Sebagai peneliti, ia telah mempublikasikan puluhan buku ilmiah dan artikel riset yang terindeks secara internasional.',
+        ],
+        [
             'slug' => 'ferdinand-pardede',
             'nama' => 'J. Ferdinand H. Pardede, S.Kom., M.M., Mc.E.Dev., MAPPI (Cert.)',
             'jabatan' => ['FDI Partners', 'Penilai Independen Pasar Modal (OJK)'],
@@ -43,7 +66,7 @@ return [
              platform BacaDulu di bawah naungan PT Bina Cendikia Academy. Dalam perannya, ia bertanggung jawab strategis dalam pengembangan platform serta memimpin 
              divisi publikasi ilmiah sebagai editor utama untuk berbagai jurnal akademik, termasuk Business, Management & Accounting (BISMA) Journal dan Pelita: Jurnal Penelitian, 
              Terapan dan Aplikatif.Di ranah akademis, Erik aktif sebagai staf pengajar dan peneliti yang terafiliasi dengan Universitas Sangga Buana, Bandung. Fokus riset dan keahlian utamanya
-              meliputi bidang manajemen strategis, akuntansi, serta pemanfaatan teknologi finansial (financial technology). Melalui dedikasinya di dunia literasi dan pendidikan, ia terus berkontribusi dalam menjembatani riset ilmiah berkualitas agar dapat diakses secara luas oleh masyarakat dan komunitas akademik di Indonesia..',
+             meliputi bidang manajemen strategis, akuntansi, serta pemanfaatan teknologi finansial (financial technology). Melalui dedikasinya di dunia literasi dan pendidikan, ia terus berkontribusi dalam menjembatani riset ilmiah berkualitas agar dapat diakses secara luas oleh masyarakat dan komunitas akademik di Indonesia..',
         ],
         [
             'slug' => 'audita-setiawan',
@@ -59,7 +82,7 @@ return [
             'bio' => 'Dr. Audita Setiawan, S.E., M.M. adalah seorang akademisi, praktisi manajemen, dan pakar pengelolaan sumber daya manusia yang saat ini mengemban amanah sebagai Kepala Biro SDM di Universitas Sangga Buana (USB) YPKP. Selain memimpin tata kelola kepegawaian institusi, beliau juga aktif menjalankan Tri Dharma Perguruan Tinggi sebagai Dosen Tetap di Fakultas Ekonomi, khususnya pada Program Studi Manajemen.
              Sebelum mendedikasikan kariernya secara penuh di dunia pendidikan tinggi sejak tahun 2015, Dr. Audita memiliki latar belakang profesional yang kuat di industri perbankan nasional.
              Beliau mengawali karier sebagai bankir di PT Bank Himpunan Saudara 1906 Tbk (sekarang Bank Woori Saudara), dengan spesialisasi keahlian di bidang Manajemen Risiko (Risk Management), Satuan Kerja Anti-Fraud, serta Internal Audit.Dalam hal rekam jejak akademis, beliau menyelesaikan pendidikan Sarjana Ekonomi (S.E.), meraih gelar Magister Manajemen (M.M.) dari Universitas Padjadjaran, dan berhasil meraih gelar Doktor Ilmu Ekonomi dengan konsentrasi Ilmu Sumber Daya Manusia dari Universitas Trisakti. Sebagai peneliti,
-              fokus risetnya mencakup ranah manajemen strategis, akuntansi, ekonomi perilaku, serta pengembangan kompetensi SDM. Melalui sinergi pengalaman praktis di industri perbankan dan keahlian akademisnya, beliau aktif berkontribusi dalam melahirkan inovasi tata kelola serta peningkatan mutu pelayanan di lingkungan sivitas akademika..',
+             fokus risetnya mencakup ranah manajemen strategis, akuntansi, ekonomi perilaku, serta pengembangan kompetensi SDM. Melalui sinergi pengalaman praktis di industri perbankan dan keahlian akademisnya, beliau aktif berkontribusi dalam melahirkan inovasi tata kelola serta peningkatan mutu pelayanan di lingkungan sivitas akademika..',
         ],
     
         [
