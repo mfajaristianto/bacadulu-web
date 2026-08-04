@@ -26,12 +26,12 @@
 
         @php
 $data = config('team.members');
-$pimpinan = array_slice($data, 0, 2);
-$anggota  = array_slice($data, 2);
+$pimpinan = array_slice($data, 0, 3);
+$anggota  = array_slice($data, 3);
 @endphp
 
 {{-- BARIS ATAS: Pimpinan --}}
-<div class="grid grid-cols-2 gap-5 max-w-lg mx-auto mb-6">
+<div class="grid grid-cols-3 gap-5 max-w-4xl mx-auto mb-6">
     @foreach($pimpinan as $item)
     <div class="fade-in-card group">
         <a href="{{ route('team.show', $item['slug']) }}"
@@ -77,7 +77,7 @@ $anggota  = array_slice($data, 2);
 </div>
 
 {{-- BARIS BAWAH: Anggota tim --}}
-<div class="grid grid-cols-3 gap-5 max-w-2xl mx-auto">
+<div class="grid grid-cols-3 gap-5 max-w-3xl mx-auto">
     @foreach($anggota as $item)
     <div class="fade-in-card group">
         <a href="{{ route('team.show', $item['slug']) }}"
