@@ -3,9 +3,9 @@
     
     <!-- Gambar Background Slideshow -->
     <div class="absolute inset-0 z-0">
-        <img id="img1" src="{{ asset('img/home.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-100">
-        <img id="img2" src="{{ asset('img/transisi-1.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0">
-        <img id="img3" src="{{ asset('img/transisi-2.jpg') }}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0">
+        <img id="img1" src="{{ asset('img/home.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 opacity-100">
+        <img id="img2" src="{{ asset('img/transisi-1.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 opacity-0">
+        <img id="img3" src="{{ asset('img/transisi-2.jpg') }}" class="hero-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 opacity-0">
         
         <!-- Overlay -->
         <div class="absolute inset-0 bg-black/60 z-[1]"></div>
@@ -33,24 +33,76 @@
     </div>
 </section>
 
-<!-- SCRIPT SLIDESHOW -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function () {
         const images = [
             document.getElementById('img1'),
             document.getElementById('img2'),
             document.getElementById('img3')
-        ];
-        
-        let currentIndex = 0;
+        ].filter(Boolean);
 
-        setInterval(() => {
-            // Matikan semua
-            images.forEach(img => img.style.opacity = '0');
-            
-            // Nyalakan yang berikutnya
-            currentIndex = (currentIndex + 1) % images.length;
-            images[currentIndex].style.opacity = '1';
-        }, 4000);
-    });
+        if (images.length < 2) {
+            return;
+        }
+
+        let currentIndex = 0;
+        let intervalId = null;
+
+        const showSlide = (index) => {
+            images.forEach((img, idx) => {
+                img.classList.remove('opacity-100');
+                img.classList.add('opacity-0');
+                img.style.zIndex = idx === index ? '2' : '1';
+                img.style.filter = 'brightness(0.6)';
+            });
+            images[index].classList.remove('opacity-0');
+            images[index].classList.add('opacity-100');
+            images[index].style.opacity = '1';
+            images[index].style.filter = 'brightness(0.6)';
+        };
+
+        const startSlideshow = () => {
+            if (intervalId !== null) {
+                return;
+            }
+            showSlide(currentIndex);
+            intervalId = setInterval(() => {
+                currentIndex = (currentIndex + 1) % images.length;
+                showSlide(currentIndex);
+            }, 7000);
+        };
+
+        const stopSlideshow = () => {
+            if (intervalId !== null) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        };
+
+        const init = () => {
+            images.forEach((img) => {
+                img.style.transition = 'opacity 1.8s ease-in-out, filter 1.8s ease-in-out';
+                img.style.zIndex = '1';
+                img.style.filter = 'brightness(0.6)';
+                img.classList.add('opacity-0');
+                img.classList.remove('opacity-100');
+            });
+            showSlide(currentIndex);
+            startSlideshow();
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                startSlideshow();
+            } else {
+                stopSlideshow();
+            }
+        });
+    })();
 </script>
