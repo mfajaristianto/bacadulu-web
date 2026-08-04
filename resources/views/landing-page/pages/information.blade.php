@@ -51,7 +51,7 @@
             <div class="col-12 text-center py-5">
                 <div class="p-5 bg-white rounded-4 shadow-sm border border-light">
                     <h4 class="text-muted fw-semibold">Belum Ada Informasi</h4>
-                    <p class="text-muted small mt-1">Silakan tambahkan data informasi melalui panel admin Filament.</p>
+                    <p class="text-muted small mt-1">Silakan tambahkan data informasi melalui panel admin CMS.</p>
                 </div>
             </div>
         @endforelse

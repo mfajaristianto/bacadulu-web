@@ -10,6 +10,9 @@ use App\Http\Controllers\ConferenceController;
 use App\Http\Controllers\HakiController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\InformationAdminController;
 
 Route::get('/cek-resi', [ShipmentController::class, 'index'])->name('cek-resi');
 Route::post('/cek-resi', [ShipmentController::class, 'track'])->name('cek-resi.track');
@@ -80,6 +83,7 @@ Route::get('/cek-resi', function () {
 // 6. Detail Biografi Tim
 Route::get('/team/{slug}', [TeamController::class, 'show'])->name('team.show');
 
+Route::get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
 
 // Action Ganti Bahasa
 Route::get('lang/{locale}', function ($locale) {
@@ -89,4 +93,20 @@ Route::get('lang/{locale}', function ($locale) {
     }
 
     return redirect()->back();
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::middleware(['auth', 'admin'])->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::resource('informations', InformationAdminController::class);
+        Route::resource('journals', \App\Http\Controllers\Admin\JurnalAdminController::class);
+        Route::resource('conferences', \App\Http\Controllers\Admin\ConferenceAdminController::class);
+        Route::resource('publishers', \App\Http\Controllers\Admin\PublisherAdminController::class);
+        Route::resource('data-articles', \App\Http\Controllers\Admin\DataArticleAdminController::class);
+        Route::get('/detail/{type}/{id}', [\App\Http\Controllers\Admin\DetailController::class, 'show'])->name('detail.show');
+    });
 });
