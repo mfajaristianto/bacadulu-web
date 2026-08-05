@@ -32,7 +32,13 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run build
 
-# Bersihkan cache config lama biar ambil env production yang baru
-RUN php artisan config:clear
+# Bersihkan SEMUA cache lama (config, route, view) biar tidak ada file cache
+# basi yang ikut ter-bundle dari repo/build sebelumnya. Route cache lama bisa
+# menyebabkan Laravel salah baca method HTTP suatu route (mis. 405 Method
+# Not Allowed) walau kode route di repo sudah benar.
+RUN php artisan config:clear \
+    && php artisan route:clear \
+    && php artisan view:clear \
+    && php artisan cache:clear
 
-CMD ["sh", "-c", "php artisan config:cache && php artisan serve --host=0.0.0.0 --port=$PORT"]
+CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan serve --host=0.0.0.0 --port=$PORT"]
