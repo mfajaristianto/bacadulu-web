@@ -110,3 +110,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/detail/{type}/{id}', [\App\Http\Controllers\Admin\DetailController::class, 'show'])->name('detail.show');
     });
 });
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
