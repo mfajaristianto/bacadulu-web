@@ -32,7 +32,9 @@
   h1,h2,h3,.brand,.nav a,.btn{font-family:'Poppins',sans-serif;}
   a{text-decoration:none;color:inherit;}
   img{display:block;max-width:100%;}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 32px;}
+  
+  /* Diubah menjadi 100% agar melebar penuh ke kanan dan kiri */
+  .wrap{width:100%;max-width:100%;margin:0;padding:0 40px;}
 
   .cta-btn{
     background:var(--brand-gradient);color:var(--white);font-weight:600;font-size:14px;
@@ -45,9 +47,10 @@
   .hero{
     background:var(--white);
     background-image:radial-gradient(circle at 88% 8%, rgba(239,88,67,0.30), transparent 52%),
-                      radial-gradient(circle at 100% 55%, rgba(247,170,53,0.35), transparent 48%),
-                      radial-gradient(circle at 6% 100%, rgba(247,170,53,0.20), transparent 42%);
+                    radial-gradient(circle at 100% 55%, rgba(247,170,53,0.35), transparent 48%),
+                    radial-gradient(circle at 6% 100%, rgba(247,170,53,0.20), transparent 42%);
     color:var(--navy);padding:76px 0 56px;position:relative;overflow:hidden;
+    width:100%;
   }
   .hero::before{
     content:"";position:absolute;top:0;left:0;right:0;height:4px;
@@ -60,11 +63,11 @@
     margin-bottom:20px;letter-spacing:.3px;
   }
   .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--brand-gradient);display:inline-block;}
-  .hero h1{font-size:42px;font-weight:700;line-height:1.15;margin-bottom:14px;max-width:640px;color:var(--navy);}
-  .hero p{font-size:16px;color:var(--ink-muted);max-width:560px;margin-bottom:32px;line-height:1.6;}
+  .hero h1{font-size:42px;font-weight:700;line-height:1.15;margin-bottom:14px;max-width:700px;color:var(--navy);}
+  .hero p{font-size:16px;color:var(--ink-muted);max-width:650px;margin-bottom:32px;line-height:1.6;}
   .search-bar{
     display:flex;gap:10px;background:var(--white);padding:8px;border-radius:12px;
-    max-width:600px;border:1px solid var(--border);box-shadow:0 12px 30px rgba(36,27,82,0.10);
+    max-width:650px;border:1px solid var(--border);box-shadow:0 12px 30px rgba(36,27,82,0.10);
   }
   .search-bar input{
     flex:1;border:none;outline:none;font-size:15px;padding:10px 14px;color:var(--navy);font-family:'Inter',sans-serif;
@@ -78,19 +81,21 @@
   .hero-stats strong{display:block;font-size:22px;font-weight:700;color:var(--navy);}
   .hero-stats span{font-size:13px;color:var(--ink-muted);}
 
-  /* ---------- SHELF (featured, horizontal scroll) ---------- */
-  section{padding:56px 0;}
+  /* ---------- SHELF ---------- */
+  section{padding:56px 0;width:100%;}
   .section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px;}
   .section-head h2{font-size:26px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:10px;}
   .section-head h2 .tag{width:10px;height:10px;border-radius:3px;background:var(--brand-gradient);display:inline-block;}
   .section-head p{color:var(--ink-muted);font-size:14px;margin-top:4px;margin-left:20px;}
   .see-all{font-size:14px;font-weight:600;color:var(--orange);}
+  
   .shelf{
     display:flex;gap:20px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x mandatory;
+    width:100%;
   }
   .shelf::-webkit-scrollbar{height:6px;}
   .shelf::-webkit-scrollbar-thumb{background:var(--brand-gradient);border-radius:10px;}
-  .shelf .book-card{min-width:190px;scroll-snap-align:start;}
+  .shelf .book-card{min-width:210px;flex:1;scroll-snap-align:start;}
 
   /* ---------- BOOK CARD ---------- */
   .book-card{
@@ -155,8 +160,8 @@
   .rating{font-size:12px;color:var(--gold);margin-bottom:8px;}
   .rating span{color:var(--ink-muted);}
 
-  /* ---------- CATALOG (filters + grid) ---------- */
-  .catalog-bg{background:var(--cream);}
+  /* ---------- CATALOG GRID (Diubah agar menyesuaikan layar penuh) ---------- */
+  .catalog-bg{background:var(--cream);width:100%;}
   .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px;}
   .chip{
     padding:9px 18px;border-radius:20px;font-size:13.5px;font-weight:500;
@@ -164,14 +169,21 @@
     transition:all .15s;
   }
   .chip.active{background:var(--navy);border-color:var(--navy);color:var(--white);}
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+  
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap:22px;
+    width:100%;
+  }
 
   /* ---------- CTA BANNER ---------- */
   .cta-banner{
-    margin:0 32px 64px;max-width:1136px;margin-left:auto;margin-right:auto;
+    width: calc(100% - 80px);
+    margin: 0 auto 64px auto;
     background:var(--white);
     background-image:linear-gradient(120deg, #FFF6EC 0%, #FFE9D2 45%, #FFEFD0 100%),
-                      radial-gradient(circle at 90% 10%, rgba(239,88,67,0.18), transparent 55%);
+                    radial-gradient(circle at 90% 10%, rgba(239,88,67,0.18), transparent 55%);
     border:1px solid var(--border);
     border-radius:20px;padding:48px 56px;display:flex;align-items:center;justify-content:space-between;
     color:var(--navy);gap:24px;position:relative;overflow:hidden;
@@ -181,7 +193,7 @@
     background:var(--brand-gradient);
   }
   .cta-banner h3{font-size:24px;font-weight:700;margin-bottom:8px;}
-  .cta-banner p{color:var(--ink-muted);font-size:14px;max-width:420px;}
+  .cta-banner p{color:var(--ink-muted);font-size:14px;max-width:500px;}
   .cta-banner .cta-btn{background:var(--brand-gradient);color:var(--navy-deep);}
   .cta-banner .cta-btn:hover{filter:brightness(0.94);}
 
@@ -261,9 +273,9 @@
   .cart-note{font-size:11.5px;color:var(--ink-muted);text-align:center;margin-top:10px;line-height:1.5;}
 
   @media (max-width:960px){
-    .grid{grid-template-columns:repeat(2,1fr);}
     .hero h1{font-size:32px;}
-    .cta-banner{flex-direction:column;text-align:center;padding:36px 28px;}
+    .cta-banner{flex-direction:column;text-align:center;padding:36px 28px;width: calc(100% - 40px);}
+    .wrap{padding:0 20px;}
   }
 </style>
 </head>
@@ -347,7 +359,6 @@
 </div>
 
 <script>
-/* ---------- Data buku (priceNum ditambahkan untuk kebutuhan hitung total) ---------- */
 const books = [
   {title:"Jejak yang Tertinggal", author:"Rani Ardhita", penerbit:"Rekacipta Media", price:"Rp 89.000", priceNum:89000, strike:"Rp 110.000", cat:"Fiksi", color:"#EF5843", badge:"best", rating:"4.9"},
   {title:"Filosofi Secangkir Kopi", author:"Bagas Wirawan", penerbit:"Pena Semesta", price:"Rp 76.500", priceNum:76500, cat:"Non-Fiksi", color:"#241B52", badge:"baru", rating:"4.7"},
@@ -416,11 +427,7 @@ document.querySelectorAll('.chip').forEach(chip=>{
   });
 });
 
-/* ================= KERANJANG ================= */
-
-// GANTI nomor ini dengan nomor WhatsApp toko/admin Baca Dulu Bookstore
 const STORE_WA_NUMBER = "6281315717719";
-
 const CART_KEY = "bacadulu_cart";
 let cart = [];
 try {
@@ -518,7 +525,6 @@ function renderCartItems(){
 
   totalText.textContent = formatRupiah(cartTotal());
 
-  // Delegasi event tombol qty/hapus (karena elemen ini dibuat ulang tiap render)
   wrap.querySelectorAll('[data-action]').forEach(btn => {
     btn.addEventListener('click', () => {
       const title = btn.dataset.title;
@@ -557,7 +563,6 @@ function checkoutViaWhatsApp(){
   window.open(url, '_blank');
 }
 
-// Tombol "+" tambah ke keranjang di tiap kartu buku
 document.querySelectorAll('.add-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     addToCart(btn.dataset.title);
@@ -571,7 +576,6 @@ document.getElementById('cartClose').addEventListener('click', closeCart);
 document.getElementById('cartOverlay').addEventListener('click', closeCart);
 document.getElementById('checkoutBtn').addEventListener('click', checkoutViaWhatsApp);
 
-// Inisialisasi tampilan keranjang saat halaman dimuat (baca dari localStorage)
 updateCartBadge();
 renderCartItems();
 </script>

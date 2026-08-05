@@ -11,10 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS CDN (Jalan Pintas biar langsung bisa dipake) -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-
     <!-- Konfigurasi Tambahan untuk Warna Oranye -->
     <script>
         tailwind.config = {
@@ -38,8 +37,8 @@
     <!-- Komponen Navbar Utama -->
     <x-navbar />
 
-    <!-- Area Konten Utama -->
-    <main class="flex-grow w-full block h-auto clear-both">
+    <!-- Area Konten Utama (Diubah agar full width tanpa batasan) -->
+    <main class="flex-grow w-full">
         @yield('content')
     </main>
 
