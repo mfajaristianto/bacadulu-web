@@ -22,9 +22,53 @@
             --black-color: #1c1917;
         }
 
+        html, body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             min-height: 100vh;
-            background-color: #6b7686;
+            position: relative;
+            overflow-x: hidden;
+            background: linear-gradient(160deg, #3a4350 0%, #5c6b7a 50%, #8b96a3 100%);
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(110px);
+            z-index: 0;
+        }
+
+        body::before {
+            width: 500px;
+            height: 500px;
+            top: -150px;
+            left: -100px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
+        }
+
+        body::after {
+            width: 600px;
+            height: 600px;
+            bottom: -200px;
+            right: -150px;
+            background: radial-gradient(circle, rgba(139, 150, 163, 0.4) 0%, transparent 70%);
+        }
+
+        .wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
         }
 
         a {
@@ -36,71 +80,32 @@
             text-decoration: underline;
         }
 
-        .wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            position: relative;
-            z-index: 1;
-        }
-
         .login_box {
             position: relative;
             width: 450px;
-            background: rgba(25, 30, 38, 0.45);
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(30px) saturate(160%);
             -webkit-backdrop-filter: blur(30px) saturate(160%);
             border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 15px;
-            padding: 7.5em 2.5em 4em 2.5em;
+            padding: 2.5em;
             color: var(--second-color);
             box-shadow: 0px 20px 45px rgba(0, 0, 0, 0.45);
         }
 
         .login-header {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #e7e2dd;
-            width: 140px;
-            height: 60px;
-            border-radius: 0 0 20px 20px;
+            width: 100%;
+            margin-bottom: 1.5em;
         }
 
         .login-header span {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--black-color);
-        }
-
-        .login-header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -30px;
-            width: 30px;
-            height: 30px;
-            border-top-right-radius: 50%;
-            background: transparent;
-            box-shadow: 15px 0 0 0 #e7e2dd;
-        }
-
-        .login-header::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            right: -30px;
-            width: 30px;
-            height: 30px;
-            border-top-left-radius: 50%;
-            background: transparent;
-            box-shadow: -15px 0 0 0 #e7e2dd;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--second-color);
+            text-align: center;
         }
 
         .error-box {
@@ -213,7 +218,7 @@
             }
 
             .login_box {
-                padding: 7.5em 1.5em 4em 1.5em;
+                padding: 2.5em 1.5em;
             }
         }
     </style>
@@ -222,7 +227,7 @@
     <div class="wrapper">
         <div class="login_box">
             <div class="login-header">
-                <span>Login</span>
+                <span>Hai Adminbaca!</span>
             </div>
 
             @if($errors->any())
