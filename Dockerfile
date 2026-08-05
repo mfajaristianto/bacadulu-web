@@ -1,5 +1,6 @@
 FROM php:8.4-cli
 
+# Install PHP dependencies + Node.js
 RUN apt-get update && apt-get install -y \
     git unzip zip curl libzip-dev libicu-dev libpng-dev \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
@@ -12,16 +13,26 @@ WORKDIR /app
 
 COPY . .
 
-# Buat ulang folder storage yang di-ignore, karena tidak ikut ter-copy
-RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+# Buat ulang folder storage (di-exclude oleh .dockerignore) satu per satu.
+# PENTING: jangan pakai brace expansion {a,b,c} di sini, karena RUN default
+# jalan pakai /bin/sh (dash) yang TIDAK mendukung syntax itu — sebelumnya ini
+# menyebabkan folder storage/framework/views tidak benar-benar terbuat,
+# yang berujung error "Please provide a valid cache path" di Blade Compiler.
+RUN mkdir -p storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
+# Install PHP packages
 RUN composer install --no-dev --optimize-autoloader
 
+# Install Node packages & build Vite
 RUN npm install
 RUN npm run build
 
 # Bersihkan cache config lama biar ambil env production yang baru
 RUN php artisan config:clear
 
-CMD php artisan config:cache && php artisan serve --host=0.0.0.0 --port=$PORT
+CMD ["sh", "-c", "php artisan config:cache && php artisan serve --host=0.0.0.0 --port=$PORT"]
