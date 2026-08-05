@@ -32,13 +32,15 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run build
 
-# Bersihkan SEMUA cache lama (config, route, view) biar tidak ada file cache
-# basi yang ikut ter-bundle dari repo/build sebelumnya. Route cache lama bisa
+# Bersihkan cache config/route/view lama (file-based, aman dijalankan saat
+# build karena tidak butuh koneksi database). Route cache lama basi bisa
 # menyebabkan Laravel salah baca method HTTP suatu route (mis. 405 Method
 # Not Allowed) walau kode route di repo sudah benar.
+# CATATAN: sengaja TIDAK menjalankan `cache:clear` di sini — command itu
+# butuh koneksi database (kalau CACHE_STORE=database/sqlite), dan database
+# belum bisa diakses saat proses build image.
 RUN php artisan config:clear \
     && php artisan route:clear \
-    && php artisan view:clear \
-    && php artisan cache:clear
+    && php artisan view:clear
 
 CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan serve --host=0.0.0.0 --port=$PORT"]
