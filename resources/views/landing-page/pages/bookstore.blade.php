@@ -1,14 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baca Dulu Bookstore</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#241B52;
@@ -278,8 +270,6 @@
     .wrap{padding:0 20px;}
   }
 </style>
-</head>
-<body>
 
 <section class="hero">
   <div class="wrap">
@@ -358,19 +348,31 @@
   </div>
 </div>
 
-<script>
-const books = [
-  {title:"Jejak yang Tertinggal", author:"Rani Ardhita", penerbit:"Rekacipta Media", price:"Rp 89.000", priceNum:89000, strike:"Rp 110.000", cat:"Fiksi", color:"#EF5843", badge:"best", rating:"4.9"},
-  {title:"Filosofi Secangkir Kopi", author:"Bagas Wirawan", penerbit:"Pena Semesta", price:"Rp 76.500", priceNum:76500, cat:"Non-Fiksi", color:"#241B52", badge:"baru", rating:"4.7"},
-  {title:"Menulis untuk Hidup", author:"Sari Kusuma", penerbit:"Aksara Baru", price:"Rp 65.000", priceNum:65000, cat:"Pengembangan Diri", color:"#F7AA35", badge:"ebook", rating:"4.8"},
-  {title:"Negeri di Ufuk Senja", author:"Dimas Prakoso", penerbit:"Rekacipta Media", price:"Rp 95.000", priceNum:95000, cat:"Fiksi", color:"#372A6E", rating:"4.6"},
-  {title:"Strategi Bisnis Kecil", author:"Yusuf Hakim", penerbit:"Cerdas Finansial", price:"Rp 82.000", priceNum:82000, cat:"Bisnis", color:"#C6432F", badge:"best", rating:"4.9"},
-  {title:"Petualangan Kancil Cerdik", author:"Nadia Putri", penerbit:"Pelangi Anak", price:"Rp 45.000", priceNum:45000, cat:"Anak & Remaja", color:"#EF5843", badge:"baru", rating:"5.0"},
-  {title:"Ruang Sunyi", author:"Alia Maheswari", penerbit:"Pena Semesta", price:"Rp 70.000", priceNum:70000, cat:"Fiksi", color:"#241B52", rating:"4.5"},
-  {title:"Investasi untuk Pemula", author:"Reza Firmansyah", penerbit:"Cerdas Finansial", price:"Rp 88.000", priceNum:88000, cat:"Bisnis", color:"#F7AA35", badge:"ebook", rating:"4.7"},
-];
+@php
+    $bookstoreBooks = $books->map(function ($book) {
+        return [
+            'title' => $book->title,
+            'author' => $book->author,
+            'penerbit' => $book->publisher,
+            'price' => 'Rp ' . number_format((float) $book->price, 0, ',', '.'),
+            'priceNum' => (float) $book->price,
+            'strike' => $book->original_price ? 'Rp ' . number_format((float) $book->original_price, 0, ',', '.') : null,
+            'cat' => $book->category ?: 'Umum',
+            'color' => '#EF5843',
+            'badge' => null,
+            'rating' => $book->rating ?? '4.9',
+            'cover' => $book->cover ? asset("storage/{$book->cover}") : null,
+            'description' => $book->description,
+            'pages' => $book->pages,
+            'detail_url' => route('portofolio.bookstore.show', $book->id),
+        ];
+    })->toArray();
+@endphp
 
-const categories = ["Semua","Fiksi","Non-Fiksi","Bisnis","Pengembangan Diri","Anak & Remaja"];
+<script>
+const books = @json($bookstoreBooks);
+
+const categories = @json($books->pluck('category')->filter()->unique()->prepend('Semua')->values()->all());
 
 function initials(title){
   return title.split(" ").slice(0,3).join(" ");
@@ -381,13 +383,17 @@ function bookCard(b){
   const badgeHtml = b.badge ? `<span class="badge ${b.badge}">${badgeMap[b.badge]}</span>` : "";
   const strikeHtml = b.strike ? `<small>${b.strike}</small>` : "";
   const coverBg = b.badge === "best" ? "var(--brand-gradient)" : b.color;
+  const frontStyle = b.cover
+    ? `background-image:url('${b.cover}'); background-size:cover; background-position:center; background-color:${coverBg};`
+    : `background:${coverBg};`;
+
   return `
   <div class="book-card" data-cat="${b.cat}">
     <div class="cover-3d">
       <div class="book3d">
         <div class="face spine" style="background:${coverBg}"></div>
         <div class="face pages"></div>
-        <div class="face front" style="background:${coverBg}">
+        <div class="face front" style="${frontStyle}">
           ${badgeHtml}
           <div>
             <div class="spine-title">${initials(b.title)}</div>
@@ -403,7 +409,10 @@ function bookCard(b){
       <div class="rating">★★★★★ <span>${b.rating}</span></div>
       <div class="row">
         <div class="price">${b.price}${strikeHtml}</div>
-        <button class="add-btn" title="Tambah ke keranjang" data-title="${b.title}">+</button>
+        <div class="flex items-center gap-2">
+          <a href="${b.detail_url}" class="inline-flex items-center rounded-full border border-orange-500 px-3 py-1 text-xs font-semibold text-orange-700 hover:bg-orange-50">Deskripsi</a>
+          <button class="add-btn" title="Tambah ke keranjang" data-title="${b.title}">+</button>
+        </div>
       </div>
     </div>
   </div>`;
@@ -579,7 +588,4 @@ document.getElementById('checkoutBtn').addEventListener('click', checkoutViaWhat
 updateCartBadge();
 renderCartItems();
 </script>
-
-</body>
-</html>
 @endsection

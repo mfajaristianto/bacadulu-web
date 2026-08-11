@@ -38,7 +38,6 @@
             --brand-gradient: linear-gradient(135deg, var(--orange) 0%, var(--gold) 100%);
         }
 
-        /* ---------- Entrance animation buat konten halaman ---------- */
         @keyframes cmsFadeUp {
             from { opacity: 0; transform: translateY(10px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -47,7 +46,6 @@
             animation: cmsFadeUp .45s ease both;
         }
 
-        /* ---------- Sidebar ---------- */
         .cms-sidebar {
             background:
                 radial-gradient(circle at 15% 0%, rgba(239,88,67,0.18), transparent 55%),
@@ -122,13 +120,11 @@
             transform: translateY(0);
         }
 
-        /* ---------- Topbar kecil di atas konten ---------- */
         .cms-topbar{
             backdrop-filter: blur(6px);
             background: rgba(255,255,255,0.75);
         }
 
-        /* ---------- Mobile sidebar toggle (tanpa JS framework, pure CSS) --- */
         #cms-mobile-toggle{ display:none; }
 
         @media (max-width: 1023.5px){
@@ -153,7 +149,6 @@
             }
         }
 
-        /* ---------- Utility classes buat dipakai di halaman konten (opsional) ---------- */
         .cms-card{
             background:#fff; border:1px solid #E5E7EB; border-radius:16px;
             box-shadow: 0 1px 2px rgba(16,24,40,0.04);
@@ -190,12 +185,10 @@
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
 
-    <!-- Checkbox tersembunyi buat toggle sidebar mobile, pure CSS -->
     <input type="checkbox" id="cms-mobile-toggle">
 
     <div class="cms-sidebar-wrap min-h-screen flex">
 
-        <!-- Overlay gelap di belakang sidebar saat mode mobile terbuka -->
         <label for="cms-mobile-toggle" class="cms-sidebar-overlay lg:hidden"></label>
 
         <aside class="cms-sidebar w-72 text-white p-6 hidden lg:block">
@@ -228,9 +221,9 @@
                    class="cms-nav-link {{ request()->routeIs('admin.publishers.*') ? 'active' : '' }}">
                     <span class="dot"></span> Publisher
                 </a>
-                <a href="{{ route('admin.data-articles.index') }}"
-                   class="cms-nav-link {{ request()->routeIs('admin.data-articles.*') ? 'active' : '' }}">
-                    <span class="dot"></span> Data Artikel
+                <a href="{{ route('admin.books.index') }}"
+                   class="cms-nav-link {{ request()->routeIs('admin.books.*') ? 'active' : '' }}">
+                    <span class="dot"></span> Kelola Buku
                 </a>
 
                 <form method="POST" action="{{ route('admin.logout') }}" class="pt-5">
@@ -243,8 +236,6 @@
         </aside>
 
         <div class="flex-1 flex flex-col min-w-0">
-
-            <!-- Topbar kecil, isinya cuma tombol hamburger buat mobile -->
             <header class="cms-topbar lg:hidden sticky top-0 z-30 flex items-center justify-between px-5 py-4 border-b border-slate-200">
                 <div class="flex items-center gap-2">
                     <div class="cms-logo-badge" style="width:30px;height:30px;font-size:12px;">BD</div>
