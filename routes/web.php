@@ -92,7 +92,7 @@ Route::get('/portofolio/bookstore', function () {
     $books = Book::latest()->get();
     return view('landing-page.pages.bookstore', compact('books'));
 })->name('portofolio.bookstore');
-Route::get('/portofolio/bookstore/{book}', function (Book $book) {
+Route::get('/portofolio/bookstore/{book:slug}', function (Book $book) {
     return view('landing-page.pages.book-detail', compact('book'));
 })->name('portofolio.bookstore.show');
 
@@ -139,7 +139,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     })->name('logout');
     
     // CRUD Resources (Menggunakan AdminBookController)
-    Route::resource('books', AdminBookController::class);
+    Route::resource('books', AdminBookController::class)->scoped(['book' => 'id']);
     Route::resource('informations', InformationAdminController::class);
     Route::resource('journals', JurnalAdminController::class);
     Route::resource('conferences', ConferenceAdminController::class);

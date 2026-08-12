@@ -26,35 +26,43 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title'          => 'required|string|max:255',
-            'publisher'      => 'required|string|max:255',
-            'author'         => 'required|string|max:255',
-            'price'          => 'required|numeric',
-            'original_price' => 'nullable|numeric',
-            'rating'         => 'nullable|string',
-            'category'       => 'nullable|string|max:255',
-            'pages'          => 'nullable|integer|min:1',
-            'description'    => 'nullable|string',
-            'cover'          => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'title'            => 'required|string|max:255',
+            'publisher'        => 'required|string|max:255',
+            'author'           => 'required|string|max:255',
+            'price'            => 'required|numeric|min:0.01|max:999999999999.99',
+            'discounted_price' => 'nullable|numeric|lt:price|min:0.01|max:999999999999.99',
+            'has_discount'     => 'sometimes|boolean',
+            'category'         => 'nullable|string|max:255',
+            'pages'            => 'nullable|integer|min:1',
+            'size'             => 'nullable|string|max:255',
+            'isbn'             => 'nullable|string|max:255',
+            'publish_year'     => 'nullable|integer|min:1900|max:' . date('Y'),
+            'description'      => 'nullable|string',
+            'cover'            => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Upload foto cover buku
         $coverPath = null;
         if ($request->hasFile('cover')) {
             $coverPath = $request->file('cover')->store('book-covers', 'public');
         }
 
+        $hasDiscount = $request->boolean('has_discount') && $request->filled('discounted_price');
+
         Book::create([
-            'title'          => $request->title,
-            'publisher'      => $request->publisher,
-            'author'         => $request->author,
-            'price'          => $request->price,
-            'original_price' => $request->original_price,
-            'rating'         => $request->rating ?? '5.0',
-            'cover'          => $coverPath,
-            'category'       => $request->category,
-            'pages'          => $request->pages,
-            'description'    => $request->description,
+            'title'               => $request->title,
+            'slug'                => Book::makeSlug($request->title),
+            'publisher'           => $request->publisher,
+            'author'              => $request->author,
+            'price'               => $request->price,
+            'discounted_price'    => $hasDiscount ? $request->discounted_price : null,
+            'discount_expires_at' => $hasDiscount ? now()->addMonth() : null,
+            'cover'               => $coverPath,
+            'category'            => $request->category ?: 'Umum',
+            'pages'               => $request->pages,
+            'size'                => $request->size,
+            'isbn'                => $request->isbn,
+            'publish_year'        => $request->publish_year,
+            'description'         => $request->description,
         ]);
 
         return redirect()->route('admin.books.index')->with('success', 'Buku berhasil ditambahkan!');
@@ -70,16 +78,19 @@ class BookController extends Controller
     public function update(Request $request, Book $book)
     {
         $request->validate([
-            'title'          => 'required|string|max:255',
-            'publisher'      => 'required|string|max:255',
-            'author'         => 'required|string|max:255',
-            'price'          => 'required|numeric',
-            'original_price' => 'nullable|numeric',
-            'rating'         => 'nullable|string',
-            'category'       => 'nullable|string|max:255',
-            'pages'          => 'nullable|integer|min:1',
-            'description'    => 'nullable|string',
-            'cover'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'title'            => 'required|string|max:255',
+            'publisher'        => 'required|string|max:255',
+            'author'           => 'required|string|max:255',
+            'price'            => 'required|numeric|min:0.01|max:999999999999.99',
+            'discounted_price' => 'nullable|numeric|lt:price|min:0.01|max:999999999999.99',
+            'has_discount'     => 'sometimes|boolean',
+            'category'         => 'nullable|string|max:255',
+            'pages'            => 'nullable|integer|min:1',
+            'size'             => 'nullable|string|max:255',
+            'isbn'             => 'nullable|string|max:255',
+            'publish_year'     => 'nullable|integer|min:1900|max:' . date('Y'),
+            'description'      => 'nullable|string',
+            'cover'            => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($request->hasFile('cover')) {
@@ -89,17 +100,23 @@ class BookController extends Controller
             $book->cover = $request->file('cover')->store('book-covers', 'public');
         }
 
+        $hasDiscount = $request->boolean('has_discount') && $request->filled('discounted_price');
+
         $book->update([
-            'title'          => $request->title,
-            'publisher'      => $request->publisher,
-            'author'         => $request->author,
-            'price'          => $request->price,
-            'original_price' => $request->original_price,
-            'rating'         => $request->rating ?? '5.0',
-            'category'       => $request->category,
-            'pages'          => $request->pages,
-            'description'    => $request->description,
-            'cover'          => $book->cover,
+            'title'               => $request->title,
+            'slug'                => Book::makeSlug($request->title, $book->id),
+            'publisher'           => $request->publisher,
+            'author'              => $request->author,
+            'price'               => $request->price,
+            'discounted_price'    => $hasDiscount ? $request->discounted_price : null,
+            'discount_expires_at' => $hasDiscount ? now()->addMonth() : null,
+            'category'            => $request->category ?: 'Umum',
+            'pages'               => $request->pages,
+            'size'                => $request->size,
+            'isbn'                => $request->isbn,
+            'publish_year'        => $request->publish_year,
+            'description'         => $request->description,
+            'cover'               => $book->cover,
         ]);
 
         return redirect()->route('admin.books.index')->with('success', 'Buku berhasil diperbarui!');

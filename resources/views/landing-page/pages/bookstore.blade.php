@@ -354,17 +354,16 @@
             'title' => $book->title,
             'author' => $book->author,
             'penerbit' => $book->publisher,
-            'price' => 'Rp ' . number_format((float) $book->price, 0, ',', '.'),
-            'priceNum' => (float) $book->price,
-            'strike' => $book->original_price ? 'Rp ' . number_format((float) $book->original_price, 0, ',', '.') : null,
+            'price' => 'Rp ' . number_format((float) $book->effective_price, 0, ',', '.'),
+            'priceNum' => (float) $book->effective_price,
+            'strike' => $book->has_active_discount ? 'Rp ' . number_format((float) $book->price, 0, ',', '.') : null,
             'cat' => $book->category ?: 'Umum',
             'color' => '#EF5843',
             'badge' => null,
-            'rating' => $book->rating ?? '4.9',
             'cover' => $book->cover ? asset("storage/{$book->cover}") : null,
             'description' => $book->description,
             'pages' => $book->pages,
-            'detail_url' => route('portofolio.bookstore.show', $book->id),
+            'detail_url' => $book->slug ? route('portofolio.bookstore.show', ['book' => $book->slug]) : null,
         ];
     })->toArray();
 @endphp
@@ -386,6 +385,7 @@ function bookCard(b){
   const frontStyle = b.cover
     ? `background-image:url('${b.cover}'); background-size:cover; background-position:center; background-color:${coverBg};`
     : `background:${coverBg};`;
+  const coverTextHtml = b.cover ? '' : `<div><div class="spine-title">${initials(b.title)}</div><div class="spine-sub">${b.author}</div></div>`;
 
   return `
   <div class="book-card" data-cat="${b.cat}">
@@ -395,10 +395,7 @@ function bookCard(b){
         <div class="face pages"></div>
         <div class="face front" style="${frontStyle}">
           ${badgeHtml}
-          <div>
-            <div class="spine-title">${initials(b.title)}</div>
-            <div class="spine-sub">${b.author}</div>
-          </div>
+          ${coverTextHtml}
         </div>
       </div>
     </div>
@@ -406,7 +403,6 @@ function bookCard(b){
       <div class="penerbit">${b.penerbit}</div>
       <div class="title">${b.title}</div>
       <div class="author">${b.author}</div>
-      <div class="rating">★★★★★ <span>${b.rating}</span></div>
       <div class="row">
         <div class="price">${b.price}${strikeHtml}</div>
         <div class="flex items-center gap-2">

@@ -20,11 +20,7 @@
                             <p class="text-sm text-slate-500">oleh {{ $book->author }} · {{ $book->publisher }}</p>
                         </div>
 
-                        <div class="grid gap-3 sm:grid-cols-3">
-                            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-                                <div class="text-slate-500">Rating</div>
-                                <div class="mt-2 text-lg font-semibold text-slate-900">{{ $book->rating }} ★</div>
-                            </div>
+                        <div class="grid gap-3 sm:grid-cols-2">
                             <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
                                 <div class="text-slate-500">Halaman</div>
                                 <div class="mt-2 text-lg font-semibold text-slate-900">{{ $book->pages ?? '—' }}</div>
@@ -38,9 +34,9 @@
                         <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
                             <div class="text-slate-500 text-sm">Harga</div>
                             <div class="mt-2 flex items-center gap-4">
-                                <span class="text-2xl font-bold text-slate-900">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
-                                @if($book->original_price)
-                                    <span class="text-sm text-slate-500 line-through">Rp {{ number_format($book->original_price, 0, ',', '.') }}</span>
+                                <span class="text-2xl font-bold text-slate-900">Rp {{ number_format($book->effective_price, 0, ',', '.') }}</span>
+                                @if($book->has_active_discount)
+                                    <span class="text-sm text-slate-500 line-through">Rp {{ number_format($book->price, 0, ',', '.') }}</span>
                                 @endif
                             </div>
                         </div>

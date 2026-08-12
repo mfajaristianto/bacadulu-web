@@ -195,7 +195,7 @@
             <div class="mb-8 flex items-center gap-3">
                 <div class="cms-logo-badge">BD</div>
                 <div>
-                    <h2 class="text-lg font-extrabold leading-tight">Admin CMS</h2>
+                    <h2 class="text-lg font-extrabold leading-tight">Admin Baca</h2>
                     <p class="text-xs text-slate-400">Kelola konten website</p>
                 </div>
             </div>
@@ -239,7 +239,7 @@
             <header class="cms-topbar lg:hidden sticky top-0 z-30 flex items-center justify-between px-5 py-4 border-b border-slate-200">
                 <div class="flex items-center gap-2">
                     <div class="cms-logo-badge" style="width:30px;height:30px;font-size:12px;">BD</div>
-                    <span class="font-bold text-sm">Admin CMS</span>
+                    <span class="font-bold text-sm">Admin Baca</span>
                 </div>
                 <label for="cms-mobile-toggle" class="cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors">
                     <svg class="w-6 h-6 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

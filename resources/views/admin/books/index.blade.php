@@ -22,7 +22,7 @@
                     <th class="p-4">Judul & Penulis</th>
                     <th class="p-4">Penerbit</th>
                     <th class="p-4">Harga</th>
-                    <th class="p-4">Rating</th>
+                    <th class="p-4">Kategori</th>
                     <th class="p-4 text-center">Aksi</th>
                 </tr>
             </thead>
@@ -42,12 +42,14 @@
                         </td>
                         <td class="p-4 text-slate-600">{{ $book->publisher }}</td>
                         <td class="p-4">
-                            <div class="font-semibold text-slate-900">Rp {{ number_format($book->price, 0, ',', '.') }}</div>
-                            @if($book->original_price)
-                                <div class="text-xs text-slate-400 line-through">Rp {{ number_format($book->original_price, 0, ',', '.') }}</div>
+                            @if($book->has_active_discount)
+                                <div class="font-semibold text-slate-900">Rp {{ number_format($book->discounted_price, 0, ',', '.') }}</div>
+                                <div class="text-xs text-slate-400 line-through">Rp {{ number_format($book->price, 0, ',', '.') }}</div>
+                            @else
+                                <div class="font-semibold text-slate-900">Rp {{ number_format($book->price, 0, ',', '.') }}</div>
                             @endif
                         </td>
-                        <td class="p-4 text-orange-500 font-bold">★ {{ $book->rating }}</td>
+                        <td class="p-4 text-slate-600">{{ $book->category ?? 'Umum' }}</td>
                         <td class="p-4 text-center space-x-2">
                             <a href="{{ route('admin.books.edit', $book->id) }}" class="rounded bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">Edit</a>
                             <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus buku ini?')">

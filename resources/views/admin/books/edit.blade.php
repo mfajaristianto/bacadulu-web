@@ -24,34 +24,46 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Harga Diskon (Rp)</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Harga Jual (Rp)</label>
                 <input type="number" name="price" value="{{ old('price', $book->price) }}" required class="w-full rounded border border-slate-300 p-2 text-sm">
             </div>
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Harga Asli / Coret (Rp)</label>
-                <input type="number" name="original_price" value="{{ old('original_price', $book->original_price) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Kategori Buku</label>
+                <input type="text" name="category" value="{{ old('category', $book->category) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 items-end">
+            <div>
+                <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <input id="has_discount" type="checkbox" name="has_discount" value="1" {{ old('has_discount', $book->discounted_price ? 1 : 0) ? 'checked' : '' }} class="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500">
+                    <span>Berikan diskon</span>
+                </label>
+            </div>
+            <div id="discounted_price_row" style="display: none;">
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Harga Diskon (Rp)</label>
+                <input id="discounted_price" type="number" name="discounted_price" value="{{ old('discounted_price', $book->discounted_price) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
             </div>
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Rating</label>
-                <input type="text" name="rating" value="{{ old('rating', $book->rating) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Ukuran Buku</label>
+                <input type="text" name="size" value="{{ old('size', $book->size) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
             </div>
         </div>
 
-        <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Kategori Buku</label>
-            <input type="text" name="category" value="{{ old('category', $book->category) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-3 gap-4">
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Jumlah Halaman</label>
                 <input type="number" name="pages" value="{{ old('pages', $book->pages) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
             </div>
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Upload Cover Baru</label>
-                <input type="file" name="cover" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                <label class="block text-sm font-semibold text-slate-700 mb-1">ISBN</label>
+                <input type="text" name="isbn" value="{{ old('isbn', $book->isbn) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Tahun Terbit</label>
+                <input type="number" name="publish_year" value="{{ old('publish_year', $book->publish_year) }}" class="w-full rounded border border-slate-300 p-2 text-sm">
             </div>
         </div>
 
@@ -73,4 +85,18 @@
         </div>
     </form>
 </div>
+<script>
+    const discountCheckbox = document.getElementById('has_discount');
+    const discountRow = document.getElementById('discounted_price_row');
+
+    function updateDiscountRow() {
+        if (!discountCheckbox) return;
+        discountRow.style.display = discountCheckbox.checked ? 'block' : 'none';
+    }
+
+    if (discountCheckbox) {
+        discountCheckbox.addEventListener('change', updateDiscountRow);
+        updateDiscountRow();
+    }
+</script>
 @endsection
