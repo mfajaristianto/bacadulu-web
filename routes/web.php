@@ -22,7 +22,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\EventController;
 
-
 // =====================================================
 // ADMIN CONTROLLER IMPORTS
 // =====================================================
@@ -73,7 +72,10 @@ Route::post('/logout', function () {
 |--------------------------------------------------------------------------
 */
 
-// Home
+// =====================================================
+// HOME
+// =====================================================
+
 Route::get('/', function () {
 
     if (session()->has('locale')) {
@@ -197,13 +199,21 @@ Route::get('/portofolio/bookstore', function () {
     );
 
 })->name('portofolio.bookstore');
+
+
+// Detail buku menggunakan slug
 Route::get('/portofolio/bookstore/{book:slug}', function (Book $book) {
-    return view('landing-page.pages.book-detail', compact('book'));
+
+    return view(
+        'landing-page.pages.book-detail',
+        compact('book')
+    );
+
 })->name('portofolio.bookstore.show');
 
 
 // =====================================================
-// BLOG & COMMENTS
+// BLOG & COMMENTS - PUBLIC
 // =====================================================
 
 Route::get('/blog', [BlogController::class, 'index'])
@@ -281,7 +291,6 @@ Route::get('/lang/{locale}', function ($locale) {
     if (in_array($locale, ['id', 'en', 'zh', 'ja', 'ko'])) {
 
         Session::put('locale', $locale);
-
         App::setLocale($locale);
     }
 
@@ -295,55 +304,111 @@ Route::get('/lang/{locale}', function ($locale) {
 | ADMIN CMS ROUTES
 |--------------------------------------------------------------------------
 |
-| Semua route di bawah:
-|
-| /admin/...
-|
-| membutuhkan login.
+| Semua route di bawah /admin membutuhkan login.
 |
 */
 
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // Route Logout Khusus Admin (Menghasilkan nama route 'admin.logout')
-    Route::match(['get', 'post'], '/logout', function () {
-        auth()->logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
-        return redirect('/');
-    })->name('logout');
-    
-    // CRUD Resources (Menggunakan AdminBookController)
-    Route::resource('books', AdminBookController::class)->scoped(['book' => 'id']);
-    Route::resource('informations', InformationAdminController::class);
-    Route::resource('journals', JurnalAdminController::class);
-    Route::resource('conferences', ConferenceAdminController::class);
-    Route::resource('publishers', PublisherAdminController::class);
-    Route::resource('data-articles', DataArticleAdminController::class);
+Route::middleware(['auth'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    // Detail Helper
-    Route::get('/detail/{type}/{id}', [DetailController::class, 'show'])->name('detail.show');
+        // =====================================================
+        // DASHBOARD
+        // =====================================================
 
-    // ... (Bagian route lainnya tetap sama)
+        Route::get('/', [DashboardController::class, 'index'])
+            ->name('dashboard');
 
-// Profil, Tim, & Search (Tambahkan route edit)
-Route::get('/user/{id}', [ProfileController::class, 'show'])->name('user.profile');
-Route::get('/profile/edit', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
-Route::put('/profile/update', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
 
-Route::get('/team/{slug}', [TeamController::class, 'show'])->name('team.show');
-Route::get('/search', [SearchController::class, 'index'])->name('search');
+        // =====================================================
+        // LOGOUT ADMIN
+        // =====================================================
 
-// Blog & Comments (Publik & Protected)
-Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/create', [BlogController::class, 'create'])->middleware('auth')->name('blog.create');
-Route::post('/blog', [BlogController::class, 'store'])->middleware('auth')->name('blog.store');
-Route::get('/blog/{post:slug}/edit', [BlogController::class, 'edit'])->middleware('auth')->name('blog.edit');
-Route::put('/blog/{post:slug}', [BlogController::class, 'update'])->middleware('auth')->name('blog.update');
-Route::delete('/blog/{post:slug}', [BlogController::class, 'destroy'])->middleware('auth')->name('blog.destroy');
-Route::post('/blog/{post}/comments', [CommentController::class, 'store'])->middleware('auth')->name('post.comment.store');
-Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
+        Route::match(['get', 'post'], '/logout', function () {
 
-// ... (Sisa route lainnya)
-});
+            auth()->logout();
+
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            return redirect('/');
+
+        })->name('logout');
+
+
+        // =====================================================
+        // ADMIN CRUD
+        // =====================================================
+
+        // Buku
+        Route::resource(
+            'books',
+            AdminBookController::class
+        )->scoped([
+            'book' => 'id'
+        ]);
+
+
+        // Informasi
+        Route::resource(
+            'informations',
+            InformationAdminController::class
+        );
+
+
+        // Jurnal
+        Route::resource(
+            'journals',
+            JurnalAdminController::class
+        );
+
+
+        // Konferensi
+        Route::resource(
+            'conferences',
+            ConferenceAdminController::class
+        );
+
+
+        // Publisher
+        Route::resource(
+            'publishers',
+            PublisherAdminController::class
+        );
+
+
+        // Data Articles
+        Route::resource(
+            'data-articles',
+            DataArticleAdminController::class
+        );
+
+
+        // Artikel / Blog yang dikelola Admin
+        Route::resource(
+            'posts',
+            PostController::class
+        );
+
+
+        // =====================================================
+        // EVENT ADMIN
+        // =====================================================
+
+        Route::resource(
+            'events',
+            EventAdminController::class
+        );
+
+
+        // =====================================================
+        // DETAIL HELPER
+        // =====================================================
+
+        Route::get(
+            '/detail/{type}/{id}',
+            [DetailController::class, 'show']
+        )->name('detail.show');
+
+    });
