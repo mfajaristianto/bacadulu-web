@@ -33,6 +33,20 @@
             <a href="{{ route('admin.journals.index') }}" class="mt-4 inline-block text-orange-600 font-semibold hover:text-orange-700">Kelola Jurnal &rarr;</a>
         </div>
 
+        <!-- Menu Event -->
+        <div class="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition">
+            <h2 class="text-lg font-semibold text-slate-900">Event</h2>
+            <p class="text-sm text-slate-600 mt-1">Kelola event yang tampil di halaman publik.</p>
+            <a href="{{ route('admin.events.index') }}" class="mt-4 inline-block text-orange-600 font-semibold hover:text-orange-700">Kelola Event &rarr;</a>
+        </div>
+
+        <!-- Menu Artikel/Posts -->
+        <div class="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition">
+            <h2 class="text-lg font-semibold text-slate-900">Artikel</h2>
+            <p class="text-sm text-slate-600 mt-1">Kelola artikel blog dari semua user.</p>
+            <a href="{{ route('admin.posts.index') }}" class="mt-4 inline-block text-orange-600 font-semibold hover:text-orange-700">Kelola Artikel &rarr;</a>
+        </div>
+
         <!-- Menu Konten Lain -->
         <div class="rounded-xl border bg-white p-6 shadow-sm hover:shadow-md transition">
             <h2 class="text-lg font-semibold text-slate-900">Konten Lain</h2>

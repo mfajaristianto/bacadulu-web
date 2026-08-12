@@ -9,26 +9,20 @@ class BlogController extends Controller
 {
     // (Jangan gunakan $this->middleware('auth') di sini pada Laravel versi baru)
 
-    public function index(Request $request)
-    {
-        $query = Post::query();
+public function index(Request $request)
+{
+    $query = Post::query();
 
-        // Filter Kategori
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
-        }
-
-        // Filter Menu (Komunitas/Event jika ada kolomnya)
-        if ($request->has('menu')) {
-            $query->where('type', $request->menu);
-        }
-
-        $posts = $query->latest()->paginate(10);
-        $category = $request->category;
-
-        return view('blog.index', compact('posts', 'category'));
+    // Filter Kategori
+    if ($request->has('category')) {
+        $query->where('category', $request->category);
     }
 
+    $posts = $query->latest()->paginate(10);
+    $category = $request->category;
+
+    return view('blog.index', compact('posts', 'category'));
+}
     public function create()
     {
         return view('blog.create');
