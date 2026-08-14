@@ -9,25 +9,19 @@ class BlogController extends Controller
 {
     // (Jangan gunakan $this->middleware('auth') di sini pada Laravel versi baru)
 
-    public function index(Request $request)
-    {
-        $query = Post::query();
+public function index(Request $request)
+{
+    $query = Post::where('status', 'approved');
 
-        // Filter Kategori
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
-        }
-
-        // Filter Menu (Komunitas/Event jika ada kolomnya)
-        if ($request->has('menu')) {
-            $query->where('type', $request->menu);
-        }
-
-        $posts = $query->latest()->paginate(10);
-        $category = $request->category;
-
-        return view('blog.index', compact('posts', 'category'));
+    if ($request->has('category')) {
+        $query->where('category', $request->category);
     }
+
+    $posts = $query->latest()->paginate(10);
+    $category = $request->category;
+
+    return view('blog.index', compact('posts', 'category'));
+}
 
     public function create()
     {
@@ -35,41 +29,42 @@ class BlogController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'category' => 'required|in:Kesehatan,Sosial,Ekonomi,Teknik',
-        ]);
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'category' => 'required|in:Kesehatan,Sosial,Ekonomi,Teknik',
+    ]);
 
-        Post::create([
-            'user_id' => auth()->id(),
-            'title' => $request->title,
-            'slug' => \Str::slug($request->title) . '-' . time(),
-            'content' => $request->content,
-            'category' => $request->category,
-        ]);
+    Post::create([
+        'user_id' => auth()->id(),
+        'title' => $request->title,
+        'slug' => \Str::slug($request->title) . '-' . time(),
+        'content' => $request->content,
+        'category' => $request->category,
+        'status' => 'pending',
+    ]);
 
-        return redirect()->route('blog.index')->with('success', 'Artikel berhasil diterbitkan!');
-    }
+    return redirect()->route('blog.myPosts')->with('success', 'Artikel berhasil dikirim! Menunggu persetujuan admin.');
+}
 
     public function show($slug)
-    {
-        $post = Post::where('slug', $slug)->firstOrFail();
-        return view('blog.show', compact('post'));
+{
+    $post = Post::where('slug', $slug)->firstOrFail();
+
+    // Kalau belum di-approve, hanya penulis sendiri yang boleh lihat
+    if ($post->status !== 'approved' && auth()->id() !== $post->user_id) {
+        abort(404);
     }
 
-    public function edit($slug)
-    {
-        $post = Post::where('slug', $slug)->firstOrFail();
-        
-        // Pastikan hanya pemilik artikel yang bisa edit
-        if (auth()->id() !== $post->user_id) {
-            abort(403);
-        }
+    return view('blog.show', compact('post'));
+}
 
-        return view('blog.edit', compact('post'));
-    }
+public function myPosts()
+{
+    $posts = Post::where('user_id', auth()->id())->latest()->paginate(10);
+    return view('blog.my-posts', compact('posts'));
+}
 
     public function update(Request $request, $slug)
     {
