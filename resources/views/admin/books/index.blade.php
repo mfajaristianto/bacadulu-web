@@ -51,8 +51,10 @@
                         </td>
                         <td class="p-4 text-slate-600">{{ $book->category ?? 'Umum' }}</td>
                         <td class="p-4 text-center space-x-2">
-                            <a href="{{ route('admin.books.edit', $book->id) }}" class="rounded bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">Edit</a>
-                            <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus buku ini?')">
+                            <!-- Menggunakan slug -->
+                            <a href="{{ route('admin.books.edit', $book->slug) }}" class="rounded bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">Edit</a>
+                            
+                            <form action="{{ route('admin.books.destroy', $book->slug) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus buku ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="rounded bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100">Hapus</button>

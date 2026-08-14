@@ -138,8 +138,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         return redirect('/');
     })->name('logout');
     
-    // CRUD Resources (Menggunakan AdminBookController)
-    Route::resource('books', AdminBookController::class)->scoped(['book' => 'id']);
+    // PERBAIKAN: Mengubah 'id' menjadi 'slug' agar sesuai dengan form admin Anda
+    Route::resource('books', AdminBookController::class)->scoped(['book' => 'slug']);
+    
     Route::resource('informations', InformationAdminController::class);
     Route::resource('journals', JurnalAdminController::class);
     Route::resource('conferences', ConferenceAdminController::class);
@@ -149,25 +150,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Detail Helper
     Route::get('/detail/{type}/{id}', [DetailController::class, 'show'])->name('detail.show');
 
-    // ... (Bagian route lainnya tetap sama)
-
-// Profil, Tim, & Search (Tambahkan route edit)
-Route::get('/user/{id}', [ProfileController::class, 'show'])->name('user.profile');
-Route::get('/profile/edit', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
-Route::put('/profile/update', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
-
-Route::get('/team/{slug}', [TeamController::class, 'show'])->name('team.show');
-Route::get('/search', [SearchController::class, 'index'])->name('search');
-
-// Blog & Comments (Publik & Protected)
-Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/create', [BlogController::class, 'create'])->middleware('auth')->name('blog.create');
-Route::post('/blog', [BlogController::class, 'store'])->middleware('auth')->name('blog.store');
-Route::get('/blog/{post:slug}/edit', [BlogController::class, 'edit'])->middleware('auth')->name('blog.edit');
-Route::put('/blog/{post:slug}', [BlogController::class, 'update'])->middleware('auth')->name('blog.update');
-Route::delete('/blog/{post:slug}', [BlogController::class, 'destroy'])->middleware('auth')->name('blog.destroy');
-Route::post('/blog/{post}/comments', [CommentController::class, 'store'])->middleware('auth')->name('post.comment.store');
-Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
-
-// ... (Sisa route lainnya)
+    // Profil, Tim, & Search (Tambahkan route edit)
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });

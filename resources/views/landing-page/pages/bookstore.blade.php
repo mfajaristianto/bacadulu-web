@@ -24,8 +24,7 @@
   h1,h2,h3,.brand,.nav a,.btn{font-family:'Poppins',sans-serif;}
   a{text-decoration:none;color:inherit;}
   img{display:block;max-width:100%;}
-  
-  /* Diubah menjadi 100% agar melebar penuh ke kanan dan kiri */
+
   .wrap{width:100%;max-width:100%;margin:0;padding:0 40px;}
 
   .cta-btn{
@@ -80,7 +79,7 @@
   .section-head h2 .tag{width:10px;height:10px;border-radius:3px;background:var(--brand-gradient);display:inline-block;}
   .section-head p{color:var(--ink-muted);font-size:14px;margin-top:4px;margin-left:20px;}
   .see-all{font-size:14px;font-weight:600;color:var(--orange);}
-  
+
   .shelf{
     display:flex;gap:20px;overflow-x:auto;padding-bottom:12px;scroll-snap-type:x mandatory;
     width:100%;
@@ -149,10 +148,8 @@
   }
   .add-btn:hover{background:var(--brand-gradient);color:var(--white);}
   .add-btn.added{transform:scale(0.85);}
-  .rating{font-size:12px;color:var(--gold);margin-bottom:8px;}
-  .rating span{color:var(--ink-muted);}
 
-  /* ---------- CATALOG GRID (Diubah agar menyesuaikan layar penuh) ---------- */
+  /* ---------- CATALOG GRID ---------- */
   .catalog-bg{background:var(--cream);width:100%;}
   .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px;}
   .chip{
@@ -161,12 +158,15 @@
     transition:all .15s;
   }
   .chip.active{background:var(--navy);border-color:var(--navy);color:var(--white);}
-  
+
   .grid{
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap:22px;
     width:100%;
+  }
+  .empty-state{
+    grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink-muted);font-size:14.5px;
   }
 
   /* ---------- CTA BANNER ---------- */
@@ -276,14 +276,9 @@
     <span class="eyebrow"><span class="dot"></span> Toko resmi Baca Dulu</span>
     <h1>Temukan buku terbitan penerbit rekan kami</h1>
     <p>Jelajahi ribuan judul e-book dan buku fisik dari para penulis dan penerbit yang telah dipercaya Baca Dulu — langsung dari sumbernya.</p>
-    <div class="search-bar">
-      <input type="text" placeholder="Cari judul, penulis, atau penerbit...">
-      <button>Cari</button>
-    </div>
     <div class="hero-stats">
-      <div><strong>1.240+</strong><span>Judul tersedia</span></div>
-      <div><strong>86</strong><span>Penerbit rekanan</span></div>
-      <div><strong>4.8/5</strong><span>Rating pembaca</span></div>
+      <div><strong>{{ $books->count() }}+</strong><span>Judul tersedia</span></div>
+      <div><strong>{{ $books->pluck('publisher')->filter()->unique()->count() }}</strong><span>Penerbit rekanan</span></div>
     </div>
   </div>
 </section>
@@ -415,22 +410,73 @@ function bookCard(b){
 }
 
 document.getElementById('shelf').innerHTML = books.slice(0,5).map(bookCard).join("");
-document.getElementById('catalogGrid').innerHTML = books.map(bookCard).join("");
 
 document.getElementById('filters').innerHTML = categories.map((c,i)=>
   `<div class="chip ${i===0?'active':''}" data-cat="${c}">${c}</div>`
 ).join("");
 
+let currentCategory = "Semua";
+let currentQuery = "";
+
+function applyFilters(){
+  let list = books;
+
+  if (currentCategory !== "Semua") {
+    list = list.filter(b => b.cat === currentCategory);
+  }
+  if (currentQuery) {
+    const q = currentQuery.toLowerCase();
+    list = list.filter(b =>
+      b.title.toLowerCase().includes(q) ||
+      b.author.toLowerCase().includes(q) ||
+      b.penerbit.toLowerCase().includes(q)
+    );
+  }
+
+  const grid = document.getElementById('catalogGrid');
+  grid.innerHTML = list.length
+    ? list.map(bookCard).join("")
+    : `<div class="empty-state">Tidak ada buku yang cocok dengan pencarian kamu.</div>`;
+
+  // update visible search status for debugging / feedback
+  const statusEl = document.getElementById('searchStatus');
+  if (statusEl) {
+    statusEl.textContent = currentQuery ? `${list.length} hasil untuk "${currentQuery}"` : `${list.length} hasil`;
+  }
+}
+
+applyFilters();
+
 document.querySelectorAll('.chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
     document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
     chip.classList.add('active');
-    const cat = chip.dataset.cat;
-    document.querySelectorAll('#catalogGrid .book-card').forEach(card=>{
-      card.style.display = (cat==="Semua" || card.dataset.cat===cat) ? "" : "none";
-    });
+    currentCategory = chip.dataset.cat;
+    applyFilters();
   });
 });
+
+function doSearch(){
+  currentQuery = document.getElementById('searchInput').value.trim();
+  applyFilters();
+}
+document.getElementById('searchBtn').addEventListener('click', doSearch);
+document.getElementById('searchInput').addEventListener('keydown', (e)=>{
+  if (e.key === "Enter") doSearch();
+});
+
+// event delegation biar tombol "+" tetap jalan meski grid di-render ulang
+function bindAddButtons(container){
+  container.addEventListener('click', (e) => {
+    const btn = e.target.closest('.add-btn');
+    if (!btn) return;
+    addToCart(btn.dataset.title);
+    btn.classList.add('added');
+    setTimeout(() => btn.classList.remove('added'), 150);
+  });
+}
+bindAddButtons(document.getElementById('shelf'));
+bindAddButtons(document.getElementById('catalogGrid'));
 
 const STORE_WA_NUMBER = "6281315717719";
 const CART_KEY = "bacadulu_cart";
@@ -567,14 +613,6 @@ function checkoutViaWhatsApp(){
   const url = `https://wa.me/${STORE_WA_NUMBER}?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 }
-
-document.querySelectorAll('.add-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    addToCart(btn.dataset.title);
-    btn.classList.add('added');
-    setTimeout(() => btn.classList.remove('added'), 150);
-  });
-});
 
 document.getElementById('cartFab').addEventListener('click', openCart);
 document.getElementById('cartClose').addEventListener('click', closeCart);

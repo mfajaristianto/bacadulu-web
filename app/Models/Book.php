@@ -31,6 +31,7 @@ class Book extends Model
         'discount_expires_at' => 'datetime',
     ];
 
+    // INI WAJIB ADA AGAR ROUTE MENGGUNAKAN SLUG
     public function getRouteKeyName()
     {
         return 'slug';
