@@ -3,46 +3,67 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLoginForm() 
-    { 
-        return view('admin.auth.login'); 
+    /**
+     * Form login admin
+     */
+    public function showLoginForm()
+    {
+        return view('admin.auth.login');
     }
 
+    /**
+     * Login admin
+     */
     public function login(Request $request)
     {
-        $request->validate(['email' => ['required', 'email']]);
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user) {
-            $username = explode('@', $request->email)[0];
-            $user = User::create([
-                'name' => ucwords(str_replace(['.', '_'], ' ', $username)),
-                'email' => $request->email,
-                'password' => bcrypt('password123'), // Password default
-            ]);
+        if (!$user || !$user->is_admin) {
+            return back()
+                ->withErrors([
+                    'email' => 'Akun ini tidak memiliki akses sebagai admin.',
+                ])
+                ->withInput();
         }
 
-        Auth::login($user);
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return back()
+                ->withErrors([
+                    'email' => 'Email atau password salah.',
+                ])
+                ->withInput();
+        }
+
+        Auth::login($user, $request->boolean('remember'));
+
         $request->session()->regenerate();
 
-        // Arahkan admin ke dashboard, user biasa ke halaman blog
-        return str_contains($request->email, 'admin') ? redirect('/admin') : redirect('/blog');
+        return redirect()->route('admin.dashboard');
     }
 
+    /**
+     * Logout admin
+     */
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
-        // Redirect ke halaman home dengan membawa pesan sukses khusus admin
-        return redirect('/')->with('admin_logout_success', 'Admin berhasil keluar dari sistem CMS.');
+
+        return redirect('/')
+            ->with('admin_logout_success', 'Admin berhasil keluar dari sistem CMS.');
     }
 }

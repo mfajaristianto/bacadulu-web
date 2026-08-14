@@ -11,6 +11,7 @@
         "ext-zip": "*",
         "cloudinary-labs/cloudinary-laravel": "^3.0",
         "laravel/framework": "^12.0",
+        "laravel/socialite": "^5.29",
         "laravel/tinker": "^2.10.1"
     },
     "require-dev": {

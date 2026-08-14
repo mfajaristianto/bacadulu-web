@@ -9,11 +9,29 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    public function index()
-    {
-        $posts = Post::with('user')->latest()->paginate(15);
-        return view('admin.posts.index', compact('posts'));
-    }
+    public function index(Request $request)
+{
+    $status = $request->get('status', 'pending');
+
+    $posts = Post::with('user')
+        ->when($status !== 'all', fn ($q) => $q->where('status', $status))
+        ->latest()
+        ->paginate(15);
+
+    return view('admin.posts.index', compact('posts', 'status'));
+}
+
+public function approve(Post $post)
+{
+    $post->update(['status' => 'approved']);
+    return back()->with('success', 'Artikel disetujui dan sudah tayang.');
+}
+
+public function reject(Post $post)
+{
+    $post->update(['status' => 'rejected']);
+    return back()->with('success', 'Artikel ditolak.');
+}
 
     public function create()
     {

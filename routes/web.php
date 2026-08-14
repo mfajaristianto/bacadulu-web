@@ -5,9 +5,12 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use App\Models\Book;
 
-// =====================================================
-// PUBLIC CONTROLLER IMPORTS
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| PUBLIC CONTROLLERS
+|--------------------------------------------------------------------------
+*/
+
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\InformationController;
 use App\Http\Controllers\PublisherController;
@@ -22,9 +25,20 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\EventController;
 
-// =====================================================
-// ADMIN CONTROLLER IMPORTS
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| USER AUTH
+|--------------------------------------------------------------------------
+*/
+
+use App\Http\Controllers\Auth\GoogleController;
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN CONTROLLERS
+|--------------------------------------------------------------------------
+*/
+
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -40,41 +54,9 @@ use App\Http\Controllers\Admin\EventAdminController;
 
 /*
 |--------------------------------------------------------------------------
-| Authentication Routes
+| HOME
 |--------------------------------------------------------------------------
 */
-
-// Login
-Route::get('/login', [AuthController::class, 'showLoginForm'])
-    ->name('login');
-
-Route::post('/login', [AuthController::class, 'login'])
-    ->name('admin.login.post');
-
-Route::post('/login-process', [AuthController::class, 'login'])
-    ->name('login.post');
-
-
-// Logout Global untuk User/Navbar Publik
-Route::post('/logout', function () {
-    auth()->logout();
-
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-
-    return redirect('/');
-})->name('logout');
-
-
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-*/
-
-// =====================================================
-// HOME
-// =====================================================
 
 Route::get('/', function () {
 
@@ -87,61 +69,143 @@ Route::get('/', function () {
 })->name('home');
 
 
-// =====================================================
-// INFORMASI
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| USER AUTHENTICATION
+|--------------------------------------------------------------------------
+|
+| Google Login hanya untuk USER / PENULIS.
+|
+*/
+
+
+// Halaman login user
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+
+// Redirect ke Google
+Route::get('/auth/google', [GoogleController::class, 'redirect'])
+    ->name('google.login');
+
+
+// Callback Google
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])
+    ->name('google.callback');
+
+
+// Logout user
+Route::post('/logout', function () {
+
+    auth()->logout();
+
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+
+    return redirect()->route('home');
+
+})->middleware('auth')->name('logout');
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN AUTHENTICATION
+|--------------------------------------------------------------------------
+|
+| Login admin terpisah.
+|
+*/
+
+
+// Halaman login admin
+Route::get('/admin/login', [AuthController::class, 'showLoginForm'])
+    ->name('admin.login');
+
+
+// Proses login admin
+Route::post('/admin/login', [AuthController::class, 'login'])
+    ->name('admin.login.post');
+
+
+// Logout admin
+Route::post('/admin/logout', [AuthController::class, 'logout'])
+    ->middleware(['auth', 'admin'])
+    ->name('admin.logout');
+
+
+/*
+|--------------------------------------------------------------------------
+| INFORMASI
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/information', [InformationController::class, 'index'])
     ->name('informasi');
 
 
-// =====================================================
-// ARTICLES
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| ARTICLES
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/articles', [DataArticleController::class, 'index'])
     ->name('articles');
 
 
-// =====================================================
-// JURNAL
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| JURNAL
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/jurnal', [JurnalController::class, 'index'])
     ->name('jurnal');
 
 
-// =====================================================
-// CONFERENCE
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| CONFERENCE
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/conference', [ConferenceController::class, 'index'])
     ->name('conference');
 
 
-// =====================================================
-// PUBLISHER
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| PUBLISHER
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/publisher', [PublisherController::class, 'index'])
     ->name('publisher');
 
 
-// =====================================================
-// KONSULTASI
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| KONSULTASI
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/konsultasi', function () {
+
     return view('landing-page.pages.konsultasi');
+
 })->name('konsultasi');
 
 
-// =====================================================
-// HAKI
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| HAKI
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/haki', [HakiController::class, 'index'])
     ->name('haki.index');
+
 
 Route::get('/haki/daftar/{jenis}', function ($jenis) {
 
@@ -152,42 +216,65 @@ Route::get('/haki/daftar/{jenis}', function ($jenis) {
 })->name('haki.daftar');
 
 
-// =====================================================
-// CEK RESI
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| CEK RESI
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/cek-resi', [ShipmentController::class, 'index'])
     ->name('cek-resi');
+
 
 Route::post('/cek-resi', [ShipmentController::class, 'track'])
     ->name('cek-resi.track');
 
 
-// =====================================================
-// TENTANG KAMI
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| TENTANG KAMI
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/tentang/dewan-redaksi', function () {
+
     return view('landing-page.pages.dewan-redaksi');
+
 })->name('tentang.dewan-redaksi');
 
+
 Route::get('/tentang/visi-misi', function () {
+
     return view('landing-page.pages.visi-misi');
+
 })->name('tentang.visi-misi');
 
+
 Route::get('/tentang/kontak', function () {
+
     return view('landing-page.pages.kontak');
+
 })->name('tentang.kontak');
 
 
-// =====================================================
-// PORTOFOLIO & BOOKSTORE
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| PORTOFOLIO
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/portofolio/katalog', function () {
+
     return view('landing-page.pages.katalog-lengkap');
+
 })->name('portofolio.katalog');
 
+
+/*
+|--------------------------------------------------------------------------
+| BOOKSTORE
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/portofolio/bookstore', function () {
 
@@ -201,147 +288,311 @@ Route::get('/portofolio/bookstore', function () {
 })->name('portofolio.bookstore');
 
 
-// Detail buku menggunakan slug
-Route::get('/portofolio/bookstore/{book:slug}', function (Book $book) {
+/*
+|--------------------------------------------------------------------------
+| BOOK DETAIL
+|--------------------------------------------------------------------------
+*/
 
-    return view(
-        'landing-page.pages.book-detail',
-        compact('book')
-    );
+Route::get(
+    '/portofolio/bookstore/{book:slug}',
+    function (Book $book) {
 
-})->name('portofolio.bookstore.show');
+        return view(
+            'landing-page.pages.book-detail',
+            compact('book')
+        );
+
+    }
+)->name('portofolio.bookstore.show');
 
 
-// =====================================================
-// BLOG & COMMENTS - PUBLIC
-// =====================================================
+/*
+|--------------------------------------------------------------------------
+| BLOG
+|--------------------------------------------------------------------------
+|
+| BLOG PUBLIC
+| Semua orang bisa membaca artikel.
+|
+| BLOG USER
+| User yang sudah login bisa:
+| - Menulis artikel
+| - Melihat artikel sendiri
+| - Edit artikel sendiri
+| - Hapus artikel sendiri
+| - Memberikan komentar
+|
+|--------------------------------------------------------------------------
+*/
 
+
+/*
+|--------------------------------------------------------------------------
+| BLOG - PUBLIC
+|--------------------------------------------------------------------------
+*/
+
+
+// Daftar semua artikel yang sudah approved
 Route::get('/blog', [BlogController::class, 'index'])
     ->name('blog.index');
 
-Route::get('/blog/create', [BlogController::class, 'create'])
-    ->middleware('auth')
-    ->name('blog.create');
 
-Route::post('/blog', [BlogController::class, 'store'])
-    ->middleware('auth')
-    ->name('blog.store');
+/*
+|--------------------------------------------------------------------------
+| BLOG - USER / PENULIS
+|--------------------------------------------------------------------------
+|
+| Semua route di bawah ini membutuhkan login.
+|
+*/
 
-Route::get('/blog/{post:slug}/edit', [BlogController::class, 'edit'])
-    ->middleware('auth')
-    ->name('blog.edit');
-
-Route::put('/blog/{post:slug}', [BlogController::class, 'update'])
-    ->middleware('auth')
-    ->name('blog.update');
-
-Route::delete('/blog/{post:slug}', [BlogController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('blog.destroy');
-
-Route::post('/blog/{post}/comments', [CommentController::class, 'store'])
-    ->middleware('auth')
-    ->name('post.comment.store');
-
-Route::get('/blog/{post:slug}', [BlogController::class, 'show'])
-    ->name('blog.show');
+Route::middleware('auth')->group(function () {
 
 
-// =====================================================
-// EVENT - PUBLIC
-// =====================================================
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE ARTICLE
+    |--------------------------------------------------------------------------
+    |
+    | URL:
+    | /blog/create
+    |
+    */
 
-// Halaman daftar Event
-Route::get('/event', [EventController::class, 'index'])
-    ->name('event.index');
-
-// Detail Event
-Route::get('/event/{slug}', [EventController::class, 'show'])
-    ->name('event.show');
-
-
-// =====================================================
-// PROFILE, TEAM & SEARCH
-// =====================================================
-
-Route::get('/user/{id}', [ProfileController::class, 'show'])
-    ->name('user.profile');
-
-Route::get('/profile/edit', [ProfileController::class, 'edit'])
-    ->middleware('auth')
-    ->name('profile.edit');
-
-Route::put('/profile/update', [ProfileController::class, 'update'])
-    ->middleware('auth')
-    ->name('profile.update');
-
-Route::get('/team/{slug}', [TeamController::class, 'show'])
-    ->name('team.show');
-
-Route::get('/search', [SearchController::class, 'index'])
-    ->name('search');
+    Route::get('/blog/create', [BlogController::class, 'create'])
+        ->name('blog.create');
 
 
-// =====================================================
-// GANTI BAHASA
-// =====================================================
+    /*
+    |--------------------------------------------------------------------------
+    | STORE ARTICLE
+    |--------------------------------------------------------------------------
+    |
+    | URL:
+    | POST /blog
+    |
+    */
 
-Route::get('/lang/{locale}', function ($locale) {
+    Route::post('/blog', [BlogController::class, 'store'])
+        ->name('blog.store');
 
-    if (in_array($locale, ['id', 'en', 'zh', 'ja', 'ko'])) {
 
-        Session::put('locale', $locale);
-        App::setLocale($locale);
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | MY POSTS
+    |--------------------------------------------------------------------------
+    |
+    | URL:
+    | /blog/saya
+    |
+    */
 
-    return redirect()->back();
+    Route::get('/blog/saya', [BlogController::class, 'myPosts'])
+        ->name('blog.myPosts');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT ARTICLE
+    |--------------------------------------------------------------------------
+    |
+    | URL:
+    | /blog/{post}/edit
+    |
+    */
+
+    Route::get(
+        '/blog/{post:slug}/edit',
+        [BlogController::class, 'edit']
+    )->name('blog.edit');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE ARTICLE
+    |--------------------------------------------------------------------------
+    |
+    | URL:
+    | PUT /blog/{post}
+    |
+    */
+
+    Route::put(
+        '/blog/{post:slug}',
+        [BlogController::class, 'update']
+    )->name('blog.update');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE ARTICLE
+    |--------------------------------------------------------------------------
+    |
+    | URL:
+    | DELETE /blog/{post}
+    |
+    */
+
+    Route::delete(
+        '/blog/{post:slug}',
+        [BlogController::class, 'destroy']
+    )->name('blog.destroy');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMMENT
+    |--------------------------------------------------------------------------
+    |
+    | User yang login dapat memberikan komentar.
+    |
+    */
+
+    Route::post(
+        '/blog/{post}/comments',
+        [CommentController::class, 'store']
+    )->name('post.comment.store');
 
 });
 
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN CMS ROUTES
+| BLOG - DETAIL PUBLIC
 |--------------------------------------------------------------------------
 |
-| Semua route di bawah /admin membutuhkan login.
+| PENTING:
+| Route wildcard {post:slug} diletakkan SETELAH
+| /blog/create dan /blog/saya.
 |
+|--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])
+
+Route::get('/blog/{post:slug}', [BlogController::class, 'show'])
+    ->name('blog.show');
+
+
+/*
+|--------------------------------------------------------------------------
+| EVENT PUBLIC
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/event', [EventController::class, 'index'])
+    ->name('event.index');
+
+
+Route::get('/event/{slug}', [EventController::class, 'show'])
+    ->name('event.show');
+
+
+/*
+|--------------------------------------------------------------------------
+| USER PROFILE
+|--------------------------------------------------------------------------
+*/
+
+
+// Profile public
+Route::get('/user/{id}', [ProfileController::class, 'show'])
+    ->name('user.profile');
+
+
+// Profile user login
+Route::middleware('auth')->group(function () {
+
+    Route::get(
+        '/profile/edit',
+        [ProfileController::class, 'edit']
+    )->name('profile.edit');
+
+
+    Route::put(
+        '/profile/update',
+        [ProfileController::class, 'update']
+    )->name('profile.update');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| TEAM
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/team/{slug}', [TeamController::class, 'show'])
+    ->name('team.show');
+
+
+/*
+|--------------------------------------------------------------------------
+| SEARCH
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/search', [SearchController::class, 'index'])
+    ->name('search');
+
+
+/*
+|--------------------------------------------------------------------------
+| LANGUAGE
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/lang/{locale}', function ($locale) {
+
+    if (in_array($locale, ['id', 'en', 'zh', 'ja', 'ko'])) {
+
+        Session::put('locale', $locale);
+
+        App::setLocale($locale);
+    }
+
+    return redirect()->back();
+
+})->name('language');
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN CMS
+|--------------------------------------------------------------------------
+|
+| auth  = harus login
+| admin = harus is_admin = true
+|
+| User Google biasa TIDAK bisa masuk.
+|
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        // =====================================================
-        // DASHBOARD
-        // =====================================================
+
+        /*
+        |--------------------------------------------------------------------------
+        | DASHBOARD
+        |--------------------------------------------------------------------------
+        */
 
         Route::get('/', [DashboardController::class, 'index'])
             ->name('dashboard');
 
 
-        // =====================================================
-        // LOGOUT ADMIN
-        // =====================================================
+        /*
+        |--------------------------------------------------------------------------
+        | BOOKS
+        |--------------------------------------------------------------------------
+        */
 
-        Route::match(['get', 'post'], '/logout', function () {
-
-            auth()->logout();
-
-            request()->session()->invalidate();
-            request()->session()->regenerateToken();
-
-            return redirect('/');
-
-        })->name('logout');
-
-
-        // =====================================================
-        // ADMIN CRUD
-        // =====================================================
-
-        // Buku
         Route::resource(
             'books',
             AdminBookController::class
@@ -350,51 +601,107 @@ Route::middleware(['auth'])
         ]);
 
 
-        // Informasi
+        /*
+        |--------------------------------------------------------------------------
+        | INFORMATIONS
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource(
             'informations',
             InformationAdminController::class
         );
 
 
-        // Jurnal
+        /*
+        |--------------------------------------------------------------------------
+        | JOURNALS
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource(
             'journals',
             JurnalAdminController::class
         );
 
 
-        // Konferensi
+        /*
+        |--------------------------------------------------------------------------
+        | CONFERENCES
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource(
             'conferences',
             ConferenceAdminController::class
         );
 
 
-        // Publisher
+        /*
+        |--------------------------------------------------------------------------
+        | PUBLISHERS
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource(
             'publishers',
             PublisherAdminController::class
         );
 
 
-        // Data Articles
+        /*
+        |--------------------------------------------------------------------------
+        | DATA ARTICLES
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource(
             'data-articles',
             DataArticleAdminController::class
         );
 
 
-        // Artikel / Blog yang dikelola Admin
+        /*
+        |--------------------------------------------------------------------------
+        | BLOG POSTS
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource(
             'posts',
             PostController::class
         );
 
 
-        // =====================================================
-        // EVENT ADMIN
-        // =====================================================
+        /*
+        |--------------------------------------------------------------------------
+        | APPROVE ARTICLE
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/posts/{post}/approve',
+            [PostController::class, 'approve']
+        )->name('posts.approve');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REJECT ARTICLE
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/posts/{post}/reject',
+            [PostController::class, 'reject']
+        )->name('posts.reject');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | EVENTS
+        |--------------------------------------------------------------------------
+        */
 
         Route::resource(
             'events',
@@ -402,13 +709,27 @@ Route::middleware(['auth'])
         );
 
 
-        // =====================================================
-        // DETAIL HELPER
-        // =====================================================
+        /*
+        |--------------------------------------------------------------------------
+        | DETAIL
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             '/detail/{type}/{id}',
             [DetailController::class, 'show']
         )->name('detail.show');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN LOGOUT
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/logout',
+            [AuthController::class, 'logout']
+        )->name('logout');
 
     });
