@@ -10,7 +10,6 @@ use App\Models\Book;
 | PUBLIC CONTROLLERS
 |--------------------------------------------------------------------------
 */
-
 use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\InformationController;
 use App\Http\Controllers\PublisherController;
@@ -30,7 +29,6 @@ use App\Http\Controllers\EventController;
 | USER AUTH
 |--------------------------------------------------------------------------
 */
-
 use App\Http\Controllers\Auth\GoogleController;
 
 /*
@@ -38,8 +36,8 @@ use App\Http\Controllers\Auth\GoogleController;
 | ADMIN CONTROLLERS
 |--------------------------------------------------------------------------
 */
-
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\AdminAuthController; 
 use App\Http\Controllers\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InformationAdminController;
@@ -57,7 +55,6 @@ use App\Http\Controllers\Admin\EventAdminController;
 | HOME
 |--------------------------------------------------------------------------
 */
-
 Route::get('/', function () {
     if (session()->has('locale')) {
         App::setLocale(session()->get('locale'));
@@ -71,7 +68,6 @@ Route::get('/', function () {
 | USER AUTHENTICATION (Google Login)
 |--------------------------------------------------------------------------
 */
-
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
@@ -89,13 +85,21 @@ Route::post('/logout', function () {
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN AUTHENTICATION
+| ADMIN AUTHENTICATION (Jalur Rahasia & Berlapis OTP)
 |--------------------------------------------------------------------------
 */
 
-Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.post');
-Route::post('/admin/logout', [AuthController::class, 'logout'])->middleware(['auth', 'admin'])->name('admin.logout');
+// 1. Form Login Awal (Email & Password)
+Route::get('/panel-adminbaca/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/panel-adminbaca/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+
+// 2. Form Verifikasi Kode OTP (Dikirim ke email pusat)
+Route::get('/panel-adminbaca/verify-otp', [AdminAuthController::class, 'showOtpForm'])->name('admin.otp');
+Route::post('/panel-adminbaca/verify-otp', [AdminAuthController::class, 'processOtp'])->name('admin.otp.submit');
+
+// 3. Form Konfirmasi Final (Ketik ulang email & password)
+Route::get('/panel-adminbaca/confirm-access', [AdminAuthController::class, 'showConfirmForm'])->name('admin.confirm');
+Route::post('/panel-adminbaca/confirm-access', [AdminAuthController::class, 'processConfirm'])->name('admin.confirm.submit');
 
 
 /*
@@ -103,7 +107,6 @@ Route::post('/admin/logout', [AuthController::class, 'logout'])->middleware(['au
 | PUBLIC PAGES (Informasi, Artikel, Jurnal, dll)
 |--------------------------------------------------------------------------
 */
-
 Route::get('/information', [InformationController::class, 'index'])->name('informasi');
 Route::get('/articles', [DataArticleController::class, 'index'])->name('articles');
 Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal');
@@ -114,27 +117,22 @@ Route::get('/konsultasi', function () {
     return view('landing-page.pages.konsultasi');
 })->name('konsultasi');
 
-// HAKI
 Route::get('/haki', [HakiController::class, 'index'])->name('haki.index');
 Route::get('/haki/daftar/{jenis}', function ($jenis) {
     return view('landing-page.pages.haki', ['jenis' => $jenis]);
 })->name('haki.daftar');
 
-// Cek Resi
 Route::get('/cek-resi', [ShipmentController::class, 'index'])->name('cek-resi');
 Route::post('/cek-resi', [ShipmentController::class, 'track'])->name('cek-resi.track');
 
-// Tentang Kami
 Route::get('/tentang/dewan-redaksi', function () { return view('landing-page.pages.dewan-redaksi'); })->name('tentang.dewan-redaksi');
 Route::get('/tentang/visi-misi', function () { return view('landing-page.pages.visi-misi'); })->name('tentang.visi-misi');
 Route::get('/tentang/kontak', function () { return view('landing-page.pages.kontak'); })->name('tentang.kontak');
 
-// Portofolio
 Route::get('/portofolio/katalog', function () {
     return view('landing-page.pages.katalog-lengkap');
 })->name('portofolio.katalog');
 
-// Bookstore (Memakai slug milikmu)
 Route::get('/portofolio/bookstore', function () {
     $books = Book::latest()->get();
     return view('landing-page.pages.bookstore', compact('books'));
@@ -150,7 +148,6 @@ Route::get('/portofolio/bookstore/{book:slug}', function (Book $book) {
 | BLOG & USER ACTIONS
 |--------------------------------------------------------------------------
 */
-
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 
 Route::middleware('auth')->group(function () {
@@ -171,7 +168,6 @@ Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.sho
 | EVENT PUBLIC
 |--------------------------------------------------------------------------
 */
-
 Route::get('/event', [EventController::class, 'index'])->name('event.index');
 Route::get('/event/{slug}', [EventController::class, 'show'])->name('event.show');
 
@@ -181,7 +177,6 @@ Route::get('/event/{slug}', [EventController::class, 'show'])->name('event.show'
 | USER PROFILE & TEAM & SEARCH & LANGUAGE
 |--------------------------------------------------------------------------
 */
-
 Route::get('/user/{id}', [ProfileController::class, 'show'])->name('user.profile');
 
 Route::middleware('auth')->group(function () {
@@ -203,10 +198,9 @@ Route::get('/lang/{locale}', function ($locale) {
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN CMS ROUTES
+| ADMIN CMS ROUTES (Dilindungi Middleware Auth & Admin)
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
@@ -227,5 +221,6 @@ Route::middleware(['auth', 'admin'])
         Route::resource('events', EventAdminController::class);
 
         Route::get('/detail/{type}/{id}', [DetailController::class, 'show'])->name('detail.show');
+        
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });

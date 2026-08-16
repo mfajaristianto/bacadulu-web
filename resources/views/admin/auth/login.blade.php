@@ -236,7 +236,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.login.post') }}">
+            <form method="POST" action="{{ route('admin.login') }}">
                 @csrf
 
                 <div class="input_box">
@@ -258,8 +258,8 @@
                     </div>
                 </div>
 
-                <div class="input_box">
-                    <input type="submit" class="input-submit" value="Login">
+                <div class="input_box" style="margin-top: 20px;">
+                     <button type="submit" class="input-submit" style="cursor: pointer; position: relative; z-index: 99;">Login Sekarang</button>
                 </div>
             </form>
         </div>
