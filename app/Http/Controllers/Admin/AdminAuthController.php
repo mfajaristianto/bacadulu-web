@@ -3,116 +3,401 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdminOtpMail;
 use App\Models\User;
+use App\Models\TrustedDevice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Str;
 
 class AdminAuthController extends Controller
 {
-    // Alias untuk rute POST /panel-adminbaca/login
-    public function login(Request $request)
-    {
-        return $this->processLogin($request);
-    }
-
-    // 1. Tampilkan Form Login Pertama (Email & Password)
+    /**
+     * STEP 1: Tampilkan form login
+     */
     public function showLoginForm()
     {
         return view('admin.auth.login');
     }
 
-    // Proses Cek Email & Password Awal -> Kirim OTP ke Email Pusat
-    public function processLogin(Request $request)
+    /**
+     * STEP 1: Proses email + password
+     *
+     * Kalau device sudah dipercaya:
+     *     langsung login
+     *
+     * Kalau device belum dipercaya:
+     *     kirim OTP
+     */
+    public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
-        $user = User::where('email', $request->email)->where('is_admin', true)->first();
+        $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return back()->with('error', 'Email atau password salah!');
+        // Cek akun admin
+        if (!$user || !$user->is_admin) {
+            return back()
+                ->withErrors([
+                    'email' => 'Akun ini tidak memiliki akses sebagai admin.',
+                ])
+                ->withInput();
         }
 
-        // Generate Kode OTP 6 Digit
-        $otp = rand(100000, 999999);
-        $user->otp_code = $otp;
-        $user->otp_expires_at = now()->addMinutes(15); 
-        $user->save();
+        // Cek password
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return back()
+                ->withErrors([
+                    'email' => 'Email atau password salah.',
+                ])
+                ->withInput();
+        }
 
-        // KIRIM OTP KE EMAIL PUSAT
-        Mail::raw("Kode OTP untuk akses admin panel adalah: {$otp}. Berlaku selama 15 menit.", function ($message) {
-            $message->to('adminbacadulu@gmail.com')
-                    ->subject('KODE OTP AKSES ADMIN BACA DULU');
-        });
+        /*
+        |--------------------------------------------------------------------------
+        | CEK TRUSTED DEVICE
+        |--------------------------------------------------------------------------
+        */
 
-        // Simpan ID user di session sementara
-        session(['admin_temp_id' => $user->id]);
+        $trustedToken = $request->cookie('admin_trusted_device');
 
-        return redirect()->route('admin.otp')->with('success', 'Kode OTP telah dikirim ke email pusat adminbacadulu@gmail.com');
+        if ($trustedToken) {
+
+            $tokenHash = hash('sha256', $trustedToken);
+
+            $trustedDevice = TrustedDevice::where('user_id', $user->id)
+                ->where('token_hash', $tokenHash)
+                ->first();
+
+            if ($trustedDevice) {
+
+                // Kalau belum expired
+                if (
+                    !$trustedDevice->expires_at ||
+                    $trustedDevice->expires_at->isFuture()
+                ) {
+
+                    Auth::login(
+                        $user,
+                        $request->boolean('remember')
+                    );
+
+                    $request->session()->regenerate();
+
+                    return redirect()->route('admin.dashboard');
+                }
+
+                // Kalau expired, hapus
+                $trustedDevice->delete();
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DEVICE BELUM DIPERCAYA → KIRIM OTP
+        |--------------------------------------------------------------------------
+        */
+
+        $otp = str_pad(
+            random_int(0, 999999),
+            6,
+            '0',
+            STR_PAD_LEFT
+        );
+
+        $request->session()->put(
+            'admin_pending_user_id',
+            $user->id
+        );
+
+        $request->session()->put(
+            'admin_otp_code',
+            $otp
+        );
+
+        $request->session()->put(
+            'admin_otp_expires_at',
+            now()->addMinutes(5)
+        );
+
+        $request->session()->put(
+            'admin_remember',
+            $request->boolean('remember')
+        );
+
+        $otpRecipient = env(
+            'ADMIN_OTP_EMAIL',
+            $user->email
+        );
+
+        Mail::to($otpRecipient)
+            ->send(new AdminOtpMail($otp));
+
+        return redirect()->route('admin.otp');
     }
 
-    // 2. Tampilkan Form Input OTP
-    public function showOtpForm()
+    /**
+     * STEP 2: Form OTP
+     */
+    public function showOtpForm(Request $request)
     {
-        if (!session()->has('admin_temp_id')) {
+        if (
+            !$request->session()->has(
+                'admin_pending_user_id'
+            )
+        ) {
             return redirect()->route('admin.login');
         }
+
         return view('admin.auth.otp');
     }
 
-    // Proses Verifikasi OTP
+    /**
+     * STEP 2: Verifikasi OTP
+     */
     public function processOtp(Request $request)
     {
-        $request->validate(['otp' => 'required|numeric']);
+        $request->validate([
+            'otp' => ['required', 'digits:6'],
+        ]);
 
-        $user = User::find(session('admin_temp_id'));
+        $sessionOtp = $request->session()->get(
+            'admin_otp_code'
+        );
 
-        if (!$user || (string)$user->otp_code !== (string)$request->otp || now()->gt($user->otp_expires_at)) {
-            return back()->with('error', 'Kode OTP salah atau sudah kedaluwarsa!');
+        $expiresAt = $request->session()->get(
+            'admin_otp_expires_at'
+        );
+
+        $userId = $request->session()->get(
+            'admin_pending_user_id'
+        );
+
+        // Session OTP tidak ditemukan
+        if (!$sessionOtp || !$userId) {
+            return redirect()
+                ->route('admin.login')
+                ->with(
+                    'error',
+                    'Sesi OTP tidak ditemukan, silakan login ulang.'
+                );
         }
 
-        // OTP Valid, hapus OTP agar tidak bisa dipakai ulang
-        $user->otp_code = null;
-        $user->otp_expires_at = null;
-        $user->save();
+        // OTP expired
+        if (
+            !$expiresAt ||
+            now()->greaterThan($expiresAt)
+        ) {
 
-        // Lanjut ke tahap konfirmasi email & password final
+            $request->session()->forget([
+                'admin_otp_code',
+                'admin_otp_expires_at',
+                'admin_pending_user_id',
+                'admin_remember',
+            ]);
+
+            return redirect()
+                ->route('admin.login')
+                ->with(
+                    'error',
+                    'Kode OTP sudah kedaluwarsa, silakan login ulang.'
+                );
+        }
+
+        // OTP salah
+        if ($request->otp !== $sessionOtp) {
+            return back()
+                ->with(
+                    'error',
+                    'Kode OTP salah.'
+                );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | OTP BENAR
+        |--------------------------------------------------------------------------
+        */
+
+        $request->session()->put(
+            'admin_otp_verified',
+            true
+        );
+
+        $request->session()->forget([
+            'admin_otp_code',
+            'admin_otp_expires_at',
+        ]);
+
         return redirect()->route('admin.confirm');
     }
 
-    // 3. Tampilkan Form Konfirmasi Final (Ketik Ulang Email & Password)
-    public function showConfirmForm()
+    /**
+     * STEP 3: Form konfirmasi
+     */
+    public function showConfirmForm(Request $request)
     {
-        if (!session()->has('admin_temp_id')) {
+        if (
+            !$request->session()->get('admin_otp_verified') ||
+            !$request->session()->has('admin_pending_user_id')
+        ) {
             return redirect()->route('admin.login');
         }
+
         return view('admin.auth.confirm');
     }
 
-    // Proses Konfirmasi Final -> Sukses Masuk Dashboard
+    /**
+     * STEP 3:
+     *
+     * Konfirmasi email + password.
+     *
+     * Setelah berhasil:
+     * 1. Login
+     * 2. Buat trusted device
+     * 3. Simpan token hash ke database
+     * 4. Simpan token asli ke cookie browser
+     */
     public function processConfirm(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
-        $user = User::find(session('admin_temp_id'));
+        $userId = $request->session()->get(
+            'admin_pending_user_id'
+        );
 
-        if (!$user || $user->email !== $request->email || !Hash::check($request->password, $user->password)) {
-            return back()->with('error', 'Konfirmasi email atau password salah!');
+        $otpVerified = $request->session()->get(
+            'admin_otp_verified'
+        );
+
+        // Cek session
+        if (!$userId || !$otpVerified) {
+            return redirect()
+                ->route('admin.login')
+                ->with(
+                    'error',
+                    'Sesi tidak valid, silakan login ulang.'
+                );
         }
 
-        // Hapus session sementara
-        session()->forget('admin_temp_id');
+        $user = User::find($userId);
 
-        // Login Resmi Masuk Sistem
-        Auth::login($user);
+        // Cek user
+        if (!$user || !$user->is_admin) {
+            return redirect()
+                ->route('admin.login')
+                ->with(
+                    'error',
+                    'Akun admin tidak ditemukan.'
+                );
+        }
 
-        return redirect()->intended('/admin')->with('success', 'Selamat datang di Panel Admin Utama!');
+        // Cek email
+        if (
+            strtolower($user->email) !==
+            strtolower($request->email)
+        ) {
+            return back()
+                ->with(
+                    'error',
+                    'Email konfirmasi tidak cocok.'
+                );
+        }
+
+        // Cek password
+        if (
+            !Hash::check(
+                $request->password,
+                $user->password
+            )
+        ) {
+            return back()
+                ->with(
+                    'error',
+                    'Password konfirmasi tidak cocok.'
+                );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | BUAT TRUSTED DEVICE BARU
+        |--------------------------------------------------------------------------
+        */
+
+        $trustedToken = Str::random(64);
+
+        TrustedDevice::create([
+            'user_id' => $user->id,
+            'token_hash' => hash(
+                'sha256',
+                $trustedToken
+            ),
+            'user_agent' => $request->userAgent(),
+            'expires_at' => now()->addYear(),
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | LOGIN ADMIN
+        |--------------------------------------------------------------------------
+        */
+
+        $remember = $request->session()->get(
+            'admin_remember',
+            false
+        );
+
+        Auth::login(
+            $user,
+            $remember
+        );
+
+        $request->session()->regenerate();
+
+        /*
+        |--------------------------------------------------------------------------
+        | BERSIHKAN SESSION OTP
+        |--------------------------------------------------------------------------
+        */
+
+        $request->session()->forget([
+            'admin_pending_user_id',
+            'admin_otp_verified',
+            'admin_remember',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | BUAT COOKIE TRUSTED DEVICE
+        |--------------------------------------------------------------------------
+        |
+        | Cookie ini TIDAK dihapus saat logout.
+        |
+        */
+
+        $cookie = Cookie::make(
+            'admin_trusted_device',
+            $trustedToken,
+            60 * 24 * 365, // 1 tahun
+            '/',
+            null,
+            false,
+            true,
+            false,
+            'lax'
+        );
+
+        return redirect()
+            ->route('admin.dashboard')
+            ->withCookie($cookie);
     }
 }

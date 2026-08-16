@@ -3,143 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konfirmasi Akses Admin - Bacadulu</title>
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins&display=swap">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
-        }
 
-        :root {
-            --primary-color: #8b96a3;
-            --second-color: #ffffff;
-            --black-color: #1c1917;
-        }
+    <title>Konfirmasi Admin - Baca Dulu</title>
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(160deg, #3a4350 0%, #5c6b7a 50%, #8b96a3 100%);
-            color: var(--second-color);
-        }
-
-        .login_box {
-            width: 450px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(30px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 15px;
-            padding: 2.5em;
-            box-shadow: 0px 20px 45px rgba(0, 0, 0, 0.45);
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 1.5em;
-        }
-
-        .login-header span {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .error-box {
-            margin-bottom: 20px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.85);
-            color: #b91c1c;
-            padding: 10px 15px;
-            font-size: 14px;
-        }
-
-        .input_box {
-            position: relative;
-            margin: 20px 0;
-        }
-
-        .input-field {
-            width: 100%;
-            height: 50px;
-            font-size: 15px;
-            padding: 0 20px;
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--second-color);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 30px;
-            outline: none;
-        }
-
-        .input-field::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .input-submit {
-            width: 100%;
-            height: 48px;
-            background: #ececec;
-            color: #1c1917;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .input-submit:hover {
-            background: var(--second-color);
-        }
-
-        p.info {
-            font-size: 13px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="login_box">
-        <div class="login-header">
-            <span>Konfirmasi Akses Final</span>
+
+<body class="min-h-screen bg-slate-100 flex items-center justify-center px-4">
+
+    <div class="w-full max-w-md">
+
+        <div class="text-center mb-8">
+
+            <div class="inline-flex items-center justify-center
+                        w-16 h-16 rounded-2xl
+                        bg-gradient-to-br from-green-400 to-emerald-600
+                        text-white text-2xl shadow-lg">
+                ✓
+            </div>
+
+            <h1 class="mt-4 text-2xl font-bold text-slate-900">
+                OTP Berhasil Diverifikasi
+            </h1>
+
+            <p class="mt-2 text-sm text-slate-500">
+                Satu langkah lagi untuk masuk ke Admin CMS.
+            </p>
+
         </div>
 
-        <p class="info">Ketik ulang Email dan Password kamu untuk menyelesaikan proses autentikasi berlapis.</p>
 
-        @if($errors->any())
-            <div class="error-box">
-                {{ $errors->first() }}
-            </div>
-        @endif
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
 
-        @if(session('error'))
-            <div class="error-box">
-                {{ session('error') }}
-            </div>
-        @endif
+            <div class="mb-6">
 
-        <form method="POST" action="{{ route('admin.confirm.submit') }}">
-            @csrf
+                <h2 class="text-xl font-bold text-slate-900">
+                    Konfirmasi identitas
+                </h2>
 
-            <div class="input_box">
-                <input type="email" name="email" class="input-field" placeholder="Email Admin" required autofocus>
+                <p class="text-sm text-slate-500 mt-2">
+                    Masukkan kembali email dan password admin
+                    untuk menyelesaikan proses login.
+                </p>
+
             </div>
 
-            <div class="input_box">
-                <input type="password" name="password" class="input-field" placeholder="Password Admin" required>
+
+            @if (session('error'))
+
+                <div class="mb-5 rounded-xl bg-red-50 border border-red-200
+                            px-4 py-3 text-sm text-red-700">
+
+                    {{ session('error') }}
+
+                </div>
+
+            @endif
+
+
+            <form
+                method="POST"
+                action="{{ route('admin.confirm.submit') }}"
+                class="space-y-5"
+            >
+
+                @csrf
+
+
+                {{-- EMAIL --}}
+                <div>
+
+                    <label
+                        for="email"
+                        class="block text-sm font-semibold text-slate-700 mb-2"
+                    >
+                        Email Admin
+                    </label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        required
+                        autocomplete="email"
+
+                        class="w-full px-4 py-3 rounded-xl
+                               border border-slate-300
+                               focus:border-green-500
+                               focus:ring-2 focus:ring-green-200
+                               outline-none"
+                    >
+
+                </div>
+
+
+                {{-- PASSWORD --}}
+                <div>
+
+                    <label
+                        for="password"
+                        class="block text-sm font-semibold text-slate-700 mb-2"
+                    >
+                        Password
+                    </label>
+
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+
+                        class="w-full px-4 py-3 rounded-xl
+                               border border-slate-300
+                               focus:border-green-500
+                               focus:ring-2 focus:ring-green-200
+                               outline-none"
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+
+                    class="w-full py-3.5
+                           rounded-xl
+                           bg-slate-900
+                           hover:bg-slate-800
+                           text-white font-semibold
+                           transition"
+                >
+                    Konfirmasi & Masuk
+                </button>
+
+            </form>
+
+
+            <div class="mt-6 p-4 rounded-xl bg-green-50 border border-green-100">
+
+                <div class="flex gap-3">
+
+                    <div class="text-lg">
+                        🛡️
+                    </div>
+
+                    <p class="text-xs text-green-800 leading-relaxed">
+                        Setelah berhasil masuk, perangkat ini akan
+                        <strong>dipercaya selama 1 tahun</strong>.
+                        Login berikutnya dari perangkat ini tidak
+                        memerlukan OTP lagi.
+                    </p>
+
+                </div>
+
             </div>
 
-            <div class="input_box" style="margin-top: 25px;">
-                <button type="submit" class="input-submit">Masuk ke Dashboard</button>
-            </div>
-        </form>
+        </div>
+
     </div>
+
 </body>
 </html>
