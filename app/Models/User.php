@@ -51,6 +51,24 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    /**
+     * Communities created by this user
+     */
+    public function communities()
+    {
+        return $this->hasMany(Community::class);
+    }
+
+    /**
+     * Communities this user is a member of
+     */
+    public function memberCommunities()
+    {
+        return $this->belongsToMany(Community::class, 'community_members')
+                    ->withTimestamps()
+                    ->withPivot('joined_at');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | ADMIN PANEL

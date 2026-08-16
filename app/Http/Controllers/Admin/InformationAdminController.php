@@ -33,6 +33,8 @@ class InformationAdminController extends Controller
             $data['image'] = $request->file('image')->store('uploads/informations', 'public');
         }
 
+        $data['slug'] = Information::makeSlug($data['title']);
+
         Information::create($data);
 
         return redirect()->route('admin.informations.index')->with('success', 'Informasi berhasil disimpan.');
@@ -53,6 +55,10 @@ class InformationAdminController extends Controller
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('uploads/informations', 'public');
+        }
+
+        if ($request->title !== $information->title) {
+            $data['slug'] = Information::makeSlug($data['title'], $information->id);
         }
 
         $information->update($data);

@@ -20,9 +20,9 @@ use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\CommunityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +48,7 @@ use App\Http\Controllers\Admin\DataArticleAdminController;
 use App\Http\Controllers\Admin\DetailController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\EventAdminController;
+use App\Http\Controllers\Admin\CommunityController as AdminCommunityController;
 
 
 /*
@@ -108,6 +109,8 @@ Route::post('/panel-adminbaca/confirm-access', [AdminAuthController::class, 'pro
 |--------------------------------------------------------------------------
 */
 Route::get('/information', [InformationController::class, 'index'])->name('informasi');
+Route::get('/information/{information:slug}', [InformationController::class, 'show'])->name('informasi.show');
+
 Route::get('/articles', [DataArticleController::class, 'index'])->name('articles');
 Route::get('/jurnal', [JurnalController::class, 'index'])->name('jurnal');
 Route::get('/conference', [ConferenceController::class, 'index'])->name('conference');
@@ -165,6 +168,23 @@ Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.sho
 
 /*
 |--------------------------------------------------------------------------
+| COMMUNITY
+|--------------------------------------------------------------------------
+*/
+Route::get('/komunitas', [CommunityController::class, 'index'])->name('community.index');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/komunitas/buat', [CommunityController::class, 'create'])->name('community.create');
+    Route::post('/komunitas', [CommunityController::class, 'store'])->name('community.store');
+    Route::post('/komunitas/{community}/join', [CommunityController::class, 'join'])->name('community.join');
+    Route::post('/komunitas/{community}/leave', [CommunityController::class, 'leave'])->name('community.leave');
+});
+
+Route::get('/komunitas/{community}', [CommunityController::class, 'show'])->name('community.show');
+
+
+/*
+|--------------------------------------------------------------------------
 | EVENT PUBLIC
 |--------------------------------------------------------------------------
 */
@@ -174,16 +194,9 @@ Route::get('/event/{slug}', [EventController::class, 'show'])->name('event.show'
 
 /*
 |--------------------------------------------------------------------------
-| USER PROFILE & TEAM & SEARCH & LANGUAGE
+| TEAM & SEARCH & LANGUAGE
 |--------------------------------------------------------------------------
 */
-Route::get('/user/{id}', [ProfileController::class, 'show'])->name('user.profile');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-});
-
 Route::get('/team/{slug}', [TeamController::class, 'show'])->name('team.show');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
@@ -219,6 +232,10 @@ Route::middleware(['auth', 'admin'])
         Route::post('/posts/{post}/reject', [PostController::class, 'reject'])->name('posts.reject');
 
         Route::resource('events', EventAdminController::class);
+        
+        Route::resource('communities', AdminCommunityController::class);
+        Route::post('/communities/{community}/approve', [AdminCommunityController::class, 'approve'])->name('communities.approve');
+        Route::post('/communities/{community}/reject', [AdminCommunityController::class, 'reject'])->name('communities.reject');
 
         Route::get('/detail/{type}/{id}', [DetailController::class, 'show'])->name('detail.show');
         

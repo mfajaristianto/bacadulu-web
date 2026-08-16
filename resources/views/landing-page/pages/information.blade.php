@@ -39,11 +39,16 @@
                         </div>
 
                         <!-- Tombol Baca Selengkapnya (Warna Ungu Cantik ala Gambar 1) -->
-                        <div>
-                            <a href="#" class="btn w-100 fw-bold py-2 rounded-pill shadow-none transition-btn" style="background-color: #f3e8ff; color: #7e22ce; border: none;">
-                                Baca Selengkapnya
-                            </a>
-                        </div>
+                        <!-- ... bagian dalam foreach($informations as $info) ... -->
+
+<!-- Tombol Baca Selengkapnya -->
+<div>
+    <a href="{{ route('informasi.show', $info->slug) }}" 
+       class="btn w-100 fw-bold py-2 rounded-pill shadow-none transition-btn" 
+       style="background-color: #f3e8ff; color: #7e22ce; border: none;">
+        Baca Selengkapnya
+    </a>
+</div>
                     </div>
                 </div>
             </div>

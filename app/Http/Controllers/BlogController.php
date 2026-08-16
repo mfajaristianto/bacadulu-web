@@ -66,6 +66,17 @@ public function myPosts()
     return view('blog.my-posts', compact('posts'));
 }
 
+    public function edit($slug)
+    {
+        $post = Post::where('slug', $slug)->firstOrFail();
+        
+        if (auth()->id() !== $post->user_id) {
+            abort(403);
+        }
+
+        return view('blog.edit', compact('post'));
+    }
+
     public function update(Request $request, $slug)
     {
         $post = Post::where('slug', $slug)->firstOrFail();
