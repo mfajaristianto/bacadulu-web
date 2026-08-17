@@ -12,6 +12,10 @@
       <input type="text" name="title" value="{{ old('title', $post->title) }}" class="w-full rounded border p-2">
     </div>
     <div class="mb-4">
+      <label class="block font-semibold">Nama Penulis</label>
+      <input type="text" name="author" value="{{ old('author', $post->author) }}" class="w-full rounded border p-2" placeholder="Masukkan nama penulis">
+    </div>
+    <div class="mb-4">
       <label class="block font-semibold">Kategori</label>
       <select name="category" class="w-full rounded border p-2">
         @foreach(['Kesehatan','Sosial','Ekonomi','Teknik'] as $cat)

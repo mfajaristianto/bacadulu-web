@@ -48,6 +48,27 @@
             @enderror
         </div>
 
+        {{-- NAMA PENULIS --}}
+        <div class="mb-4">
+            <label for="author" class="block font-semibold mb-1">
+                Nama Penulis
+            </label>
+
+            <input
+                id="author"
+                type="text"
+                name="author"
+                value="{{ old('author') }}"
+                class="w-full rounded border p-2"
+                placeholder="Masukkan nama penulis"
+                required
+            >
+
+            @error('author')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
         {{-- KATEGORI --}}
         <div class="mb-4">
             <label for="category" class="block font-semibold mb-1">

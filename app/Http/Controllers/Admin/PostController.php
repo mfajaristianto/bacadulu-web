@@ -42,6 +42,7 @@ public function reject(Post $post)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
             'content' => 'required|string',
             'category' => 'required|in:Kesehatan,Sosial,Ekonomi,Teknik',
         ]);
@@ -63,6 +64,7 @@ public function reject(Post $post)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
             'content' => 'required|string',
             'category' => 'required|in:Kesehatan,Sosial,Ekonomi,Teknik',
         ]);

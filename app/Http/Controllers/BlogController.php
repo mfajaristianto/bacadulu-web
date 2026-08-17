@@ -32,6 +32,7 @@ public function index(Request $request)
 {
     $request->validate([
         'title' => 'required|string|max:255',
+        'author' => 'required|string|max:255',
         'content' => 'required|string',
         'category' => 'required|in:Kesehatan,Sosial,Ekonomi,Teknik',
     ]);
@@ -39,6 +40,7 @@ public function index(Request $request)
     Post::create([
         'user_id' => auth()->id(),
         'title' => $request->title,
+        'author' => $request->author,
         'slug' => \Str::slug($request->title) . '-' . time(),
         'content' => $request->content,
         'category' => $request->category,
@@ -87,12 +89,14 @@ public function myPosts()
 
         $request->validate([
             'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
             'content' => 'required|string',
             'category' => 'required|in:Kesehatan,Sosial,Ekonomi,Teknik',
         ]);
 
         $post->update([
             'title' => $request->title,
+            'author' => $request->author,
             'content' => $request->content,
             'category' => $request->category,
         ]);
