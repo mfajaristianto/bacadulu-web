@@ -43,7 +43,7 @@
 
 <!-- Tombol Baca Selengkapnya -->
 <div>
-    <a href="{{ route('informasi.show', $info->slug) }}" 
+   <a href="{{ route('informasi.show', ['information' => $info->slug]) }}"
        class="btn w-100 fw-bold py-2 rounded-pill shadow-none transition-btn" 
        style="background-color: #f3e8ff; color: #7e22ce; border: none;">
         Baca Selengkapnya
