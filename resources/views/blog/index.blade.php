@@ -1,95 +1,507 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-6 py-12">
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-    
-    <!-- SIDEBAR (Kiri) -->
-    <div class="lg:col-span-1 space-y-6">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sticky top-24">
-        
-        <!-- Menu Utama -->
-        <div class="space-y-1">
-          <a href="{{ route('blog.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold {{ empty(request('menu')) && empty(request('category')) ? 'bg-[#1e1e50]/10 text-[#1e1e50]' : 'text-gray-600 hover:bg-gray-50' }}">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-            Home
-          </a>
-          
-          <a href="{{ route('blog.index', ['menu' => 'komunitas']) }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold {{ request('menu') == 'komunitas' ? 'bg-[#1e1e50]/10 text-[#1e1e50]' : 'text-gray-600 hover:bg-gray-50' }}">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            Komunitas
-          </a>
 
-          <a href="{{ route('event.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            Event
-          </a>
-        </div>
+<div class="max-w-7xl mx-auto px-4 py-8">
 
-        <hr class="my-4 border-gray-100">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
 
-        <!-- Kategori -->
-        <div class="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
-          Kategori
-        </div>
-        <div class="space-y-1">
-          @foreach(['Sosial', 'Ekonomi', 'Teknik', 'Kesehatan'] as $cat)
-            <a href="{{ route('blog.index', ['category' => $cat]) }}" class="block px-4 py-2 rounded-lg text-sm font-medium {{ (isset($category) && $category === $cat) ? 'bg-[#1e1e50]/10 text-[#1e1e50] font-bold' : 'text-gray-600 hover:bg-gray-50' }}">
-              {{ $cat }}
-            </a>
-          @endforeach
-        </div>
 
-      </div>
-    </div>
+        {{-- ========================================================= --}}
+        {{-- SIDEBAR KIRI --}}
+        {{-- ========================================================= --}}
 
-    <!-- KONTEN UTAMA BLOG (Kanan) -->
-    <div class="lg:col-span-3">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        
-        <!-- Header: Judul & Tombol Tulis Artikel Sejajar -->
-        <div class="flex justify-between items-center mb-6">
-          <h1 class="text-2xl font-bold text-slate-800">
-            @if(request('menu') == 'komunitas')
-              Rubrik Komunitas
-            @elseif(!empty($category))
-              Kategori: {{ $category }}
-            @else
-              Artikel Terbaru
-            @endif
-          </h1>
+        <aside class="lg:col-span-1">
 
-          <!-- Tombol Tulis Artikel (Wajib Login via Middleware Auth) -->
-          <a href="{{ route('blog.create') }}" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl shadow transition !no-underline flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tulis Artikel
-          </a>
-        </div>
+            {{-- Sticky: mengikuti scroll halaman --}}
+            <div class="sticky top-24">
 
-        <!-- List Artikel -->
-        <div class="space-y-6">
-          @forelse($posts as $post)
-            <article class="p-5 border border-gray-100 rounded-xl hover:shadow-md transition bg-white">
-              <h2 class="text-xl font-semibold">
-                <a href="{{ route('blog.show', $post->slug) }}" class="text-slate-900 hover:text-orange-600 transition !no-underline">{{ $post->title }}</a>
-              </h2>
-              <div class="text-sm text-slate-500 mt-1">
-                {{ $post->user->name ?? 'Penulis' }} · {{ $post->created_at->format('d M Y') }} · <span class="font-medium text-orange-600">{{ $post->category }}</span>
-              </div>
-              <p class="mt-3 text-slate-700 text-sm leading-relaxed">{{ Str::limit(strip_tags($post->content), 200) }}</p>
-            </article>
-          @empty
-            <div class="text-center py-12">
-              <p class="text-gray-500 italic">Belum ada artikel ditemukan untuk kategori atau menu ini.</p>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+
+                    {{-- ================================================= --}}
+                    {{-- MENU UTAMA --}}
+                    {{-- ================================================= --}}
+
+                    <div class="space-y-1">
+
+                        {{-- HOME --}}
+                        <a
+                            href="{{ route('blog.index') }}"
+                            class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold
+                            {{ empty(request('category'))
+                                ? 'bg-blue-50 text-blue-700'
+                                : 'text-gray-600 hover:bg-gray-50' }}"
+                        >
+
+                            <svg
+                                class="w-5 h-5 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                                />
+                            </svg>
+
+                            <span>Home</span>
+
+                        </a>
+
+
+                        {{-- EVENT --}}
+                        <a
+                            href="{{ route('event.index') }}"
+                            class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50"
+                        >
+
+                            <svg
+                                class="w-5 h-5 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2v12a2 2 0 002 2z"
+                                />
+                            </svg>
+
+                            <span>Event</span>
+
+                        </a>
+
+                    </div>
+
+
+                    {{-- GARIS --}}
+                    <hr class="my-4 border-gray-100">
+
+
+                    {{-- ================================================= --}}
+                    {{-- KATEGORI --}}
+                    {{-- ================================================= --}}
+
+                    <div class="px-3 mb-2">
+
+                        <div class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                            Kategori
+                        </div>
+
+                    </div>
+
+
+                    <div class="space-y-1">
+
+                        {{-- SOSIAL --}}
+                        <a
+                            href="{{ route('blog.index', ['category' => 'Sosial']) }}"
+                            class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
+                            {{ isset($category) && $category === 'Sosial'
+                                ? 'bg-blue-50 text-blue-700 font-bold'
+                                : 'text-gray-600 hover:bg-gray-50' }}"
+                        >
+                            Sosial
+                        </a>
+
+
+                        {{-- EKONOMI --}}
+                        <a
+                            href="{{ route('blog.index', ['category' => 'Ekonomi']) }}"
+                            class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
+                            {{ isset($category) && $category === 'Ekonomi'
+                                ? 'bg-blue-50 text-blue-700 font-bold'
+                                : 'text-gray-600 hover:bg-gray-50' }}"
+                        >
+                            Ekonomi
+                        </a>
+
+
+                        {{-- TEKNIK --}}
+                        <a
+                            href="{{ route('blog.index', ['category' => 'Teknik']) }}"
+                            class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
+                            {{ isset($category) && $category === 'Teknik'
+                                ? 'bg-blue-50 text-blue-700 font-bold'
+                                : 'text-gray-600 hover:bg-gray-50' }}"
+                        >
+                            Teknik
+                        </a>
+
+
+                        {{-- KESEHATAN --}}
+                        <a
+                            href="{{ route('blog.index', ['category' => 'Kesehatan']) }}"
+                            class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
+                            {{ isset($category) && $category === 'Kesehatan'
+                                ? 'bg-blue-50 text-blue-700 font-bold'
+                                : 'text-gray-600 hover:bg-gray-50' }}"
+                        >
+                            Kesehatan
+                        </a>
+
+                    </div>
+
+                </div>
+
             </div>
-          @endforelse
-        </div>
 
-        <div class="mt-6">{{ $posts->links() }}</div>
+        </aside>
 
-      </div>
+
+
+        {{-- ========================================================= --}}
+        {{-- FEED UTAMA --}}
+        {{-- ========================================================= --}}
+
+        <main class="lg:col-span-2">
+
+
+            {{-- ================================================= --}}
+            {{-- TABS --}}
+            {{-- ================================================= --}}
+
+            <div class="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
+
+                {{-- TOP --}}
+                <a
+                    href="{{ route('blog.index') }}"
+                    class="flex items-center gap-1.5 px-4 py-2 rounded-full border border-blue-500 bg-blue-500 text-white text-sm font-semibold whitespace-nowrap"
+                >
+
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M5 10l7-7m0 0l7 7m-7-7v18"
+                        />
+                    </svg>
+
+                    Top
+
+                </a>
+
+
+                {{-- TERBARU --}}
+                <a
+                    href="{{ route('blog.index') }}"
+                    class="px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-semibold whitespace-nowrap hover:bg-gray-50"
+                >
+                    Terbaru
+                </a>
+
+
+                {{-- KATEGORI AKTIF --}}
+                @if(!empty($category))
+
+                    <span
+                        class="px-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-gray-500 text-sm font-medium whitespace-nowrap"
+                    >
+                        Kategori: {{ $category }}
+                    </span>
+
+                @endif
+
+            </div>
+
+
+
+            {{-- ================================================= --}}
+            {{-- TULIS ARTIKEL --}}
+            {{-- ================================================= --}}
+
+            @auth
+
+                <div class="mb-5 flex justify-end">
+
+                    <a
+                        href="{{ route('blog.create') }}"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-lg shadow transition"
+                    >
+
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 4v16m8-8H4"
+                            />
+                        </svg>
+
+                        Tulis Artikel
+
+                    </a>
+
+                </div>
+
+            @endauth
+
+
+
+            {{-- ================================================= --}}
+            {{-- LIST ARTIKEL --}}
+            {{-- ================================================= --}}
+
+            <div class="space-y-4">
+
+                @forelse($posts as $post)
+
+                    <article
+                        class="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition"
+                    >
+
+
+                        {{-- ========================================= --}}
+                        {{-- AUTHOR --}}
+                        {{-- ========================================= --}}
+
+                        <div class="flex items-center gap-2.5 mb-3">
+
+
+                            {{-- ================================= --}}
+                            {{-- AVATAR USER --}}
+                            {{-- ================================= --}}
+
+                            @if($post->user && $post->user->avatar)
+
+                                @php
+                                    $avatar = $post->user->avatar;
+
+                                    // Kalau avatar adalah URL lengkap
+                                    $avatarUrl = filter_var($avatar, FILTER_VALIDATE_URL)
+                                        ? $avatar
+                                        : asset('storage/' . $avatar);
+                                @endphp
+
+                                <img
+                                    src="{{ $avatarUrl }}"
+                                    alt="{{ $post->user->name }}"
+                                    class="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-200"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                >
+
+                                {{-- FALLBACK JIKA GAMBAR GAGAL --}}
+                                <div
+                                    class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white items-center justify-center text-sm font-bold shrink-0"
+                                    style="display:none;"
+                                >
+                                    {{ strtoupper(substr($post->user->name ?? 'A', 0, 1)) }}
+                                </div>
+
+                            @else
+
+                                {{-- FALLBACK JIKA USER TIDAK PUNYA AVATAR --}}
+                                <div
+                                    class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-sm font-bold shrink-0"
+                                >
+                                    {{ strtoupper(substr($post->user->name ?? 'A', 0, 1)) }}
+                                </div>
+
+                            @endif
+
+
+                            {{-- ================================= --}}
+                            {{-- NAMA PENULIS --}}
+                            {{-- ================================= --}}
+
+                            <div class="leading-tight">
+
+                                <p class="text-sm font-bold text-slate-900">
+
+                                    {{ $post->user->name ?? $post->author ?? 'Penulis' }}
+
+                                </p>
+
+                                <p class="text-xs text-slate-400 mt-1">
+
+                                    {{ $post->created_at->translatedFormat('d F Y') }}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        {{-- ========================================= --}}
+                        {{-- JUDUL + EXCERPT --}}
+                        {{-- ========================================= --}}
+
+                        <a
+                            href="{{ route('blog.show', $post->slug) }}"
+                            class="block group"
+                        >
+
+                            <h2
+                                class="text-xl font-bold text-slate-900 group-hover:text-blue-700 transition leading-snug mb-2"
+                            >
+                                {{ $post->title }}
+                            </h2>
+
+
+                            <p
+                                class="text-sm text-slate-600 leading-relaxed line-clamp-3"
+                            >
+                                {{ Str::limit(strip_tags($post->content), 220) }}
+                            </p>
+
+                        </a>
+
+
+
+                        {{-- ========================================= --}}
+                        {{-- GAMBAR ARTIKEL --}}
+                        {{-- ========================================= --}}
+
+                        @if($post->image)
+
+                            <a
+                                href="{{ route('blog.show', $post->slug) }}"
+                                class="block mt-4"
+                            >
+
+                                <img
+                                    src="{{ asset('storage/' . $post->image) }}"
+                                    alt="{{ $post->title }}"
+                                    class="w-full h-64 object-cover rounded-xl border border-gray-100"
+                                >
+
+                            </a>
+
+                        @endif
+
+
+
+                        {{-- ========================================= --}}
+                        {{-- KATEGORI --}}
+                        {{-- ========================================= --}}
+
+                        <div class="mt-4 flex items-center gap-2">
+
+                            <span
+                                class="text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full"
+                            >
+                                {{ $post->category }}
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                @empty
+
+                    <div
+                        class="bg-white rounded-xl border border-gray-100 text-center py-16"
+                    >
+
+                        <p class="text-gray-400 italic">
+                            Belum ada artikel ditemukan untuk kategori ini.
+                        </p>
+
+                    </div>
+
+                @endforelse
+
+            </div>
+
+
+
+            {{-- ================================================= --}}
+            {{-- PAGINATION --}}
+            {{-- ================================================= --}}
+
+            <div class="mt-6">
+                {{ $posts->links() }}
+            </div>
+
+        </main>
+
+
+
+        {{-- ========================================================= --}}
+        {{-- SIDEBAR KANAN --}}
+        {{-- ========================================================= --}}
+
+        <aside class="lg:col-span-1">
+
+            <div class="sticky top-24">
+
+                <div class="bg-white rounded-xl border border-gray-100 p-5">
+
+                    <h3 class="text-base font-bold text-slate-900 mb-4">
+                        Artikel Terbaru
+                    </h3>
+
+
+                    <div class="space-y-4">
+
+                        @forelse($posts->take(5) as $index => $post)
+
+                            <a
+                                href="{{ route('blog.show', $post->slug) }}"
+                                class="flex gap-3 group"
+                            >
+
+                                <span
+                                    class="text-lg font-extrabold text-slate-200 shrink-0 w-6"
+                                >
+                                    {{ $index + 1 }}
+                                </span>
+
+
+                                <div>
+
+                                    <p
+                                        class="text-sm font-semibold text-slate-800 group-hover:text-blue-700 transition leading-snug line-clamp-2"
+                                    >
+                                        {{ $post->title }}
+                                    </p>
+
+
+                                    <p class="text-xs text-slate-400 mt-1">
+                                        {{ $post->user->name ?? $post->author ?? 'Penulis' }}
+                                    </p>
+
+                                </div>
+
+                            </a>
+
+                        @empty
+
+                            <p class="text-sm text-gray-400 italic">
+                                Belum ada artikel.
+                            </p>
+
+                        @endforelse
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
     </div>
 
-  </div>
 </div>
+
 @endsection
