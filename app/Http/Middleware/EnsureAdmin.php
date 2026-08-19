@@ -14,7 +14,7 @@ class EnsureAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || !Auth::user()->is_admin) {
+        if (!Auth::guard('admin')->check() || !Auth::guard('admin')->user()->is_admin) {
             abort(403, 'Anda tidak memiliki akses admin.');
         }
 

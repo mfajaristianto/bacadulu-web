@@ -83,7 +83,7 @@ class AdminAuthController extends Controller
                     $trustedDevice->expires_at->isFuture()
                 ) {
 
-                    Auth::login(
+                    Auth::guard('admin')->login(
                         $user,
                         $request->boolean('remember')
                     );
@@ -147,6 +147,8 @@ class AdminAuthController extends Controller
      */
     public function showOtpForm(Request $request)
     {
+        dd($request->session()->all()); // <-- DEBUG SEMENTARA, hapus setelah selesai testing
+
         if (
             !$request->session()->has(
                 'admin_pending_user_id'
@@ -356,10 +358,7 @@ class AdminAuthController extends Controller
             false
         );
 
-        Auth::login(
-            $user,
-            $remember
-        );
+        Auth::guard('admin')->login($user, $remember);
 
         $request->session()->regenerate();
 

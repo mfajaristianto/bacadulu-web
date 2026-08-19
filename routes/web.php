@@ -548,10 +548,9 @@ Route::get('/lang/{locale}', function ($locale) {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware([
-    'auth',
-    'admin'
-])
+Route::middleware(['auth:admin', 'admin'])
+
+
 ->prefix('admin')
 ->name('admin.')
 ->group(function () {
