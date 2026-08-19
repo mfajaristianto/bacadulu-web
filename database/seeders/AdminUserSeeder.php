@@ -1,0 +1,23 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
+class AdminUserSeeder extends Seeder
+{
+    public function run(): void
+    {
+        User::updateOrCreate(
+            ['email' => 'adminbacadulu@gmail.com'],
+            [
+                'name' => 'Admin Utama',
+                'password' => Hash::make('bacaduluadmin'),
+                'is_admin' => true, // Pastikan kolom ini ada di database Anda
+                'email_verified_at' => now(),
+            ]
+        );
+    }
+}

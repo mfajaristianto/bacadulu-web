@@ -10,6 +10,10 @@ class CommentController extends Controller
 {
     public function store(Request $request, Post $post)
     {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu untuk berkomentar.');
+        }
+
         $validated = $request->validate([
             'content' => ['required', 'string', 'max:2000'],
         ]);

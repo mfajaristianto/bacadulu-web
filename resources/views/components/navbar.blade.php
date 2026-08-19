@@ -60,11 +60,41 @@
         <a href="{{ route('haki.index') }}" class="px-3 py-2 rounded-lg transition duration-200 !no-underline whitespace-nowrap {{ request()->routeIs('haki.index') ? 'bg-[#1e1e50]/10 !text-[#1e1e50]' : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]' }}">HAKI</a>
       </div>
 
-      <!-- 4. AREA KANAN (Selalu menampilkan tombol Kirim Naskah) -->
+      <!-- 4. AREA KANAN (Kirim Naskah + Login/Profil Khusus Halaman Blog) -->
       <div class="hidden md:flex items-center gap-3">
         <a href="https://wa.me/6281315717719" target="_blank" class="bg-[#f05a42] hover:bg-[#d94f38] !text-white px-3 py-2 rounded-full text-xs font-bold shadow-md transition !no-underline whitespace-nowrap">
           Kirim Naskah
         </a>
+
+        <!-- Tombol Login / Profil HANYA MUNCUL di Halaman Blogging -->
+        @if(request()->routeIs('blog.*'))
+          @auth
+            <!-- Dropdown Profil User -->
+            <div class="relative group">
+              <button class="flex items-center gap-2 focus:outline-none py-1">
+                <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-gray-200 shadow-sm">
+                <span class="text-sm font-bold text-gray-700 max-w-[120px] truncate">{{ auth()->user()->name }}</span>
+                <svg class="w-4 h-4 text-gray-500 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              
+              <div class="absolute right-0 hidden group-hover:block bg-white shadow-xl rounded-lg mt-0 py-2 w-48 border border-gray-100 z-50">
+                @if(auth()->user()->is_admin)
+                  <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Panel Admin</a>
+                @endif
+                <a href="{{ route('blog.myPosts') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Artikel Saya</a>
+                <div class="border-t border-gray-100 my-1"></div>
+                <form action="{{ route('logout') }}" method="POST">
+                  @csrf
+                  <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-semibold cursor-pointer">Logout</button>
+                </form>
+              </div>
+            </div>
+          @else
+            <a href="{{ route('login') }}" class="bg-[#1e1e50] hover:bg-[#1e1e50]/90 !text-white px-4 py-2 rounded-full text-xs font-bold shadow-md transition !no-underline whitespace-nowrap">
+              Login
+            </a>
+          @endauth
+        @endif
       </div>
 
       <!-- HAMBURGER (Mobile Toggle) -->
@@ -112,6 +142,22 @@
 
       <div class="border-t pt-2 flex flex-col space-y-2 pb-2">
         <a href="https://wa.me/6281315717719" target="_blank" class="bg-[#f05a42] text-center text-white py-2 rounded-lg text-sm shadow-md !no-underline">Kirim Naskah</a>
+        
+        <!-- Login / Profil Mobile HANYA MUNCUL di Halaman Blogging -->
+        @if(request()->routeIs('blog.*'))
+          @auth
+            @if(auth()->user()->is_admin)
+              <a href="{{ route('admin.dashboard') }}" class="block text-center bg-gray-100 text-gray-700 py-2 rounded-lg text-sm !no-underline">Panel Admin</a>
+            @endif
+            <a href="{{ route('blog.myPosts') }}" class="block text-center bg-gray-100 text-gray-700 py-2 rounded-lg text-sm !no-underline">Artikel Saya</a>
+            <form action="{{ route('logout') }}" method="POST">
+              @csrf
+              <button type="submit" class="w-full bg-red-50 text-red-600 text-center py-2 rounded-lg text-sm font-bold cursor-pointer">Logout</button>
+            </form>
+          @else
+            <a href="{{ route('login') }}" class="bg-[#1e1e50] text-center text-white py-2 rounded-lg text-sm shadow-md !no-underline">Login</a>
+          @endauth
+        @endif
       </div>
     </div>
   </div>

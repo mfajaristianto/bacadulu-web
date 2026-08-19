@@ -48,7 +48,7 @@
             @enderror
         </div>
 
-        {{-- NAMA PENULIS --}}
+        {{-- NAMA PENULIS (Otomatis dari Akun yang Login) --}}
         <div class="mb-4">
             <label for="author" class="block font-semibold mb-1">
                 Nama Penulis
@@ -57,12 +57,11 @@
             <input
                 id="author"
                 type="text"
-                name="author"
-                value="{{ old('author') }}"
-                class="w-full rounded border p-2"
-                placeholder="Masukkan nama penulis"
-                required
+                value="{{ auth()->user()->name }}"
+                class="w-full rounded border p-2 bg-gray-100 text-gray-600 cursor-not-allowed"
+                disabled
             >
+            <input type="hidden" name="author" value="{{ auth()->user()->name }}">
 
             @error('author')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>

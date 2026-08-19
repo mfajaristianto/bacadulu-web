@@ -4,7 +4,7 @@
 <div class="max-w-7xl mx-auto px-6 py-12">
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
     
-    <!-- SIDEBAR ALA KOMPASIANA (Kiri) -->
+    <!-- SIDEBAR (Kiri) -->
     <div class="lg:col-span-1 space-y-6">
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sticky top-24">
         
@@ -28,7 +28,7 @@
 
         <hr class="my-4 border-gray-100">
 
-        <!-- Kategori (Sosial, Ekonomi, Teknik, Kesehatan) -->
+        <!-- Kategori -->
         <div class="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
           Kategori
         </div>
@@ -47,6 +47,7 @@
     <div class="lg:col-span-3">
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         
+        <!-- Header: Judul & Tombol Tulis Artikel Sejajar -->
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-2xl font-bold text-slate-800">
             @if(request('menu') == 'komunitas')
@@ -58,9 +59,11 @@
             @endif
           </h1>
 
-          @auth
-            <a href="{{ route('blog.create') }}" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded shadow transition">Tulis Artikel</a>
-          @endauth
+          <!-- Tombol Tulis Artikel (Wajib Login via Middleware Auth) -->
+          <a href="{{ route('blog.create') }}" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl shadow transition !no-underline flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Tulis Artikel
+          </a>
         </div>
 
         <!-- List Artikel -->
@@ -68,7 +71,7 @@
           @forelse($posts as $post)
             <article class="p-5 border border-gray-100 rounded-xl hover:shadow-md transition bg-white">
               <h2 class="text-xl font-semibold">
-                <a href="{{ route('blog.show', $post->slug) }}" class="text-slate-900 hover:text-orange-600 transition">{{ $post->title }}</a>
+                <a href="{{ route('blog.show', $post->slug) }}" class="text-slate-900 hover:text-orange-600 transition !no-underline">{{ $post->title }}</a>
               </h2>
               <div class="text-sm text-slate-500 mt-1">
                 {{ $post->user->name ?? 'Penulis' }} · {{ $post->created_at->format('d M Y') }} · <span class="font-medium text-orange-600">{{ $post->category }}</span>
