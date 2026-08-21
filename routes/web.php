@@ -660,6 +660,10 @@ Route::get(
 |--------------------------------------------------------------------------
 | COMMUNITY PUBLIC
 |--------------------------------------------------------------------------
+|
+| Halaman daftar komunitas dapat dilihat semua pengunjung.
+|
+|--------------------------------------------------------------------------
 */
 
 Route::get(
@@ -675,77 +679,151 @@ Route::get(
 |--------------------------------------------------------------------------
 | COMMUNITY USER
 |--------------------------------------------------------------------------
+|
+| Semua route berikut hanya untuk USER yang login.
+|
+| USER:
+|
+| - Membuat komunitas
+| - Edit komunitas miliknya sendiri
+| - Update komunitas miliknya sendiri
+| - Join komunitas
+| - Leave komunitas
+|
+| ADMIN tetap menggunakan:
+|
+| /admin/communities/...
+|
+|--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')
-    ->group(function () {
+Route::middleware('auth')->group(function () {
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | CREATE COMMUNITY
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE COMMUNITY
+    |--------------------------------------------------------------------------
+    |
+    | GET /komunitas/buat
+    |
+    |--------------------------------------------------------------------------
+    */
 
-        Route::get(
-            '/komunitas/buat',
-            [
-                CommunityController::class,
-                'create'
-            ]
-        )->name('community.create');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | STORE COMMUNITY
-        |--------------------------------------------------------------------------
-        */
-
-        Route::post(
-            '/komunitas',
-            [
-                CommunityController::class,
-                'store'
-            ]
-        )->name('community.store');
+    Route::get(
+        '/komunitas/buat',
+        [
+            CommunityController::class,
+            'create'
+        ]
+    )->name('community.create');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | JOIN COMMUNITY
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | STORE COMMUNITY
+    |--------------------------------------------------------------------------
+    |
+    | POST /komunitas
+    |
+    |--------------------------------------------------------------------------
+    */
 
-        Route::post(
-            '/komunitas/{community}/join',
-            [
-                CommunityController::class,
-                'join'
-            ]
-        )->name('community.join');
+    Route::post(
+        '/komunitas',
+        [
+            CommunityController::class,
+            'store'
+        ]
+    )->name('community.store');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | LEAVE COMMUNITY
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT COMMUNITY USER
+    |--------------------------------------------------------------------------
+    |
+    | GET /komunitas/10/edit
+    |
+    | Ini adalah halaman USER.
+    |
+    | BUKAN:
+    |
+    | /admin/communities/10/edit
+    |
+    |--------------------------------------------------------------------------
+    */
 
-        Route::post(
-            '/komunitas/{community}/leave',
-            [
-                CommunityController::class,
-                'leave'
-            ]
-        )->name('community.leave');
+    Route::get(
+        '/komunitas/{community}/edit',
+        [
+            CommunityController::class,
+            'edit'
+        ]
+    )->name('community.edit');
 
-    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE COMMUNITY USER
+    |--------------------------------------------------------------------------
+    |
+    | PUT /komunitas/10
+    |
+    |--------------------------------------------------------------------------
+    */
+
+    Route::put(
+        '/komunitas/{community}',
+        [
+            CommunityController::class,
+            'update'
+        ]
+    )->name('community.update');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | JOIN COMMUNITY
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/komunitas/{community}/join',
+        [
+            CommunityController::class,
+            'join'
+        ]
+    )->name('community.join');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LEAVE COMMUNITY
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/komunitas/{community}/leave',
+        [
+            CommunityController::class,
+            'leave'
+        ]
+    )->name('community.leave');
+
+});
 
 
 /*
 |--------------------------------------------------------------------------
 | SHOW COMMUNITY
+|--------------------------------------------------------------------------
+|
+| Route ini HARUS berada setelah:
+|
+| /komunitas/buat
+| /komunitas/{community}/edit
+|
 |--------------------------------------------------------------------------
 */
 
@@ -756,7 +834,6 @@ Route::get(
         'show'
     ]
 )->name('community.show');
-
 
 /*
 |--------------------------------------------------------------------------
