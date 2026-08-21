@@ -104,6 +104,38 @@
             {!! $post->content !!}
         </div>
 
+        {{-- TOMBOL LIKE --}}
+        <div class="mt-8 pt-4 border-t border-gray-100 flex items-center gap-4">
+            @php
+                $isLiked = auth()->check() && $post->likes()->where('user_id', auth()->id())->exists();
+            @endphp
+
+            @auth
+                <button
+                    onclick="toggleLike('{{ $post->slug }}')"
+                    id="like-btn"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border transition {{ $isLiked ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-white border-gray-200 text-slate-600 hover:bg-gray-50' }}"
+                >
+                    <svg id="like-icon" class="w-5 h-5" fill="{{ $isLiked ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span class="text-sm font-semibold">Suka</span>
+                    <span id="like-count" class="text-sm font-bold bg-gray-100 px-2 py-0.5 rounded-full">{{ $post->likes()->count() }}</span>
+                </button>
+            @else
+                <a
+                    href="{{ route('login') }}"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-slate-600 hover:bg-gray-50 transition"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span class="text-sm font-semibold">Suka</span>
+                    <span class="text-sm font-bold bg-gray-100 px-2 py-0.5 rounded-full">{{ $post->likes()->count() }}</span>
+                </a>
+            @endauth
+        </div>
+
     </article>
 
 
@@ -120,7 +152,8 @@
 
         @auth
 
-            <form action="{{ route('post.comment.store', $post->id) }}" method="POST" class="bg-white rounded-xl border border-gray-100 p-4">
+            {{-- FORM KOMENTAR (SUDAH DIPERBAIKI TAG-NYA) --}}
+            <form action="{{ route('post.comment.store', $post->slug) }}" method="POST" class="bg-white rounded-xl border border-gray-100 p-4">
                 @csrf
 
                 <textarea
@@ -128,6 +161,7 @@
                     rows="3"
                     class="w-full rounded-lg border border-gray-200 p-3 text-sm resize-none focus:ring-2 focus:ring-orange-100 focus:border-orange-400 focus:outline-none break-words"
                     placeholder="Tulis komentar..."
+                    required
                 >{{ old('content') }}</textarea>
 
                 @error('content')
@@ -135,7 +169,7 @@
                 @enderror
 
                 <div class="mt-3 flex justify-end">
-                    <button class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-lg transition">
+                    <button type="submit" class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-lg transition">
                         Kirim Komentar
                     </button>
                 </div>
@@ -195,5 +229,48 @@
     </section>
 
 </div>
+
+{{-- ================================================= --}}
+{{-- SCRIPTS (CSRF TOKEN & AJAX LIKE) --}}
+{{-- ================================================= --}}
+@push('scripts')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<script>
+function toggleLike(slug) {
+    fetch(`/blog/${slug}/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Gagal memproses like.');
+        return res.json();
+    })
+    .then(data => {
+        // Update angka total like
+        document.getElementById('like-count').textContent = data.likes_count;
+
+        // Update tampilan tombol (warna & ikon hati)
+        const btn = document.getElementById('like-btn');
+        const icon = document.getElementById('like-icon');
+
+        if (data.liked) {
+            btn.className = "inline-flex items-center gap-2 px-4 py-2 rounded-xl border transition bg-orange-50 border-orange-200 text-orange-600";
+            icon.setAttribute('fill', 'currentColor');
+        } else {
+            btn.className = "inline-flex items-center gap-2 px-4 py-2 rounded-xl border transition bg-white border-gray-200 text-slate-600 hover:bg-gray-50";
+            icon.setAttribute('fill', 'none');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Terjadi kesalahan, pastikan Anda sudah login.');
+    });
+}
+</script>
+@endpush
 
 @endsection

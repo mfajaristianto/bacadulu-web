@@ -51,6 +51,7 @@ use App\Http\Controllers\Admin\EventAdminController;
 use App\Http\Controllers\Admin\CommunityController as AdminCommunityController;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | HOME
@@ -363,52 +364,28 @@ Route::get(
 Route::middleware('auth')->group(function () {
 
     // CREATE
-    Route::get(
-        '/blog/create',
-        [BlogController::class, 'create']
-    )->name('blog.create');
-
+    Route::get('/blog/create', [BlogController::class, 'create'])->name('blog.create');
 
     // STORE
-    Route::post(
-        '/blog',
-        [BlogController::class, 'store']
-    )->name('blog.store');
-
+    Route::post('/blog', [BlogController::class, 'store'])->name('blog.store');
 
     // MY POSTS
-    Route::get(
-        '/blog/saya',
-        [BlogController::class, 'myPosts']
-    )->name('blog.myPosts');
-
+    Route::get('/blog/saya', [BlogController::class, 'myPosts'])->name('blog.myPosts');
 
     // EDIT
-    Route::get(
-        '/blog/{post:slug}/edit',
-        [BlogController::class, 'edit']
-    )->name('blog.edit');
-
+    Route::get('/blog/{post:slug}/edit', [BlogController::class, 'edit'])->name('blog.edit');
 
     // UPDATE
-    Route::put(
-        '/blog/{post:slug}',
-        [BlogController::class, 'update']
-    )->name('blog.update');
-
+    Route::put('/blog/{post:slug}', [BlogController::class, 'update'])->name('blog.update');
 
     // DELETE
-    Route::delete(
-        '/blog/{post:slug}',
-        [BlogController::class, 'destroy']
-    )->name('blog.destroy');
+    Route::delete('/blog/{post:slug}', [BlogController::class, 'destroy'])->name('blog.destroy');
 
+    // LIKE
+    Route::post('/blog/{post:slug}/like', [BlogController::class, 'toggleLike'])->name('blog.like');
 
     // COMMENT
-    Route::post(
-        '/blog/{post}/comments',
-        [CommentController::class, 'store']
-    )->name('post.comment.store');
+    Route::post('/blog/{post:slug}/comments', [CommentController::class, 'store'])->name('post.comment.store');
 });
 
 
