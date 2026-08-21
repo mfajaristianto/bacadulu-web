@@ -10,13 +10,14 @@ return new class extends Migration
     {
         Schema::table('posts', function (Blueprint $table) {
             $table->string('image')->nullable()->after('content');
+            $table->unsignedBigInteger('views')->default(0)->after('image');
         });
     }
 
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn('image');
+            $table->dropColumn(['image', 'views']);
         });
     }
 };

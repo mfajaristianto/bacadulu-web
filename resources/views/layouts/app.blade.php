@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+    {{-- CSRF TOKEN UNTUK AJAX / FETCH API --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Baca Dulu - Platform Penerbitan Modern</title>
 
     <!-- =====================================================
@@ -27,14 +30,11 @@
     <!-- =====================================================
          TRIX EDITOR
     ====================================================== -->
-
-    <!-- Trix CSS -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/trix@2.1.15/dist/trix.css"
     >
 
-    <!-- Trix JavaScript -->
     <script
         src="https://unpkg.com/trix@2.1.15/dist/trix.umd.min.js"
         defer

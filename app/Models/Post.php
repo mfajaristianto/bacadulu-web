@@ -9,30 +9,87 @@ class Post extends Model
 {
     use HasFactory;
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILLABLE
+    |--------------------------------------------------------------------------
+    */
+
     protected $fillable = [
+        'user_id',
+        'author',
         'title',
         'slug',
         'content',
         'image',
         'category',
-        'user_id',
-        'author',
         'status',
+        'views',
     ];
 
-    /**
-     * Relasi ke user/penulis
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | USER
+    |--------------------------------------------------------------------------
+    */
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class
+        );
     }
 
-    /**
-     * Relasi komentar
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMMENTS
+    |--------------------------------------------------------------------------
+    */
+
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(
+            Comment::class
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LIKES
+    |--------------------------------------------------------------------------
+    */
+
+    public function likes()
+    {
+        return $this->hasMany(
+            PostLike::class
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CEK APAKAH USER SUDAH LIKE
+    |--------------------------------------------------------------------------
+    */
+
+    public function isLikedBy($userId): bool
+    {
+        if (!$userId) {
+            return false;
+        }
+
+
+        return $this
+            ->likes()
+            ->where(
+                'user_id',
+                $userId
+            )
+            ->exists();
     }
 }
