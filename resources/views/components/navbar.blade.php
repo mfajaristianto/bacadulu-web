@@ -1,170 +1,1632 @@
-<nav class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100" id="main-navbar">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-20 gap-4">
-      
-      <!-- 1. AREA LOGO -->
-      <div class="flex-shrink-0 flex items-center">
-        <a href="{{ route('home') }}" class="flex items-center !no-underline">
-          <img src="{{ asset('img/images.jpg') }}" alt="Logo Baca Dulu" class="h-14 w-auto object-contain">
-        </a>
-      </div>
+<nav
+    id="main-navbar"
+    class="
+        sticky
+        top-0
+        z-50
+        w-full
+        bg-white
+        border-b
+        border-gray-100
+        shadow-sm
+    "
+>
 
-      <!-- 2. KOLOM SEARCH (Hanya muncul saat berada di halaman Blogging) -->
-      @if(request()->routeIs('blog.*'))
-      <div class="flex-1 max-w-md hidden md:block">
-        <form action="{{ route('search') }}" method="GET" class="relative">
-          <input type="text" name="q" placeholder="Cari artikel..." class="w-full bg-gray-100 text-sm text-gray-700 rounded-full pl-4 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white border border-transparent focus:border-orange-350 transition">
-          <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          </button>
-        </form>
-      </div>
-      @endif
+    {{-- =====================================================
+        NAVBAR CONTAINER
+    ====================================================== --}}
 
-      <!-- 3. NAVIGATION LINKS (Desktop Menu Kiri/Tengah) -->
-      <div class="hidden lg:flex items-center space-x-1 text-sm font-bold">
-        <a href="{{ route('home') }}" class="px-3 py-2 rounded-lg transition duration-200 !no-underline {{ request()->is('/') ? 'bg-[#1e1e50]/10 !text-[#1e1e50]' : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]' }}">
-            Home
-        </a>
+    <div class="w-full max-w-[1600px] mx-auto px-5 sm:px-6 lg:px-8 xl:px-10">
 
-        <!-- Tentang Kami -->
-        <div class="relative group">
-          <button class="px-3 py-2 rounded-lg !text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50] transition duration-200 flex items-center gap-1 focus:outline-none !no-underline font-bold whitespace-nowrap">
-            <span>Tentang Kami</span>
-            <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
-          <div class="absolute left-0 hidden group-hover:block bg-white shadow-xl rounded-lg mt-0 py-2 w-52 border border-gray-100 z-50">
-            <a href="{{ route('tentang.dewan-redaksi') }}#team-bacadulu" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Team BacaDulu</a>
-            <a href="{{ route('tentang.dewan-redaksi') }}#nilai-perusahaan" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Nilai Perusahaan</a>
-            <a href="{{ route('tentang.dewan-redaksi') }}#visi-misi" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Visi & Misi</a>
-          </div>
-        </div>
+        <div class="flex items-center h-20 gap-5 xl:gap-8">
 
-        <!-- Katalog Baca -->
-        <div class="relative group">
-          <button class="px-3 py-2 rounded-lg !text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50] transition duration-200 flex items-center gap-1 focus:outline-none !no-underline font-bold whitespace-nowrap">
-            <span>Katalog Baca</span>
-            <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-          </button>
-          <div class="absolute left-0 hidden group-hover:block bg-white shadow-xl rounded-lg mt-0 py-2 w-56 border border-gray-100 z-50">
-            <a href="{{ route('informasi') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Baca Informasi</a>
-            <a href="{{ route('konsultasi') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Baca Konsultasi</a>
-            <a href="{{ route('jurnal') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Baca Jurnal</a>
-            <a href="{{ route('conference') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Baca Conference</a>
-            <a href="{{ route('publisher') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Baca Publisher</a>
-          </div>
-        </div>
 
-        <a href="{{ route('portofolio.bookstore') }}" class="px-3 py-2 rounded-lg transition duration-200 !no-underline whitespace-nowrap {{ request()->routeIs('portofolio.bookstore') ? 'bg-[#1e1e50]/10 !text-[#1e1e50]' : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]' }}">Bookstore</a>
-        <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg transition duration-200 !no-underline whitespace-nowrap {{ request()->routeIs('blog.*') ? 'bg-[#1e1e50]/10 !text-[#1e1e50]' : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]' }}">Blogging</a>
-        <a href="{{ route('haki.index') }}" class="px-3 py-2 rounded-lg transition duration-200 !no-underline whitespace-nowrap {{ request()->routeIs('haki.index') ? 'bg-[#1e1e50]/10 !text-[#1e1e50]' : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]' }}">HAKI</a>
-      </div>
+            {{-- =================================================
+                1. LOGO
+            ================================================== --}}
 
-      <!-- 4. AREA KANAN (Kirim Naskah + Login/Profil Khusus Halaman Blog) -->
-      <div class="hidden md:flex items-center gap-3">
-        <a href="https://wa.me/6281315717719" target="_blank" class="bg-[#f05a42] hover:bg-[#d94f38] !text-white px-3 py-2 rounded-full text-xs font-bold shadow-md transition !no-underline whitespace-nowrap">
-          Kirim Naskah
-        </a>
+            <div class="flex-shrink-0">
 
-        <!-- Tombol Login / Profil HANYA MUNCUL di Halaman Blogging -->
-        @if(request()->routeIs('blog.*'))
-          @auth
-            <!-- Dropdown Profil User -->
-            <div class="relative group">
-              <button class="flex items-center gap-2 focus:outline-none py-1">
-                <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-gray-200 shadow-sm">
-                <span class="text-sm font-bold text-gray-700 max-w-[120px] truncate">{{ auth()->user()->name }}</span>
-                <svg class="w-4 h-4 text-gray-500 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-              </button>
-              
-              <div class="absolute right-0 hidden group-hover:block bg-white shadow-xl rounded-lg mt-0 py-2 w-48 border border-gray-100 z-50">
-                @if(auth()->user()->is_admin)
-                  <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Panel Admin</a>
-                @endif
-                <a href="{{ route('blog.myPosts') }}" class="block px-4 py-2 text-sm !text-gray-700 hover:bg-gray-50 hover:!text-[#1e1e50] !no-underline font-semibold">Artikel Saya</a>
-                <div class="border-t border-gray-100 my-1"></div>
-                <form action="{{ route('logout') }}" method="POST">
-                  @csrf
-                  <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-semibold cursor-pointer">Logout</button>
-                </form>
-              </div>
+                <a
+                    href="{{ route('home') }}"
+                    class="flex items-center !no-underline"
+                >
+
+                    <img
+                        src="{{ asset('img/images.jpg') }}"
+                        alt="Logo Baca Dulu"
+                        class="
+                            h-14
+                            w-auto
+                            max-w-[150px]
+                            object-contain
+                        "
+                    >
+
+                </a>
+
             </div>
-          @else
-            <a href="{{ route('login') }}" class="bg-[#1e1e50] hover:bg-[#1e1e50]/90 !text-white px-4 py-2 rounded-full text-xs font-bold shadow-md transition !no-underline whitespace-nowrap">
-              Login
+
+
+            {{-- =================================================
+                2. MENU DESKTOP
+            ================================================== --}}
+
+            <div
+                class="
+                    hidden
+                    lg:flex
+                    flex-1
+                    items-center
+                    justify-center
+                    gap-1
+                    xl:gap-2
+                    text-sm
+                    font-bold
+                    min-w-0
+                "
+            >
+
+
+                {{-- HOME --}}
+
+                <a
+                    href="{{ route('home') }}"
+                    class="
+                        px-3
+                        xl:px-4
+                        py-2.5
+                        rounded-lg
+                        whitespace-nowrap
+                        transition
+                        duration-200
+                        !no-underline
+
+                        {{ request()->is('/')
+                            ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
+                            : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
+                        }}
+                    "
+                >
+                    Home
+                </a>
+
+
+
+                {{-- =================================================
+                    TENTANG KAMI
+                ================================================== --}}
+
+                <div class="relative group flex-shrink-0">
+
+                    <button
+                        type="button"
+                        class="
+                            px-3
+                            xl:px-4
+                            py-2.5
+                            rounded-lg
+                            !text-gray-600
+                            hover:bg-gray-50
+                            hover:!text-[#1e1e50]
+                            transition
+                            duration-200
+                            flex
+                            items-center
+                            gap-1.5
+                            focus:outline-none
+                            font-bold
+                            whitespace-nowrap
+                        "
+                    >
+
+                        <span>
+                            Tentang Kami
+                        </span>
+
+
+                        <svg
+                            class="
+                                w-4
+                                h-4
+                                transition-transform
+                                duration-200
+                                group-hover:rotate-180
+                            "
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+
+                        </svg>
+
+                    </button>
+
+
+                    {{-- DROPDOWN TENTANG KAMI --}}
+
+                    <div
+                        class="
+                            absolute
+                            left-0
+                            top-full
+                            pt-2
+                            hidden
+                            group-hover:block
+                            z-[100]
+                        "
+                    >
+
+                        <div
+                            class="
+                                bg-white
+                                shadow-xl
+                                rounded-xl
+                                py-2
+                                w-56
+                                border
+                                border-gray-100
+                            "
+                        >
+
+                            <a
+                                href="{{ route('tentang.dewan-redaksi') }}#team-bacadulu"
+                                class="
+                                    block
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    !text-gray-700
+                                    hover:bg-gray-50
+                                    hover:!text-[#1e1e50]
+                                    !no-underline
+                                    font-semibold
+                                "
+                            >
+                                Team BacaDulu
+                            </a>
+
+
+                            <a
+                                href="{{ route('tentang.dewan-redaksi') }}#nilai-perusahaan"
+                                class="
+                                    block
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    !text-gray-700
+                                    hover:bg-gray-50
+                                    hover:!text-[#1e1e50]
+                                    !no-underline
+                                    font-semibold
+                                "
+                            >
+                                Nilai Perusahaan
+                            </a>
+
+
+                            <a
+                                href="{{ route('tentang.dewan-redaksi') }}#visi-misi"
+                                class="
+                                    block
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    !text-gray-700
+                                    hover:bg-gray-50
+                                    hover:!text-[#1e1e50]
+                                    !no-underline
+                                    font-semibold
+                                "
+                            >
+                                Visi & Misi
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                {{-- =================================================
+                    KATALOG BACA
+                ================================================== --}}
+
+                <div class="relative group flex-shrink-0">
+
+                    <button
+                        type="button"
+                        class="
+                            px-3
+                            xl:px-4
+                            py-2.5
+                            rounded-lg
+                            !text-gray-600
+                            hover:bg-gray-50
+                            hover:!text-[#1e1e50]
+                            transition
+                            duration-200
+                            flex
+                            items-center
+                            gap-1.5
+                            focus:outline-none
+                            font-bold
+                            whitespace-nowrap
+                        "
+                    >
+
+                        <span>
+                            Katalog Baca
+                        </span>
+
+
+                        <svg
+                            class="
+                                w-4
+                                h-4
+                                transition-transform
+                                duration-200
+                                group-hover:rotate-180
+                            "
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+
+                        </svg>
+
+                    </button>
+
+
+                    {{-- DROPDOWN KATALOG --}}
+
+                    <div
+                        class="
+                            absolute
+                            left-0
+                            top-full
+                            pt-2
+                            hidden
+                            group-hover:block
+                            z-[100]
+                        "
+                    >
+
+                        <div
+                            class="
+                                bg-white
+                                shadow-xl
+                                rounded-xl
+                                py-2
+                                w-60
+                                border
+                                border-gray-100
+                            "
+                        >
+
+                            <a
+                                href="{{ route('informasi') }}"
+                                class="
+                                    block
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    !text-gray-700
+                                    hover:bg-gray-50
+                                    hover:!text-[#1e1e50]
+                                    !no-underline
+                                    font-semibold
+                                "
+                            >
+                                Baca Informasi
+                            </a>
+
+
+                            <a
+                                href="{{ route('konsultasi') }}"
+                                class="
+                                    block
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    !text-gray-700
+                                    hover:bg-gray-50
+                                    hover:!text-[#1e1e50]
+                                    !no-underline
+                                    font-semibold
+                                "
+                            >
+                                Baca Konsultasi
+                            </a>
+
+
+                            <a
+                                href="{{ route('jurnal') }}"
+                                class="
+                                    block
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    !text-gray-700
+                                    hover:bg-gray-50
+                                    hover:!text-[#1e1e50]
+                                    !no-underline
+                                    font-semibold
+                                "
+                            >
+                                Baca Jurnal
+                            </a>
+
+
+                            <a
+                                href="{{ route('conference') }}"
+                                class="
+                                    block
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    !text-gray-700
+                                    hover:bg-gray-50
+                                    hover:!text-[#1e1e50]
+                                    !no-underline
+                                    font-semibold
+                                "
+                            >
+                                Baca Conference
+                            </a>
+
+
+                            <a
+                                href="{{ route('publisher') }}"
+                                class="
+                                    block
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    !text-gray-700
+                                    hover:bg-gray-50
+                                    hover:!text-[#1e1e50]
+                                    !no-underline
+                                    font-semibold
+                                "
+                            >
+                                Baca Publisher
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                {{-- =================================================
+                    BOOKSTORE
+                ================================================== --}}
+
+                <a
+                    href="{{ route('portofolio.bookstore') }}"
+                    class="
+                        px-3
+                        xl:px-4
+                        py-2.5
+                        rounded-lg
+                        transition
+                        duration-200
+                        !no-underline
+                        whitespace-nowrap
+
+                        {{ request()->routeIs('portofolio.bookstore*')
+                            ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
+                            : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
+                        }}
+                    "
+                >
+                    Bookstore
+                </a>
+
+
+
+                {{-- =================================================
+                    BLOGGING
+                ================================================== --}}
+
+                <a
+                    href="{{ route('blog.index') }}"
+                    class="
+                        px-3
+                        xl:px-4
+                        py-2.5
+                        rounded-lg
+                        transition
+                        duration-200
+                        !no-underline
+                        whitespace-nowrap
+
+                        {{ request()->routeIs('blog.*')
+                            ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
+                            : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
+                        }}
+                    "
+                >
+                    Blogging
+                </a>
+
+
+
+                {{-- =================================================
+                    HAKI
+                ================================================== --}}
+
+                <a
+                    href="{{ route('haki.index') }}"
+                    class="
+                        px-3
+                        xl:px-4
+                        py-2.5
+                        rounded-lg
+                        transition
+                        duration-200
+                        !no-underline
+                        whitespace-nowrap
+
+                        {{ request()->routeIs('haki.*')
+                            ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
+                            : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
+                        }}
+                    "
+                >
+                    HAKI
+                </a>
+
+
+            </div>
+
+
+
+            {{-- =================================================
+                3. AREA KANAN DESKTOP
+            ================================================== --}}
+
+            <div
+                class="
+                    hidden
+                    lg:flex
+                    items-center
+                    gap-3
+                    flex-shrink-0
+                "
+            >
+
+
+                {{-- =================================================
+                    KIRIM NASKAH
+                ================================================== --}}
+
+                <a
+                    href="https://wa.me/6281315717719"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="
+                        inline-flex
+                        items-center
+                        justify-center
+                        bg-[#f05a42]
+                        hover:bg-[#d94f38]
+                        !text-white
+                        px-5
+                        py-2.5
+                        rounded-full
+                        text-xs
+                        font-bold
+                        shadow-md
+                        hover:shadow-lg
+                        transition
+                        duration-200
+                        !no-underline
+                        whitespace-nowrap
+                    "
+                >
+                    Kirim Naskah
+                </a>
+
+
+
+                {{-- =================================================
+                    LOGIN / PROFIL
+                    HANYA DI HALAMAN BLOG
+                ================================================== --}}
+
+                @if(request()->routeIs('blog.*'))
+
+
+                    @auth
+
+
+                        {{-- PROFILE DROPDOWN --}}
+
+                        <div class="relative group">
+
+
+                            <button
+                                type="button"
+                                class="
+                                    flex
+                                    items-center
+                                    gap-2
+                                    py-1
+                                    px-1
+                                    rounded-full
+                                    focus:outline-none
+                                "
+                            >
+
+
+                                {{-- AVATAR --}}
+
+                                <img
+                                    src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}"
+                                    alt="{{ auth()->user()->name }}"
+                                    class="
+                                        w-10
+                                        h-10
+                                        rounded-full
+                                        object-cover
+                                        border
+                                        border-gray-200
+                                        shadow-sm
+                                    "
+                                >
+
+
+                                {{-- USER NAME --}}
+
+                                <span
+                                    class="
+                                        hidden
+                                        xl:block
+                                        max-w-[130px]
+                                        truncate
+                                        text-sm
+                                        font-bold
+                                        text-gray-700
+                                    "
+                                >
+                                    {{ auth()->user()->name }}
+                                </span>
+
+
+                                {{-- ARROW --}}
+
+                                <svg
+                                    class="
+                                        hidden
+                                        xl:block
+                                        w-4
+                                        h-4
+                                        text-gray-500
+                                        transition-transform
+                                        duration-200
+                                        group-hover:rotate-180
+                                    "
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M19 9l-7 7-7-7"
+                                    />
+
+                                </svg>
+
+
+                            </button>
+
+
+
+                            {{-- PROFILE DROPDOWN --}}
+
+                            <div
+                                class="
+                                    absolute
+                                    right-0
+                                    top-full
+                                    pt-2
+                                    hidden
+                                    group-hover:block
+                                    z-[100]
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        bg-white
+                                        shadow-xl
+                                        rounded-xl
+                                        py-2
+                                        w-52
+                                        border
+                                        border-gray-100
+                                    "
+                                >
+
+
+                                    {{-- ADMIN --}}
+
+                                    @if(auth()->user()->is_admin)
+
+                                        <a
+                                            href="{{ route('admin.dashboard') }}"
+                                            class="
+                                                block
+                                                px-4
+                                                py-2.5
+                                                text-sm
+                                                !text-gray-700
+                                                hover:bg-gray-50
+                                                hover:!text-[#1e1e50]
+                                                !no-underline
+                                                font-semibold
+                                            "
+                                        >
+                                            Panel Admin
+                                        </a>
+
+                                    @endif
+
+
+
+                                    {{-- MY POSTS --}}
+
+                                    <a
+                                        href="{{ route('blog.myPosts') }}"
+                                        class="
+                                            block
+                                            px-4
+                                            py-2.5
+                                            text-sm
+                                            !text-gray-700
+                                            hover:bg-gray-50
+                                            hover:!text-[#1e1e50]
+                                            !no-underline
+                                            font-semibold
+                                        "
+                                    >
+                                        Artikel Saya
+                                    </a>
+
+
+
+                                    <div
+                                        class="
+                                            border-t
+                                            border-gray-100
+                                            my-1
+                                        "
+                                    ></div>
+
+
+
+                                    {{-- LOGOUT --}}
+
+                                    <form
+                                        action="{{ route('logout') }}"
+                                        method="POST"
+                                    >
+
+                                        @csrf
+
+
+                                        <button
+                                            type="submit"
+                                            class="
+                                                w-full
+                                                text-left
+                                                px-4
+                                                py-2.5
+                                                text-sm
+                                                text-red-600
+                                                hover:bg-red-50
+                                                font-semibold
+                                                cursor-pointer
+                                            "
+                                        >
+                                            Logout
+                                        </button>
+
+
+                                    </form>
+
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                    @else
+
+
+                        {{-- LOGIN --}}
+
+                        <a
+                            href="{{ route('login') }}"
+                            class="
+                                inline-flex
+                                items-center
+                                justify-center
+                                bg-[#1e1e50]
+                                hover:bg-[#29296b]
+                                !text-white
+                                px-5
+                                py-2.5
+                                rounded-full
+                                text-xs
+                                font-bold
+                                shadow-md
+                                hover:shadow-lg
+                                transition
+                                !no-underline
+                                whitespace-nowrap
+                            "
+                        >
+                            Login
+                        </a>
+
+
+                    @endauth
+
+
+                @endif
+
+
+            </div>
+
+
+
+            {{-- =================================================
+                4. HAMBURGER MOBILE/TABLET
+            ================================================== --}}
+
+            <div class="flex lg:hidden items-center ml-auto">
+
+
+                <button
+                    type="button"
+                    id="mobile-menu-button"
+                    onclick="toggleMobileMenu()"
+                    aria-expanded="false"
+                    aria-controls="mobile-menu"
+                    aria-label="Buka menu"
+                    class="
+                        inline-flex
+                        items-center
+                        justify-center
+                        w-11
+                        h-11
+                        rounded-xl
+                        !text-gray-600
+                        hover:bg-gray-100
+                        focus:outline-none
+                        transition
+                    "
+                >
+
+
+                    <svg
+                        id="hamburger-icon"
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"
+                        />
+
+                    </svg>
+
+
+                    <svg
+                        id="close-icon"
+                        class="h-6 w-6 hidden"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+
+                    </svg>
+
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    {{-- =====================================================
+        MOBILE MENU
+    ====================================================== --}}
+
+    <div
+        id="mobile-menu"
+        class="
+            hidden
+            lg:hidden
+            bg-white
+            border-t
+            border-gray-100
+            shadow-lg
+        "
+    >
+
+
+        <div
+            class="
+                max-h-[calc(100vh-80px)]
+                overflow-y-auto
+                px-5
+                sm:px-6
+                py-4
+                space-y-2
+                font-bold
+                text-sm
+            "
+        >
+
+
+            {{-- =================================================
+                HOME
+            ================================================== --}}
+
+            <a
+                href="{{ route('home') }}"
+                class="
+                    block
+                    py-3
+                    px-4
+                    rounded-xl
+                    !no-underline
+                    transition
+
+                    {{ request()->is('/')
+                        ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
+                        : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
+                    }}
+                "
+            >
+                Home
             </a>
-          @endauth
-        @endif
-      </div>
 
-      <!-- HAMBURGER (Mobile Toggle) -->
-      <div class="flex items-center md:hidden">
-        <button type="button" onclick="toggleMobileMenu()" class="!text-gray-600 focus:outline-none">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-        </button>
-      </div>
+
+
+            {{-- =================================================
+                TENTANG KAMI
+            ================================================== --}}
+
+            <div
+                class="
+                    border-t
+                    border-gray-100
+                    pt-4
+                    mt-2
+                "
+            >
+
+
+                <span
+                    class="
+                        block
+                        px-4
+                        mb-2
+                        text-[11px]
+                        font-bold
+                        tracking-wider
+                        text-gray-400
+                        uppercase
+                    "
+                >
+                    Tentang Kami
+                </span>
+
+
+                <a
+                    href="{{ route('tentang.dewan-redaksi') }}#team-bacadulu"
+                    class="
+                        block
+                        !text-gray-600
+                        hover:bg-gray-50
+                        hover:!text-[#1e1e50]
+                        py-2.5
+                        px-6
+                        rounded-lg
+                        !no-underline
+                    "
+                >
+                    Team BacaDulu
+                </a>
+
+
+                <a
+                    href="{{ route('tentang.dewan-redaksi') }}#nilai-perusahaan"
+                    class="
+                        block
+                        !text-gray-600
+                        hover:bg-gray-50
+                        hover:!text-[#1e1e50]
+                        py-2.5
+                        px-6
+                        rounded-lg
+                        !no-underline
+                    "
+                >
+                    Nilai Perusahaan
+                </a>
+
+
+                <a
+                    href="{{ route('tentang.dewan-redaksi') }}#visi-misi"
+                    class="
+                        block
+                        !text-gray-600
+                        hover:bg-gray-50
+                        hover:!text-[#1e1e50]
+                        py-2.5
+                        px-6
+                        rounded-lg
+                        !no-underline
+                    "
+                >
+                    Visi & Misi
+                </a>
+
+
+            </div>
+
+
+
+            {{-- =================================================
+                KATALOG BACA
+            ================================================== --}}
+
+            <div
+                class="
+                    border-t
+                    border-gray-100
+                    pt-4
+                    mt-2
+                "
+            >
+
+
+                <span
+                    class="
+                        block
+                        px-4
+                        mb-2
+                        text-[11px]
+                        font-bold
+                        tracking-wider
+                        text-gray-400
+                        uppercase
+                    "
+                >
+                    Katalog Baca
+                </span>
+
+
+                <a
+                    href="{{ route('informasi') }}"
+                    class="
+                        block
+                        !text-gray-600
+                        hover:bg-gray-50
+                        hover:!text-[#1e1e50]
+                        py-2.5
+                        px-6
+                        rounded-lg
+                        !no-underline
+                    "
+                >
+                    Baca Informasi
+                </a>
+
+
+                <a
+                    href="{{ route('konsultasi') }}"
+                    class="
+                        block
+                        !text-gray-600
+                        hover:bg-gray-50
+                        hover:!text-[#1e1e50]
+                        py-2.5
+                        px-6
+                        rounded-lg
+                        !no-underline
+                    "
+                >
+                    Baca Konsultasi
+                </a>
+
+
+                <a
+                    href="{{ route('jurnal') }}"
+                    class="
+                        block
+                        !text-gray-600
+                        hover:bg-gray-50
+                        hover:!text-[#1e1e50]
+                        py-2.5
+                        px-6
+                        rounded-lg
+                        !no-underline
+                    "
+                >
+                    Baca Jurnal
+                </a>
+
+
+                <a
+                    href="{{ route('conference') }}"
+                    class="
+                        block
+                        !text-gray-600
+                        hover:bg-gray-50
+                        hover:!text-[#1e1e50]
+                        py-2.5
+                        px-6
+                        rounded-lg
+                        !no-underline
+                    "
+                >
+                    Baca Conference
+                </a>
+
+
+                <a
+                    href="{{ route('publisher') }}"
+                    class="
+                        block
+                        !text-gray-600
+                        hover:bg-gray-50
+                        hover:!text-[#1e1e50]
+                        py-2.5
+                        px-6
+                        rounded-lg
+                        !no-underline
+                    "
+                >
+                    Baca Publisher
+                </a>
+
+
+            </div>
+
+
+
+            {{-- =================================================
+                MAIN MENU MOBILE
+            ================================================== --}}
+
+            <div
+                class="
+                    border-t
+                    border-gray-100
+                    pt-3
+                    mt-3
+                    space-y-1
+                "
+            >
+
+
+                {{-- BOOKSTORE --}}
+
+                <a
+                    href="{{ route('portofolio.bookstore') }}"
+                    class="
+                        block
+                        py-3
+                        px-4
+                        rounded-xl
+                        !no-underline
+
+                        {{ request()->routeIs('portofolio.bookstore*')
+                            ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
+                            : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
+                        }}
+                    "
+                >
+                    Bookstore
+                </a>
+
+
+
+                {{-- BLOGGING --}}
+
+                <a
+                    href="{{ route('blog.index') }}"
+                    class="
+                        block
+                        py-3
+                        px-4
+                        rounded-xl
+                        !no-underline
+
+                        {{ request()->routeIs('blog.*')
+                            ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
+                            : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
+                        }}
+                    "
+                >
+                    Blogging
+                </a>
+
+
+
+                {{-- HAKI --}}
+
+                <a
+                    href="{{ route('haki.index') }}"
+                    class="
+                        block
+                        py-3
+                        px-4
+                        rounded-xl
+                        !no-underline
+
+                        {{ request()->routeIs('haki.*')
+                            ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
+                            : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
+                        }}
+                    "
+                >
+                    HAKI
+                </a>
+
+
+            </div>
+
+
+
+            {{-- =================================================
+                MOBILE ACTION
+            ================================================== --}}
+
+            <div
+                class="
+                    border-t
+                    border-gray-100
+                    pt-4
+                    mt-3
+                    flex
+                    flex-col
+                    gap-2
+                    pb-2
+                "
+            >
+
+
+                {{-- KIRIM NASKAH --}}
+
+                <a
+                    href="https://wa.me/6281315717719"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="
+                        flex
+                        items-center
+                        justify-center
+                        bg-[#f05a42]
+                        hover:bg-[#d94f38]
+                        !text-white
+                        py-3
+                        px-4
+                        rounded-xl
+                        text-sm
+                        shadow-md
+                        !no-underline
+                        transition
+                    "
+                >
+                    Kirim Naskah
+                </a>
+
+
+
+                {{-- =================================================
+                    PROFILE MOBILE KHUSUS BLOG
+                ================================================== --}}
+
+                @if(request()->routeIs('blog.*'))
+
+
+                    @auth
+
+
+                        {{-- USER INFO --}}
+
+                        <div
+                            class="
+                                flex
+                                items-center
+                                gap-3
+                                p-3
+                                rounded-xl
+                                bg-gray-50
+                            "
+                        >
+
+                            <img
+                                src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}"
+                                alt="{{ auth()->user()->name }}"
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-full
+                                    object-cover
+                                    border
+                                    border-gray-200
+                                "
+                            >
+
+
+                            <div class="min-w-0">
+
+                                <p
+                                    class="
+                                        text-sm
+                                        font-bold
+                                        text-gray-700
+                                        truncate
+                                    "
+                                >
+                                    {{ auth()->user()->name }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        {{-- ADMIN --}}
+
+                        @if(auth()->user()->is_admin)
+
+                            <a
+                                href="{{ route('admin.dashboard') }}"
+                                class="
+                                    block
+                                    text-center
+                                    bg-gray-100
+                                    hover:bg-gray-200
+                                    !text-gray-700
+                                    py-3
+                                    rounded-xl
+                                    text-sm
+                                    !no-underline
+                                "
+                            >
+                                Panel Admin
+                            </a>
+
+                        @endif
+
+
+
+                        {{-- MY ARTICLES --}}
+
+                        <a
+                            href="{{ route('blog.myPosts') }}"
+                            class="
+                                block
+                                text-center
+                                bg-gray-100
+                                hover:bg-gray-200
+                                !text-gray-700
+                                py-3
+                                rounded-xl
+                                text-sm
+                                !no-underline
+                            "
+                        >
+                            Artikel Saya
+                        </a>
+
+
+
+                        {{-- LOGOUT --}}
+
+                        <form
+                            action="{{ route('logout') }}"
+                            method="POST"
+                        >
+
+                            @csrf
+
+
+                            <button
+                                type="submit"
+                                class="
+                                    w-full
+                                    bg-red-50
+                                    hover:bg-red-100
+                                    text-red-600
+                                    text-center
+                                    py-3
+                                    rounded-xl
+                                    text-sm
+                                    font-bold
+                                    cursor-pointer
+                                    transition
+                                "
+                            >
+                                Logout
+                            </button>
+
+
+                        </form>
+
+
+                    @else
+
+
+                        {{-- LOGIN --}}
+
+                        <a
+                            href="{{ route('login') }}"
+                            class="
+                                flex
+                                items-center
+                                justify-center
+                                bg-[#1e1e50]
+                                hover:bg-[#29296b]
+                                !text-white
+                                py-3
+                                rounded-xl
+                                text-sm
+                                shadow-md
+                                !no-underline
+                            "
+                        >
+                            Login
+                        </a>
+
+
+                    @endauth
+
+
+                @endif
+
+
+            </div>
+
+
+        </div>
+
     </div>
-  </div>
 
-  <!-- MOBILE MENU -->
-  <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100 bg-white shadow-inner">
-    <div class="px-4 py-3 space-y-2 font-bold text-sm">
-      
-      @if(request()->routeIs('blog.*'))
-      <!-- Search Mobile (Khusus Blog) -->
-      <form action="{{ route('search') }}" method="GET" class="pb-2">
-        <input type="text" name="q" placeholder="Cari artikel..." class="w-full bg-gray-100 text-sm text-gray-700 rounded-full px-4 py-2 focus:outline-none border border-gray-200">
-      </form>
-      @endif
 
-      <a href="{{ route('home') }}" class="block text-gray-600 py-2 px-3 !no-underline">Home</a>
-      
-      <div class="border-t pt-2">
-        <span class="text-[11px] text-gray-400 uppercase block px-3 mb-1">Tentang Kami</span>
-        <a href="{{ route('tentang.dewan-redaksi') }}#team-bacadulu" class="block text-gray-600 py-1.5 px-6 !no-underline">Team BacaDulu</a>
-        <a href="{{ route('tentang.dewan-redaksi') }}#visi-misi" class="block text-gray-600 py-1.5 px-6 !no-underline">Visi & Misi</a>
-        <a href="{{ route('tentang.dewan-redaksi') }}#nilai-perusahaan" class="block text-gray-600 py-1.5 px-6 !no-underline">Nilai Perusahaan</a>
-      </div>
-
-      <div class="border-t pt-2">
-        <span class="text-[11px] text-gray-400 uppercase block px-3 mb-1">Katalog Baca</span>
-        <a href="{{ route('informasi') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Baca Informasi</a>
-        <a href="{{ route('articles') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Baca Artikel</a>
-        <a href="{{ route('konsultasi') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Baca Konsultasi</a>
-        <a href="{{ route('jurnal') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Baca Jurnal</a>
-        <a href="{{ route('conference') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Baca Conference</a>
-        <a href="{{ route('publisher') }}" class="block text-gray-600 py-1.5 px-6 !no-underline">Baca Publisher</a>
-      </div>
-
-      <a href="{{ route('portofolio.bookstore') }}" class="block text-gray-600 py-2 px-3 !no-underline border-t pt-2">Bookstore</a>
-      <a href="{{ route('blog.index') }}" class="block text-gray-600 py-2 px-3 !no-underline border-t pt-2">Blogging</a>
-      <a href="{{ route('haki.index') }}" class="block text-gray-600 py-2 px-3 !no-underline border-t pt-2">HAKI</a>
-
-      <div class="border-t pt-2 flex flex-col space-y-2 pb-2">
-        <a href="https://wa.me/6281315717719" target="_blank" class="bg-[#f05a42] text-center text-white py-2 rounded-lg text-sm shadow-md !no-underline">Kirim Naskah</a>
-        
-        <!-- Login / Profil Mobile HANYA MUNCUL di Halaman Blogging -->
-        @if(request()->routeIs('blog.*'))
-          @auth
-            @if(auth()->user()->is_admin)
-              <a href="{{ route('admin.dashboard') }}" class="block text-center bg-gray-100 text-gray-700 py-2 rounded-lg text-sm !no-underline">Panel Admin</a>
-            @endif
-            <a href="{{ route('blog.myPosts') }}" class="block text-center bg-gray-100 text-gray-700 py-2 rounded-lg text-sm !no-underline">Artikel Saya</a>
-            <form action="{{ route('logout') }}" method="POST">
-              @csrf
-              <button type="submit" class="w-full bg-red-50 text-red-600 text-center py-2 rounded-lg text-sm font-bold cursor-pointer">Logout</button>
-            </form>
-          @else
-            <a href="{{ route('login') }}" class="bg-[#1e1e50] text-center text-white py-2 rounded-lg text-sm shadow-md !no-underline">Login</a>
-          @endauth
-        @endif
-      </div>
-    </div>
-  </div>
 </nav>
 
+
+
+{{-- ============================================================
+    NAVBAR SCRIPT
+============================================================ --}}
+
 <script>
+
     function toggleMobileMenu() {
-        document.getElementById('mobile-menu').classList.toggle('hidden');
+
+        const menu =
+            document.getElementById('mobile-menu');
+
+        const button =
+            document.getElementById('mobile-menu-button');
+
+        const hamburgerIcon =
+            document.getElementById('hamburger-icon');
+
+        const closeIcon =
+            document.getElementById('close-icon');
+
+
+        if (!menu) {
+            return;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Toggle Menu
+        |--------------------------------------------------------------------------
+        */
+
+        menu.classList.toggle('hidden');
+
+
+        const isOpen =
+            !menu.classList.contains('hidden');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Aria
+        |--------------------------------------------------------------------------
+        */
+
+        if (button) {
+
+            button.setAttribute(
+                'aria-expanded',
+                isOpen ? 'true' : 'false'
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Change Icon
+        |--------------------------------------------------------------------------
+        */
+
+        if (hamburgerIcon) {
+
+            hamburgerIcon.classList.toggle(
+                'hidden',
+                isOpen
+            );
+
+        }
+
+
+        if (closeIcon) {
+
+            closeIcon.classList.toggle(
+                'hidden',
+                !isOpen
+            );
+
+        }
+
     }
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close menu saat ukuran layar kembali desktop
+    |--------------------------------------------------------------------------
+    */
+
+    window.addEventListener(
+        'resize',
+        function () {
+
+            if (window.innerWidth >= 1024) {
+
+
+                const menu =
+                    document.getElementById('mobile-menu');
+
+                const button =
+                    document.getElementById('mobile-menu-button');
+
+                const hamburgerIcon =
+                    document.getElementById('hamburger-icon');
+
+                const closeIcon =
+                    document.getElementById('close-icon');
+
+
+                if (menu) {
+
+                    menu.classList.add('hidden');
+
+                }
+
+
+                if (button) {
+
+                    button.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+                }
+
+
+                if (hamburgerIcon) {
+
+                    hamburgerIcon.classList.remove('hidden');
+
+                }
+
+
+                if (closeIcon) {
+
+                    closeIcon.classList.add('hidden');
+
+                }
+
+            }
+
+        }
+    );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESC menutup mobile menu
+    |--------------------------------------------------------------------------
+    */
+
+    document.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (event.key !== 'Escape') {
+                return;
+            }
+
+
+            const menu =
+                document.getElementById('mobile-menu');
+
+
+            if (
+                menu &&
+                !menu.classList.contains('hidden')
+            ) {
+
+                toggleMobileMenu();
+
+            }
+
+        }
+    );
+
 </script>
