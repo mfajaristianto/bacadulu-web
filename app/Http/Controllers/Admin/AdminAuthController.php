@@ -147,7 +147,15 @@ class AdminAuthController extends Controller
      */
     public function showOtpForm(Request $request)
     {
-        dd($request->session()->all()); // <-- DEBUG SEMENTARA, hapus setelah selesai testing
+        /*
+        |--------------------------------------------------------------------------
+        | CEK SESSION OTP
+        |--------------------------------------------------------------------------
+        |
+        | Jangan gunakan dd() di sini karena akan menghentikan
+        | proses dan menampilkan seluruh isi session.
+        |
+        */
 
         if (
             !$request->session()->has(
@@ -339,11 +347,14 @@ class AdminAuthController extends Controller
 
         TrustedDevice::create([
             'user_id' => $user->id,
+
             'token_hash' => hash(
                 'sha256',
                 $trustedToken
             ),
+
             'user_agent' => $request->userAgent(),
+
             'expires_at' => now()->addYear(),
         ]);
 
@@ -358,7 +369,10 @@ class AdminAuthController extends Controller
             false
         );
 
-        Auth::guard('admin')->login($user, $remember);
+        Auth::guard('admin')->login(
+            $user,
+            $remember
+        );
 
         $request->session()->regenerate();
 
