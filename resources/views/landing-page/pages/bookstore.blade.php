@@ -2330,34 +2330,6 @@
 
             </p>
 
-
-            {{-- SEARCH --}}
-
-            <div class="search-bar">
-
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="Cari judul buku, penulis, atau penerbit..."
-                    autocomplete="off"
-                >
-
-                <button
-                    type="button"
-                    id="searchBtn"
-                >
-                    Cari Buku
-                </button>
-
-            </div>
-
-
-            <div
-                id="searchStatus"
-                class="search-status"
-            ></div>
-
-
             {{-- STATISTIC --}}
 
             <div class="hero-stats">
