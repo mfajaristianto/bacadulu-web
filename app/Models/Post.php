@@ -9,7 +9,6 @@ class Post extends Model
 {
     use HasFactory;
 
-
     /*
     |--------------------------------------------------------------------------
     | FILLABLE
@@ -37,9 +36,7 @@ class Post extends Model
 
     public function user()
     {
-        return $this->belongsTo(
-            User::class
-        );
+        return $this->belongsTo(User::class);
     }
 
 
@@ -51,9 +48,7 @@ class Post extends Model
 
     public function comments()
     {
-        return $this->hasMany(
-            Comment::class
-        );
+        return $this->hasMany(Comment::class);
     }
 
 
@@ -65,15 +60,13 @@ class Post extends Model
 
     public function likes()
     {
-        return $this->hasMany(
-            PostLike::class
-        );
+        return $this->hasMany(PostLike::class);
     }
 
 
     /*
     |--------------------------------------------------------------------------
-    | CEK APAKAH USER SUDAH LIKE
+    | CEK LIKE USER
     |--------------------------------------------------------------------------
     */
 
@@ -83,13 +76,9 @@ class Post extends Model
             return false;
         }
 
-
         return $this
             ->likes()
-            ->where(
-                'user_id',
-                $userId
-            )
+            ->where('user_id', $userId)
             ->exists();
     }
 }
