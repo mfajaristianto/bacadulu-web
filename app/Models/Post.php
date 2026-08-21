@@ -9,6 +9,13 @@ class Post extends Model
 {
     use HasFactory;
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILLABLE
+    |--------------------------------------------------------------------------
+    */
+
     protected $fillable = [
         'user_id',
         'author',
@@ -21,35 +28,68 @@ class Post extends Model
         'views',
     ];
 
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | USER
+    |--------------------------------------------------------------------------
+    */
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class
+        );
     }
 
-    /**
-     * Ubah PostComment menjadi Comment
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMMENTS
+    |--------------------------------------------------------------------------
+    */
+
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(
+            Comment::class
+        );
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LIKES
+    |--------------------------------------------------------------------------
+    */
 
     public function likes()
     {
-        return $this->hasMany(PostLike::class);
+        return $this->hasMany(
+            PostLike::class
+        );
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CEK APAKAH USER SUDAH LIKE
+    |--------------------------------------------------------------------------
+    */
 
     public function isLikedBy($userId): bool
     {
-        if (! $userId) {
+        if (!$userId) {
             return false;
         }
 
-        return $this->likes()->where('user_id', $userId)->exists();
+
+        return $this
+            ->likes()
+            ->where(
+                'user_id',
+                $userId
+            )
+            ->exists();
     }
 }
