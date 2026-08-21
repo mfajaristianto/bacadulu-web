@@ -35,7 +35,6 @@
     {{-- Vite --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-
     <style>
 
         :root {
@@ -119,22 +118,28 @@
 
             border-radius: 12px;
 
-            background:
-                var(--brand-gradient);
+            overflow: hidden;
 
             display: flex;
 
             align-items: center;
             justify-content: center;
 
-            font-weight: 900;
-
-            color: white;
-
-            font-size: 14px;
+            background: white;
 
             box-shadow:
                 0 8px 22px rgba(239,88,67,.28);
+        }
+
+
+        .cms-logo-badge img {
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
         }
 
 
@@ -610,7 +615,13 @@
             <div class="mb-7 flex items-center gap-3 px-2">
 
                 <div class="cms-logo-badge">
-                    BD
+
+                    {{-- FIX: folder public/img --}}
+                    <img
+                        src="{{ asset('img/bacadulu-logo.jpg') }}"
+                        alt="Logo Baca Dulu"
+                    >
+
                 </div>
 
                 <div class="min-w-0">
@@ -661,6 +672,7 @@
                             stroke="currentColor"
                             stroke-width="1.8"
                         >
+
                             <rect
                                 x="4"
                                 y="4"
@@ -692,6 +704,7 @@
                                 height="6"
                                 rx="1"
                             />
+
                         </svg>
 
                     </span>
@@ -712,6 +725,8 @@
                     Blogging
                 </div>
 
+
+                {{-- Artikel --}}
 
                 <a
                     href="{{ route('admin.posts.index') }}"
@@ -770,6 +785,101 @@
                         </span>
 
                     @endif
+
+                </a>
+
+
+
+                {{-- Komunitas --}}
+
+                <a
+                    href="{{ route('admin.communities.index') }}"
+                    class="cms-nav-link {{ request()->routeIs('admin.communities.*') ? 'active' : '' }}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"
+                            />
+
+                            <circle
+                                cx="9"
+                                cy="7"
+                                r="4"
+                            />
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M22 21v-2a4 4 0 00-3-3.87"
+                            />
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M16 3.13a4 4 0 010 7.75"
+                            />
+
+                        </svg>
+
+                    </span>
+
+                    <span class="flex-1">
+                        Komunitas
+                    </span>
+
+                </a>
+
+
+
+                {{-- Event --}}
+
+                <a
+                    href="{{ route('admin.events.index') }}"
+                    class="cms-nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+
+                            <rect
+                                x="4"
+                                y="5"
+                                width="16"
+                                height="15"
+                                rx="2"
+                            />
+
+                            <path
+                                stroke-linecap="round"
+                                d="M8 3v4M16 3v4M4 10h16"
+                            />
+
+                        </svg>
+
+                    </span>
+
+                    <span class="flex-1">
+                        Event
+                    </span>
 
                 </a>
 
@@ -852,48 +962,6 @@
 
                     <span class="flex-1">
                         Jurnal
-                    </span>
-
-                </a>
-
-
-
-                {{-- Event --}}
-
-                <a
-                    href="{{ route('admin.events.index') }}"
-                    class="cms-nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}"
-                >
-
-                    <span class="nav-icon">
-
-                        <svg
-                            class="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-
-                            <rect
-                                x="4"
-                                y="5"
-                                width="16"
-                                height="15"
-                                rx="2"
-                            />
-
-                            <path
-                                stroke-linecap="round"
-                                d="M8 3v4M16 3v4M4 10h16"
-                            />
-
-                        </svg>
-
-                    </span>
-
-                    <span class="flex-1">
-                        Event
                     </span>
 
                 </a>
@@ -1151,9 +1219,15 @@
 
                     <div
                         class="cms-logo-badge"
-                        style="width:34px;height:34px;font-size:11px;"
+                        style="width:34px;height:34px;"
                     >
-                        BD
+
+                        {{-- FIX: folder public/img --}}
+                        <img
+                            src="{{ asset('img/bacadulu-logo.jpg') }}"
+                            alt="Logo Baca Dulu"
+                        >
+
                     </div>
 
                     <div>

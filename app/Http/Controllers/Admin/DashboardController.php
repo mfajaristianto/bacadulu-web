@@ -9,6 +9,7 @@ use App\Models\Information;
 use App\Models\Jurnal;
 use App\Models\Publisher;
 use App\Models\Post;
+use App\Models\Community;
 
 class DashboardController extends Controller
 {
@@ -43,18 +44,22 @@ class DashboardController extends Controller
             'approved_posts' => $approvedPosts,
             'rejected_posts' => $rejectedPosts,
 
-            // Konten website
+            // Konten Website
             'informations' => Information::count(),
             'journals' => Jurnal::count(),
             'conferences' => Conference::count(),
             'publishers' => Publisher::count(),
             'data_articles' => DataArticle::count(),
 
-            // Untuk dashboard kalau nanti model ini sudah tersedia
+            // Komunitas
+            'communities' => Community::count(),
+
+            // Event
             'events' => class_exists(\App\Models\Event::class)
                 ? \App\Models\Event::count()
                 : 0,
 
+            // Buku
             'books' => class_exists(\App\Models\Book::class)
                 ? \App\Models\Book::count()
                 : 0,
