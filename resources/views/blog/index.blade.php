@@ -11,10 +11,9 @@
         {{-- SIDEBAR KIRI --}}
         {{-- ========================================================= --}}
 
-        <aside class="lg:col-span-1">
+        <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
 
-            {{-- Sticky: mengikuti scroll halaman --}}
-            <div class="sticky top-24">
+            <div class="pr-1">
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
 
@@ -27,7 +26,7 @@
                         {{-- HOME --}}
                         <a
                             href="{{ route('blog.index') }}"
-                            class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold
+                            class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition
                             {{ empty(request('category'))
                                 ? 'bg-blue-50 text-blue-700'
                                 : 'text-gray-600 hover:bg-gray-50' }}"
@@ -55,7 +54,7 @@
                         {{-- EVENT --}}
                         <a
                             href="{{ route('event.index') }}"
-                            class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50"
+                            class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 transition"
                         >
 
                             <svg
@@ -73,6 +72,31 @@
                             </svg>
 
                             <span>Event</span>
+
+                        </a>
+
+
+                        {{-- Komunitas --}}
+                        <a
+                            href="{{ route('community.index') }}"
+                            class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 transition"
+                        >
+
+                            <svg
+                                class="w-5 h-5 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2v12a2 2 0 002 2z"
+                                />
+                            </svg>
+
+                            <span>Komunitas</span>
 
                         </a>
 
@@ -98,54 +122,35 @@
 
                     <div class="space-y-1">
 
-                        {{-- SOSIAL --}}
-                        <a
-                            href="{{ route('blog.index', ['category' => 'Sosial']) }}"
-                            class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
-                            {{ isset($category) && $category === 'Sosial'
-                                ? 'bg-blue-50 text-blue-700 font-bold'
-                                : 'text-gray-600 hover:bg-gray-50' }}"
-                        >
-                            Sosial
-                        </a>
+                        @foreach(['Sosial', 'Ekonomi', 'Teknik', 'Kesehatan'] as $cat)
 
+                            <a
+                                href="{{ route('blog.index', array_merge(request()->except('page'), ['category' => $cat])) }}"
+                                class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
+                                {{ isset($category) && $category === $cat
+                                    ? 'bg-blue-50 text-blue-700 font-bold'
+                                    : 'text-gray-600 hover:bg-gray-50' }}"
+                            >
+                                {{ $cat }}
+                            </a>
 
-                        {{-- EKONOMI --}}
-                        <a
-                            href="{{ route('blog.index', ['category' => 'Ekonomi']) }}"
-                            class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
-                            {{ isset($category) && $category === 'Ekonomi'
-                                ? 'bg-blue-50 text-blue-700 font-bold'
-                                : 'text-gray-600 hover:bg-gray-50' }}"
-                        >
-                            Ekonomi
-                        </a>
-
-
-                        {{-- TEKNIK --}}
-                        <a
-                            href="{{ route('blog.index', ['category' => 'Teknik']) }}"
-                            class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
-                            {{ isset($category) && $category === 'Teknik'
-                                ? 'bg-blue-50 text-blue-700 font-bold'
-                                : 'text-gray-600 hover:bg-gray-50' }}"
-                        >
-                            Teknik
-                        </a>
-
-
-                        {{-- KESEHATAN --}}
-                        <a
-                            href="{{ route('blog.index', ['category' => 'Kesehatan']) }}"
-                            class="block px-4 py-2.5 rounded-lg text-sm font-medium transition
-                            {{ isset($category) && $category === 'Kesehatan'
-                                ? 'bg-blue-50 text-blue-700 font-bold'
-                                : 'text-gray-600 hover:bg-gray-50' }}"
-                        >
-                            Kesehatan
-                        </a>
+                        @endforeach
 
                     </div>
+
+                    @if(!empty($category))
+
+                        <a
+                            href="{{ route('blog.index', request()->except(['category', 'page'])) }}"
+                            class="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-red-600 transition"
+                        >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Hapus filter kategori
+                        </a>
+
+                    @endif
 
                 </div>
 
@@ -159,19 +164,26 @@
         {{-- FEED UTAMA --}}
         {{-- ========================================================= --}}
 
-        <main class="lg:col-span-2">
+        <main class="lg:col-span-2 min-w-0">
 
 
             {{-- ================================================= --}}
-            {{-- TABS --}}
+            {{-- TABS FILTER (Top / Terbaru / Terpopuler) --}}
             {{-- ================================================= --}}
+
+            @php
+                $activeSort = request('sort', 'top');
+            @endphp
 
             <div class="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
 
                 {{-- TOP --}}
                 <a
-                    href="{{ route('blog.index') }}"
-                    class="flex items-center gap-1.5 px-4 py-2 rounded-full border border-blue-500 bg-blue-500 text-white text-sm font-semibold whitespace-nowrap"
+                    href="{{ route('blog.index', array_merge(request()->except(['sort', 'page']), ['sort' => 'top'])) }}"
+                    class="flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-semibold whitespace-nowrap transition
+                    {{ $activeSort === 'top'
+                        ? 'border-blue-500 bg-blue-500 text-white'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50' }}"
                 >
 
                     <svg
@@ -195,10 +207,53 @@
 
                 {{-- TERBARU --}}
                 <a
-                    href="{{ route('blog.index') }}"
-                    class="px-4 py-2 rounded-full border border-gray-200 text-gray-600 text-sm font-semibold whitespace-nowrap hover:bg-gray-50"
+                    href="{{ route('blog.index', array_merge(request()->except(['sort', 'page']), ['sort' => 'terbaru'])) }}"
+                    class="flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-semibold whitespace-nowrap transition
+                    {{ $activeSort === 'terbaru'
+                        ? 'border-blue-500 bg-blue-500 text-white'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50' }}"
                 >
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+
                     Terbaru
+                </a>
+
+
+                {{-- TERPOPULER --}}
+                <a
+                    href="{{ route('blog.index', array_merge(request()->except(['sort', 'page']), ['sort' => 'terpopuler'])) }}"
+                    class="flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-semibold whitespace-nowrap transition
+                    {{ $activeSort === 'terpopuler'
+                        ? 'border-blue-500 bg-blue-500 text-white'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50' }}"
+                >
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                    </svg>
+
+                    Terpopuler
                 </a>
 
 
@@ -271,7 +326,7 @@
                         {{-- AUTHOR --}}
                         {{-- ========================================= --}}
 
-                        <div class="flex items-center gap-2.5 mb-3">
+                        <div class="flex items-center gap-2.5 mb-3 min-w-0">
 
 
                             {{-- ================================= --}}
@@ -320,9 +375,9 @@
                             {{-- NAMA PENULIS --}}
                             {{-- ================================= --}}
 
-                            <div class="leading-tight">
+                            <div class="leading-tight min-w-0">
 
-                                <p class="text-sm font-bold text-slate-900">
+                                <p class="text-sm font-bold text-slate-900 truncate">
 
                                     {{ $post->user->name ?? $post->author ?? 'Penulis' }}
 
@@ -350,14 +405,14 @@
                         >
 
                             <h2
-                                class="text-xl font-bold text-slate-900 group-hover:text-blue-700 transition leading-snug mb-2"
+                                class="text-xl font-bold text-slate-900 group-hover:text-blue-700 transition leading-snug mb-2 break-words"
                             >
                                 {{ $post->title }}
                             </h2>
 
 
                             <p
-                                class="text-sm text-slate-600 leading-relaxed line-clamp-3"
+                                class="text-sm text-slate-600 leading-relaxed line-clamp-3 break-words"
                             >
                                 {{ Str::limit(strip_tags($post->content), 220) }}
                             </p>
@@ -428,7 +483,7 @@
             {{-- ================================================= --}}
 
             <div class="mt-6">
-                {{ $posts->links() }}
+                {{ $posts->appends(request()->query())->links() }}
             </div>
 
         </main>
@@ -439,9 +494,9 @@
         {{-- SIDEBAR KANAN --}}
         {{-- ========================================================= --}}
 
-        <aside class="lg:col-span-1">
+        <aside class="lg:col-span-1 self-start">
 
-            <div class="sticky top-24">
+            <div class="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-1">
 
                 <div class="bg-white rounded-xl border border-gray-100 p-5">
 
@@ -456,7 +511,7 @@
 
                             <a
                                 href="{{ route('blog.show', $post->slug) }}"
-                                class="flex gap-3 group"
+                                class="flex gap-3 group min-w-0"
                             >
 
                                 <span
@@ -466,16 +521,16 @@
                                 </span>
 
 
-                                <div>
+                                <div class="min-w-0">
 
                                     <p
-                                        class="text-sm font-semibold text-slate-800 group-hover:text-blue-700 transition leading-snug line-clamp-2"
+                                        class="text-sm font-semibold text-slate-800 group-hover:text-blue-700 transition leading-snug line-clamp-2 break-words"
                                     >
                                         {{ $post->title }}
                                     </p>
 
 
-                                    <p class="text-xs text-slate-400 mt-1">
+                                    <p class="text-xs text-slate-400 mt-1 truncate">
                                         {{ $post->user->name ?? $post->author ?? 'Penulis' }}
                                     </p>
 
@@ -504,4 +559,4 @@
 
 </div>
 
-@endsection
+@endsection     

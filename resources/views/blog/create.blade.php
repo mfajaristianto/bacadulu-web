@@ -80,7 +80,7 @@
                 name="title"
                 value="{{ old('title') }}"
                 placeholder="Masukkan judul artikel..."
-                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 break-words"
                 required
             >
 
@@ -221,7 +221,7 @@
 
             <trix-editor
                 input="content"
-                class="prose border border-gray-300 rounded-lg min-h-[300px] p-4"
+                class="prose max-w-none border border-gray-300 rounded-lg min-h-[300px] p-4 break-words [overflow-wrap:anywhere]"
             ></trix-editor>
 
             @error('content')
