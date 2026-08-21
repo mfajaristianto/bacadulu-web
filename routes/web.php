@@ -72,7 +72,6 @@ Route::get('/', function () {
         );
     }
 
-
     return view(
         'landing-page.index'
     );
@@ -97,7 +96,7 @@ Route::get('/login', function () {
 
 /*
 |--------------------------------------------------------------------------
-| GOOGLE OAUTH
+| GOOGLE LOGIN
 |--------------------------------------------------------------------------
 */
 
@@ -105,7 +104,7 @@ Route::get(
     '/auth/google',
     [
         GoogleController::class,
-        'redirect',
+        'redirect'
     ]
 )->name('google.login');
 
@@ -114,7 +113,7 @@ Route::get(
     '/auth/google/callback',
     [
         GoogleController::class,
-        'callback',
+        'callback'
     ]
 )->name('google.callback');
 
@@ -137,7 +136,6 @@ Route::post('/logout', function () {
         ->session()
         ->regenerateToken();
 
-
     return redirect()
         ->route('home');
 
@@ -156,7 +154,7 @@ Route::get(
     '/panel-adminbaca/login',
     [
         AdminAuthController::class,
-        'showLoginForm',
+        'showLoginForm'
     ]
 )->name('admin.login');
 
@@ -165,7 +163,7 @@ Route::post(
     '/panel-adminbaca/login',
     [
         AdminAuthController::class,
-        'login',
+        'login'
     ]
 )->name('admin.login.submit');
 
@@ -180,7 +178,7 @@ Route::get(
     '/panel-adminbaca/verify-otp',
     [
         AdminAuthController::class,
-        'showOtpForm',
+        'showOtpForm'
     ]
 )->name('admin.otp');
 
@@ -189,7 +187,7 @@ Route::post(
     '/panel-adminbaca/verify-otp',
     [
         AdminAuthController::class,
-        'processOtp',
+        'processOtp'
     ]
 )->name('admin.otp.submit');
 
@@ -204,7 +202,7 @@ Route::get(
     '/panel-adminbaca/confirm-access',
     [
         AdminAuthController::class,
-        'showConfirmForm',
+        'showConfirmForm'
     ]
 )->name('admin.confirm');
 
@@ -213,7 +211,7 @@ Route::post(
     '/panel-adminbaca/confirm-access',
     [
         AdminAuthController::class,
-        'processConfirm',
+        'processConfirm'
     ]
 )->name('admin.confirm.submit');
 
@@ -228,7 +226,7 @@ Route::get(
     '/information',
     [
         InformationController::class,
-        'index',
+        'index'
     ]
 )->name('informasi');
 
@@ -237,7 +235,7 @@ Route::get(
     '/information/{information:slug}',
     [
         InformationController::class,
-        'show',
+        'show'
     ]
 )->name('informasi.show');
 
@@ -252,7 +250,7 @@ Route::get(
     '/articles',
     [
         DataArticleController::class,
-        'index',
+        'index'
     ]
 )->name('articles');
 
@@ -267,7 +265,7 @@ Route::get(
     '/jurnal',
     [
         JurnalController::class,
-        'index',
+        'index'
     ]
 )->name('jurnal');
 
@@ -282,7 +280,7 @@ Route::get(
     '/conference',
     [
         ConferenceController::class,
-        'index',
+        'index'
     ]
 )->name('conference');
 
@@ -297,7 +295,7 @@ Route::get(
     '/publisher',
     [
         PublisherController::class,
-        'index',
+        'index'
     ]
 )->name('publisher');
 
@@ -327,7 +325,7 @@ Route::get(
     '/haki',
     [
         HakiController::class,
-        'index',
+        'index'
     ]
 )->name('haki.index');
 
@@ -337,7 +335,7 @@ Route::get('/haki/daftar/{jenis}', function ($jenis) {
     return view(
         'landing-page.pages.haki',
         [
-            'jenis' => $jenis,
+            'jenis' => $jenis
         ]
     );
 
@@ -354,7 +352,7 @@ Route::get(
     '/cek-resi',
     [
         ShipmentController::class,
-        'index',
+        'index'
     ]
 )->name('cek-resi');
 
@@ -363,7 +361,7 @@ Route::post(
     '/cek-resi',
     [
         ShipmentController::class,
-        'track',
+        'track'
     ]
 )->name('cek-resi.track');
 
@@ -437,7 +435,6 @@ Route::get(
         $books = Book::latest()
             ->get();
 
-
         return view(
             'landing-page.pages.bookstore',
             compact('books')
@@ -468,14 +465,18 @@ Route::get(
     '/blog',
     [
         BlogController::class,
-        'index',
+        'index'
     ]
 )->name('blog.index');
 
 
 /*
 |--------------------------------------------------------------------------
-| BLOG USER
+| BLOG USER / PENULIS
+|--------------------------------------------------------------------------
+|
+| Semua route di bawah membutuhkan login user.
+|
 |--------------------------------------------------------------------------
 */
 
@@ -485,7 +486,7 @@ Route::middleware('auth')
 
         /*
         |--------------------------------------------------------------------------
-        | CREATE
+        | CREATE ARTICLE
         |--------------------------------------------------------------------------
         */
 
@@ -493,14 +494,14 @@ Route::middleware('auth')
             '/blog/create',
             [
                 BlogController::class,
-                'create',
+                'create'
             ]
         )->name('blog.create');
 
 
         /*
         |--------------------------------------------------------------------------
-        | STORE
+        | STORE ARTICLE
         |--------------------------------------------------------------------------
         */
 
@@ -508,7 +509,7 @@ Route::middleware('auth')
             '/blog',
             [
                 BlogController::class,
-                'store',
+                'store'
             ]
         )->name('blog.store');
 
@@ -523,14 +524,22 @@ Route::middleware('auth')
             '/blog/saya',
             [
                 BlogController::class,
-                'myPosts',
+                'myPosts'
             ]
         )->name('blog.myPosts');
 
 
         /*
         |--------------------------------------------------------------------------
-        | EDIT
+        | EDIT ARTICLE
+        |--------------------------------------------------------------------------
+        |
+        | Menggunakan slug.
+        |
+        | Contoh:
+        |
+        | /blog/test-artikel-123/edit
+        |
         |--------------------------------------------------------------------------
         */
 
@@ -538,14 +547,14 @@ Route::middleware('auth')
             '/blog/{post:slug}/edit',
             [
                 BlogController::class,
-                'edit',
+                'edit'
             ]
         )->name('blog.edit');
 
 
         /*
         |--------------------------------------------------------------------------
-        | UPDATE
+        | UPDATE ARTICLE
         |--------------------------------------------------------------------------
         */
 
@@ -553,14 +562,14 @@ Route::middleware('auth')
             '/blog/{post:slug}',
             [
                 BlogController::class,
-                'update',
+                'update'
             ]
         )->name('blog.update');
 
 
         /*
         |--------------------------------------------------------------------------
-        | DELETE
+        | DELETE ARTICLE
         |--------------------------------------------------------------------------
         */
 
@@ -568,32 +577,49 @@ Route::middleware('auth')
             '/blog/{post:slug}',
             [
                 BlogController::class,
-                'destroy',
+                'destroy'
             ]
         )->name('blog.destroy');
 
 
         /*
         |--------------------------------------------------------------------------
-        | LIKE
+        | LIKE ARTICLE
         |--------------------------------------------------------------------------
         |
-        | Controller mendukung ID maupun slug.
+        | Sengaja tidak memakai :slug di parameter route.
         |
+        | Karena controller toggleLike() gabungan kita dapat menerima:
+        |
+        | ID:
+        | /blog/13/like
+        |
+        | atau slug:
+        | /blog/test-artikel-123/like
+        |
+        |--------------------------------------------------------------------------
         */
 
         Route::post(
             '/blog/{post}/like',
             [
                 BlogController::class,
-                'toggleLike',
+                'toggleLike'
             ]
         )->name('blog.like');
 
 
         /*
         |--------------------------------------------------------------------------
-        | COMMENT
+        | COMMENT ARTICLE
+        |--------------------------------------------------------------------------
+        |
+        | Komentar menggunakan route model binding berdasarkan SLUG.
+        |
+        | Contoh:
+        |
+        | /blog/test-artikel-1-1787287056/comments
+        |
         |--------------------------------------------------------------------------
         */
 
@@ -601,7 +627,7 @@ Route::middleware('auth')
             '/blog/{post:slug}/comments',
             [
                 CommentController::class,
-                'store',
+                'store'
             ]
         )->name('post.comment.store');
 
@@ -610,7 +636,14 @@ Route::middleware('auth')
 
 /*
 |--------------------------------------------------------------------------
-| SHOW BLOG
+| SHOW BLOG ARTICLE
+|--------------------------------------------------------------------------
+|
+| HARUS berada setelah:
+|
+| /blog/create
+| /blog/saya
+|
 |--------------------------------------------------------------------------
 */
 
@@ -618,14 +651,14 @@ Route::get(
     '/blog/{post:slug}',
     [
         BlogController::class,
-        'show',
+        'show'
     ]
 )->name('blog.show');
 
 
 /*
 |--------------------------------------------------------------------------
-| COMMUNITY
+| COMMUNITY PUBLIC
 |--------------------------------------------------------------------------
 */
 
@@ -633,65 +666,101 @@ Route::get(
     '/komunitas',
     [
         CommunityController::class,
-        'index',
+        'index'
     ]
 )->name('community.index');
 
+
+/*
+|--------------------------------------------------------------------------
+| COMMUNITY USER
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('auth')
     ->group(function () {
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | CREATE COMMUNITY
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             '/komunitas/buat',
             [
                 CommunityController::class,
-                'create',
+                'create'
             ]
         )->name('community.create');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | STORE COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
         Route::post(
             '/komunitas',
             [
                 CommunityController::class,
-                'store',
+                'store'
             ]
         )->name('community.store');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | JOIN COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
         Route::post(
             '/komunitas/{community}/join',
             [
                 CommunityController::class,
-                'join',
+                'join'
             ]
         )->name('community.join');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | LEAVE COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
         Route::post(
             '/komunitas/{community}/leave',
             [
                 CommunityController::class,
-                'leave',
+                'leave'
             ]
         )->name('community.leave');
 
     });
 
 
+/*
+|--------------------------------------------------------------------------
+| SHOW COMMUNITY
+|--------------------------------------------------------------------------
+*/
+
 Route::get(
     '/komunitas/{community}',
     [
         CommunityController::class,
-        'show',
+        'show'
     ]
 )->name('community.show');
 
 
 /*
 |--------------------------------------------------------------------------
-| EVENT
+| EVENT PUBLIC
 |--------------------------------------------------------------------------
 */
 
@@ -699,7 +768,7 @@ Route::get(
     '/event',
     [
         EventController::class,
-        'index',
+        'index'
     ]
 )->name('event.index');
 
@@ -708,7 +777,7 @@ Route::get(
     '/event/{slug}',
     [
         EventController::class,
-        'show',
+        'show'
     ]
 )->name('event.show');
 
@@ -723,7 +792,7 @@ Route::get(
     '/team/{slug}',
     [
         TeamController::class,
-        'show',
+        'show'
     ]
 )->name('team.show');
 
@@ -738,7 +807,7 @@ Route::get(
     '/search',
     [
         SearchController::class,
-        'index',
+        'index'
     ]
 )->name('search');
 
@@ -759,7 +828,7 @@ Route::get('/lang/{locale}', function ($locale) {
                 'en',
                 'zh',
                 'ja',
-                'ko',
+                'ko'
             ]
         )
     ) {
@@ -774,7 +843,6 @@ Route::get('/lang/{locale}', function ($locale) {
         );
     }
 
-
     return redirect()
         ->back();
 
@@ -785,11 +853,22 @@ Route::get('/lang/{locale}', function ($locale) {
 |--------------------------------------------------------------------------
 | ADMIN CMS
 |--------------------------------------------------------------------------
+|
+| Semua halaman admin:
+|
+| /admin/...
+|
+| Dilindungi oleh:
+|
+| auth:admin
+| admin
+|
+|--------------------------------------------------------------------------
 */
 
 Route::middleware([
         'auth:admin',
-        'admin',
+        'admin'
     ])
     ->prefix('admin')
     ->name('admin.')
@@ -806,7 +885,7 @@ Route::middleware([
             '/',
             [
                 DashboardController::class,
-                'index',
+                'index'
             ]
         )->name('dashboard');
 
@@ -821,7 +900,7 @@ Route::middleware([
             'books',
             AdminBookController::class
         )->scoped([
-            'book' => 'slug',
+            'book' => 'slug'
         ]);
 
 
@@ -890,8 +969,13 @@ Route::middleware([
         | BLOG POSTS ADMIN
         |--------------------------------------------------------------------------
         |
-        | Admin memakai ID.
+        | Admin menggunakan ID artikel.
         |
+        | Contoh:
+        |
+        | /admin/posts/13/edit
+        |
+        |--------------------------------------------------------------------------
         */
 
 
@@ -905,7 +989,7 @@ Route::middleware([
             '/posts',
             [
                 PostController::class,
-                'index',
+                'index'
             ]
         )->name('posts.index');
 
@@ -920,7 +1004,7 @@ Route::middleware([
             '/posts/{post}/edit',
             [
                 PostController::class,
-                'edit',
+                'edit'
             ]
         )->name('posts.edit');
 
@@ -935,7 +1019,7 @@ Route::middleware([
             '/posts/{post}',
             [
                 PostController::class,
-                'update',
+                'update'
             ]
         )->name('posts.update');
 
@@ -950,7 +1034,7 @@ Route::middleware([
             '/posts/{post}',
             [
                 PostController::class,
-                'destroy',
+                'destroy'
             ]
         )->name('posts.destroy');
 
@@ -965,7 +1049,7 @@ Route::middleware([
             '/posts/{post}/approve',
             [
                 PostController::class,
-                'approve',
+                'approve'
             ]
         )->name('posts.approve');
 
@@ -980,7 +1064,7 @@ Route::middleware([
             '/posts/{post}/reject',
             [
                 PostController::class,
-                'reject',
+                'reject'
             ]
         )->name('posts.reject');
 
@@ -1011,7 +1095,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | COMMUNITY APPROVAL
+        | COMMUNITY APPROVE
         |--------------------------------------------------------------------------
         */
 
@@ -1019,16 +1103,22 @@ Route::middleware([
             '/communities/{community}/approve',
             [
                 AdminCommunityController::class,
-                'approve',
+                'approve'
             ]
         )->name('communities.approve');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | COMMUNITY REJECT
+        |--------------------------------------------------------------------------
+        */
 
         Route::post(
             '/communities/{community}/reject',
             [
                 AdminCommunityController::class,
-                'reject',
+                'reject'
             ]
         )->name('communities.reject');
 
@@ -1043,14 +1133,14 @@ Route::middleware([
             '/detail/{type}/{id}',
             [
                 DetailController::class,
-                'show',
+                'show'
             ]
         )->name('detail.show');
 
 
         /*
         |--------------------------------------------------------------------------
-        | LOGOUT
+        | ADMIN LOGOUT
         |--------------------------------------------------------------------------
         */
 
@@ -1058,7 +1148,7 @@ Route::middleware([
             '/logout',
             [
                 AuthController::class,
-                'logout',
+                'logout'
             ]
         )->name('logout');
 

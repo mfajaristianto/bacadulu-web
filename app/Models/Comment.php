@@ -9,6 +9,7 @@ class Comment extends Model
 {
     use HasFactory;
 
+
     /*
     |--------------------------------------------------------------------------
     | FILLABLE
@@ -18,30 +19,59 @@ class Comment extends Model
     protected $fillable = [
         'post_id',
         'user_id',
-        'content',
+        'body',
     ];
 
 
     /*
     |--------------------------------------------------------------------------
-    | POST
+    | RELASI POST
     |--------------------------------------------------------------------------
     */
 
     public function post()
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(
+            Post::class
+        );
     }
 
 
     /*
     |--------------------------------------------------------------------------
-    | USER
+    | RELASI USER
     |--------------------------------------------------------------------------
     */
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | COMPATIBILITY ACCESSOR
+    |--------------------------------------------------------------------------
+    |
+    | Database menggunakan:
+    |
+    | $comment->body
+    |
+    | Tetapi Blade yang sudah Anda dan teman Anda buat menggunakan:
+    |
+    | $comment->content
+    |
+    | Accessor ini membuat keduanya tetap bekerja tanpa perlu mengubah
+    | seluruh Blade.
+    |
+    |--------------------------------------------------------------------------
+    */
+
+    public function getContentAttribute()
+    {
+        return $this->body;
     }
 }
