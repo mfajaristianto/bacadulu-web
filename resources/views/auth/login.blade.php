@@ -35,7 +35,7 @@
                 </h1>
 
                 <p class="text-sm text-slate-500 mt-2">
-                    Masuk untuk menulis artikel dan berkomentar.
+                    Masuk untuk menulis artikel, berkomentar, menyukai, dan fitur lainnya.
                 </p>
 
             </div>

@@ -322,6 +322,11 @@
         }
 
 
+        /* =====================================================
+           PENDING BADGE
+           DIGUNAKAN ARTIKEL + KOMUNITAS
+        ====================================================== */
+
         .cms-pending-badge {
 
             min-width: 22px;
@@ -346,6 +351,10 @@
             font-size: 10px;
 
             font-weight: 800;
+
+            line-height: 1;
+
+            flex-shrink: 0;
 
             box-shadow:
                 0 4px 10px rgba(239,88,67,.25);
@@ -535,9 +544,7 @@
         ====================================================== */
 
         .cms-main {
-
-            background:
-                #f8fafc;
+            background: #f8fafc;
         }
 
 
@@ -546,15 +553,12 @@
         ====================================================== */
 
         .cms-sidebar::-webkit-scrollbar {
-
             width: 5px;
         }
 
 
         .cms-sidebar::-webkit-scrollbar-track {
-
-            background:
-                transparent;
+            background: transparent;
         }
 
 
@@ -573,6 +577,45 @@
 
 
 <body class="min-h-screen bg-slate-100 text-slate-900">
+
+
+    {{-- =========================================================
+         HITUNG DATA PENDING
+    ========================================================== --}}
+
+    @php
+
+        /*
+        |--------------------------------------------------------------------------
+        | ARTIKEL PENDING
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingPosts =
+            \App\Models\Post::where(
+                'status',
+                'pending'
+            )->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | KOMUNITAS PENDING
+        |--------------------------------------------------------------------------
+        |
+        | Ketika user membuat komunitas baru dan statusnya pending,
+        | angka akan otomatis muncul pada menu Komunitas.
+        |
+        */
+
+        $pendingCommunities =
+            \App\Models\Community::where(
+                'status',
+                'pending'
+            )->count();
+
+    @endphp
+
 
 
     {{-- =========================================================
@@ -616,13 +659,13 @@
 
                 <div class="cms-logo-badge">
 
-                    {{-- FIX: folder public/img --}}
                     <img
                         src="{{ asset('img/bacadulu-logo.jpg') }}"
                         alt="Logo Baca Dulu"
                     >
 
                 </div>
+
 
                 <div class="min-w-0">
 
@@ -656,7 +699,10 @@
                 </div>
 
 
-                {{-- Dashboard --}}
+
+                {{-- =================================================
+                     DASHBOARD
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.dashboard') }}"
@@ -709,6 +755,7 @@
 
                     </span>
 
+
                     <span class="flex-1">
                         Dashboard
                     </span>
@@ -726,7 +773,10 @@
                 </div>
 
 
-                {{-- Artikel --}}
+
+                {{-- =================================================
+                     ARTIKEL
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.posts.index') }}"
@@ -765,22 +815,15 @@
                     </span>
 
 
-                    @php
-
-                        $pendingPosts =
-                            \App\Models\Post::where(
-                                'status',
-                                'pending'
-                            )->count();
-
-                    @endphp
-
-
+                    {{-- JUMLAH ARTIKEL PENDING --}}
                     @if($pendingPosts > 0)
 
                         <span class="cms-pending-badge">
 
-                            {{ $pendingPosts > 99 ? '99+' : $pendingPosts }}
+                            {{ $pendingPosts > 99
+                                ? '99+'
+                                : $pendingPosts
+                            }}
 
                         </span>
 
@@ -790,7 +833,9 @@
 
 
 
-                {{-- Komunitas --}}
+                {{-- =================================================
+                     KOMUNITAS
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.communities.index') }}"
@@ -835,15 +880,37 @@
 
                     </span>
 
+
                     <span class="flex-1">
                         Komunitas
                     </span>
+
+
+                    {{-- =============================================
+                         JUMLAH KOMUNITAS PENDING
+                         INI YANG SEBELUMNYA BELUM ADA
+                    ============================================== --}}
+
+                    @if($pendingCommunities > 0)
+
+                        <span class="cms-pending-badge">
+
+                            {{ $pendingCommunities > 99
+                                ? '99+'
+                                : $pendingCommunities
+                            }}
+
+                        </span>
+
+                    @endif
 
                 </a>
 
 
 
-                {{-- Event --}}
+                {{-- =================================================
+                     EVENT
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.events.index') }}"
@@ -877,6 +944,7 @@
 
                     </span>
 
+
                     <span class="flex-1">
                         Event
                     </span>
@@ -894,7 +962,10 @@
                 </div>
 
 
-                {{-- Informasi --}}
+
+                {{-- =================================================
+                     INFORMASI
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.informations.index') }}"
@@ -926,6 +997,7 @@
 
                     </span>
 
+
                     <span class="flex-1">
                         Informasi
                     </span>
@@ -934,7 +1006,9 @@
 
 
 
-                {{-- Jurnal --}}
+                {{-- =================================================
+                     JURNAL
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.journals.index') }}"
@@ -960,6 +1034,7 @@
 
                     </span>
 
+
                     <span class="flex-1">
                         Jurnal
                     </span>
@@ -968,7 +1043,9 @@
 
 
 
-                {{-- Konferensi --}}
+                {{-- =================================================
+                     KONFERENSI
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.conferences.index') }}"
@@ -1000,6 +1077,7 @@
 
                     </span>
 
+
                     <span class="flex-1">
                         Konferensi
                     </span>
@@ -1008,7 +1086,9 @@
 
 
 
-                {{-- Publisher --}}
+                {{-- =================================================
+                     PUBLISHER
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.publishers.index') }}"
@@ -1040,6 +1120,7 @@
 
                     </span>
 
+
                     <span class="flex-1">
                         Publisher
                     </span>
@@ -1057,7 +1138,10 @@
                 </div>
 
 
-                {{-- Buku --}}
+
+                {{-- =================================================
+                     BUKU
+                ================================================== --}}
 
                 <a
                     href="{{ route('admin.books.index') }}"
@@ -1088,6 +1172,7 @@
                         </svg>
 
                     </span>
+
 
                     <span class="flex-1">
                         Kelola Buku
@@ -1121,7 +1206,13 @@
 
                         <div class="cms-user-avatar">
 
-                            {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                            {{ strtoupper(
+                                substr(
+                                    auth()->user()->name ?? 'A',
+                                    0,
+                                    1
+                                )
+                            ) }}
 
                         </div>
 
@@ -1133,6 +1224,7 @@
                                 {{ auth()->user()->name ?? 'Administrator' }}
 
                             </p>
+
 
                             <p class="truncate text-[10px] text-slate-400">
 
@@ -1156,6 +1248,7 @@
                 >
 
                     @csrf
+
 
                     <button
                         type="submit"
@@ -1222,13 +1315,13 @@
                         style="width:34px;height:34px;"
                     >
 
-                        {{-- FIX: folder public/img --}}
                         <img
                             src="{{ asset('img/bacadulu-logo.jpg') }}"
                             alt="Logo Baca Dulu"
                         >
 
                     </div>
+
 
                     <div>
 

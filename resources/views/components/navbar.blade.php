@@ -1,3 +1,26 @@
+@php
+    /*
+    |--------------------------------------------------------------------------
+    | AREA BLOGGING BACA DULU
+    |--------------------------------------------------------------------------
+    |
+    | Blog, Event, dan Komunitas merupakan satu ekosistem.
+    |
+    | Digunakan untuk:
+    | - Menandai menu Blogging aktif
+    | - Menampilkan profil jika sudah login
+    | - Menampilkan tombol Login jika belum login
+    | - Berlaku desktop dan mobile
+    |
+    */
+
+    $isBloggingArea =
+        request()->routeIs('blog.*')
+        || request()->routeIs('event.*')
+        || request()->routeIs('community.*');
+@endphp
+
+
 <nav
     id="main-navbar"
     class="
@@ -446,6 +469,7 @@
 
                 {{-- =================================================
                     BLOGGING
+                    AKTIF JUGA SAAT EVENT / KOMUNITAS
                 ================================================== --}}
 
                 <a
@@ -460,7 +484,7 @@
                         !no-underline
                         whitespace-nowrap
 
-                        {{ request()->routeIs('blog.*')
+                        {{ $isBloggingArea
                             ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
                             : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
                         }}
@@ -551,10 +575,10 @@
 
                 {{-- =================================================
                     LOGIN / PROFIL
-                    HANYA DI HALAMAN BLOG
+                    BLOG + EVENT + KOMUNITAS
                 ================================================== --}}
 
-                @if(request()->routeIs('blog.*'))
+                @if($isBloggingArea)
 
 
                     @auth
@@ -1192,7 +1216,7 @@
                         rounded-xl
                         !no-underline
 
-                        {{ request()->routeIs('blog.*')
+                        {{ $isBloggingArea
                             ? 'bg-[#1e1e50]/10 !text-[#1e1e50]'
                             : '!text-gray-600 hover:bg-gray-50 hover:!text-[#1e1e50]'
                         }}
@@ -1274,10 +1298,11 @@
 
 
                 {{-- =================================================
-                    PROFILE MOBILE KHUSUS BLOG
+                    PROFILE MOBILE
+                    BLOG + EVENT + KOMUNITAS
                 ================================================== --}}
 
-                @if(request()->routeIs('blog.*'))
+                @if($isBloggingArea)
 
 
                     @auth

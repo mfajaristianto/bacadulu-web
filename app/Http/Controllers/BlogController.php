@@ -4,23 +4,59 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
-    /**
-     * Tampilkan daftar artikel yang sudah disetujui
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | INDEX
+    |--------------------------------------------------------------------------
+    */
+
     public function index(Request $request)
     {
         /*
         |--------------------------------------------------------------------------
-        | QUERY ARTIKEL
+        | SORT
+        |--------------------------------------------------------------------------
+        |
+        | Tidak ada lagi "top".
+        |
+        | Default:
+        | - terbaru
+        |
+        | Pilihan:
+        | - terbaru
+        | - terpopuler
+        |
+        */
+
+        $sort = $request->get('sort', 'terbaru');
+
+        if (!in_array($sort, ['terbaru', 'terpopuler'])) {
+            $sort = 'terbaru';
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CATEGORY
         |--------------------------------------------------------------------------
         */
 
-        $query = Post::with([
+        $category = $request->get('category');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | QUERY
+        |--------------------------------------------------------------------------
+        */
+
+        $query = Post::query()
+            ->with([
                 'user',
                 'comments',
                 'likes',
@@ -34,15 +70,12 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | FILTER KATEGORI
+        | FILTER CATEGORY
         |--------------------------------------------------------------------------
         */
 
-        if ($request->filled('category')) {
-            $query->where(
-                'category',
-                $request->category
-            );
+        if ($category) {
+            $query->where('category', $category);
         }
 
 
@@ -50,40 +83,29 @@ class BlogController extends Controller
         |--------------------------------------------------------------------------
         | SORTING
         |--------------------------------------------------------------------------
-        |
-        | Mendukung tombol:
-        |
-        | Top
-        | Terbaru
-        | Terpopuler
-        |
         */
 
-        $sort = $request->get('sort', 'top');
-
-
-        if ($sort === 'terbaru') {
-
-            $query->latest();
-
-        } elseif ($sort === 'terpopuler') {
+        if ($sort === 'terpopuler') {
 
             $query
                 ->orderByDesc('views')
-                ->latest();
+                ->orderByDesc('likes_count')
+                ->orderByDesc('created_at');
 
         } else {
 
             /*
             |--------------------------------------------------------------------------
-            | TOP
+            | TERBARU
             |--------------------------------------------------------------------------
+            |
+            | Ini sekarang menjadi default.
+            |
             */
 
-            $query
-                ->orderByDesc('likes_count')
-                ->orderByDesc('views')
-                ->latest();
+            $sort = 'terbaru';
+
+            $query->orderByDesc('created_at');
         }
 
 
@@ -98,46 +120,38 @@ class BlogController extends Controller
             ->withQueryString();
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | KATEGORI AKTIF
-        |--------------------------------------------------------------------------
-        */
-
-        $category = $request->category;
-
-
         return view(
             'blog.index',
             compact(
                 'posts',
+                'sort',
                 'category'
             )
         );
     }
 
 
-    /**
-     * Tampilkan form buat artikel
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE
+    |--------------------------------------------------------------------------
+    */
+
     public function create()
     {
         return view('blog.create');
     }
 
 
-    /**
-     * Simpan artikel baru
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | STORE
+    |--------------------------------------------------------------------------
+    */
+
     public function store(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI
-        |--------------------------------------------------------------------------
-        */
-
-        $request->validate([
+        $validated = $request->validate([
             'title' => [
                 'required',
                 'string',
@@ -165,7 +179,7 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | UPLOAD GAMBAR
+        | IMAGE
         |--------------------------------------------------------------------------
         */
 
@@ -184,26 +198,37 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | SIMPAN ARTIKEL
+        | SLUG
+        |--------------------------------------------------------------------------
+        */
+
+        $slug = $this->generateUniqueSlug(
+            $validated['title']
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CREATE
         |--------------------------------------------------------------------------
         */
 
         Post::create([
             'user_id' => auth()->id(),
 
-            'author' => auth()->user()->name,
+            'author' => auth()
+                ->user()
+                ->name,
 
-            'title' => $request->title,
+            'title' => $validated['title'],
 
-            'slug' => Str::slug($request->title)
-                . '-'
-                . time(),
+            'slug' => $slug,
 
-            'content' => $request->content,
+            'content' => $validated['content'],
 
             'image' => $imagePath,
 
-            'category' => $request->category,
+            'category' => $validated['category'],
 
             'status' => 'pending',
 
@@ -215,27 +240,28 @@ class BlogController extends Controller
             ->route('blog.myPosts')
             ->with(
                 'success',
-                'Artikel berhasil dikirim! Menunggu persetujuan admin.'
+                'Artikel berhasil dikirim dan sedang menunggu persetujuan admin.'
             );
     }
 
 
-    /**
-     * Tampilkan detail artikel
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW
+    |--------------------------------------------------------------------------
+    */
+
     public function show(Post $post)
     {
         /*
         |--------------------------------------------------------------------------
-        | ARTIKEL PENDING / REJECTED
+        | ARTICLE ACCESS
         |--------------------------------------------------------------------------
-        |
-        | Hanya pemilik artikel yang dapat melihat.
-        |
         */
 
         if (
-            $post->status !== 'approved' &&
+            $post->status !== 'approved'
+            &&
             auth()->id() !== $post->user_id
         ) {
             abort(404);
@@ -244,7 +270,7 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | LOAD RELASI
+        | RELATION
         |--------------------------------------------------------------------------
         */
 
@@ -257,7 +283,7 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | VIEW COUNT
+        | VIEW
         |--------------------------------------------------------------------------
         */
 
@@ -271,17 +297,21 @@ class BlogController extends Controller
     }
 
 
-    /**
-     * Tampilkan artikel milik user yang sedang login
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | MY POSTS
+    |--------------------------------------------------------------------------
+    */
+
     public function myPosts()
     {
-        $posts = Post::with('user')
+        $posts = Post::query()
+            ->with('user')
             ->where(
                 'user_id',
                 auth()->id()
             )
-            ->latest()
+            ->orderByDesc('created_at')
             ->paginate(10);
 
 
@@ -292,17 +322,14 @@ class BlogController extends Controller
     }
 
 
-    /**
-     * Tampilkan form edit
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT
+    |--------------------------------------------------------------------------
+    */
+
     public function edit(Post $post)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | CEK KEPEMILIKAN
-        |--------------------------------------------------------------------------
-        */
-
         if (
             auth()->id() !== $post->user_id
         ) {
@@ -317,19 +344,16 @@ class BlogController extends Controller
     }
 
 
-    /**
-     * Update artikel
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE
+    |--------------------------------------------------------------------------
+    */
+
     public function update(
         Request $request,
         Post $post
     ) {
-        /*
-        |--------------------------------------------------------------------------
-        | CEK KEPEMILIKAN
-        |--------------------------------------------------------------------------
-        */
-
         if (
             auth()->id() !== $post->user_id
         ) {
@@ -337,13 +361,7 @@ class BlogController extends Controller
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI
-        |--------------------------------------------------------------------------
-        */
-
-        $request->validate([
+        $validated = $request->validate([
             'title' => [
                 'required',
                 'string',
@@ -371,54 +389,53 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | DATA UPDATE
+        | DATA
         |--------------------------------------------------------------------------
         */
 
         $data = [
-            'title' => $request->title,
+            'title' => $validated['title'],
 
-            'author' => auth()->user()->name,
+            'author' => auth()
+                ->user()
+                ->name,
 
-            'content' => $request->content,
+            'content' => $validated['content'],
 
-            'category' => $request->category,
+            'category' => $validated['category'],
         ];
 
 
         /*
         |--------------------------------------------------------------------------
-        | UPDATE SLUG JIKA JUDUL BERUBAH
+        | SLUG
         |--------------------------------------------------------------------------
         */
 
         if (
-            $post->title !== $request->title
+            $post->title !==
+            $validated['title']
         ) {
 
             $data['slug'] =
-                Str::slug($request->title)
-                . '-'
-                . time();
+                $this->generateUniqueSlug(
+                    $validated['title'],
+                    $post->id
+                );
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | UPDATE GAMBAR
+        | IMAGE
         |--------------------------------------------------------------------------
         */
 
         if ($request->hasFile('image')) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | Hapus gambar lama
-            |--------------------------------------------------------------------------
-            */
-
             if (
-                $post->image &&
+                $post->image
+                &&
                 Storage::disk('public')
                     ->exists($post->image)
             ) {
@@ -427,12 +444,6 @@ class BlogController extends Controller
                     ->delete($post->image);
             }
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | Simpan gambar baru
-            |--------------------------------------------------------------------------
-            */
 
             $data['image'] = $request
                 ->file('image')
@@ -445,18 +456,11 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | UPDATE ARTIKEL
+        | UPDATE
         |--------------------------------------------------------------------------
         */
 
         $post->update($data);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | REFRESH POST
-        |--------------------------------------------------------------------------
-        */
 
         $post->refresh();
 
@@ -468,22 +472,19 @@ class BlogController extends Controller
             )
             ->with(
                 'success',
-                'Artikel berhasil diperbarui!'
+                'Artikel berhasil diperbarui.'
             );
     }
 
 
-    /**
-     * Hapus artikel
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | DESTROY
+    |--------------------------------------------------------------------------
+    */
+
     public function destroy(Post $post)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | CEK KEPEMILIKAN
-        |--------------------------------------------------------------------------
-        */
-
         if (
             auth()->id() !== $post->user_id
         ) {
@@ -493,12 +494,13 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | HAPUS GAMBAR
+        | DELETE IMAGE
         |--------------------------------------------------------------------------
         */
 
         if (
-            $post->image &&
+            $post->image
+            &&
             Storage::disk('public')
                 ->exists($post->image)
         ) {
@@ -510,7 +512,7 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | HAPUS ARTIKEL
+        | DELETE POST
         |--------------------------------------------------------------------------
         */
 
@@ -521,51 +523,54 @@ class BlogController extends Controller
             ->route('blog.myPosts')
             ->with(
                 'success',
-                'Artikel berhasil dihapus!'
+                'Artikel berhasil dihapus.'
             );
     }
 
 
-    /**
-     * Toggle Like (AJAX)
-     *
-     * Parameter bisa berupa:
-     * - ID dari blog/index.blade.php
-     * - slug dari blog/show.blade.php
-     *
-     * Dengan demikian dua kode tetap dapat digunakan bersama.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | LIKE
+    |--------------------------------------------------------------------------
+    */
+
     public function toggleLike($post)
     {
         /*
         |--------------------------------------------------------------------------
-        | CARI BERDASARKAN ID ATAU SLUG
+        | FIND POST
         |--------------------------------------------------------------------------
+        |
+        | Bisa menggunakan ID maupun slug.
+        |
         */
 
-        $article = Post::where(
-                'id',
-                $post
-            )
-            ->orWhere(
-                'slug',
-                $post
-            )
+        $article = Post::query()
+            ->where('id', $post)
+            ->orWhere('slug', $post)
             ->firstOrFail();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | USER LOGIN
-        |--------------------------------------------------------------------------
-        */
 
         $userId = auth()->id();
 
 
         /*
         |--------------------------------------------------------------------------
-        | CEK LIKE
+        | AUTH
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$userId) {
+
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | EXISTING LIKE
         |--------------------------------------------------------------------------
         */
 
@@ -602,12 +607,6 @@ class BlogController extends Controller
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | RESPONSE AJAX
-        |--------------------------------------------------------------------------
-        */
-
         return response()->json([
             'liked' => $liked,
 
@@ -615,5 +614,59 @@ class BlogController extends Controller
                 ->likes()
                 ->count(),
         ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | UNIQUE SLUG
+    |--------------------------------------------------------------------------
+    */
+
+    private function generateUniqueSlug(
+        string $title,
+        ?int $ignoreId = null
+    ): string {
+        $baseSlug = Str::slug($title);
+
+
+        if (!$baseSlug) {
+            $baseSlug = 'artikel';
+        }
+
+
+        $slug = $baseSlug;
+
+        $number = 1;
+
+
+        while (
+            Post::query()
+                ->where('slug', $slug)
+                ->when(
+                    $ignoreId,
+                    function ($query) use ($ignoreId) {
+
+                        $query->where(
+                            'id',
+                            '!=',
+                            $ignoreId
+                        );
+                    }
+                )
+                ->exists()
+        ) {
+
+            $slug =
+                $baseSlug .
+                '-' .
+                $number;
+
+
+            $number++;
+        }
+
+
+        return $slug;
     }
 }
