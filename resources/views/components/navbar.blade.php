@@ -521,7 +521,7 @@
                 ================================================== --}}
 
                 <a
-                    href="https://wa.me/6281315717719"
+                    href="https://wa.me/6285139461070"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="
@@ -1249,7 +1249,7 @@
                 {{-- KIRIM NASKAH --}}
 
                 <a
-                    href="https://wa.me/6281315717719"
+                    href="https://wa.me/6285139461070"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="

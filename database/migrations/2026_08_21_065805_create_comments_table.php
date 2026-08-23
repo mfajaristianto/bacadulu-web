@@ -6,20 +6,35 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('comments', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        /*
+        |--------------------------------------------------------------------------
+        | CEGAH ERROR TABLE SUDAH ADA
+        |--------------------------------------------------------------------------
+        |
+        | Database Anda ternyata sudah mempunyai tabel comments,
+        | sedangkan migration ini belum tercatat sebagai "Ran".
+        |
+        | Jadi apabila tabel sudah ada, migration dilewati tanpa
+        | menghapus data comments yang sudah tersimpan.
+        |
+        */
+
+        if (!Schema::hasTable('comments')) {
+
+            Schema::create('comments', function (Blueprint $table) {
+
+                $table->id();
+
+                $table->timestamps();
+
+            });
+
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('comments');

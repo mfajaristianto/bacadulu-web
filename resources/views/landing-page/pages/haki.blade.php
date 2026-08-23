@@ -202,7 +202,7 @@
             <div class="relative">
                 <h3 class="text-2xl md:text-3xl font-extrabold text-white mb-3">Punya Naskah Buku atau Jurnal Siap HAKI?</h3>
                 <p class="text-orange-50 mb-8 max-w-xl mx-auto">Konsultasikan naskah Anda bersama tim kami sekarang juga.</p>
-                <a href="https://wa.me/6281315717719" target="_blank"
+                <a href="https://wa.me/6285139461070" target="_blank"
                    class="inline-flex items-center gap-3 bg-white hover:bg-orange-50 text-orange-600 px-8 py-3.5 rounded-full font-bold transition-all shadow-md hover:-translate-y-0.5">
                     Konsultasi via WhatsApp
                 </a>
@@ -219,7 +219,7 @@
             <div class="text-xs text-orange-300 font-semibold uppercase tracking-wide">Kategori Dipilih</div>
             <div class="text-white font-bold" id="pilihan-label">-</div>
         </div>
-        <a id="pilihan-wa" href="https://wa.me/6281315717719" target="_blank"
+        <a id="pilihan-wa" href="https://wa.me/6285139461070" target="_blank"
            class="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 py-3 rounded-full transition-all shadow-md hover:-translate-y-0.5">
             Lanjut Konsultasi
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">

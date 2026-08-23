@@ -1,4043 +1,909 @@
 @extends('layouts.app')
 
-
-@section('title', 'Bookstore - Baca Dulu')
-
+@section('title','Bookstore - Baca Dulu')
 
 @section('content')
-
 <style>
-
-    /*
-    |--------------------------------------------------------------------------
-    | BOOKSTORE ONLY
-    |--------------------------------------------------------------------------
-    | Seluruh selector dibuat berada di bawah .bookstore-page
-    | agar TIDAK mengubah navbar, footer, blog, atau halaman lain.
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page {
-
-        --navy: #241B52;
-        --navy-deep: #170F38;
-
-        --orange: #EF5843;
-        --orange-dark: #C6432F;
-
-        --gold: #F7AA35;
-
-        --cream: #FBF9F5;
-        --white: #FFFFFF;
-
-        --ink-muted: #6B7280;
-
-        --border: #EAE7DF;
-
-        --brand-gradient:
-            linear-gradient(
-                135deg,
-                var(--orange) 0%,
-                var(--gold) 100%
-            );
-
-        width: 100%;
-
-        color: var(--navy);
-
-        background: var(--white);
-
-        font-family: 'Inter', sans-serif;
-
-        overflow-x: hidden;
-
-        -webkit-font-smoothing: antialiased;
-
-    }
-
-
-    .bookstore-page,
-    .bookstore-page * {
-
-        box-sizing: border-box;
-
-    }
-
-
-    .bookstore-page h1,
-    .bookstore-page h2,
-    .bookstore-page h3,
-    .bookstore-page .btn,
-    .bookstore-page button {
-
-        font-family: 'Poppins', sans-serif;
-
-    }
-
-
-    .bookstore-page a {
-
-        text-decoration: none;
-
-        color: inherit;
-
-    }
-
-
-    .bookstore-page img {
-
-        display: block;
-
-        max-width: 100%;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CONTAINER
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .wrap {
-
-        width: 100%;
-
-        max-width: 1440px;
-
-        margin-left: auto;
-
-        margin-right: auto;
-
-        padding-left: 32px;
-
-        padding-right: 32px;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BUTTON
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .cta-btn {
-
-        display: inline-flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        background: var(--brand-gradient);
-
-        color: var(--white);
-
-        font-weight: 600;
-
-        font-size: 14px;
-
-        padding: 12px 22px;
-
-        border-radius: 10px;
-
-        border: none;
-
-        cursor: pointer;
-
-        transition:
-            filter 0.15s ease,
-            transform 0.15s ease;
-
-        white-space: nowrap;
-
-    }
-
-
-    .bookstore-page .cta-btn:hover {
-
-        filter: brightness(0.94);
-
-        transform: translateY(-1px);
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | HERO
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .hero {
-
-        position: relative;
-
-        width: 100%;
-
-        overflow: hidden;
-
-        color: var(--navy);
-
-        padding: 78px 0 64px;
-
-        background-color: var(--white);
-
-        background-image:
-
-            radial-gradient(
-                circle at 88% 8%,
-                rgba(239, 88, 67, 0.30),
-                transparent 52%
-            ),
-
-            radial-gradient(
-                circle at 100% 55%,
-                rgba(247, 170, 53, 0.35),
-                transparent 48%
-            ),
-
-            radial-gradient(
-                circle at 6% 100%,
-                rgba(247, 170, 53, 0.20),
-                transparent 42%
-            );
-
-    }
-
-
-    .bookstore-page .hero::before {
-
-        content: "";
-
-        position: absolute;
-
-        top: 0;
-
-        left: 0;
-
-        right: 0;
-
-        height: 4px;
-
-        background: var(--brand-gradient);
-
-    }
-
-
-    .bookstore-page .eyebrow {
-
-        display: inline-flex;
-
-        align-items: center;
-
-        gap: 9px;
-
-        background: #FFF1E4;
-
-        color: var(--orange-dark);
-
-        font-size: 13px;
-
-        font-weight: 700;
-
-        padding: 8px 16px;
-
-        border-radius: 999px;
-
-        margin-bottom: 24px;
-
-        letter-spacing: 0.2px;
-
-    }
-
-
-    .bookstore-page .eyebrow .dot {
-
-        width: 8px;
-
-        height: 8px;
-
-        flex-shrink: 0;
-
-        border-radius: 50%;
-
-        background: var(--brand-gradient);
-
-    }
-
-
-    .bookstore-page .hero h1 {
-
-        max-width: 770px;
-
-        margin: 0 0 18px;
-
-        color: var(--navy);
-
-        font-size: clamp(38px, 4.2vw, 58px);
-
-        font-weight: 700;
-
-        line-height: 1.12;
-
-        letter-spacing: -1px;
-
-    }
-
-
-    .bookstore-page .hero-description {
-
-        max-width: 760px;
-
-        margin: 0 0 28px;
-
-        color: var(--ink-muted);
-
-        font-size: 17px;
-
-        line-height: 1.75;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SEARCH
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .search-bar {
-
-        display: flex;
-
-        align-items: stretch;
-
-        gap: 8px;
-
-        max-width: 700px;
-
-        padding: 8px;
-
-        background: var(--white);
-
-        border: 1px solid var(--border);
-
-        border-radius: 14px;
-
-        box-shadow:
-            0 12px 35px rgba(36, 27, 82, 0.10);
-
-    }
-
-
-    .bookstore-page .search-bar input {
-
-        flex: 1;
-
-        min-width: 0;
-
-        border: none;
-
-        outline: none;
-
-        background: transparent;
-
-        color: var(--navy);
-
-        font-family: 'Inter', sans-serif;
-
-        font-size: 14px;
-
-        padding: 11px 14px;
-
-    }
-
-
-    .bookstore-page .search-bar input::placeholder {
-
-        color: #9CA3AF;
-
-    }
-
-
-    .bookstore-page .search-bar button {
-
-        flex-shrink: 0;
-
-        border: none;
-
-        border-radius: 9px;
-
-        padding: 0 24px;
-
-        cursor: pointer;
-
-        background: var(--brand-gradient);
-
-        color: var(--white);
-
-        font-weight: 600;
-
-        font-size: 13px;
-
-        transition:
-            filter 0.15s ease,
-            transform 0.15s ease;
-
-    }
-
-
-    .bookstore-page .search-bar button:hover {
-
-        filter: brightness(0.94);
-
-    }
-
-
-    .bookstore-page .search-status {
-
-        min-height: 18px;
-
-        margin-top: 10px;
-
-        color: var(--ink-muted);
-
-        font-size: 12px;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | HERO STATISTIC
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .hero-stats {
-
-        display: flex;
-
-        flex-wrap: wrap;
-
-        gap: 42px;
-
-        margin-top: 38px;
-
-    }
-
-
-    .bookstore-page .hero-stat {
-
-        min-width: 150px;
-
-        border-left: 2px solid var(--border);
-
-        padding-left: 16px;
-
-    }
-
-
-    .bookstore-page .hero-stat strong {
-
-        display: block;
-
-        margin-bottom: 4px;
-
-        color: var(--navy);
-
-        font-family: 'Poppins', sans-serif;
-
-        font-size: 23px;
-
-        font-weight: 700;
-
-    }
-
-
-    .bookstore-page .hero-stat span {
-
-        color: var(--ink-muted);
-
-        font-size: 13px;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SECTION
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .store-section {
-
-        width: 100%;
-
-        padding: 64px 0;
-
-    }
-
-
-    .bookstore-page .section-head {
-
-        display: flex;
-
-        align-items: flex-end;
-
-        justify-content: space-between;
-
-        gap: 20px;
-
-        margin-bottom: 28px;
-
-    }
-
-
-    .bookstore-page .section-head h2 {
-
-        display: flex;
-
-        align-items: center;
-
-        gap: 11px;
-
-        margin: 0;
-
-        color: var(--navy);
-
-        font-size: 27px;
-
-        font-weight: 700;
-
-        line-height: 1.25;
-
-    }
-
-
-    .bookstore-page .section-head h2 .tag {
-
-        display: inline-block;
-
-        width: 11px;
-
-        height: 11px;
-
-        flex-shrink: 0;
-
-        border-radius: 3px;
-
-        background: var(--brand-gradient);
-
-    }
-
-
-    .bookstore-page .section-head p {
-
-        margin: 7px 0 0 22px;
-
-        color: var(--ink-muted);
-
-        font-size: 14px;
-
-        line-height: 1.5;
-
-    }
-
-
-    .bookstore-page .see-all {
-
-        flex-shrink: 0;
-
-        color: var(--orange);
-
-        font-size: 14px;
-
-        font-weight: 700;
-
-        transition: color 0.15s ease;
-
-    }
-
-
-    .bookstore-page .see-all:hover {
-
-        color: var(--orange-dark);
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SHELF
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .shelf {
-
-        display: flex;
-
-        gap: 20px;
-
-        width: 100%;
-
-        overflow-x: auto;
-
-        padding: 3px 2px 16px;
-
-        scroll-snap-type: x mandatory;
-
-        scrollbar-width: thin;
-
-    }
-
-
-    .bookstore-page .shelf::-webkit-scrollbar {
-
-        height: 6px;
-
-    }
-
-
-    .bookstore-page .shelf::-webkit-scrollbar-track {
-
-        background: #F4F1EB;
-
-        border-radius: 999px;
-
-    }
-
-
-    .bookstore-page .shelf::-webkit-scrollbar-thumb {
-
-        background: var(--brand-gradient);
-
-        border-radius: 999px;
-
-    }
-
-
-    .bookstore-page .shelf .book-card {
-
-        min-width: 240px;
-
-        flex: 1 0 240px;
-
-        scroll-snap-align: start;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BOOK CARD
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .book-card {
-
-        overflow: hidden;
-
-        background: var(--white);
-
-        border: 1px solid var(--border);
-
-        border-radius: 16px;
-
-        transition:
-            box-shadow 0.22s ease,
-            transform 0.22s ease;
-
-    }
-
-
-    .bookstore-page .book-card:hover {
-
-        transform: translateY(-4px);
-
-        box-shadow:
-            0 16px 32px rgba(27, 36, 83, 0.10);
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BOOK COVER
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .cover-3d {
-
-        position: relative;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        height: 255px;
-
-        overflow: hidden;
-
-        perspective: 900px;
-
-        background:
-            linear-gradient(
-                180deg,
-                var(--cream) 0%,
-                #F1EDE4 100%
-            );
-
-    }
-
-
-    .bookstore-page .cover-3d::after {
-
-        content: "";
-
-        position: absolute;
-
-        left: 50%;
-
-        bottom: 21px;
-
-        width: 120px;
-
-        height: 15px;
-
-        transform: translateX(-50%);
-
-        background:
-            radial-gradient(
-                ellipse at center,
-                rgba(27, 36, 83, 0.18),
-                transparent 70%
-            );
-
-    }
-
-
-    .bookstore-page .book3d {
-
-        position: relative;
-
-        z-index: 2;
-
-        width: 150px;
-
-        height: 205px;
-
-        transform-style: preserve-3d;
-
-        transform: rotateY(-25deg);
-
-        transition: transform 0.4s ease;
-
-    }
-
-
-    .bookstore-page .book-card:hover .book3d {
-
-        transform: rotateY(-7deg);
-
-    }
-
-
-    .bookstore-page .face {
-
-        position: absolute;
-
-        top: 0;
-
-    }
-
-
-    .bookstore-page .face.front {
-
-        left: 0;
-
-        width: 150px;
-
-        height: 205px;
-
-        display: flex;
-
-        flex-direction: column;
-
-        justify-content: flex-end;
-
-        padding: 16px;
-
-        overflow: hidden;
-
-        color: var(--white);
-
-        transform: translateZ(9px);
-
-        border-radius: 2px 6px 6px 2px;
-
-        box-shadow:
-            8px 14px 26px rgba(18, 25, 59, 0.28);
-
-    }
-
-
-    .bookstore-page .face.pages {
-
-        top: 2px;
-
-        right: 0;
-
-        width: 18px;
-
-        height: 201px;
-
-        transform-origin: right;
-
-        transform: rotateY(90deg);
-
-        background:
-            repeating-linear-gradient(
-                to bottom,
-                #FDFCF9 0 2px,
-                #EAE5DA 2px 3px
-            );
-
-        box-shadow:
-            inset -2px 0 4px rgba(0, 0, 0, 0.10);
-
-    }
-
-
-    .bookstore-page .face.spine {
-
-        top: 2px;
-
-        left: 0;
-
-        width: 18px;
-
-        height: 201px;
-
-        transform-origin: left;
-
-        transform: rotateY(-90deg);
-
-        filter: brightness(0.72);
-
-    }
-
-
-    .bookstore-page .front .spine-title {
-
-        font-family: 'Poppins', sans-serif;
-
-        font-weight: 700;
-
-        font-size: 15px;
-
-        line-height: 1.3;
-
-    }
-
-
-    .bookstore-page .front .spine-sub {
-
-        margin-top: 4px;
-
-        font-size: 11px;
-
-        line-height: 1.3;
-
-        opacity: 0.85;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BADGE
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .badge {
-
-        position: absolute;
-
-        top: 12px;
-
-        left: 12px;
-
-        z-index: 3;
-
-        padding: 4px 9px;
-
-        border-radius: 999px;
-
-        font-size: 10px;
-
-        font-weight: 700;
-
-        letter-spacing: 0.3px;
-
-    }
-
-
-    .bookstore-page .badge.baru {
-
-        background: var(--gold);
-
-        color: var(--navy-deep);
-
-    }
-
-
-    .bookstore-page .badge.best {
-
-        background: var(--brand-gradient);
-
-        color: var(--white);
-
-    }
-
-
-    .bookstore-page .badge.ebook {
-
-        background: rgba(255, 255, 255, 0.92);
-
-        color: var(--navy);
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BOOK INFORMATION
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .book-info {
-
-        padding: 16px 17px 19px;
-
-    }
-
-
-    .bookstore-page .book-info .penerbit {
-
-        min-height: 16px;
-
-        color: var(--ink-muted);
-
-        font-size: 10.5px;
-
-        text-transform: uppercase;
-
-        letter-spacing: 0.5px;
-
-        font-weight: 700;
-
-        white-space: nowrap;
-
-        overflow: hidden;
-
-        text-overflow: ellipsis;
-
-    }
-
-
-    .bookstore-page .book-info .title {
-
-        min-height: 42px;
-
-        margin: 6px 0;
-
-        color: var(--navy);
-
-        font-family: 'Poppins', sans-serif;
-
-        font-size: 15px;
-
-        font-weight: 600;
-
-        line-height: 1.4;
-
-        display: -webkit-box;
-
-        -webkit-line-clamp: 2;
-
-        -webkit-box-orient: vertical;
-
-        overflow: hidden;
-
-    }
-
-
-    .bookstore-page .book-info .author {
-
-        min-height: 18px;
-
-        margin-bottom: 13px;
-
-        color: var(--ink-muted);
-
-        font-size: 12.5px;
-
-        white-space: nowrap;
-
-        overflow: hidden;
-
-        text-overflow: ellipsis;
-
-    }
-
-
-    .bookstore-page .book-bottom {
-
-        display: flex;
-
-        align-items: flex-end;
-
-        justify-content: space-between;
-
-        gap: 10px;
-
-    }
-
-
-    .bookstore-page .price {
-
-        color: var(--navy);
-
-        font-size: 15px;
-
-        font-weight: 700;
-
-        white-space: nowrap;
-
-    }
-
-
-    .bookstore-page .price small {
-
-        display: block;
-
-        margin-bottom: 2px;
-
-        color: var(--ink-muted);
-
-        font-size: 10.5px;
-
-        font-weight: 400;
-
-        text-decoration: line-through;
-
-    }
-
-
-    .bookstore-page .book-actions {
-
-        display: flex;
-
-        align-items: center;
-
-        gap: 6px;
-
-        flex-shrink: 0;
-
-    }
-
-
-    .bookstore-page .detail-btn {
-
-        display: inline-flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        min-height: 34px;
-
-        padding: 7px 10px;
-
-        border: 1px solid #F97316;
-
-        border-radius: 9px;
-
-        color: #C2410C;
-
-        background: var(--white);
-
-        font-size: 10.5px;
-
-        font-weight: 700;
-
-        transition: all 0.15s ease;
-
-    }
-
-
-    .bookstore-page .detail-btn:hover {
-
-        background: #FFF7ED;
-
-        border-color: #EA580C;
-
-        color: #9A3412;
-
-    }
-
-
-    .bookstore-page .add-btn {
-
-        display: inline-flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        width: 34px;
-
-        height: 34px;
-
-        flex-shrink: 0;
-
-        border: none;
-
-        border-radius: 9px;
-
-        background: var(--cream);
-
-        color: var(--orange);
-
-        font-family: 'Inter', sans-serif;
-
-        font-size: 19px;
-
-        font-weight: 700;
-
-        cursor: pointer;
-
-        transition:
-            background 0.15s ease,
-            color 0.15s ease,
-            transform 0.15s ease;
-
-    }
-
-
-    .bookstore-page .add-btn:hover {
-
-        background: var(--brand-gradient);
-
-        color: var(--white);
-
-    }
-
-
-    .bookstore-page .add-btn.added {
-
-        transform: scale(0.83);
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CATALOG
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .catalog-bg {
-
-        background: var(--cream);
-
-    }
-
-
-    .bookstore-page .filter-row {
-
-        display: flex;
-
-        flex-wrap: wrap;
-
-        gap: 9px;
-
-        margin-bottom: 30px;
-
-    }
-
-
-    .bookstore-page .chip {
-
-        padding: 9px 18px;
-
-        border: 1px solid var(--border);
-
-        border-radius: 999px;
-
-        background: var(--white);
-
-        color: var(--navy);
-
-        font-size: 13px;
-
-        font-weight: 600;
-
-        cursor: pointer;
-
-        transition:
-            background 0.15s ease,
-            border-color 0.15s ease,
-            color 0.15s ease,
-            transform 0.15s ease;
-
-    }
-
-
-    .bookstore-page .chip:hover {
-
-        border-color: #D6D0C4;
-
-        transform: translateY(-1px);
-
-    }
-
-
-    .bookstore-page .chip.active {
-
-        background: var(--navy);
-
-        border-color: var(--navy);
-
-        color: var(--white);
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | IMPORTANT
-    |--------------------------------------------------------------------------
-    | Jangan diberi nama ".grid" karena bentrok dengan Tailwind.
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .book-grid {
-
-        display: grid;
-
-        grid-template-columns:
-            repeat(
-                auto-fill,
-                minmax(240px, 1fr)
-            );
-
-        gap: 22px;
-
-        width: 100%;
-
-    }
-
-
-    .bookstore-page .empty-state {
-
-        grid-column: 1 / -1;
-
-        padding: 70px 20px;
-
-        text-align: center;
-
-        color: var(--ink-muted);
-
-        font-size: 14px;
-
-        line-height: 1.7;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CTA BANNER
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .cta-wrapper {
-
-        width: 100%;
-
-        padding: 0 32px 70px;
-
-        background: var(--white);
-
-    }
-
-
-    .bookstore-page .cta-banner {
-
-        position: relative;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: space-between;
-
-        gap: 30px;
-
-        width: 100%;
-
-        max-width: 1376px;
-
-        margin: 0 auto;
-
-        overflow: hidden;
-
-        padding: 46px 52px;
-
-        color: var(--navy);
-
-        background-image:
-            linear-gradient(
-                120deg,
-                #FFF6EC 0%,
-                #FFE9D2 45%,
-                #FFEFD0 100%
-            );
-
-        border: 1px solid var(--border);
-
-        border-radius: 22px;
-
-    }
-
-
-    .bookstore-page .cta-banner::before {
-
-        content: "";
-
-        position: absolute;
-
-        top: 0;
-
-        left: 0;
-
-        bottom: 0;
-
-        width: 5px;
-
-        background: var(--brand-gradient);
-
-    }
-
-
-    .bookstore-page .cta-banner h3 {
-
-        margin: 0 0 8px;
-
-        color: var(--navy);
-
-        font-size: 24px;
-
-        font-weight: 700;
-
-        line-height: 1.35;
-
-    }
-
-
-    .bookstore-page .cta-banner p {
-
-        max-width: 620px;
-
-        margin: 0;
-
-        color: var(--ink-muted);
-
-        font-size: 14px;
-
-        line-height: 1.7;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FLOATING CART
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .cart-fab {
-
-        position: fixed;
-
-        right: 28px;
-
-        bottom: 28px;
-
-        z-index: 1200;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        width: 60px;
-
-        height: 60px;
-
-        border: none;
-
-        border-radius: 50%;
-
-        background: var(--navy);
-
-        color: var(--white);
-
-        font-family: 'Inter', sans-serif;
-
-        font-size: 24px;
-
-        cursor: pointer;
-
-        box-shadow:
-            0 12px 30px rgba(36, 27, 82, 0.35);
-
-        transition:
-            transform 0.15s ease,
-            box-shadow 0.15s ease;
-
-    }
-
-
-    .bookstore-page .cart-fab:hover {
-
-        transform: translateY(-3px);
-
-        box-shadow:
-            0 16px 35px rgba(36, 27, 82, 0.40);
-
-    }
-
-
-    .bookstore-page .cart-count {
-
-        position: absolute;
-
-        top: -4px;
-
-        right: -4px;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        min-width: 23px;
-
-        height: 23px;
-
-        padding: 0 5px;
-
-        border-radius: 999px;
-
-        background: var(--brand-gradient);
-
-        color: var(--white);
-
-        font-size: 11px;
-
-        font-weight: 700;
-
-        box-shadow:
-            0 0 0 2px var(--white);
-
-    }
-
-
-    .bookstore-page .cart-count.hide {
-
-        display: none;
-
-    }
-
-
-    .bookstore-page .cart-count.pop {
-
-        animation: cartPop 0.3s ease;
-
-    }
-
-
-    @keyframes cartPop {
-
-        0% {
-            transform: scale(1);
-        }
-
-        50% {
-            transform: scale(1.35);
-        }
-
-        100% {
-            transform: scale(1);
-        }
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CART OVERLAY
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .cart-overlay {
-
-        position: fixed;
-
-        inset: 0;
-
-        z-index: 1300;
-
-        background:
-            rgba(23, 15, 56, 0.45);
-
-        opacity: 0;
-
-        pointer-events: none;
-
-        transition:
-            opacity 0.25s ease;
-
-    }
-
-
-    .bookstore-page .cart-overlay.show {
-
-        opacity: 1;
-
-        pointer-events: auto;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CART DRAWER
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .cart-drawer {
-
-        position: fixed;
-
-        top: 0;
-
-        right: 0;
-
-        z-index: 1400;
-
-        display: flex;
-
-        flex-direction: column;
-
-        width: 410px;
-
-        max-width: 94vw;
-
-        height: 100dvh;
-
-        background: var(--white);
-
-        transform: translateX(100%);
-
-        transition:
-            transform 0.3s cubic-bezier(.22, 1, .36, 1);
-
-        box-shadow:
-            -18px 0 40px rgba(23, 15, 56, 0.18);
-
-    }
-
-
-    .bookstore-page .cart-drawer.open {
-
-        transform: translateX(0);
-
-    }
-
-
-    .bookstore-page .cart-drawer-head {
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: space-between;
-
-        padding: 22px 24px;
-
-        border-bottom: 1px solid var(--border);
-
-    }
-
-
-    .bookstore-page .cart-drawer-head h3 {
-
-        margin: 0;
-
-        color: var(--navy);
-
-        font-size: 18px;
-
-        font-weight: 700;
-
-    }
-
-
-    .bookstore-page .cart-close {
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        width: 36px;
-
-        height: 36px;
-
-        border: none;
-
-        border-radius: 9px;
-
-        background: transparent;
-
-        color: var(--ink-muted);
-
-        font-family: 'Inter', sans-serif;
-
-        font-size: 18px;
-
-        cursor: pointer;
-
-        transition:
-            background 0.15s ease;
-
-    }
-
-
-    .bookstore-page .cart-close:hover {
-
-        background: var(--cream);
-
-    }
-
-
-    .bookstore-page .cart-items {
-
-        flex: 1;
-
-        overflow-y: auto;
-
-        padding: 16px 24px;
-
-    }
-
-
-    .bookstore-page .cart-empty {
-
-        padding: 65px 10px;
-
-        color: var(--ink-muted);
-
-        font-size: 14px;
-
-        line-height: 1.7;
-
-        text-align: center;
-
-    }
-
-
-    .bookstore-page .cart-item {
-
-        display: flex;
-
-        gap: 12px;
-
-        padding: 15px 0;
-
-        border-bottom: 1px solid var(--border);
-
-    }
-
-
-    .bookstore-page .ci-info {
-
-        flex: 1;
-
-        min-width: 0;
-
-    }
-
-
-    .bookstore-page .ci-title {
-
-        margin-bottom: 3px;
-
-        overflow: hidden;
-
-        color: var(--navy);
-
-        font-size: 14px;
-
-        font-weight: 600;
-
-        text-overflow: ellipsis;
-
-        white-space: nowrap;
-
-    }
-
-
-    .bookstore-page .ci-author {
-
-        margin-bottom: 9px;
-
-        color: var(--ink-muted);
-
-        font-size: 12px;
-
-    }
-
-
-    .bookstore-page .ci-row {
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: space-between;
-
-        gap: 15px;
-
-    }
-
-
-    .bookstore-page .qty-ctrl {
-
-        display: flex;
-
-        align-items: center;
-
-        gap: 8px;
-
-    }
-
-
-    .bookstore-page .qty-ctrl button {
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        width: 27px;
-
-        height: 27px;
-
-        border: 1px solid var(--border);
-
-        border-radius: 7px;
-
-        background: var(--cream);
-
-        color: var(--navy);
-
-        font-family: 'Inter', sans-serif;
-
-        font-size: 14px;
-
-        font-weight: 700;
-
-        cursor: pointer;
-
-    }
-
-
-    .bookstore-page .qty-ctrl span {
-
-        min-width: 16px;
-
-        color: var(--navy);
-
-        font-size: 13px;
-
-        font-weight: 600;
-
-        text-align: center;
-
-    }
-
-
-    .bookstore-page .ci-price {
-
-        color: var(--navy);
-
-        font-size: 13.5px;
-
-        font-weight: 700;
-
-        white-space: nowrap;
-
-    }
-
-
-    .bookstore-page .ci-remove {
-
-        margin-top: 8px;
-
-        padding: 0;
-
-        border: none;
-
-        background: none;
-
-        color: var(--orange-dark);
-
-        font-family: 'Inter', sans-serif;
-
-        font-size: 11.5px;
-
-        cursor: pointer;
-
-        text-decoration: underline;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CART FOOTER
-    |--------------------------------------------------------------------------
-    */
-
-    .bookstore-page .cart-drawer-foot {
-
-        padding: 20px 24px 24px;
-
-        border-top: 1px solid var(--border);
-
-        background: var(--white);
-
-    }
-
-
-    .bookstore-page .cart-total-row {
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: space-between;
-
-        margin-bottom: 14px;
-
-    }
-
-
-    .bookstore-page .cart-total-row span {
-
-        color: var(--ink-muted);
-
-        font-size: 14px;
-
-    }
-
-
-    .bookstore-page .cart-total-row strong {
-
-        color: var(--navy);
-
-        font-size: 19px;
-
-    }
-
-
-    .bookstore-page .checkout-wa-btn {
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        gap: 8px;
-
-        width: 100%;
-
-        padding: 13px;
-
-        border: none;
-
-        border-radius: 11px;
-
-        background: #25D366;
-
-        color: var(--white);
-
-        font-size: 14px;
-
-        font-weight: 700;
-
-        cursor: pointer;
-
-        transition:
-            filter 0.15s ease;
-
-    }
-
-
-    .bookstore-page .checkout-wa-btn:hover:not(:disabled) {
-
-        filter: brightness(0.94);
-
-    }
-
-
-    .bookstore-page .checkout-wa-btn:disabled {
-
-        opacity: 0.5;
-
-        cursor: not-allowed;
-
-    }
-
-
-    .bookstore-page .cart-note {
-
-        margin: 11px 0 0;
-
-        color: var(--ink-muted);
-
-        font-size: 11px;
-
-        line-height: 1.55;
-
-        text-align: center;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESPONSIVE TABLET
-    |--------------------------------------------------------------------------
-    */
-
-    @media (max-width: 1024px) {
-
-        .bookstore-page .hero {
-
-            padding: 65px 0 55px;
-
-        }
-
-
-        .bookstore-page .wrap {
-
-            padding-left: 24px;
-
-            padding-right: 24px;
-
-        }
-
-
-        .bookstore-page .store-section {
-
-            padding: 54px 0;
-
-        }
-
-
-        .bookstore-page .cta-wrapper {
-
-            padding-left: 24px;
-
-            padding-right: 24px;
-
-        }
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESPONSIVE MOBILE
-    |--------------------------------------------------------------------------
-    */
-
-    @media (max-width: 640px) {
-
-        .bookstore-page .wrap {
-
-            padding-left: 18px;
-
-            padding-right: 18px;
-
-        }
-
-
-        .bookstore-page .hero {
-
-            padding: 48px 0 44px;
-
-        }
-
-
-        .bookstore-page .hero h1 {
-
-            font-size: 34px;
-
-            line-height: 1.15;
-
-            letter-spacing: -0.5px;
-
-        }
-
-
-        .bookstore-page .hero-description {
-
-            font-size: 15px;
-
-            line-height: 1.7;
-
-        }
-
-
-        .bookstore-page .search-bar {
-
-            flex-direction: column;
-
-            padding: 7px;
-
-        }
-
-
-        .bookstore-page .search-bar button {
-
-            min-height: 43px;
-
-            padding: 10px 20px;
-
-        }
-
-
-        .bookstore-page .hero-stats {
-
-            gap: 20px;
-
-            margin-top: 30px;
-
-        }
-
-
-        .bookstore-page .hero-stat {
-
-            min-width: 130px;
-
-        }
-
-
-        .bookstore-page .store-section {
-
-            padding: 46px 0;
-
-        }
-
-
-        .bookstore-page .section-head {
-
-            align-items: flex-start;
-
-        }
-
-
-        .bookstore-page .section-head h2 {
-
-            font-size: 22px;
-
-        }
-
-
-        .bookstore-page .section-head p {
-
-            margin-left: 22px;
-
-            font-size: 13px;
-
-        }
-
-
-        .bookstore-page .see-all {
-
-            display: none;
-
-        }
-
-
-        .bookstore-page .shelf .book-card {
-
-            min-width: 225px;
-
-            flex-basis: 225px;
-
-        }
-
-
-        .bookstore-page .book-grid {
-
-            grid-template-columns:
-                repeat(
-                    2,
-                    minmax(0, 1fr)
-                );
-
-            gap: 12px;
-
-        }
-
-
-        .bookstore-page .book-grid .cover-3d {
-
-            height: 210px;
-
-        }
-
-
-        .bookstore-page .book-grid .book3d {
-
-            width: 122px;
-
-            height: 170px;
-
-        }
-
-
-        .bookstore-page .book-grid .face.front {
-
-            width: 122px;
-
-            height: 170px;
-
-            padding: 12px;
-
-        }
-
-
-        .bookstore-page .book-grid .face.pages,
-        .bookstore-page .book-grid .face.spine {
-
-            height: 166px;
-
-        }
-
-
-        .bookstore-page .book-grid .book-info {
-
-            padding: 12px;
-
-        }
-
-
-        .bookstore-page .book-grid .book-info .title {
-
-            min-height: 38px;
-
-            font-size: 13px;
-
-        }
-
-
-        .bookstore-page .book-grid .book-info .author {
-
-            font-size: 11px;
-
-        }
-
-
-        .bookstore-page .book-grid .price {
-
-            font-size: 12px;
-
-        }
-
-
-        .bookstore-page .book-grid .detail-btn {
-
-            display: none;
-
-        }
-
-
-        .bookstore-page .cta-wrapper {
-
-            padding:
-                0
-                18px
-                50px;
-
-        }
-
-
-        .bookstore-page .cta-banner {
-
-            flex-direction: column;
-
-            align-items: flex-start;
-
-            padding: 32px 26px;
-
-        }
-
-
-        .bookstore-page .cta-banner h3 {
-
-            font-size: 21px;
-
-        }
-
-
-        .bookstore-page .cta-banner .cta-btn {
-
-            width: 100%;
-
-        }
-
-
-        .bookstore-page .cart-fab {
-
-            right: 18px;
-
-            bottom: 20px;
-
-            width: 56px;
-
-            height: 56px;
-
-        }
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | MOBILE KECIL
-    |--------------------------------------------------------------------------
-    */
-
-    @media (max-width: 390px) {
-
-        .bookstore-page .book-grid {
-
-            grid-template-columns: 1fr;
-
-        }
-
-
-        .bookstore-page .book-grid .cover-3d {
-
-            height: 250px;
-
-        }
-
-
-        .bookstore-page .book-grid .book3d {
-
-            width: 148px;
-
-            height: 200px;
-
-        }
-
-
-        .bookstore-page .book-grid .face.front {
-
-            width: 148px;
-
-            height: 200px;
-
-        }
-
-
-        .bookstore-page .book-grid .face.pages,
-        .bookstore-page .book-grid .face.spine {
-
-            height: 196px;
-
-        }
-
-    }
-
+.bookstore-page{--navy:#241B52;--orange:#EF5843;--orange-dark:#C6432F;--gold:#F7AA35;--cream:#FBF9F5;--muted:#6B7280;--border:#EAE7DF;--gradient:linear-gradient(135deg,#EF5843,#F7AA35);--ease:cubic-bezier(.22,1,.36,1);width:100%;min-height:100vh;overflow-x:hidden;background:#fff;color:var(--navy);font-family:'Inter',sans-serif}
+.bookstore-page*,.bookstore-page *::before,.bookstore-page *::after{box-sizing:border-box}
+.bookstore-page a{text-decoration:none;color:inherit}
+.store-wrap{width:100%;max-width:1500px;margin:auto;padding:0 32px}
+
+/* HERO */
+.store-hero{position:relative;padding:64px 0 50px;overflow:hidden;background:radial-gradient(circle at 90% 15%,rgba(239,88,67,.18),transparent 42%),radial-gradient(circle at 100% 75%,rgba(247,170,53,.18),transparent 38%),#fff}
+.store-hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--gradient)}
+.store-hero::after{content:"";position:absolute;width:340px;height:340px;right:6%;top:-175px;border-radius:50%;background:radial-gradient(circle,rgba(247,170,53,.18),rgba(239,88,67,.05) 48%,transparent 70%);pointer-events:none;animation:storeHeroGlow 10s ease-in-out infinite}
+.store-hero .store-wrap{position:relative;z-index:2}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;padding:7px 14px;border:1px solid rgba(239,88,67,.08);border-radius:999px;background:#FFF1E4;color:var(--orange-dark);font-size:11px;font-weight:700;animation:storeHeroBadge .65s var(--ease) both}
+.eyebrow-icon{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.store-hero h1{max-width:820px;margin:0 0 14px;color:var(--navy);font-family:'Poppins',sans-serif;font-size:clamp(34px,4vw,52px);font-weight:750;line-height:1.12;letter-spacing:-1px;animation:storeHeroIn .75s .08s var(--ease) both}
+.hero-description{max-width:760px;margin:0;color:var(--muted);font-size:14px;line-height:1.7;animation:storeHeroIn .75s .16s var(--ease) both}
+.hero-stats{display:flex;flex-wrap:wrap;gap:34px;margin-top:28px;animation:storeHeroIn .75s .24s var(--ease) both}
+.hero-stat{min-width:140px;padding-left:14px;border-left:2px solid var(--border);transition:transform .3s var(--ease),border-color .3s ease}
+.hero-stat:hover{transform:translateY(-3px);border-color:var(--orange)}
+.hero-stat strong{display:block;font-family:'Poppins',sans-serif;font-size:21px;font-weight:750}
+.hero-stat span{color:var(--muted);font-size:10px}
+
+/* SECTION */
+.store-section{padding:50px 0}
+.catalog-section{background:var(--cream)}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
+.section-head h2{display:flex;align-items:center;gap:9px;margin:0;color:var(--navy);font-family:'Poppins',sans-serif;font-size:24px;font-weight:700}
+.section-head p{margin:5px 0 0 20px;color:var(--muted);font-size:11px}
+.section-tag{width:10px;height:10px;border-radius:3px;background:var(--gradient);transition:transform .35s var(--ease)}
+.section-head:hover .section-tag{transform:rotate(45deg)}
+.see-all{display:inline-flex;align-items:center;gap:6px;color:var(--orange)!important;font-size:11px;font-weight:700;transition:gap .2s ease,color .2s ease}
+.see-all svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.see-all:hover{gap:10px;color:var(--orange-dark)!important}
+
+/* GRID */
+.five-book-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;gap:18px}
+
+/* CARD */
+.book-card{--rx:0deg;--ry:0deg;--lift:0px;position:relative;display:flex;flex-direction:column;width:100%;height:100%;min-width:0;overflow:hidden;background:#fff;border:1px solid var(--border);border-radius:17px;box-shadow:0 5px 16px rgba(36,27,82,.045);transform:perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift));transform-style:preserve-3d;will-change:transform;transition:transform .32s var(--ease),box-shadow .32s ease,border-color .32s ease}
+.book-card::after{content:"";position:absolute;inset:0;z-index:8;opacity:0;pointer-events:none;border-radius:inherit;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.22) 45%,transparent 64%);transform:translateX(-120%)}
+.book-card:hover{--lift:-7px;border-color:rgba(239,88,67,.23);box-shadow:0 21px 40px rgba(36,27,82,.1)}
+.book-card:hover::after{opacity:1;animation:storeCardShine .9s ease forwards}
+
+/* COVER */
+.cover-area{position:relative;display:flex;align-items:center;justify-content:center;height:225px;overflow:hidden;background:linear-gradient(180deg,#FBF9F5,#F1EDE4);perspective:900px}
+.cover-area::before{content:"";position:absolute;width:145px;height:34px;left:50%;bottom:21px;border-radius:50%;background:rgba(36,27,82,.13);filter:blur(10px);transform:translateX(-50%);transition:.35s ease}
+.book-3d{position:relative;z-index:2;width:130px;height:180px;transform-style:preserve-3d;animation:storeBookIdle 6.5s ease-in-out infinite;will-change:transform}
+.book-card:hover .book-3d{animation-play-state:paused;transform:rotateY(-6deg) rotateX(1deg) translateY(-4px) scale(1.025)}
+.book-card:hover .cover-area::before{width:132px;opacity:.72}
+.book-face{position:absolute}
+.book-front{width:130px;height:180px;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;color:#fff;border-radius:2px 6px 6px 2px;transform:translateZ(9px);background-color:var(--orange);background-size:cover;background-position:center;background-repeat:no-repeat;box-shadow:8px 13px 22px rgba(18,25,59,.27);transition:box-shadow .35s ease,filter .35s ease}
+.book-card:hover .book-front{box-shadow:13px 18px 28px rgba(18,25,59,.32);filter:saturate(1.04)}
+.book-pages{top:2px;right:0;width:18px;height:176px;transform-origin:right;transform:rotateY(90deg);background:repeating-linear-gradient(to bottom,#fdfcf9 0 2px,#eae5da 2px 3px)}
+.book-spine{top:2px;left:0;width:18px;height:176px;transform-origin:left;transform:rotateY(-90deg);filter:brightness(.75)}
+.cover-title{font-size:12px;font-weight:700;line-height:1.35}
+.cover-author{margin-top:4px;font-size:9px;opacity:.85}
+
+/* INFO */
+.book-info{position:relative;z-index:4;display:flex;flex:1;flex-direction:column;padding:14px;background:#fff}
+.book-publisher{height:14px;overflow:hidden;color:#8A8F9C;font-size:9px;font-weight:700;text-transform:uppercase;text-overflow:ellipsis;white-space:nowrap}
+.book-title{min-height:40px;max-height:40px;margin:5px 0;overflow:hidden;color:var(--navy);font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.book-author{height:17px;margin-bottom:10px;overflow:hidden;color:var(--muted);font-size:11px;white-space:nowrap;text-overflow:ellipsis}
+
+/* FORMAT */
+.book-format-list{display:grid;grid-template-rows:repeat(2,76px);gap:8px;width:100%;margin:0 0 10px}
+.format-box{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;height:76px;padding:9px 10px;overflow:hidden;border-radius:9px;transition:transform .22s var(--ease),border-color .22s ease,box-shadow .22s ease}
+.print-format{border:1px solid #FED7AA;background:#FFF7ED}
+.ebook-format{border:1px solid #C7D2FE;background:#EEF2FF}
+.format-box:not(.format-unavailable):hover{transform:translateX(2px);box-shadow:0 6px 15px rgba(36,27,82,.05)}
+.print-format:not(.format-unavailable):hover{border-color:#FDBA74}
+.ebook-format:not(.format-unavailable):hover{border-color:#A5B4FC}
+.format-content{min-width:0;flex:1}
+.format-label{display:flex;align-items:center;gap:5px;margin-bottom:2px;font-size:9px;font-weight:800;text-transform:uppercase}
+.format-icon{width:12px;height:12px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.print-label{color:#C2410C}
+.ebook-label{color:#4338CA}
+.format-old-price{height:12px;color:#94A3B8;font-size:8px;line-height:12px;text-decoration:line-through}
+.format-price{color:var(--navy);font-size:13px;line-height:17px;font-weight:800}
+.format-discount{display:block;height:12px;margin-top:2px;color:#DC2626;font-size:8px;line-height:12px;font-weight:800}
+.format-discount-placeholder{display:block;height:12px;margin-top:2px;font-size:8px;line-height:12px}
+.format-unavailable{opacity:.72}
+.format-unavailable-text{height:29px;display:flex;align-items:center;color:#94A3B8;font-size:10px;font-weight:600}
+.format-add{position:relative;flex-shrink:0;min-width:68px;height:35px;padding:0 8px;overflow:hidden;border:0;border-radius:8px;color:#fff;font-size:9px;font-weight:800;cursor:pointer;transition:transform .18s ease,opacity .18s ease}
+.format-add::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.3) 48%,transparent 75%);transform:translateX(-130%)}
+.format-add:hover::before{animation:storeButtonShine .7s ease forwards}
+.format-add:hover{transform:translateY(-1px)}
+.format-add:active{transform:scale(.96)}
+.print-add{background:linear-gradient(135deg,#EF5843,#F7AA35)}
+.ebook-add{background:linear-gradient(135deg,#4338CA,#6366F1)}
+.unavailable-add{color:#64748B;background:#E2E8F0}
+.unavailable-add:hover{color:#475569;background:#CBD5E1;transform:none}
+.unavailable-add::before{display:none}
+.format-add:disabled{opacity:.65;cursor:default}
+
+/* DETAIL */
+.detail-btn{position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-height:38px;margin-top:auto;padding:7px 10px;overflow:hidden;border:1px solid var(--orange);border-radius:8px;color:var(--orange-dark)!important;background:#fff;font-size:10px;font-weight:700;transition:background .2s ease,color .2s ease,padding .2s ease}
+.detail-btn::after{content:"→";position:absolute;right:13px;opacity:0;transform:translateX(-5px);transition:.2s ease}
+.detail-btn:hover{padding-right:27px;background:var(--orange);color:#fff!important}
+.detail-btn:hover::after{opacity:1;transform:none}
+
+/* FILTER */
+.filter-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:25px}
+.category-chip{padding:7px 15px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--navy)!important;font-size:10px;font-weight:650;transition:transform .22s var(--ease),background .22s ease,color .22s ease,border-color .22s ease,box-shadow .22s ease}
+.category-chip:hover{transform:translateY(-2px);border-color:var(--orange);color:var(--orange)!important;box-shadow:0 6px 13px rgba(36,27,82,.06)}
+.category-chip.active{background:var(--navy);border-color:var(--navy);color:#fff!important;box-shadow:0 7px 16px rgba(36,27,82,.14)}
+
+/* PAGINATION */
+.store-pagination{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin-top:35px}
+.store-pagination a,.store-pagination span{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 10px;border:1px solid #E5E7EB;border-radius:9px;background:#fff;color:var(--navy)!important;font-size:11px;font-weight:700}
+.store-pagination a{transition:.2s var(--ease)}
+.store-pagination a:hover{transform:translateY(-2px);border-color:var(--orange);color:var(--orange)!important;box-shadow:0 5px 12px rgba(36,27,82,.07)}
+.store-pagination .active{background:var(--navy);border-color:var(--navy);color:#fff!important}
+.store-pagination .disabled{background:#F8FAFC;color:#9CA3AF!important}
+
+/* EMPTY */
+.empty-state{grid-column:1/-1;padding:45px 20px;text-align:center;border:1px solid var(--border);border-radius:14px;background:#fff;color:var(--muted);font-size:12px}
+
+/* CTA */
+.cta-wrapper{padding:0 32px 55px}
+.cta-banner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:1436px;margin:auto;padding:32px 36px;overflow:hidden;border:1px solid var(--border);border-radius:18px;background:linear-gradient(120deg,#FFF6EC,#FFE9D2);transition:transform .35s var(--ease),box-shadow .35s ease}
+.cta-banner::before{content:"";position:absolute;width:190px;height:190px;right:-80px;top:-90px;border:34px solid rgba(247,170,53,.12);border-radius:50%;transition:transform .7s var(--ease)}
+.cta-banner:hover{transform:translateY(-3px);box-shadow:0 16px 35px rgba(36,27,82,.08)}
+.cta-banner:hover::before{transform:scale(1.15) rotate(22deg)}
+.cta-banner>div,.cta-btn{position:relative;z-index:2}
+.cta-banner h3{margin:0 0 5px;font-size:19px;font-weight:750}
+.cta-banner p{margin:0;color:var(--muted);font-size:11px}
+.cta-btn{flex-shrink:0;padding:11px 20px;border-radius:8px;color:#fff!important;background:var(--gradient);font-size:11px;font-weight:750;transition:transform .22s ease,box-shadow .22s ease}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(239,88,67,.22)}
+
+/* REVEAL */
+.bs-reveal{opacity:0;filter:blur(3px);transform:translateY(30px);transition:opacity .72s var(--ease),transform .72s var(--ease),filter .72s ease;transition-delay:var(--delay,0ms)}
+.bs-reveal.bs-visible{opacity:1;filter:none;transform:none}
+
+/* CART FAB */
+.cart-fab{position:fixed;right:24px;bottom:24px;z-index:1200;display:flex;align-items:center;justify-content:center;width:56px;height:56px;padding:0;border:0;border-radius:50%;color:#fff;background:var(--navy);cursor:pointer;box-shadow:0 12px 28px rgba(36,27,82,.32);transition:transform .25s var(--ease),box-shadow .25s ease}
+.cart-fab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cart-fab:hover{transform:translateY(-4px) rotate(-3deg);box-shadow:0 17px 35px rgba(36,27,82,.38)}
+.cart-fab.cart-pop{animation:storeCartPop .45s var(--ease)}
+.cart-count{position:absolute;top:-5px;right:-5px;display:flex;align-items:center;justify-content:center;min-width:21px;height:21px;padding:0 5px;border:2px solid #fff;border-radius:999px;color:#fff;background:var(--orange);font-size:9px;font-weight:800}
+.cart-count.hide{display:none}
+
+/* CART */
+.cart-overlay{position:fixed;inset:0;z-index:1300;opacity:0;visibility:hidden;background:rgba(15,23,42,.48);backdrop-filter:blur(3px);transition:.25s ease}
+.cart-overlay.show{opacity:1;visibility:visible}
+.cart-drawer{position:fixed;top:0;right:0;z-index:1400;display:flex;flex-direction:column;width:460px;max-width:100vw;height:100dvh;background:#fff;transform:translateX(100%);transition:transform .35s var(--ease);box-shadow:-20px 0 50px rgba(15,23,42,.16)}
+.cart-drawer.open{transform:translateX(0)}
+.cart-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 20px;border-bottom:1px solid #E5E7EB}
+.cart-heading h3{margin:0;color:var(--navy);font-size:20px;font-weight:700}
+.cart-heading p{margin:2px 0 0;color:var(--muted);font-size:10px}
+.cart-header-actions{display:flex;align-items:center;gap:6px}
+.clear-cart{display:none;padding:7px 9px;border:1px solid #FECACA;border-radius:7px;color:#DC2626;background:#FEF2F2;font-size:9px;font-weight:700;cursor:pointer}
+.clear-cart.show{display:block}
+.cart-close{display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:0;border-radius:8px;color:#64748B;background:#F8FAFC;cursor:pointer}
+.cart-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+.cart-items{flex:1;overflow-y:auto;padding:12px;background:#F8FAFC}
+.cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;padding:25px;text-align:center;color:var(--muted)}
+.cart-empty-icon{display:flex;align-items:center;justify-content:center;width:62px;height:62px;margin-bottom:12px;border-radius:50%;color:var(--navy);background:#fff}
+.cart-empty-icon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.7}
+.cart-empty strong{color:var(--navy);font-size:14px}
+.cart-empty span{margin-top:4px;font-size:10px}
+
+/* CART ITEM */
+.cart-product{display:grid;grid-template-columns:60px minmax(0,1fr);gap:11px;margin-bottom:10px;padding:11px;border:1px solid #E5E7EB;border-radius:11px;background:#fff;animation:storeCartItem .35s var(--ease) both;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.cart-product:hover{transform:translateX(-2px);border-color:#D7D9E1;box-shadow:0 5px 15px rgba(36,27,82,.05)}
+.cart-product-cover{width:60px;height:82px;overflow:hidden;border-radius:6px;background:linear-gradient(135deg,#FFF1E4,#FFE2BC)}
+.cart-product-cover img{display:block;width:100%;height:100%;object-fit:cover}
+.cart-cover-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:var(--orange)}
+.cart-cover-placeholder svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6}
+.cart-product-info{min-width:0}
+.cart-product-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.cart-format{display:inline-flex;margin-bottom:4px;padding:3px 7px;border-radius:999px;font-size:8px;font-weight:800;text-transform:uppercase}
+.cart-format.print{color:#C2410C;background:#FFEDD5}
+.cart-format.ebook{color:#4338CA;background:#E0E7FF}
+.cart-remove{padding:0;border:0;color:#94A3B8;background:transparent;font-size:14px;cursor:pointer}
+.cart-remove:hover{color:#DC2626}
+.cart-product-title{margin:0 0 2px;overflow:hidden;color:var(--navy);font-size:12px;font-weight:800;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cart-product-meta{margin:0;color:#64748B;font-size:9px;line-height:1.5}
+.cart-unit-price{margin-top:5px;color:var(--navy);font-size:10px;font-weight:700}
+.cart-product-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:8px}
+.qty-control{display:inline-flex;align-items:center;gap:2px;padding:2px;border:1px solid #E5E7EB;border-radius:7px;background:#F8FAFC}
+.qty-control button{display:flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border:0;border-radius:5px;color:var(--navy);background:#fff;font-size:14px;cursor:pointer}
+.qty-control span{min-width:24px;text-align:center;font-size:10px;font-weight:800}
+.cart-subtotal-label{color:#94A3B8;font-size:7px;text-align:right;text-transform:uppercase}
+.cart-subtotal{margin-top:1px;color:var(--navy);font-size:12px;font-weight:800;text-align:right}
+
+/* CART FOOTER */
+.cart-drawer-foot{padding:15px 18px 18px;border-top:1px solid #E5E7EB;background:#fff}
+.cart-summary-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.cart-summary-row span{color:var(--muted);font-size:11px}
+.cart-summary-row strong{font-size:12px}
+.cart-total-row{display:flex;align-items:center;justify-content:space-between;margin:10px 0 13px;padding-top:10px;border-top:1px dashed #D1D5DB}
+.cart-total-row span{font-size:13px;font-weight:700}
+.cart-total-row strong{font-size:21px;font-weight:800}
+.checkout-btn{width:100%;min-height:46px;border:0;border-radius:9px;color:#fff;background:#22C55E;font-size:12px;font-weight:800;cursor:pointer;transition:background .2s ease,transform .2s ease}
+.checkout-btn:hover:not(:disabled){transform:translateY(-1px);background:#16A34A}
+.checkout-btn:disabled{opacity:.45;cursor:not-allowed}
+.cart-note{margin:8px 0 0;color:#94A3B8;font-size:8.5px;line-height:1.5;text-align:center}
+
+/* TOAST */
+.cart-toast{position:fixed;right:25px;bottom:90px;z-index:1500;max-width:320px;padding:11px 14px;opacity:0;visibility:hidden;transform:translateY(8px);border-radius:8px;color:#fff;background:var(--navy);font-size:10px;font-weight:700;transition:.2s ease}
+.cart-toast.show{opacity:1;visibility:visible;transform:none}
+.cart-toast.warning{background:#C2410C}
+
+/* ANIMATIONS */
+@keyframes storeHeroGlow{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-22px,28px,0)}}
+@keyframes storeHeroBadge{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:none}}
+@keyframes storeHeroIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes storeBookIdle{0%,100%{transform:rotateY(-22deg) translateY(0)}50%{transform:rotateY(-15deg) translateY(-6px)}}
+@keyframes storeCardShine{from{transform:translateX(-120%)}to{transform:translateX(120%)}}
+@keyframes storeButtonShine{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+@keyframes storeCartPop{0%{transform:scale(1)}45%{transform:scale(1.13) rotate(-5deg)}100%{transform:scale(1)}}
+@keyframes storeCartItem{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+
+@media(max-width:1199px){
+    .five-book-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+@media(max-width:767px){
+    .store-wrap{padding:0 18px}
+    .store-hero{padding:45px 0 38px}
+    .store-section{padding:38px 0}
+    .five-book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    .section-head{align-items:flex-start;flex-direction:column}
+    .cta-wrapper{padding:0 18px 42px}
+    .cta-banner{align-items:flex-start;flex-direction:column;padding:25px}
+    .cart-drawer{width:100%}
+    .book-card{--rx:0deg!important;--ry:0deg!important}
+}
+
+@media(max-width:480px){
+    .five-book-grid{grid-template-columns:1fr}
+    .cover-area{height:240px}
+}
+
+@media(prefers-reduced-motion:reduce){
+    .store-hero::after,.book-3d{animation:none!important}
+    .bs-reveal{opacity:1!important;filter:none!important;transform:none!important;transition:none!important}
+    .book-card,.format-box,.category-chip,.cta-banner{transform:none!important;transition:none!important}
+}
 </style>
-
-
-
-{{-- ============================================================
-    BOOKSTORE PAGE WRAPPER
-============================================================ --}}
 
 <div class="bookstore-page">
 
+<section class="store-hero">
+    <div class="store-wrap">
+        <span class="eyebrow">
+            <svg class="eyebrow-icon" viewBox="0 0 24 24">
+                <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+            </svg>
+            Toko resmi Baca Dulu
+        </span>
 
-    {{-- ========================================================
-        HERO
-    ========================================================= --}}
+        <h1>Temukan buku terbitan penerbit rekan kami</h1>
 
-    <section class="hero">
+        <p class="hero-description">
+            Jelajahi E-book dan Buku Cetak dari penulis dan penerbit yang telah dipercaya Baca Dulu.
+        </p>
 
-        <div class="wrap">
-
-
-            <span class="eyebrow">
-
-                <span class="dot"></span>
-
-                Toko resmi Baca Dulu
-
-            </span>
-
-
-            <h1>
-                Temukan buku terbitan penerbit rekan kami
-            </h1>
-
-
-            <p class="hero-description">
-
-                Jelajahi ribuan judul e-book dan buku fisik dari
-                para penulis dan penerbit yang telah dipercaya
-                Baca Dulu — langsung dari sumbernya.
-
-            </p>
-
-            {{-- STATISTIC --}}
-
-            <div class="hero-stats">
-
-                <div class="hero-stat">
-
-                    <strong>
-                        {{ $books->count() }}+
-                    </strong>
-
-                    <span>
-                        Judul tersedia
-                    </span>
-
-                </div>
-
-
-                <div class="hero-stat">
-
-                    <strong>
-                        {{ $books->pluck('publisher')->filter()->unique()->count() }}
-                    </strong>
-
-                    <span>
-                        Penerbit rekanan
-                    </span>
-
-                </div>
-
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <strong>{{ $totalBooks }}+</strong>
+                <span>Judul tersedia</span>
             </div>
 
-        </div>
-
-    </section>
-
-
-    {{-- ========================================================
-        TERBITAN TERBARU
-    ========================================================= --}}
-
-    <section class="store-section">
-
-        <div class="wrap">
-
-
-            <div class="section-head">
-
-                <div>
-
-                    <h2>
-
-                        <span class="tag"></span>
-
-                        Terbitan terbaru
-
-                    </h2>
-
-                    <p>
-                        Baru rilis dari penerbit-penerbit rekan kami
-                    </p>
-
-                </div>
-
-
-                <a
-                    href="#catalog"
-                    class="see-all"
-                >
-                    Lihat semua →
-                </a>
-
+            <div class="hero-stat">
+                <strong>{{ $publisherCount }}</strong>
+                <span>Penerbit rekanan</span>
             </div>
-
-
-            <div
-                class="shelf"
-                id="shelf"
-            ></div>
-
-
         </div>
+    </div>
+</section>
 
-    </section>
+<section class="store-section">
+    <div class="store-wrap">
 
-
-    {{-- ========================================================
-        KATALOG
-    ========================================================= --}}
-
-    <section
-        id="catalog"
-        class="store-section catalog-bg"
-    >
-
-        <div class="wrap">
-
-
-            <div class="section-head">
-
-                <div>
-
-                    <h2>
-
-                        <span class="tag"></span>
-
-                        Katalog lengkap
-
-                    </h2>
-
-                    <p>
-                        Semua buku yang dijual penerbit di Baca Dulu Bookstore
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            {{-- CATEGORY FILTER --}}
-
-            <div
-                class="filter-row"
-                id="filters"
-            ></div>
-
-
-            {{-- BOOK GRID --}}
-
-            <div
-                class="book-grid"
-                id="catalogGrid"
-            ></div>
-
-
-        </div>
-
-    </section>
-
-
-    {{-- ========================================================
-        CTA
-    ========================================================= --}}
-
-    <div class="cta-wrapper">
-
-        <div class="cta-banner">
-
+        <div class="section-head">
             <div>
-
-                <h3>
-                    Penerbit atau penulis? Jual bukumu di sini.
-                </h3>
-
-                <p>
-                    Gabung sebagai mitra penerbit dan pasarkan
-                    judul-judulmu langsung kepada pembaca Baca Dulu.
-                </p>
-
+                <h2><span class="section-tag"></span>Terbitan terbaru</h2>
+                <p>Lima buku terbaru dari penerbit rekan kami</p>
             </div>
 
-
-            <a
-                href="https://wa.me/6281315717719"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="cta-btn"
-            >
-                Kirim Naskah
+            <a href="#catalog" class="see-all">
+                Lihat katalog
+                <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
             </a>
+        </div>
 
+        <div class="five-book-grid">
+            @forelse($latestBooks as $book)
+                @include('landing-page.pages.partisials',['book'=>$book])
+            @empty
+                <div class="empty-state">Belum ada buku tersedia.</div>
+            @endforelse
         </div>
 
     </div>
+</section>
 
+<section id="catalog" class="store-section catalog-section">
+    <div class="store-wrap">
 
-    {{-- ========================================================
-        FLOATING CART
-    ========================================================= --}}
-
-    <button
-        type="button"
-        class="cart-fab"
-        id="cartFab"
-        title="Buka keranjang"
-        aria-label="Buka keranjang"
-    >
-
-        🛒
-
-        <span
-            class="cart-count hide"
-            id="cartCount"
-        >
-            0
-        </span>
-
-    </button>
-
-
-    {{-- ========================================================
-        CART OVERLAY
-    ========================================================= --}}
-
-    <div
-        class="cart-overlay"
-        id="cartOverlay"
-    ></div>
-
-
-    {{-- ========================================================
-        CART DRAWER
-    ========================================================= --}}
-
-    <aside
-        class="cart-drawer"
-        id="cartDrawer"
-        aria-label="Keranjang belanja"
-    >
-
-
-        <div class="cart-drawer-head">
-
-            <h3>
-                Keranjang Anda
-            </h3>
-
-
-            <button
-                type="button"
-                class="cart-close"
-                id="cartClose"
-                aria-label="Tutup keranjang"
-            >
-                ✕
-            </button>
-
-        </div>
-
-
-        <div
-            class="cart-items"
-            id="cartItemsWrap"
-        ></div>
-
-
-        <div class="cart-drawer-foot">
-
-
-            <div class="cart-total-row">
-
-                <span>
-                    Total
-                </span>
-
-                <strong id="cartTotalText">
-                    Rp 0
-                </strong>
-
+        <div class="section-head">
+            <div>
+                <h2><span class="section-tag"></span>Katalog lengkap</h2>
+                <p>Maksimal 5 judul ditampilkan pada setiap halaman.</p>
             </div>
-
-
-            <button
-                type="button"
-                class="checkout-wa-btn"
-                id="checkoutBtn"
-                disabled
-            >
-                💬 Checkout via WhatsApp
-            </button>
-
-
-            <p class="cart-note">
-
-                Pesanan akan diteruskan ke tim kami lewat
-                WhatsApp untuk konfirmasi stok, ongkir,
-                dan pembayaran.
-
-            </p>
-
-
         </div>
 
-    </aside>
+        <div class="filter-row">
+            <a href="{{ route('portofolio.bookstore') }}#catalog"
+               class="category-chip {{ $selectedCategory==='Semua'?'active':'' }}">
+                Semua
+            </a>
 
+            @foreach($categories as $category)
+                <a href="{{ route('portofolio.bookstore',['category'=>$category]) }}#catalog"
+                   class="category-chip {{ $selectedCategory===$category?'active':'' }}">
+                    {{ $category }}
+                </a>
+            @endforeach
+        </div>
+
+        <div class="five-book-grid">
+            @forelse($books as $book)
+                @include('landing-page.pages.partisials',['book'=>$book])
+            @empty
+                <div class="empty-state">Tidak ada buku pada kategori ini.</div>
+            @endforelse
+        </div>
+
+        @if($books->hasPages())
+            @php
+                $startPage=max(1,$books->currentPage()-2);
+                $endPage=min($books->lastPage(),$books->currentPage()+2);
+            @endphp
+
+            <nav class="store-pagination">
+                @if($books->onFirstPage())
+                    <span class="disabled">‹</span>
+                @else
+                    <a href="{{ $books->previousPageUrl() }}#catalog">‹</a>
+                @endif
+
+                @if($startPage>1)
+                    <a href="{{ $books->url(1) }}#catalog">1</a>
+                    @if($startPage>2)
+                        <span class="disabled">...</span>
+                    @endif
+                @endif
+
+                @for($page=$startPage;$page<=$endPage;$page++)
+                    @if($page===$books->currentPage())
+                        <span class="active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $books->url($page) }}#catalog">{{ $page }}</a>
+                    @endif
+                @endfor
+
+                @if($endPage<$books->lastPage())
+                    @if($endPage<$books->lastPage()-1)
+                        <span class="disabled">...</span>
+                    @endif
+
+                    <a href="{{ $books->url($books->lastPage()) }}#catalog">
+                        {{ $books->lastPage() }}
+                    </a>
+                @endif
+
+                @if($books->hasMorePages())
+                    <a href="{{ $books->nextPageUrl() }}#catalog">›</a>
+                @else
+                    <span class="disabled">›</span>
+                @endif
+            </nav>
+        @endif
+
+    </div>
+</section>
+
+<div class="cta-wrapper">
+    <div class="cta-banner">
+        <div>
+            <h3>Penerbit atau penulis? Jual bukumu di sini.</h3>
+            <p>Gabung sebagai mitra penerbit dan pasarkan judul-judulmu kepada pembaca Baca Dulu.</p>
+        </div>
+
+        <a href="https://wa.me/6285139461070"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="cta-btn">
+            Kirim Naskah
+        </a>
+    </div>
+</div>
+
+<button type="button" class="cart-fab" id="cartFab" aria-label="Buka keranjang">
+    <svg viewBox="0 0 24 24">
+        <circle cx="9" cy="20" r="1"/>
+        <circle cx="18" cy="20" r="1"/>
+        <path d="M3 4h2l2.4 10.2a2 2 0 002 1.5h7.8a2 2 0 002-1.5L21 7H6"/>
+    </svg>
+    <span class="cart-count hide" id="cartCount">0</span>
+</button>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-head">
+        <div class="cart-heading">
+            <h3>Keranjang Anda</h3>
+            <p id="cartHeaderCount">Belum ada produk</p>
+        </div>
+
+        <div class="cart-header-actions">
+            <button type="button" class="clear-cart" id="clearCartBtn">Kosongkan</button>
+
+            <button type="button" class="cart-close" id="cartClose" aria-label="Tutup keranjang">
+                <svg viewBox="0 0 24 24">
+                    <path d="M6 6l12 12M18 6L6 18"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="cart-items" id="cartItems"></div>
+
+    <div class="cart-drawer-foot">
+        <div class="cart-summary-row">
+            <span>Jumlah produk</span>
+            <strong id="cartItemCount">0 item</strong>
+        </div>
+
+        <div class="cart-total-row">
+            <span>Total</span>
+            <strong id="cartTotal">Rp 0</strong>
+        </div>
+
+        <button type="button" class="checkout-btn" id="checkoutBtn" disabled>
+            Checkout via WhatsApp
+        </button>
+
+        <p class="cart-note">
+            Stok, ongkir, file E-book, dan pembayaran akan dikonfirmasi oleh tim Baca Dulu.
+        </p>
+    </div>
+</aside>
+
+<div class="cart-toast" id="cartToast"></div>
 
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+    const CART_KEY='bacadulu_cart';
+    const WA_NUMBER='6285139461070';
+    const reduceMotion=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    let cart=[];
 
+    const $=id=>document.getElementById(id);
+    const cartFab=$('cartFab');
+    const cartCount=$('cartCount');
+    const cartDrawer=$('cartDrawer');
+    const cartOverlay=$('cartOverlay');
+    const cartClose=$('cartClose');
+    const cartItems=$('cartItems');
+    const cartTotal=$('cartTotal');
+    const cartItemCount=$('cartItemCount');
+    const cartHeaderCount=$('cartHeaderCount');
+    const checkoutBtn=$('checkoutBtn');
+    const clearCartBtn=$('clearCartBtn');
+    const cartToast=$('cartToast');
 
-{{-- ============================================================
-    CONVERT LARAVEL COLLECTION TO JAVASCRIPT
-============================================================ --}}
-
-@php
-
-    $bookstoreBooks = $books->map(function ($book) {
-
-        return [
-
-            'id' => $book->id,
-
-            'title' => $book->title ?? '',
-
-            'author' => $book->author ?? '',
-
-            'penerbit' => $book->publisher ?? 'Baca Dulu',
-
-            'price' =>
-                'Rp ' .
-                number_format(
-                    (float) $book->effective_price,
-                    0,
-                    ',',
-                    '.'
-                ),
-
-            'priceNum' =>
-                (float) $book->effective_price,
-
-            'strike' =>
-                $book->has_active_discount
-                    ? 'Rp ' .
-                        number_format(
-                            (float) $book->price,
-                            0,
-                            ',',
-                            '.'
-                        )
-                    : null,
-
-            'cat' =>
-                $book->category ?: 'Umum',
-
-            'color' =>
-                '#EF5843',
-
-            'badge' =>
-                null,
-
-            'cover' =>
-                $book->cover
-                    ? asset("storage/{$book->cover}")
-                    : null,
-
-            'description' =>
-                $book->description,
-
-            'pages' =>
-                $book->pages,
-
-            'detail_url' =>
-                $book->slug
-                    ? route(
-                        'portofolio.bookstore.show',
-                        ['book' => $book->slug]
-                    )
-                    : null,
-
+    /* ANIMATION SYSTEM */
+    if(!reduceMotion){
+        const revealElements=[
+            ...document.querySelectorAll('.section-head'),
+            ...document.querySelectorAll('.filter-row'),
+            ...document.querySelectorAll('.five-book-grid .book-card'),
+            ...document.querySelectorAll('.store-pagination'),
+            ...document.querySelectorAll('.cta-banner')
         ];
 
-    })->values()->toArray();
+        revealElements.forEach((el,index)=>{
+            el.classList.add('bs-reveal');
+            el.style.setProperty('--delay',`${Math.min(index%5,4)*65}ms`);
+        });
 
+        const observer=new IntersectionObserver(entries=>{
+            entries.forEach(entry=>{
+                if(entry.isIntersecting){
+                    entry.target.classList.add('bs-visible');
+                }else{
+                    entry.target.classList.remove('bs-visible');
+                }
+            });
+        },{
+            threshold:.08,
+            rootMargin:'0px 0px -5% 0px'
+        });
 
-    $bookstoreCategories = $books
-        ->pluck('category')
-        ->filter()
-        ->unique()
-        ->values()
-        ->prepend('Semua')
-        ->values()
-        ->all();
+        revealElements.forEach(el=>observer.observe(el));
 
-@endphp
+        document.querySelectorAll('.book-card').forEach(card=>{
+            card.addEventListener('pointermove',event=>{
+                if(window.innerWidth<768)return;
 
+                const rect=card.getBoundingClientRect();
+                const x=(event.clientX-rect.left)/rect.width;
+                const y=(event.clientY-rect.top)/rect.height;
 
+                card.style.setProperty('--rx',`${(.5-y)*2.8}deg`);
+                card.style.setProperty('--ry',`${(x-.5)*4}deg`);
+            });
 
-<script>
-
-    /*
-    |--------------------------------------------------------------------------
-    | DATA
-    |--------------------------------------------------------------------------
-    */
-
-    const books = @json($bookstoreBooks);
-
-    const categories = @json($bookstoreCategories);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | HELPERS
-    |--------------------------------------------------------------------------
-    */
-
-    function escapeHtml(value) {
-
-        const div = document.createElement('div');
-
-        div.textContent = value ?? '';
-
-        return div.innerHTML;
-
+            card.addEventListener('pointerleave',()=>{
+                card.style.setProperty('--rx','0deg');
+                card.style.setProperty('--ry','0deg');
+            });
+        });
     }
 
-
-    function initials(title) {
-
-        return String(title || '')
-            .split(' ')
-            .filter(Boolean)
-            .slice(0, 3)
-            .join(' ');
-
+    function rupiah(value){
+        return'Rp '+Number(value||0).toLocaleString('id-ID');
     }
 
-
-    function formatRupiah(number) {
-
-        const value = Number(number) || 0;
-
-        return 'Rp ' + value.toLocaleString('id-ID');
-
+    function escapeHtml(value){
+        const el=document.createElement('div');
+        el.textContent=value??'';
+        return el.innerHTML;
     }
 
+    function normalizeCart(data){
+        if(!Array.isArray(data))return[];
 
-    /*
-    |--------------------------------------------------------------------------
-    | BOOK CARD
-    |--------------------------------------------------------------------------
-    */
+        return data.map((item,index)=>{
+            const price=Number(item.price??item.priceNum??0);
+            const qty=Math.max(1,Number(item.qty??1));
+            let format=item.format??'Buku';
+            let title=String(item.title??'');
 
-    function bookCard(book) {
+            if(!item.format&&title.toLowerCase().includes('e-book')){
+                format='E-book';
+            }
 
-        const badgeMap = {
+            if(!item.format&&title.toLowerCase().includes('cetak')){
+                format='Buku Cetak';
+            }
 
-            baru: 'Baru',
+            return{
+                key:String(item.key??item.productKey??`legacy-${item.id??index}-${index}`),
+                bookId:item.bookId??item.id??null,
+                title:title.replace(/\s*-\s*(Buku Cetak|E-book)$/i,''),
+                format,
+                author:String(item.author??''),
+                publisher:String(item.publisher??''),
+                cover:String(item.cover??''),
+                price,
+                qty
+            };
+        }).filter(item=>item.title!==''&&item.price>0&&item.qty>0);
+    }
 
-            best: 'Bestseller',
+    function loadCart(){
+        try{
+            cart=normalizeCart(JSON.parse(localStorage.getItem(CART_KEY)||'[]'));
+            localStorage.setItem(CART_KEY,JSON.stringify(cart));
+        }catch(e){
+            cart=[];
+        }
+    }
 
-            ebook: 'E-book'
+    function saveCart(){
+        localStorage.setItem(CART_KEY,JSON.stringify(cart));
+        renderCart();
+    }
 
+    function getCount(){
+        return cart.reduce((total,item)=>total+Number(item.qty),0);
+    }
+
+    function getTotal(){
+        return cart.reduce((total,item)=>total+(Number(item.price)*Number(item.qty)),0);
+    }
+
+    function openCart(){
+        cartDrawer?.classList.add('open');
+        cartOverlay?.classList.add('show');
+        document.body.style.overflow='hidden';
+    }
+
+    function closeCart(){
+        cartDrawer?.classList.remove('open');
+        cartOverlay?.classList.remove('show');
+        document.body.style.overflow='';
+    }
+
+    let toastTimer;
+
+    function showToast(message,type='normal'){
+        if(!cartToast)return;
+
+        cartToast.textContent=message;
+        cartToast.classList.remove('warning');
+
+        if(type==='warning'){
+            cartToast.classList.add('warning');
+        }
+
+        cartToast.classList.add('show');
+
+        clearTimeout(toastTimer);
+
+        toastTimer=setTimeout(()=>{
+            cartToast.classList.remove('show','warning');
+        },2200);
+    }
+
+    function animateCartFab(){
+        if(!cartFab)return;
+
+        cartFab.classList.remove('cart-pop');
+        void cartFab.offsetWidth;
+        cartFab.classList.add('cart-pop');
+    }
+
+    function addProduct(button){
+        const product={
+            key:button.dataset.key,
+            bookId:button.dataset.bookId,
+            title:button.dataset.title??'',
+            format:button.dataset.format??'Buku',
+            author:button.dataset.author??'',
+            publisher:button.dataset.publisher??'',
+            price:Number(button.dataset.price??0),
+            cover:button.dataset.cover??'',
+            qty:1
         };
 
+        if(!product.key||!product.title||product.price<=0){
+            showToast('Harga produk belum tersedia.','warning');
+            return;
+        }
 
-        const badgeHtml = book.badge
+        const existing=cart.find(item=>item.key===product.key);
 
-            ? `
-                <span class="badge ${escapeHtml(book.badge)}">
-                    ${escapeHtml(badgeMap[book.badge] || book.badge)}
-                </span>
-            `
+        if(existing){
+            existing.qty++;
+        }else{
+            cart.push(product);
+        }
 
-            : '';
+        saveCart();
+        animateCartFab();
+        showToast(`${product.format} berhasil ditambahkan`);
 
+        const oldText=button.textContent;
+        button.textContent='✓ Ditambah';
+        button.disabled=true;
 
-        const strikeHtml = book.strike
+        setTimeout(()=>{
+            button.textContent=oldText;
+            button.disabled=false;
+        },700);
 
-            ? `
-                <small>
-                    ${escapeHtml(book.strike)}
-                </small>
-            `
+        setTimeout(openCart,120);
+    }
 
-            : '';
+    function changeQty(key,delta){
+        const item=cart.find(row=>row.key===key);
+        if(!item)return;
 
+        item.qty=Number(item.qty)+delta;
 
-        const coverBg = book.badge === 'best'
+        if(item.qty<=0){
+            cart=cart.filter(row=>row.key!==key);
+        }
 
-            ? 'var(--brand-gradient)'
+        saveCart();
+    }
 
-            : (book.color || '#EF5843');
+    function removeItem(key){
+        cart=cart.filter(item=>item.key!==key);
+        saveCart();
+    }
 
+    function clearCart(){
+        if(!cart.length)return;
 
-        const frontStyle = book.cover
+        if(!confirm('Kosongkan seluruh isi keranjang?'))return;
 
-            ? `
-                background-image:url('${encodeURI(book.cover)}');
-                background-size:cover;
-                background-position:center;
-                background-repeat:no-repeat;
-                background-color:${coverBg};
-            `
+        cart=[];
+        saveCart();
+    }
 
-            : `
-                background:${coverBg};
-            `;
+    function renderCart(){
+        const count=getCount();
+        const total=getTotal();
 
+        if(cartCount){
+            cartCount.textContent=count;
+            cartCount.classList.toggle('hide',count===0);
+        }
 
-        const coverTextHtml = book.cover
+        if(cartHeaderCount){
+            cartHeaderCount.textContent=count===0
+                ?'Belum ada produk'
+                :`${count} produk di keranjang`;
+        }
 
-            ? ''
+        if(cartItemCount){
+            cartItemCount.textContent=`${count} item`;
+        }
 
-            : `
-                <div>
+        if(cartTotal){
+            cartTotal.textContent=rupiah(total);
+        }
 
-                    <div class="spine-title">
-                        ${escapeHtml(initials(book.title))}
+        if(checkoutBtn){
+            checkoutBtn.disabled=count===0;
+        }
+
+        if(clearCartBtn){
+            clearCartBtn.classList.toggle('show',count>0);
+        }
+
+        if(!cartItems)return;
+
+        if(!cart.length){
+            cartItems.innerHTML=`
+                <div class="cart-empty">
+                    <div class="cart-empty-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="9" cy="20" r="1"></circle>
+                            <circle cx="18" cy="20" r="1"></circle>
+                            <path d="M3 4h2l2.4 10.2a2 2 0 002 1.5h7.8a2 2 0 002-1.5L21 7H6"></path>
+                        </svg>
                     </div>
-
-                    <div class="spine-sub">
-                        ${escapeHtml(book.author)}
-                    </div>
-
+                    <strong>Keranjang masih kosong</strong>
+                    <span>Pilih Buku Cetak atau E-book dari katalog.</span>
                 </div>
             `;
+            return;
+        }
 
+        cartItems.innerHTML=cart.map(item=>{
+            const subtotal=Number(item.price)*Number(item.qty);
 
-        const detailButton = book.detail_url
+            const formatClass=
+                item.format.toLowerCase().includes('ebook')||
+                item.format.toLowerCase().includes('e-book')
+                    ?'ebook'
+                    :'print';
 
-            ? `
-                <a
-                    href="${escapeHtml(book.detail_url)}"
-                    class="detail-btn"
-                >
-                    Deskripsi
-                </a>
-            `
+            const cover=item.cover
+                ?`<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}">`
+                :`<div class="cart-cover-placeholder">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path>
+                    </svg>
+                  </div>`;
 
-            : '';
+            const publisher=item.publisher
+                ?` • ${escapeHtml(item.publisher)}`
+                :'';
 
-
-        return `
-
-            <article
-                class="book-card"
-                data-cat="${escapeHtml(book.cat)}"
-            >
-
-                <div class="cover-3d">
-
-                    <div class="book3d">
-
-
-                        <div
-                            class="face spine"
-                            style="background:${coverBg}"
-                        ></div>
-
-
-                        <div class="face pages"></div>
-
-
-                        <div
-                            class="face front"
-                            style="${frontStyle}"
-                        >
-
-                            ${badgeHtml}
-
-                            ${coverTextHtml}
-
-                        </div>
-
-
+            return`
+                <article class="cart-product">
+                    <div class="cart-product-cover">
+                        ${cover}
                     </div>
 
-                </div>
+                    <div class="cart-product-info">
+                        <div class="cart-product-top">
+                            <span class="cart-format ${formatClass}">
+                                ${escapeHtml(item.format)}
+                            </span>
 
-
-                <div class="book-info">
-
-
-                    <div class="penerbit">
-
-                        ${escapeHtml(book.penerbit)}
-
-                    </div>
-
-
-                    <div class="title">
-
-                        ${escapeHtml(book.title)}
-
-                    </div>
-
-
-                    <div class="author">
-
-                        ${escapeHtml(book.author)}
-
-                    </div>
-
-
-                    <div class="book-bottom">
-
-
-                        <div class="price">
-
-                            ${strikeHtml}
-
-                            ${escapeHtml(book.price)}
-
-                        </div>
-
-
-                        <div class="book-actions">
-
-                            ${detailButton}
-
-                            <button
-                                type="button"
-                                class="add-btn"
-                                title="Tambah ke keranjang"
-                                aria-label="Tambah ${escapeHtml(book.title)} ke keranjang"
-                                data-id="${book.id}"
-                            >
-                                +
+                            <button type="button"
+                                class="cart-remove"
+                                data-cart-action="remove"
+                                data-key="${escapeHtml(item.key)}">
+                                ✕
                             </button>
-
                         </div>
 
+                        <h4 class="cart-product-title">
+                            ${escapeHtml(item.title)}
+                        </h4>
 
-                    </div>
+                        <p class="cart-product-meta">
+                            ${escapeHtml(item.author)}${publisher}
+                        </p>
 
-                </div>
-
-            </article>
-
-        `;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SHELF
-    |--------------------------------------------------------------------------
-    */
-
-    const shelfElement =
-        document.getElementById('shelf');
-
-
-    if (shelfElement) {
-
-        shelfElement.innerHTML =
-            books
-                .slice(0, 5)
-                .map(bookCard)
-                .join('');
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CATEGORY FILTER
-    |--------------------------------------------------------------------------
-    */
-
-    const filtersElement =
-        document.getElementById('filters');
-
-
-    if (filtersElement) {
-
-        filtersElement.innerHTML =
-            categories
-                .map((category, index) => `
-
-                    <button
-                        type="button"
-                        class="chip ${index === 0 ? 'active' : ''}"
-                        data-cat="${escapeHtml(category)}"
-                    >
-                        ${escapeHtml(category)}
-                    </button>
-
-                `)
-                .join('');
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FILTER STATE
-    |--------------------------------------------------------------------------
-    */
-
-    let currentCategory = 'Semua';
-
-    let currentQuery = '';
-
-
-    function applyFilters() {
-
-        let filteredBooks = [...books];
-
-
-        /*
-        | CATEGORY
-        */
-
-        if (currentCategory !== 'Semua') {
-
-            filteredBooks =
-                filteredBooks.filter(
-                    book =>
-                        book.cat === currentCategory
-                );
-
-        }
-
-
-        /*
-        | SEARCH
-        */
-
-        if (currentQuery) {
-
-            const query =
-                currentQuery.toLocaleLowerCase('id-ID');
-
-
-            filteredBooks =
-                filteredBooks.filter(book => {
-
-                    const title =
-                        String(book.title || '')
-                            .toLocaleLowerCase('id-ID');
-
-                    const author =
-                        String(book.author || '')
-                            .toLocaleLowerCase('id-ID');
-
-                    const publisher =
-                        String(book.penerbit || '')
-                            .toLocaleLowerCase('id-ID');
-
-
-                    return (
-                        title.includes(query) ||
-                        author.includes(query) ||
-                        publisher.includes(query)
-                    );
-
-                });
-
-        }
-
-
-        /*
-        | RENDER
-        */
-
-        const grid =
-            document.getElementById('catalogGrid');
-
-
-        if (grid) {
-
-            grid.innerHTML =
-                filteredBooks.length
-
-                    ? filteredBooks
-                        .map(bookCard)
-                        .join('')
-
-                    : `
-                        <div class="empty-state">
-
-                            Tidak ada buku yang cocok dengan
-                            pencarian atau kategori yang dipilih.
-
+                        <div class="cart-unit-price">
+                            ${rupiah(item.price)} / item
                         </div>
-                    `;
 
-        }
+                        <div class="cart-product-bottom">
+                            <div class="qty-control">
+                                <button type="button"
+                                    data-cart-action="minus"
+                                    data-key="${escapeHtml(item.key)}">−</button>
 
+                                <span>${item.qty}</span>
 
-        /*
-        | SEARCH STATUS
-        */
-
-        const status =
-            document.getElementById('searchStatus');
-
-
-        if (status) {
-
-            if (currentQuery) {
-
-                status.textContent =
-                    `${filteredBooks.length} hasil untuk "${currentQuery}"`;
-
-            } else {
-
-                status.textContent = '';
-
-            }
-
-        }
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | INITIAL CATALOG
-    |--------------------------------------------------------------------------
-    */
-
-    applyFilters();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CATEGORY EVENT
-    |--------------------------------------------------------------------------
-    */
-
-    if (filtersElement) {
-
-        filtersElement.addEventListener(
-            'click',
-            function (event) {
-
-                const chip =
-                    event.target.closest('.chip');
-
-
-                if (!chip) {
-                    return;
-                }
-
-
-                filtersElement
-                    .querySelectorAll('.chip')
-                    .forEach(item => {
-
-                        item.classList.remove('active');
-
-                    });
-
-
-                chip.classList.add('active');
-
-
-                currentCategory =
-                    chip.dataset.cat || 'Semua';
-
-
-                applyFilters();
-
-            }
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SEARCH
-    |--------------------------------------------------------------------------
-    */
-
-    const searchInput =
-        document.getElementById('searchInput');
-
-    const searchButton =
-        document.getElementById('searchBtn');
-
-
-    function doSearch() {
-
-        if (!searchInput) {
-            return;
-        }
-
-
-        currentQuery =
-            searchInput.value.trim();
-
-
-        applyFilters();
-
-
-        const catalog =
-            document.getElementById('catalog');
-
-
-        if (currentQuery && catalog) {
-
-            catalog.scrollIntoView({
-
-                behavior: 'smooth',
-
-                block: 'start'
-
-            });
-
-        }
-
-    }
-
-
-    if (searchButton) {
-
-        searchButton.addEventListener(
-            'click',
-            doSearch
-        );
-
-    }
-
-
-    if (searchInput) {
-
-        searchInput.addEventListener(
-            'keydown',
-            function (event) {
-
-                if (event.key === 'Enter') {
-
-                    event.preventDefault();
-
-                    doSearch();
-
-                }
-
-            }
-        );
-
-
-        /*
-        | Jika input dikosongkan,
-        | tampilkan kembali semua buku.
-        */
-
-        searchInput.addEventListener(
-            'input',
-            function () {
-
-                if (
-                    searchInput.value.trim() === '' &&
-                    currentQuery !== ''
-                ) {
-
-                    currentQuery = '';
-
-                    applyFilters();
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CART CONFIGURATION
-    |--------------------------------------------------------------------------
-    */
-
-    const STORE_WA_NUMBER =
-        '6281315717719';
-
-    const CART_KEY =
-        'bacadulu_cart';
-
-
-    let cart = [];
-
-
-    try {
-
-        const savedCart =
-            JSON.parse(
-                localStorage.getItem(CART_KEY) || '[]'
-            );
-
-
-        cart =
-            Array.isArray(savedCart)
-                ? savedCart
-                : [];
-
-    } catch (error) {
-
-        cart = [];
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CART HELPERS
-    |--------------------------------------------------------------------------
-    */
-
-    function saveCart() {
-
-        localStorage.setItem(
-            CART_KEY,
-            JSON.stringify(cart)
-        );
-
-
-        updateCartBadge();
-
-        renderCartItems();
-
-    }
-
-
-    function cartItemCount() {
-
-        return cart.reduce(
-
-            (total, item) =>
-                total + Number(item.qty || 0),
-
-            0
-
-        );
-
-    }
-
-
-    function cartTotal() {
-
-        return cart.reduce(
-
-            (total, item) =>
-                total +
-                (
-                    Number(item.priceNum || 0) *
-                    Number(item.qty || 0)
-                ),
-
-            0
-
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ADD CART
-    |--------------------------------------------------------------------------
-    */
-
-    function addToCart(bookId) {
-
-        const numericBookId =
-            Number(bookId);
-
-
-        const book =
-            books.find(
-                item =>
-                    Number(item.id) === numericBookId
-            );
-
-
-        if (!book) {
-            return;
-        }
-
-
-        const existing =
-            cart.find(
-                item =>
-                    Number(item.id) === numericBookId
-            );
-
-
-        if (existing) {
-
-            existing.qty =
-                Number(existing.qty || 0) + 1;
-
-        } else {
-
-            cart.push({
-
-                id: book.id,
-
-                title: book.title,
-
-                author: book.author,
-
-                priceNum: Number(book.priceNum),
-
-                qty: 1
-
-            });
-
-        }
-
-
-        saveCart();
-
-        bumpCartCount();
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CHANGE QUANTITY
-    |--------------------------------------------------------------------------
-    */
-
-    function changeQty(bookId, delta) {
-
-        const numericBookId =
-            Number(bookId);
-
-
-        const item =
-            cart.find(
-                cartItem =>
-                    Number(cartItem.id) === numericBookId
-            );
-
-
-        if (!item) {
-            return;
-        }
-
-
-        item.qty =
-            Number(item.qty || 0) + delta;
-
-
-        if (item.qty <= 0) {
-
-            cart =
-                cart.filter(
-                    cartItem =>
-                        Number(cartItem.id) !== numericBookId
-                );
-
-        }
-
-
-        saveCart();
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REMOVE CART
-    |--------------------------------------------------------------------------
-    */
-
-    function removeFromCart(bookId) {
-
-        const numericBookId =
-            Number(bookId);
-
-
-        cart =
-            cart.filter(
-                item =>
-                    Number(item.id) !== numericBookId
-            );
-
-
-        saveCart();
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CART BADGE
-    |--------------------------------------------------------------------------
-    */
-
-    function updateCartBadge() {
-
-        const countElement =
-            document.getElementById('cartCount');
-
-        const checkoutButton =
-            document.getElementById('checkoutBtn');
-
-
-        const count =
-            cartItemCount();
-
-
-        if (countElement) {
-
-            countElement.textContent =
-                count;
-
-            countElement.classList.toggle(
-                'hide',
-                count === 0
-            );
-
-        }
-
-
-        if (checkoutButton) {
-
-            checkoutButton.disabled =
-                count === 0;
-
-        }
-
-    }
-
-
-    function bumpCartCount() {
-
-        const countElement =
-            document.getElementById('cartCount');
-
-
-        if (!countElement) {
-            return;
-        }
-
-
-        countElement.classList.remove('pop');
-
-
-        void countElement.offsetWidth;
-
-
-        countElement.classList.add('pop');
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RENDER CART
-    |--------------------------------------------------------------------------
-    */
-
-    function renderCartItems() {
-
-        const wrapper =
-            document.getElementById('cartItemsWrap');
-
-        const totalText =
-            document.getElementById('cartTotalText');
-
-
-        if (!wrapper || !totalText) {
-            return;
-        }
-
-
-        if (cart.length === 0) {
-
-            wrapper.innerHTML = `
-
-                <p class="cart-empty">
-
-                    Keranjang masih kosong.
-                    <br>
-
-                    Yuk pilih buku dari katalog di atas.
-
-                </p>
-
-            `;
-
-        } else {
-
-            wrapper.innerHTML =
-                cart
-                    .map(item => `
-
-                        <div class="cart-item">
-
-                            <div class="ci-info">
-
-
-                                <div class="ci-title">
-
-                                    ${escapeHtml(item.title)}
-
-                                </div>
-
-
-                                <div class="ci-author">
-
-                                    ${escapeHtml(item.author)}
-
-                                </div>
-
-
-                                <div class="ci-row">
-
-
-                                    <div class="qty-ctrl">
-
-                                        <button
-                                            type="button"
-                                            data-action="dec"
-                                            data-id="${item.id}"
-                                        >
-                                            −
-                                        </button>
-
-
-                                        <span>
-
-                                            ${item.qty}
-
-                                        </span>
-
-
-                                        <button
-                                            type="button"
-                                            data-action="inc"
-                                            data-id="${item.id}"
-                                        >
-                                            +
-                                        </button>
-
-                                    </div>
-
-
-                                    <div class="ci-price">
-
-                                        ${formatRupiah(
-                                            Number(item.priceNum) *
-                                            Number(item.qty)
-                                        )}
-
-                                    </div>
-
-
-                                </div>
-
-
-                                <button
-                                    type="button"
-                                    class="ci-remove"
-                                    data-action="remove"
-                                    data-id="${item.id}"
-                                >
-                                    Hapus
-                                </button>
-
-
+                                <button type="button"
+                                    data-cart-action="plus"
+                                    data-key="${escapeHtml(item.key)}">+</button>
                             </div>
 
+                            <div>
+                                <div class="cart-subtotal-label">Subtotal</div>
+                                <div class="cart-subtotal">${rupiah(subtotal)}</div>
+                            </div>
                         </div>
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
 
-                    `)
-                    .join('');
+    document.addEventListener('click',function(event){
+        const unavailableButton=event.target.closest('[data-unavailable-message]');
 
-        }
+        if(unavailableButton){
+            event.preventDefault();
 
-
-        totalText.textContent =
-            formatRupiah(
-                cartTotal()
+            showToast(
+                unavailableButton.dataset.unavailableMessage||
+                'Format buku ini tidak tersedia.',
+                'warning'
             );
 
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CART ITEM EVENT
-    |--------------------------------------------------------------------------
-    */
-
-    const cartItemsWrapper =
-        document.getElementById('cartItemsWrap');
-
-
-    if (cartItemsWrapper) {
-
-        cartItemsWrapper.addEventListener(
-            'click',
-            function (event) {
-
-                const button =
-                    event.target.closest('[data-action]');
-
-
-                if (!button) {
-                    return;
-                }
-
-
-                const bookId =
-                    button.dataset.id;
-
-                const action =
-                    button.dataset.action;
-
-
-                if (action === 'inc') {
-
-                    changeQty(
-                        bookId,
-                        1
-                    );
-
-                }
-
-
-                if (action === 'dec') {
-
-                    changeQty(
-                        bookId,
-                        -1
-                    );
-
-                }
-
-
-                if (action === 'remove') {
-
-                    removeFromCart(
-                        bookId
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ADD BUTTON EVENT DELEGATION
-    |--------------------------------------------------------------------------
-    */
-
-    function bindAddButtons(container) {
-
-        if (!container) {
             return;
         }
 
+        const addButton=event.target.closest('[data-cart-add="1"]');
 
-        container.addEventListener(
-            'click',
-            function (event) {
-
-                const button =
-                    event.target.closest('.add-btn');
-
-
-                if (!button) {
-                    return;
-                }
-
-
-                addToCart(
-                    button.dataset.id
-                );
-
-
-                button.classList.add('added');
-
-
-                window.setTimeout(
-                    function () {
-
-                        button.classList.remove('added');
-
-                    },
-                    160
-                );
-
-            }
-        );
-
-    }
-
-
-    bindAddButtons(
-        document.getElementById('shelf')
-    );
-
-
-    bindAddButtons(
-        document.getElementById('catalogGrid')
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | OPEN / CLOSE CART
-    |--------------------------------------------------------------------------
-    */
-
-    function openCart() {
-
-        const drawer =
-            document.getElementById('cartDrawer');
-
-        const overlay =
-            document.getElementById('cartOverlay');
-
-
-        if (drawer) {
-
-            drawer.classList.add('open');
-
+        if(addButton){
+            event.preventDefault();
+            addProduct(addButton);
         }
+    });
 
+    cartItems?.addEventListener('click',function(event){
+        const button=event.target.closest('[data-cart-action]');
+        if(!button)return;
 
-        if (overlay) {
+        const key=button.dataset.key;
+        const action=button.dataset.cartAction;
 
-            overlay.classList.add('show');
+        if(action==='plus')changeQty(key,1);
+        if(action==='minus')changeQty(key,-1);
+        if(action==='remove')removeItem(key);
+    });
 
-        }
+    function checkout(){
+        if(!cart.length)return;
 
+        const lines=cart.map((item,index)=>{
+            const subtotal=Number(item.price)*Number(item.qty);
 
-        document.body.style.overflow =
-            'hidden';
+            return`${index+1}. ${item.title}
+Format: ${item.format}
+Penulis: ${item.author}
+Penerbit: ${item.publisher||'-'}
+Harga: ${rupiah(item.price)}
+Jumlah: ${item.qty}
+Subtotal: ${rupiah(subtotal)}`;
+        }).join('\n\n');
 
-    }
+        const message=`Halo Baca Dulu, saya ingin melakukan pemesanan:
 
+${lines}
 
-    function closeCart() {
+TOTAL: ${rupiah(getTotal())}
 
-        const drawer =
-            document.getElementById('cartDrawer');
-
-        const overlay =
-            document.getElementById('cartOverlay');
-
-
-        if (drawer) {
-
-            drawer.classList.remove('open');
-
-        }
-
-
-        if (overlay) {
-
-            overlay.classList.remove('show');
-
-        }
-
-
-        document.body.style.overflow =
-            '';
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CHECKOUT WHATSAPP
-    |--------------------------------------------------------------------------
-    */
-
-    function checkoutViaWhatsApp() {
-
-        if (cart.length === 0) {
-            return;
-        }
-
-
-        const orderLines =
-            cart
-                .map(
-                    (item, index) => {
-
-                        const subtotal =
-                            Number(item.priceNum) *
-                            Number(item.qty);
-
-
-                        return (
-                            `${index + 1}. ` +
-                            `${item.title} ` +
-                            `(${item.qty}x) - ` +
-                            `${formatRupiah(subtotal)}`
-                        );
-
-                    }
-                )
-                .join('\n');
-
-
-        const message =
-
-            `Halo, saya ingin memesan buku berikut dari Baca Dulu Bookstore:\n\n` +
-
-            `${orderLines}\n\n` +
-
-            `Total: ${formatRupiah(cartTotal())}\n\n` +
-
-            `Mohon informasi mengenai stok, ongkir, dan cara pembayarannya. Terima kasih.`;
-
-
-        const url =
-
-            `https://wa.me/${STORE_WA_NUMBER}` +
-
-            `?text=${encodeURIComponent(message)}`;
-
+Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih.`;
 
         window.open(
-            url,
+            `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`,
             '_blank',
             'noopener,noreferrer'
         );
-
     }
 
+    cartFab?.addEventListener('click',openCart);
+    cartClose?.addEventListener('click',closeCart);
+    cartOverlay?.addEventListener('click',closeCart);
+    clearCartBtn?.addEventListener('click',clearCart);
+    checkoutBtn?.addEventListener('click',checkout);
 
-    /*
-    |--------------------------------------------------------------------------
-    | BUTTON EVENTS
-    |--------------------------------------------------------------------------
-    */
-
-    const cartFab =
-        document.getElementById('cartFab');
-
-    const cartClose =
-        document.getElementById('cartClose');
-
-    const cartOverlay =
-        document.getElementById('cartOverlay');
-
-    const checkoutButton =
-        document.getElementById('checkoutBtn');
-
-
-    if (cartFab) {
-
-        cartFab.addEventListener(
-            'click',
-            openCart
-        );
-
-    }
-
-
-    if (cartClose) {
-
-        cartClose.addEventListener(
-            'click',
-            closeCart
-        );
-
-    }
-
-
-    if (cartOverlay) {
-
-        cartOverlay.addEventListener(
-            'click',
-            closeCart
-        );
-
-    }
-
-
-    if (checkoutButton) {
-
-        checkoutButton.addEventListener(
-            'click',
-            checkoutViaWhatsApp
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESC CLOSE CART
-    |--------------------------------------------------------------------------
-    */
-
-    document.addEventListener(
-        'keydown',
-        function (event) {
-
-            if (event.key === 'Escape') {
-
-                closeCart();
-
-            }
-
+    document.addEventListener('keydown',event=>{
+        if(event.key==='Escape'){
+            closeCart();
         }
-    );
+    });
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | INITIALIZE
-    |--------------------------------------------------------------------------
-    */
-
-    updateCartBadge();
-
-    renderCartItems();
-
+    loadCart();
+    renderCart();
+});
 </script>
-
 @endsection
