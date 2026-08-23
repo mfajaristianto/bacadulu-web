@@ -1,270 +1,258 @@
 @extends('layouts.admin')
 
 @section('content')
+
 <div class="container mx-auto px-4 py-8">
 
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+
         <div>
             <h1 class="text-3xl font-bold text-slate-900">
-                Kelola Event
+                Event
             </h1>
 
-            <p class="text-slate-600 mt-1">
-                Tambahkan dan kelola event yang tampil di halaman Blogging.
+            <p class="text-sm text-slate-500 mt-1">
+                Kelola event yang tampil pada halaman Blogging.
             </p>
         </div>
 
-        <a href="{{ route('admin.events.create') }}"
-           class="inline-flex items-center rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 transition">
 
+        <a
+            href="{{ route('admin.events.create') }}"
+            class="inline-flex items-center justify-center px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-lg transition"
+        >
             + Tambah Event
-
         </a>
+
     </div>
 
 
-    {{-- Success Message --}}
+    {{-- Success --}}
     @if(session('success'))
-        <div class="mb-6 rounded-lg bg-green-100 px-4 py-3 text-green-800">
+
+        <div class="mb-6 rounded-lg bg-green-100 border border-green-200 px-4 py-3 text-green-700">
             {{ session('success') }}
         </div>
+
     @endif
 
 
-    {{-- Error Message --}}
-    @if($errors->any())
-        <div class="mb-6 rounded-lg bg-red-100 px-4 py-3 text-red-800">
-            <ul class="list-disc pl-5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    {{-- Event Table --}}
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full">
+
+                <thead class="bg-slate-50 border-b border-slate-200">
+
+                    <tr>
+
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Event
+                        </th>
+
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Jadwal
+                        </th>
+
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Lokasi
+                        </th>
+
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Status
+                        </th>
+
+                        <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Aksi
+                        </th>
+
+                    </tr>
+
+                </thead>
 
 
-    {{-- Event List --}}
-    <div class="rounded-xl border bg-white shadow-sm overflow-hidden">
+                <tbody class="divide-y divide-slate-100">
 
-        @if($events->count())
+                    @forelse($events as $event)
 
-            <div class="overflow-x-auto">
+                        <tr class="hover:bg-slate-50 transition">
 
-                <table class="w-full text-sm text-left">
+                            {{-- Event --}}
+                            <td class="px-5 py-4">
 
-                    <thead class="bg-slate-50 border-b">
-                        <tr>
-                            <th class="px-6 py-4 font-semibold text-slate-700">
-                                Event
-                            </th>
+                                <div class="flex items-center gap-4">
 
-                            <th class="px-6 py-4 font-semibold text-slate-700">
-                                Kategori
-                            </th>
-
-                            <th class="px-6 py-4 font-semibold text-slate-700">
-                                Tanggal
-                            </th>
-
-                            <th class="px-6 py-4 font-semibold text-slate-700">
-                                Lokasi
-                            </th>
-
-                            <th class="px-6 py-4 font-semibold text-slate-700">
-                                Featured
-                            </th>
-
-                            <th class="px-6 py-4 font-semibold text-slate-700 text-right">
-                                Aksi
-                            </th>
-                        </tr>
-                    </thead>
-
-
-                    <tbody class="divide-y">
-
-                        @foreach($events as $event)
-
-                            <tr class="hover:bg-slate-50 transition">
-
-                                {{-- Event --}}
-                                <td class="px-6 py-4">
-
-                                    <div class="flex items-center gap-4">
+                                    <div class="w-20 h-14 rounded-lg bg-slate-100 overflow-hidden shrink-0">
 
                                         @if($event->banner_image)
 
                                             <img
                                                 src="{{ asset('storage/' . $event->banner_image) }}"
                                                 alt="{{ $event->title }}"
-                                                class="h-16 w-24 rounded-lg object-cover"
+                                                class="w-full h-full object-cover"
                                             >
 
                                         @else
 
-                                            <div class="h-16 w-24 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400">
+                                            <div class="w-full h-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-400">
                                                 No Image
                                             </div>
 
                                         @endif
 
+                                    </div>
 
-                                        <div>
 
-                                            <p class="font-semibold text-slate-900">
-                                                {{ $event->title }}
-                                            </p>
+                                    <div class="min-w-0">
 
-                                            <p class="text-xs text-slate-500 mt-1">
-                                                {{ $event->slug }}
-                                            </p>
-
+                                        <div class="font-semibold text-slate-900 line-clamp-2">
+                                            {{ $event->title }}
                                         </div>
 
-                                    </div>
+                                        @if($event->category)
 
-                                </td>
+                                            <div class="text-xs text-orange-600 mt-1">
+                                                {{ $event->category }}
+                                            </div>
 
-
-                                {{-- Category --}}
-                                <td class="px-6 py-4 text-slate-600">
-                                    {{ $event->category ?? '-' }}
-                                </td>
-
-
-                                {{-- Date --}}
-                                <td class="px-6 py-4 text-slate-600">
-
-                                    {{ $event->start_date?->format('d M Y H:i') }}
-
-                                    @if($event->end_date)
-                                        <br>
-                                        <span class="text-xs text-slate-400">
-                                            s/d {{ $event->end_date->format('d M Y H:i') }}
-                                        </span>
-                                    @endif
-
-                                </td>
-
-
-                                {{-- Location --}}
-                                <td class="px-6 py-4 text-slate-600">
-                                    {{ $event->location }}
-                                </td>
-
-
-                                {{-- Featured --}}
-                                <td class="px-6 py-4">
-
-                                    @if($event->is_featured)
-
-                                        <span class="inline-flex rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
-                                            Featured
-                                        </span>
-
-                                    @else
-
-                                        <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
-                                            Normal
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- Actions --}}
-                                <td class="px-6 py-4">
-
-                                    <div class="flex items-center justify-end gap-2">
-
-                                        {{-- Detail --}}
-                                        <a
-                                            href="{{ route('admin.events.show', $event) }}"
-                                            class="rounded-lg border px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                                        >
-                                            Lihat
-                                        </a>
-
-
-                                        {{-- Edit --}}
-                                        <a
-                                            href="{{ route('admin.events.edit', $event) }}"
-                                            class="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
-                                        >
-                                            Edit
-                                        </a>
-
-
-                                        {{-- Delete --}}
-                                        <form
-                                            action="{{ route('admin.events.destroy', $event) }}"
-                                            method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus event ini?')"
-                                        >
-
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button
-                                                type="submit"
-                                                class="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
-                                            >
-                                                Hapus
-                                            </button>
-
-                                        </form>
+                                        @endif
 
                                     </div>
 
-                                </td>
+                                </div>
 
-                            </tr>
-
-                        @endforeach
-
-                    </tbody>
-
-                </table>
-
-            </div>
+                            </td>
 
 
-            {{-- Pagination --}}
-            <div class="border-t px-6 py-4">
-                {{ $events->links() }}
-            </div>
+                            {{-- Date --}}
+                            <td class="px-5 py-4 text-sm text-slate-600 whitespace-nowrap">
 
-        @else
+                                @if($event->start_date)
 
-            {{-- Empty State --}}
-            <div class="py-16 text-center">
+                                    {{ $event->start_date
+                                        ->copy()
+                                        ->timezone('Asia/Jakarta')
+                                        ->format('d M Y H:i')
+                                    }}
 
-                <div class="text-4xl mb-4">
-                    📅
-                </div>
+                                @else
 
-                <h2 class="text-lg font-semibold text-slate-900">
-                    Belum ada event
-                </h2>
+                                    -
 
-                <p class="text-sm text-slate-500 mt-1">
-                    Belum ada event yang ditambahkan ke website.
-                </p>
+                                @endif
 
-                <a
-                    href="{{ route('admin.events.create') }}"
-                    class="inline-block mt-5 rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700"
-                >
-                    + Tambah Event
-                </a>
+                            </td>
 
-            </div>
 
-        @endif
+                            {{-- Location --}}
+                            <td class="px-5 py-4 text-sm text-slate-600">
+                                {{ $event->location }}
+                            </td>
+
+
+                            {{-- Featured --}}
+                            <td class="px-5 py-4">
+
+                                @if($event->is_featured)
+
+                                    <span class="inline-flex px-3 py-1 bg-orange-50 text-orange-700 text-xs font-semibold rounded-full">
+                                        Unggulan
+                                    </span>
+
+                                @else
+
+                                    <span class="inline-flex px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full">
+                                        Reguler
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+
+                            {{-- Actions --}}
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center justify-end gap-2">
+
+                                    <a
+                                        href="{{ route('event.show', $event->slug) }}"
+                                        target="_blank"
+                                        class="px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                                    >
+                                        Lihat
+                                    </a>
+
+
+                                    <a
+                                        href="{{ route('admin.events.edit', $event) }}"
+                                        class="px-3 py-2 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition"
+                                    >
+                                        Edit
+                                    </a>
+
+
+                                    <form
+                                        action="{{ route('admin.events.destroy', $event) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus event ini?');"
+                                    >
+
+                                        @csrf
+                                        @method('DELETE')
+
+
+                                        <button
+                                            type="submit"
+                                            class="px-3 py-2 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition"
+                                        >
+                                            Hapus
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                    @empty
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="px-5 py-14 text-center text-sm text-slate-400"
+                            >
+                                Belum ada event.
+                            </td>
+
+                        </tr>
+
+                    @endforelse
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
+
+    @if($events->hasPages())
+
+        <div class="mt-6">
+            {{ $events->links() }}
+        </div>
+
+    @endif
+
 </div>
+
 @endsection

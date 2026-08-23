@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
-use App\Models\Book;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +15,7 @@ use App\Http\Controllers\InformationController;
 use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\DataArticleController;
 use App\Http\Controllers\ConferenceController;
+use App\Http\Controllers\BookstoreController;
 use App\Http\Controllers\HakiController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\TeamController;
@@ -330,16 +329,19 @@ Route::get(
 )->name('haki.index');
 
 
-Route::get('/haki/daftar/{jenis}', function ($jenis) {
+Route::get(
+    '/haki/daftar/{jenis}',
+    function ($jenis) {
 
-    return view(
-        'landing-page.pages.haki',
-        [
-            'jenis' => $jenis
-        ]
-    );
+        return view(
+            'landing-page.pages.haki',
+            [
+                'jenis' => $jenis
+            ]
+        );
 
-})->name('haki.daftar');
+    }
+)->name('haki.daftar');
 
 
 /*
@@ -379,6 +381,7 @@ Route::get(
         return view(
             'landing-page.pages.dewan-redaksi'
         );
+
     }
 )->name('tentang.dewan-redaksi');
 
@@ -390,6 +393,7 @@ Route::get(
         return view(
             'landing-page.pages.visi-misi'
         );
+
     }
 )->name('tentang.visi-misi');
 
@@ -401,6 +405,7 @@ Route::get(
         return view(
             'landing-page.pages.kontak'
         );
+
     }
 )->name('tentang.kontak');
 
@@ -418,40 +423,32 @@ Route::get(
         return view(
             'landing-page.pages.katalog-lengkap'
         );
+
     }
 )->name('portofolio.katalog');
 
 
 /*
 |--------------------------------------------------------------------------
-| BOOKSTORE
+| BOOKSTORE PUBLIC
 |--------------------------------------------------------------------------
 */
 
 Route::get(
     '/portofolio/bookstore',
-    function () {
-
-        $books = Book::latest()
-            ->get();
-
-        return view(
-            'landing-page.pages.bookstore',
-            compact('books')
-        );
-    }
+    [
+        BookstoreController::class,
+        'index'
+    ]
 )->name('portofolio.bookstore');
 
 
 Route::get(
     '/portofolio/bookstore/{book:slug}',
-    function (Book $book) {
-
-        return view(
-            'landing-page.pages.book-detail',
-            compact('book')
-        );
-    }
+    [
+        BookstoreController::class,
+        'show'
+    ]
 )->name('portofolio.bookstore.show');
 
 
@@ -473,10 +470,6 @@ Route::get(
 /*
 |--------------------------------------------------------------------------
 | BLOG USER / PENULIS
-|--------------------------------------------------------------------------
-|
-| Semua route di bawah membutuhkan login user.
-|
 |--------------------------------------------------------------------------
 */
 
@@ -533,14 +526,6 @@ Route::middleware('auth')
         |--------------------------------------------------------------------------
         | EDIT ARTICLE
         |--------------------------------------------------------------------------
-        |
-        | Menggunakan slug.
-        |
-        | Contoh:
-        |
-        | /blog/test-artikel-123/edit
-        |
-        |--------------------------------------------------------------------------
         */
 
         Route::get(
@@ -586,18 +571,6 @@ Route::middleware('auth')
         |--------------------------------------------------------------------------
         | LIKE ARTICLE
         |--------------------------------------------------------------------------
-        |
-        | Sengaja tidak memakai :slug di parameter route.
-        |
-        | Karena controller toggleLike() gabungan kita dapat menerima:
-        |
-        | ID:
-        | /blog/13/like
-        |
-        | atau slug:
-        | /blog/test-artikel-123/like
-        |
-        |--------------------------------------------------------------------------
         */
 
         Route::post(
@@ -612,14 +585,6 @@ Route::middleware('auth')
         /*
         |--------------------------------------------------------------------------
         | COMMENT ARTICLE
-        |--------------------------------------------------------------------------
-        |
-        | Komentar menggunakan route model binding berdasarkan SLUG.
-        |
-        | Contoh:
-        |
-        | /blog/test-artikel-1-1787287056/comments
-        |
         |--------------------------------------------------------------------------
         */
 
@@ -638,13 +603,6 @@ Route::middleware('auth')
 |--------------------------------------------------------------------------
 | SHOW BLOG ARTICLE
 |--------------------------------------------------------------------------
-|
-| HARUS berada setelah:
-|
-| /blog/create
-| /blog/saya
-|
-|--------------------------------------------------------------------------
 */
 
 Route::get(
@@ -659,10 +617,6 @@ Route::get(
 /*
 |--------------------------------------------------------------------------
 | COMMUNITY PUBLIC
-|--------------------------------------------------------------------------
-|
-| Halaman daftar komunitas dapat dilihat semua pengunjung.
-|
 |--------------------------------------------------------------------------
 */
 
@@ -679,151 +633,107 @@ Route::get(
 |--------------------------------------------------------------------------
 | COMMUNITY USER
 |--------------------------------------------------------------------------
-|
-| Semua route berikut hanya untuk USER yang login.
-|
-| USER:
-|
-| - Membuat komunitas
-| - Edit komunitas miliknya sendiri
-| - Update komunitas miliknya sendiri
-| - Join komunitas
-| - Leave komunitas
-|
-| ADMIN tetap menggunakan:
-|
-| /admin/communities/...
-|
-|--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')
+    ->group(function () {
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | CREATE COMMUNITY
-    |--------------------------------------------------------------------------
-    |
-    | GET /komunitas/buat
-    |
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | CREATE COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
-    Route::get(
-        '/komunitas/buat',
-        [
-            CommunityController::class,
-            'create'
-        ]
-    )->name('community.create');
+        Route::get(
+            '/komunitas/buat',
+            [
+                CommunityController::class,
+                'create'
+            ]
+        )->name('community.create');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | STORE COMMUNITY
-    |--------------------------------------------------------------------------
-    |
-    | POST /komunitas
-    |
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | STORE COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
-    Route::post(
-        '/komunitas',
-        [
-            CommunityController::class,
-            'store'
-        ]
-    )->name('community.store');
+        Route::post(
+            '/komunitas',
+            [
+                CommunityController::class,
+                'store'
+            ]
+        )->name('community.store');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | EDIT COMMUNITY USER
-    |--------------------------------------------------------------------------
-    |
-    | GET /komunitas/10/edit
-    |
-    | Ini adalah halaman USER.
-    |
-    | BUKAN:
-    |
-    | /admin/communities/10/edit
-    |
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | EDIT COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
-    Route::get(
-        '/komunitas/{community}/edit',
-        [
-            CommunityController::class,
-            'edit'
-        ]
-    )->name('community.edit');
+        Route::get(
+            '/komunitas/{community}/edit',
+            [
+                CommunityController::class,
+                'edit'
+            ]
+        )->name('community.edit');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE COMMUNITY USER
-    |--------------------------------------------------------------------------
-    |
-    | PUT /komunitas/10
-    |
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
-    Route::put(
-        '/komunitas/{community}',
-        [
-            CommunityController::class,
-            'update'
-        ]
-    )->name('community.update');
+        Route::put(
+            '/komunitas/{community}',
+            [
+                CommunityController::class,
+                'update'
+            ]
+        )->name('community.update');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | JOIN COMMUNITY
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | JOIN COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
-    Route::post(
-        '/komunitas/{community}/join',
-        [
-            CommunityController::class,
-            'join'
-        ]
-    )->name('community.join');
+        Route::post(
+            '/komunitas/{community}/join',
+            [
+                CommunityController::class,
+                'join'
+            ]
+        )->name('community.join');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | LEAVE COMMUNITY
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | LEAVE COMMUNITY
+        |--------------------------------------------------------------------------
+        */
 
-    Route::post(
-        '/komunitas/{community}/leave',
-        [
-            CommunityController::class,
-            'leave'
-        ]
-    )->name('community.leave');
+        Route::post(
+            '/komunitas/{community}/leave',
+            [
+                CommunityController::class,
+                'leave'
+            ]
+        )->name('community.leave');
 
-});
+    });
 
 
 /*
 |--------------------------------------------------------------------------
 | SHOW COMMUNITY
-|--------------------------------------------------------------------------
-|
-| Route ini HARUS berada setelah:
-|
-| /komunitas/buat
-| /komunitas/{community}/edit
-|
 |--------------------------------------------------------------------------
 */
 
@@ -835,9 +745,39 @@ Route::get(
     ]
 )->name('community.show');
 
+
 /*
 |--------------------------------------------------------------------------
 | EVENT PUBLIC
+|--------------------------------------------------------------------------
+|
+| Event publik menggunakan EventController.
+|
+| Controller:
+|
+| app/Http/Controllers/EventController.php
+|
+| View index:
+|
+| resources/views/event/index.blade.php
+|
+| View detail:
+|
+| resources/views/event/show.blade.php
+|
+|--------------------------------------------------------------------------
+*/
+
+
+/*
+|--------------------------------------------------------------------------
+| EVENT INDEX
+|--------------------------------------------------------------------------
+|
+| URL:
+|
+| /event
+|
 |--------------------------------------------------------------------------
 */
 
@@ -849,6 +789,18 @@ Route::get(
     ]
 )->name('event.index');
 
+
+/*
+|--------------------------------------------------------------------------
+| EVENT DETAIL
+|--------------------------------------------------------------------------
+|
+| URL contoh:
+|
+| /event/seminar-super-penting
+|
+|--------------------------------------------------------------------------
+*/
 
 Route::get(
     '/event/{slug}',
@@ -895,51 +847,43 @@ Route::get(
 |--------------------------------------------------------------------------
 */
 
-Route::get('/lang/{locale}', function ($locale) {
+Route::get(
+    '/lang/{locale}',
+    function ($locale) {
 
-    if (
-        in_array(
-            $locale,
-            [
-                'id',
-                'en',
-                'zh',
-                'ja',
-                'ko'
-            ]
-        )
-    ) {
+        if (
+            in_array(
+                $locale,
+                [
+                    'id',
+                    'en',
+                    'zh',
+                    'ja',
+                    'ko'
+                ]
+            )
+        ) {
 
-        Session::put(
-            'locale',
-            $locale
-        );
+            Session::put(
+                'locale',
+                $locale
+            );
 
-        App::setLocale(
-            $locale
-        );
+            App::setLocale(
+                $locale
+            );
+        }
+
+        return redirect()
+            ->back();
+
     }
-
-    return redirect()
-        ->back();
-
-})->name('language');
+)->name('language');
 
 
 /*
 |--------------------------------------------------------------------------
 | ADMIN CMS
-|--------------------------------------------------------------------------
-|
-| Semua halaman admin:
-|
-| /admin/...
-|
-| Dilindungi oleh:
-|
-| auth:admin
-| admin
-|
 |--------------------------------------------------------------------------
 */
 
@@ -1043,22 +987,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | BLOG POSTS ADMIN
-        |--------------------------------------------------------------------------
-        |
-        | Admin menggunakan ID artikel.
-        |
-        | Contoh:
-        |
-        | /admin/posts/13/edit
-        |
-        |--------------------------------------------------------------------------
-        */
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | INDEX
+        | POSTS INDEX
         |--------------------------------------------------------------------------
         */
 
@@ -1073,7 +1002,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | EDIT
+        | POSTS EDIT
         |--------------------------------------------------------------------------
         */
 
@@ -1088,7 +1017,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | UPDATE
+        | POSTS UPDATE
         |--------------------------------------------------------------------------
         */
 
@@ -1103,7 +1032,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | DELETE
+        | POSTS DELETE
         |--------------------------------------------------------------------------
         */
 
@@ -1118,7 +1047,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | APPROVE
+        | POSTS APPROVE
         |--------------------------------------------------------------------------
         */
 
@@ -1133,7 +1062,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | REJECT
+        | POSTS REJECT
         |--------------------------------------------------------------------------
         */
 
@@ -1148,7 +1077,15 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | EVENTS
+        | EVENTS ADMIN
+        |--------------------------------------------------------------------------
+        |
+        | Ini khusus CMS Admin.
+        |
+        | URL:
+        |
+        | /admin/events
+        |
         |--------------------------------------------------------------------------
         */
 
@@ -1160,7 +1097,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | COMMUNITIES
+        | COMMUNITIES ADMIN
         |--------------------------------------------------------------------------
         */
 

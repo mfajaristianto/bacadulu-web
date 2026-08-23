@@ -1,38 +1,58 @@
 @extends('layouts.admin')
 
 @section('content')
+
 <div class="container mx-auto px-4 py-8 max-w-4xl">
 
     {{-- Header --}}
     <div class="mb-6">
-        <a href="{{ route('admin.events.index') }}"
-           class="text-sm text-slate-500 hover:text-orange-600">
+
+        <a
+            href="{{ route('admin.events.index') }}"
+            class="text-sm text-slate-500 hover:text-orange-600"
+        >
             ← Kembali ke Event
         </a>
+
 
         <h1 class="text-3xl font-bold text-slate-900 mt-3">
             Tambah Event
         </h1>
 
+
         <p class="text-slate-600 mt-1">
             Tambahkan event baru yang akan tampil di halaman Blogging.
         </p>
+
     </div>
+
 
     {{-- Validation Error --}}
     @if($errors->any())
+
         <div class="mb-6 rounded-lg bg-red-100 px-4 py-3 text-red-800">
+
             <p class="font-semibold mb-2">
                 Ada data yang belum benar:
             </p>
 
+
             <ul class="list-disc pl-5 text-sm">
+
                 @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
+
+                    <li>
+                        {{ $error }}
+                    </li>
+
                 @endforeach
+
             </ul>
+
         </div>
+
     @endif
+
 
     {{-- Form --}}
     <form
@@ -44,12 +64,17 @@
 
         @csrf
 
+
         {{-- Judul --}}
         <div class="mb-6">
-            <label for="title"
-                   class="block text-sm font-semibold text-slate-700 mb-2">
+
+            <label
+                for="title"
+                class="block text-sm font-semibold text-slate-700 mb-2"
+            >
                 Judul Event
             </label>
+
 
             <input
                 type="text"
@@ -61,17 +86,28 @@
                 class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500"
             >
 
+
             @error('title')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+
+                <p class="mt-1 text-sm text-red-600">
+                    {{ $message }}
+                </p>
+
             @enderror
+
         </div>
+
 
         {{-- Slug --}}
         <div class="mb-6">
-            <label for="slug"
-                   class="block text-sm font-semibold text-slate-700 mb-2">
+
+            <label
+                for="slug"
+                class="block text-sm font-semibold text-slate-700 mb-2"
+            >
                 Slug
             </label>
+
 
             <input
                 type="text"
@@ -82,49 +118,69 @@
                 class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500"
             >
 
+
             <p class="mt-1 text-xs text-slate-500">
                 Contoh: workshop-menulis-kreatif
             </p>
 
+
             @error('slug')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+
+                <p class="mt-1 text-sm text-red-600">
+                    {{ $message }}
+                </p>
+
             @enderror
+
         </div>
+
 
         {{-- Banner --}}
         <div class="mb-6">
-            <label for="banner_image"
-                   class="block text-sm font-semibold text-slate-700 mb-2">
+
+            <label
+                for="banner_image"
+                class="block text-sm font-semibold text-slate-700 mb-2"
+            >
                 Banner Event
             </label>
+
 
             <input
                 type="file"
                 id="banner_image"
                 name="banner_image"
                 accept=".jpg,.jpeg,.png,.webp"
-                class="block w-full rounded-lg border border-slate-300 text-sm
-                       file:mr-4 file:border-0
-                       file:bg-orange-600 file:px-4 file:py-3
-                       file:text-sm file:font-semibold file:text-white
-                       hover:file:bg-orange-700"
+                class="block w-full rounded-lg border border-slate-300 text-sm file:mr-4 file:border-0 file:bg-orange-600 file:px-4 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:bg-orange-700"
             >
+
 
             <p class="mt-1 text-xs text-slate-500">
                 Format: JPG, JPEG, PNG, WEBP. Maksimal 5 MB.
             </p>
 
+
             @error('banner_image')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+
+                <p class="mt-1 text-sm text-red-600">
+                    {{ $message }}
+                </p>
+
             @enderror
+
         </div>
+
 
         {{-- Category --}}
         <div class="mb-6">
-            <label for="category"
-                   class="block text-sm font-semibold text-slate-700 mb-2">
+
+            <label
+                for="category"
+                class="block text-sm font-semibold text-slate-700 mb-2"
+            >
                 Kategori
             </label>
+
 
             <input
                 type="text"
@@ -135,17 +191,28 @@
                 class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500"
             >
 
+
             @error('category')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+
+                <p class="mt-1 text-sm text-red-600">
+                    {{ $message }}
+                </p>
+
             @enderror
+
         </div>
+
 
         {{-- Location --}}
         <div class="mb-6">
-            <label for="location"
-                   class="block text-sm font-semibold text-slate-700 mb-2">
+
+            <label
+                for="location"
+                class="block text-sm font-semibold text-slate-700 mb-2"
+            >
                 Lokasi
             </label>
+
 
             <input
                 type="text"
@@ -157,19 +224,30 @@
                 class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500"
             >
 
+
             @error('location')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+
+                <p class="mt-1 text-sm text-red-600">
+                    {{ $message }}
+                </p>
+
             @enderror
+
         </div>
+
 
         {{-- Date --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
 
             <div>
-                <label for="start_date"
-                       class="block text-sm font-semibold text-slate-700 mb-2">
+
+                <label
+                    for="start_date"
+                    class="block text-sm font-semibold text-slate-700 mb-2"
+                >
                     Tanggal & Waktu Mulai
                 </label>
+
 
                 <input
                     type="datetime-local"
@@ -180,16 +258,27 @@
                     class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500"
                 >
 
+
                 @error('start_date')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+
+                    <p class="mt-1 text-sm text-red-600">
+                        {{ $message }}
+                    </p>
+
                 @enderror
+
             </div>
 
+
             <div>
-                <label for="end_date"
-                       class="block text-sm font-semibold text-slate-700 mb-2">
+
+                <label
+                    for="end_date"
+                    class="block text-sm font-semibold text-slate-700 mb-2"
+                >
                     Tanggal & Waktu Selesai
                 </label>
+
 
                 <input
                     type="datetime-local"
@@ -199,23 +288,35 @@
                     class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500"
                 >
 
+
                 <p class="mt-1 text-xs text-slate-500">
                     Boleh dikosongkan jika event hanya memiliki satu waktu.
                 </p>
 
+
                 @error('end_date')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+
+                    <p class="mt-1 text-sm text-red-600">
+                        {{ $message }}
+                    </p>
+
                 @enderror
+
             </div>
 
         </div>
 
+
         {{-- Description --}}
         <div class="mb-6">
-            <label for="description"
-                   class="block text-sm font-semibold text-slate-700 mb-2">
+
+            <label
+                for="description"
+                class="block text-sm font-semibold text-slate-700 mb-2"
+            >
                 Deskripsi Event
             </label>
+
 
             <textarea
                 id="description"
@@ -226,10 +327,17 @@
                 class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500"
             >{{ old('description') }}</textarea>
 
+
             @error('description')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+
+                <p class="mt-1 text-sm text-red-600">
+                    {{ $message }}
+                </p>
+
             @enderror
+
         </div>
+
 
         {{-- Featured --}}
         <div class="mb-8 rounded-xl bg-orange-50 border border-orange-100 p-4">
@@ -244,20 +352,24 @@
                     class="mt-1 h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
                 >
 
+
                 <span>
+
                     <span class="block text-sm font-semibold text-slate-800">
                         Jadikan Event Unggulan
                     </span>
 
+
                     <span class="block text-xs text-slate-500 mt-1">
-                        Event unggulan akan ditampilkan lebih menonjol
-                        pada halaman Event.
+                        Event unggulan akan ditampilkan lebih menonjol pada halaman Event.
                     </span>
+
                 </span>
 
             </label>
 
         </div>
+
 
         {{-- Buttons --}}
         <div class="flex items-center justify-end gap-3">
@@ -268,6 +380,7 @@
             >
                 Batal
             </a>
+
 
             <button
                 type="submit"
@@ -281,4 +394,5 @@
     </form>
 
 </div>
+
 @endsection
