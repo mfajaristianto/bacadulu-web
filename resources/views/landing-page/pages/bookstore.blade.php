@@ -1,15 +1,12 @@
 @extends('layouts.app')
-
 @section('title','Bookstore - Baca Dulu')
-
 @section('content')
+
 <style>
 .bookstore-page{--navy:#241B52;--orange:#EF5843;--orange-dark:#C6432F;--gold:#F7AA35;--cream:#FBF9F5;--muted:#6B7280;--border:#EAE7DF;--gradient:linear-gradient(135deg,#EF5843,#F7AA35);--ease:cubic-bezier(.22,1,.36,1);width:100%;min-height:100vh;overflow-x:hidden;background:#fff;color:var(--navy);font-family:'Inter',sans-serif}
 .bookstore-page*,.bookstore-page *::before,.bookstore-page *::after{box-sizing:border-box}
 .bookstore-page a{text-decoration:none;color:inherit}
 .store-wrap{width:100%;max-width:1500px;margin:auto;padding:0 32px}
-
-/* HERO */
 .store-hero{position:relative;padding:64px 0 50px;overflow:hidden;background:radial-gradient(circle at 90% 15%,rgba(239,88,67,.18),transparent 42%),radial-gradient(circle at 100% 75%,rgba(247,170,53,.18),transparent 38%),#fff}
 .store-hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--gradient)}
 .store-hero::after{content:"";position:absolute;width:340px;height:340px;right:6%;top:-175px;border-radius:50%;background:radial-gradient(circle,rgba(247,170,53,.18),rgba(239,88,67,.05) 48%,transparent 70%);pointer-events:none;animation:storeHeroGlow 10s ease-in-out infinite}
@@ -23,8 +20,6 @@
 .hero-stat:hover{transform:translateY(-3px);border-color:var(--orange)}
 .hero-stat strong{display:block;font-family:'Poppins',sans-serif;font-size:21px;font-weight:750}
 .hero-stat span{color:var(--muted);font-size:10px}
-
-/* SECTION */
 .store-section{padding:50px 0}
 .catalog-section{background:var(--cream)}
 .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
@@ -35,17 +30,11 @@
 .see-all{display:inline-flex;align-items:center;gap:6px;color:var(--orange)!important;font-size:11px;font-weight:700;transition:gap .2s ease,color .2s ease}
 .see-all svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
 .see-all:hover{gap:10px;color:var(--orange-dark)!important}
-
-/* GRID */
 .five-book-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;gap:18px}
-
-/* CARD */
 .book-card{--rx:0deg;--ry:0deg;--lift:0px;position:relative;display:flex;flex-direction:column;width:100%;height:100%;min-width:0;overflow:hidden;background:#fff;border:1px solid var(--border);border-radius:17px;box-shadow:0 5px 16px rgba(36,27,82,.045);transform:perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift));transform-style:preserve-3d;will-change:transform;transition:transform .32s var(--ease),box-shadow .32s ease,border-color .32s ease}
 .book-card::after{content:"";position:absolute;inset:0;z-index:8;opacity:0;pointer-events:none;border-radius:inherit;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.22) 45%,transparent 64%);transform:translateX(-120%)}
 .book-card:hover{--lift:-7px;border-color:rgba(239,88,67,.23);box-shadow:0 21px 40px rgba(36,27,82,.1)}
 .book-card:hover::after{opacity:1;animation:storeCardShine .9s ease forwards}
-
-/* COVER */
 .cover-area{position:relative;display:flex;align-items:center;justify-content:center;height:225px;overflow:hidden;background:linear-gradient(180deg,#FBF9F5,#F1EDE4);perspective:900px}
 .cover-area::before{content:"";position:absolute;width:145px;height:34px;left:50%;bottom:21px;border-radius:50%;background:rgba(36,27,82,.13);filter:blur(10px);transform:translateX(-50%);transition:.35s ease}
 .book-3d{position:relative;z-index:2;width:130px;height:180px;transform-style:preserve-3d;animation:storeBookIdle 6.5s ease-in-out infinite;will-change:transform}
@@ -58,16 +47,12 @@
 .book-spine{top:2px;left:0;width:18px;height:176px;transform-origin:left;transform:rotateY(-90deg);filter:brightness(.75)}
 .cover-title{font-size:12px;font-weight:700;line-height:1.35}
 .cover-author{margin-top:4px;font-size:9px;opacity:.85}
-
-/* INFO */
 .book-info{position:relative;z-index:4;display:flex;flex:1;flex-direction:column;padding:14px;background:#fff}
 .book-publisher{height:14px;overflow:hidden;color:#8A8F9C;font-size:9px;font-weight:700;text-transform:uppercase;text-overflow:ellipsis;white-space:nowrap}
 .book-title{min-height:40px;max-height:40px;margin:5px 0;overflow:hidden;color:var(--navy);font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .book-author{height:17px;margin-bottom:10px;overflow:hidden;color:var(--muted);font-size:11px;white-space:nowrap;text-overflow:ellipsis}
-
-/* FORMAT */
 .book-format-list{display:grid;grid-template-rows:repeat(2,76px);gap:8px;width:100%;margin:0 0 10px}
-.format-box{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;height:76px;padding:9px 10px;overflow:hidden;border-radius:9px;transition:transform .22s var(--ease),border-color .22s ease,box-shadow .22s ease}
+.format-box{position:relative;display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;height:76px;padding:9px 9px;overflow:hidden;border-radius:9px;transition:transform .22s var(--ease),border-color .22s ease,box-shadow .22s ease}
 .print-format{border:1px solid #FED7AA;background:#FFF7ED}
 .ebook-format{border:1px solid #C7D2FE;background:#EEF2FF}
 .format-box:not(.format-unavailable):hover{transform:translateX(2px);box-shadow:0 6px 15px rgba(36,27,82,.05)}
@@ -78,13 +63,13 @@
 .format-icon{width:12px;height:12px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .print-label{color:#C2410C}
 .ebook-label{color:#4338CA}
-.format-old-price{height:12px;color:#94A3B8;font-size:8px;line-height:12px;text-decoration:line-through}
-.format-price{color:var(--navy);font-size:13px;line-height:17px;font-weight:800}
+.format-old-price{height:12px;overflow:hidden;color:#94A3B8;font-size:7.5px;line-height:12px;text-decoration:line-through;white-space:nowrap}
+.format-price{overflow:hidden;color:var(--navy);font-size:11px;line-height:17px;font-weight:800;white-space:nowrap}
 .format-discount{display:block;height:12px;margin-top:2px;color:#DC2626;font-size:8px;line-height:12px;font-weight:800}
 .format-discount-placeholder{display:block;height:12px;margin-top:2px;font-size:8px;line-height:12px}
 .format-unavailable{opacity:.72}
 .format-unavailable-text{height:29px;display:flex;align-items:center;color:#94A3B8;font-size:10px;font-weight:600}
-.format-add{position:relative;flex-shrink:0;min-width:68px;height:35px;padding:0 8px;overflow:hidden;border:0;border-radius:8px;color:#fff;font-size:9px;font-weight:800;cursor:pointer;transition:transform .18s ease,opacity .18s ease}
+.format-add{position:relative;flex-shrink:0;min-width:61px;height:35px;padding:0 6px;overflow:hidden;border:0;border-radius:8px;color:#fff;font-size:8px;font-weight:800;cursor:pointer;transition:transform .18s ease,opacity .18s ease}
 .format-add::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.3) 48%,transparent 75%);transform:translateX(-130%)}
 .format-add:hover::before{animation:storeButtonShine .7s ease forwards}
 .format-add:hover{transform:translateY(-1px)}
@@ -95,31 +80,21 @@
 .unavailable-add:hover{color:#475569;background:#CBD5E1;transform:none}
 .unavailable-add::before{display:none}
 .format-add:disabled{opacity:.65;cursor:default}
-
-/* DETAIL */
 .detail-btn{position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-height:38px;margin-top:auto;padding:7px 10px;overflow:hidden;border:1px solid var(--orange);border-radius:8px;color:var(--orange-dark)!important;background:#fff;font-size:10px;font-weight:700;transition:background .2s ease,color .2s ease,padding .2s ease}
 .detail-btn::after{content:"→";position:absolute;right:13px;opacity:0;transform:translateX(-5px);transition:.2s ease}
 .detail-btn:hover{padding-right:27px;background:var(--orange);color:#fff!important}
 .detail-btn:hover::after{opacity:1;transform:none}
-
-/* FILTER */
 .filter-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:25px}
 .category-chip{padding:7px 15px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--navy)!important;font-size:10px;font-weight:650;transition:transform .22s var(--ease),background .22s ease,color .22s ease,border-color .22s ease,box-shadow .22s ease}
 .category-chip:hover{transform:translateY(-2px);border-color:var(--orange);color:var(--orange)!important;box-shadow:0 6px 13px rgba(36,27,82,.06)}
 .category-chip.active{background:var(--navy);border-color:var(--navy);color:#fff!important;box-shadow:0 7px 16px rgba(36,27,82,.14)}
-
-/* PAGINATION */
 .store-pagination{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin-top:35px}
 .store-pagination a,.store-pagination span{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 10px;border:1px solid #E5E7EB;border-radius:9px;background:#fff;color:var(--navy)!important;font-size:11px;font-weight:700}
 .store-pagination a{transition:.2s var(--ease)}
 .store-pagination a:hover{transform:translateY(-2px);border-color:var(--orange);color:var(--orange)!important;box-shadow:0 5px 12px rgba(36,27,82,.07)}
 .store-pagination .active{background:var(--navy);border-color:var(--navy);color:#fff!important}
 .store-pagination .disabled{background:#F8FAFC;color:#9CA3AF!important}
-
-/* EMPTY */
 .empty-state{grid-column:1/-1;padding:45px 20px;text-align:center;border:1px solid var(--border);border-radius:14px;background:#fff;color:var(--muted);font-size:12px}
-
-/* CTA */
 .cta-wrapper{padding:0 32px 55px}
 .cta-banner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:1436px;margin:auto;padding:32px 36px;overflow:hidden;border:1px solid var(--border);border-radius:18px;background:linear-gradient(120deg,#FFF6EC,#FFE9D2);transition:transform .35s var(--ease),box-shadow .35s ease}
 .cta-banner::before{content:"";position:absolute;width:190px;height:190px;right:-80px;top:-90px;border:34px solid rgba(247,170,53,.12);border-radius:50%;transition:transform .7s var(--ease)}
@@ -130,20 +105,14 @@
 .cta-banner p{margin:0;color:var(--muted);font-size:11px}
 .cta-btn{flex-shrink:0;padding:11px 20px;border-radius:8px;color:#fff!important;background:var(--gradient);font-size:11px;font-weight:750;transition:transform .22s ease,box-shadow .22s ease}
 .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(239,88,67,.22)}
-
-/* REVEAL */
-.bs-reveal{opacity:0;filter:blur(3px);transform:translateY(30px);transition:opacity .72s var(--ease),transform .72s var(--ease),filter .72s ease;transition-delay:var(--delay,0ms)}
-.bs-reveal.bs-visible{opacity:1;filter:none;transform:none}
-
-/* CART FAB */
+.bs-reveal{opacity:0;filter:blur(3px);translate:0 30px;transition:opacity .72s var(--ease),translate .72s var(--ease),filter .72s ease;transition-delay:var(--delay,0ms)}
+.bs-reveal.bs-visible{opacity:1;filter:none;translate:0 0}
 .cart-fab{position:fixed;right:24px;bottom:24px;z-index:1200;display:flex;align-items:center;justify-content:center;width:56px;height:56px;padding:0;border:0;border-radius:50%;color:#fff;background:var(--navy);cursor:pointer;box-shadow:0 12px 28px rgba(36,27,82,.32);transition:transform .25s var(--ease),box-shadow .25s ease}
 .cart-fab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .cart-fab:hover{transform:translateY(-4px) rotate(-3deg);box-shadow:0 17px 35px rgba(36,27,82,.38)}
 .cart-fab.cart-pop{animation:storeCartPop .45s var(--ease)}
 .cart-count{position:absolute;top:-5px;right:-5px;display:flex;align-items:center;justify-content:center;min-width:21px;height:21px;padding:0 5px;border:2px solid #fff;border-radius:999px;color:#fff;background:var(--orange);font-size:9px;font-weight:800}
 .cart-count.hide{display:none}
-
-/* CART */
 .cart-overlay{position:fixed;inset:0;z-index:1300;opacity:0;visibility:hidden;background:rgba(15,23,42,.48);backdrop-filter:blur(3px);transition:.25s ease}
 .cart-overlay.show{opacity:1;visibility:visible}
 .cart-drawer{position:fixed;top:0;right:0;z-index:1400;display:flex;flex-direction:column;width:460px;max-width:100vw;height:100dvh;background:#fff;transform:translateX(100%);transition:transform .35s var(--ease);box-shadow:-20px 0 50px rgba(15,23,42,.16)}
@@ -162,8 +131,6 @@
 .cart-empty-icon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.7}
 .cart-empty strong{color:var(--navy);font-size:14px}
 .cart-empty span{margin-top:4px;font-size:10px}
-
-/* CART ITEM */
 .cart-product{display:grid;grid-template-columns:60px minmax(0,1fr);gap:11px;margin-bottom:10px;padding:11px;border:1px solid #E5E7EB;border-radius:11px;background:#fff;animation:storeCartItem .35s var(--ease) both;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
 .cart-product:hover{transform:translateX(-2px);border-color:#D7D9E1;box-shadow:0 5px 15px rgba(36,27,82,.05)}
 .cart-product-cover{width:60px;height:82px;overflow:hidden;border-radius:6px;background:linear-gradient(135deg,#FFF1E4,#FFE2BC)}
@@ -186,8 +153,6 @@
 .qty-control span{min-width:24px;text-align:center;font-size:10px;font-weight:800}
 .cart-subtotal-label{color:#94A3B8;font-size:7px;text-align:right;text-transform:uppercase}
 .cart-subtotal{margin-top:1px;color:var(--navy);font-size:12px;font-weight:800;text-align:right}
-
-/* CART FOOTER */
 .cart-drawer-foot{padding:15px 18px 18px;border-top:1px solid #E5E7EB;background:#fff}
 .cart-summary-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
 .cart-summary-row span{color:var(--muted);font-size:11px}
@@ -199,13 +164,9 @@
 .checkout-btn:hover:not(:disabled){transform:translateY(-1px);background:#16A34A}
 .checkout-btn:disabled{opacity:.45;cursor:not-allowed}
 .cart-note{margin:8px 0 0;color:#94A3B8;font-size:8.5px;line-height:1.5;text-align:center}
-
-/* TOAST */
 .cart-toast{position:fixed;right:25px;bottom:90px;z-index:1500;max-width:320px;padding:11px 14px;opacity:0;visibility:hidden;transform:translateY(8px);border-radius:8px;color:#fff;background:var(--navy);font-size:10px;font-weight:700;transition:.2s ease}
 .cart-toast.show{opacity:1;visibility:visible;transform:none}
 .cart-toast.warning{background:#C2410C}
-
-/* ANIMATIONS */
 @keyframes storeHeroGlow{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-22px,28px,0)}}
 @keyframes storeHeroBadge{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:none}}
 @keyframes storeHeroIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
@@ -214,80 +175,36 @@
 @keyframes storeButtonShine{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
 @keyframes storeCartPop{0%{transform:scale(1)}45%{transform:scale(1.13) rotate(-5deg)}100%{transform:scale(1)}}
 @keyframes storeCartItem{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
-
-@media(max-width:1199px){
-    .five-book-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-
-@media(max-width:767px){
-    .store-wrap{padding:0 18px}
-    .store-hero{padding:45px 0 38px}
-    .store-section{padding:38px 0}
-    .five-book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
-    .section-head{align-items:flex-start;flex-direction:column}
-    .cta-wrapper{padding:0 18px 42px}
-    .cta-banner{align-items:flex-start;flex-direction:column;padding:25px}
-    .cart-drawer{width:100%}
-    .book-card{--rx:0deg!important;--ry:0deg!important}
-}
-
-@media(max-width:480px){
-    .five-book-grid{grid-template-columns:1fr}
-    .cover-area{height:240px}
-}
-
-@media(prefers-reduced-motion:reduce){
-    .store-hero::after,.book-3d{animation:none!important}
-    .bs-reveal{opacity:1!important;filter:none!important;transform:none!important;transition:none!important}
-    .book-card,.format-box,.category-chip,.cta-banner{transform:none!important;transition:none!important}
-}
+@media(max-width:1199px){.five-book-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.format-price{font-size:12px}}
+@media(max-width:767px){.store-wrap{padding:0 18px}.store-hero{padding:45px 0 38px}.store-section{padding:38px 0}.five-book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.section-head{align-items:flex-start;flex-direction:column}.cta-wrapper{padding:0 18px 42px}.cta-banner{align-items:flex-start;flex-direction:column;padding:25px}.cart-drawer{width:100%}.book-card{--rx:0deg!important;--ry:0deg!important}.format-price{font-size:11px}}
+@media(max-width:480px){.five-book-grid{grid-template-columns:1fr}.cover-area{height:240px}.format-price{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.store-hero::after,.book-3d{animation:none!important}.bs-reveal{opacity:1!important;filter:none!important;translate:0!important;transition:none!important}.book-card,.format-box,.category-chip,.cta-banner{transition:none!important}}
 </style>
 
 <div class="bookstore-page">
-
 <section class="store-hero">
     <div class="store-wrap">
         <span class="eyebrow">
-            <svg class="eyebrow-icon" viewBox="0 0 24 24">
-                <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
-            </svg>
+            <svg class="eyebrow-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
             Toko resmi Baca Dulu
         </span>
-
         <h1>Temukan buku terbitan penerbit rekan kami</h1>
-
-        <p class="hero-description">
-            Jelajahi E-book dan Buku Cetak dari penulis dan penerbit yang telah dipercaya Baca Dulu.
-        </p>
-
+        <p class="hero-description">Jelajahi E-book dan Buku Cetak dari penulis dan penerbit yang telah dipercaya Baca Dulu.</p>
         <div class="hero-stats">
-            <div class="hero-stat">
-                <strong>{{ $totalBooks }}+</strong>
-                <span>Judul tersedia</span>
-            </div>
-
-            <div class="hero-stat">
-                <strong>{{ $publisherCount }}</strong>
-                <span>Penerbit rekanan</span>
-            </div>
+            <div class="hero-stat"><strong>{{ $totalBooks }}+</strong><span>Judul tersedia</span></div>
+            <div class="hero-stat"><strong>{{ $publisherCount }}</strong><span>Penerbit rekanan</span></div>
         </div>
     </div>
 </section>
 
 <section class="store-section">
     <div class="store-wrap">
-
         <div class="section-head">
             <div>
                 <h2><span class="section-tag"></span>Terbitan terbaru</h2>
                 <p>Lima buku terbaru dari penerbit rekan kami</p>
             </div>
-
-            <a href="#catalog" class="see-all">
-                Lihat katalog
-                <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
-            </a>
+            <a href="#catalog" class="see-all">Lihat katalog <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></a>
         </div>
 
         <div class="five-book-grid">
@@ -297,13 +214,11 @@
                 <div class="empty-state">Belum ada buku tersedia.</div>
             @endforelse
         </div>
-
     </div>
 </section>
 
 <section id="catalog" class="store-section catalog-section">
     <div class="store-wrap">
-
         <div class="section-head">
             <div>
                 <h2><span class="section-tag"></span>Katalog lengkap</h2>
@@ -312,16 +227,9 @@
         </div>
 
         <div class="filter-row">
-            <a href="{{ route('portofolio.bookstore') }}#catalog"
-               class="category-chip {{ $selectedCategory==='Semua'?'active':'' }}">
-                Semua
-            </a>
-
+            <a href="{{ route('portofolio.bookstore') }}#catalog" class="category-chip {{ $selectedCategory==='Semua'?'active':'' }}">Semua</a>
             @foreach($categories as $category)
-                <a href="{{ route('portofolio.bookstore',['category'=>$category]) }}#catalog"
-                   class="category-chip {{ $selectedCategory===$category?'active':'' }}">
-                    {{ $category }}
-                </a>
+                <a href="{{ route('portofolio.bookstore',['category'=>$category]) }}#catalog" class="category-chip {{ $selectedCategory===$category?'active':'' }}">{{ $category }}</a>
             @endforeach
         </div>
 
@@ -340,45 +248,28 @@
             @endphp
 
             <nav class="store-pagination">
-                @if($books->onFirstPage())
-                    <span class="disabled">‹</span>
-                @else
-                    <a href="{{ $books->previousPageUrl() }}#catalog">‹</a>
-                @endif
+                @if($books->onFirstPage())<span class="disabled">‹</span>
+                @else<a href="{{ $books->previousPageUrl() }}#catalog">‹</a>@endif
 
                 @if($startPage>1)
                     <a href="{{ $books->url(1) }}#catalog">1</a>
-                    @if($startPage>2)
-                        <span class="disabled">...</span>
-                    @endif
+                    @if($startPage>2)<span class="disabled">...</span>@endif
                 @endif
 
                 @for($page=$startPage;$page<=$endPage;$page++)
-                    @if($page===$books->currentPage())
-                        <span class="active">{{ $page }}</span>
-                    @else
-                        <a href="{{ $books->url($page) }}#catalog">{{ $page }}</a>
-                    @endif
+                    @if($page===$books->currentPage())<span class="active">{{ $page }}</span>
+                    @else<a href="{{ $books->url($page) }}#catalog">{{ $page }}</a>@endif
                 @endfor
 
                 @if($endPage<$books->lastPage())
-                    @if($endPage<$books->lastPage()-1)
-                        <span class="disabled">...</span>
-                    @endif
-
-                    <a href="{{ $books->url($books->lastPage()) }}#catalog">
-                        {{ $books->lastPage() }}
-                    </a>
+                    @if($endPage<$books->lastPage()-1)<span class="disabled">...</span>@endif
+                    <a href="{{ $books->url($books->lastPage()) }}#catalog">{{ $books->lastPage() }}</a>
                 @endif
 
-                @if($books->hasMorePages())
-                    <a href="{{ $books->nextPageUrl() }}#catalog">›</a>
-                @else
-                    <span class="disabled">›</span>
-                @endif
+                @if($books->hasMorePages())<a href="{{ $books->nextPageUrl() }}#catalog">›</a>
+                @else<span class="disabled">›</span>@endif
             </nav>
         @endif
-
     </div>
 </section>
 
@@ -388,22 +279,12 @@
             <h3>Penerbit atau penulis? Jual bukumu di sini.</h3>
             <p>Gabung sebagai mitra penerbit dan pasarkan judul-judulmu kepada pembaca Baca Dulu.</p>
         </div>
-
-        <a href="https://wa.me/6285139461070"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="cta-btn">
-            Kirim Naskah
-        </a>
+        <a href="https://wa.me/6285139461070" target="_blank" rel="noopener noreferrer" class="cta-btn">Kirim Naskah</a>
     </div>
 </div>
 
 <button type="button" class="cart-fab" id="cartFab" aria-label="Buka keranjang">
-    <svg viewBox="0 0 24 24">
-        <circle cx="9" cy="20" r="1"/>
-        <circle cx="18" cy="20" r="1"/>
-        <path d="M3 4h2l2.4 10.2a2 2 0 002 1.5h7.8a2 2 0 002-1.5L21 7H6"/>
-    </svg>
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M3 4h2l2.4 10.2a2 2 0 002 1.5h7.8a2 2 0 002-1.5L21 7H6"/></svg>
     <span class="cart-count hide" id="cartCount">0</span>
 </button>
 
@@ -415,14 +296,10 @@
             <h3>Keranjang Anda</h3>
             <p id="cartHeaderCount">Belum ada produk</p>
         </div>
-
         <div class="cart-header-actions">
             <button type="button" class="clear-cart" id="clearCartBtn">Kosongkan</button>
-
             <button type="button" class="cart-close" id="cartClose" aria-label="Tutup keranjang">
-                <svg viewBox="0 0 24 24">
-                    <path d="M6 6l12 12M18 6L6 18"/>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
             </button>
         </div>
     </div>
@@ -430,28 +307,14 @@
     <div class="cart-items" id="cartItems"></div>
 
     <div class="cart-drawer-foot">
-        <div class="cart-summary-row">
-            <span>Jumlah produk</span>
-            <strong id="cartItemCount">0 item</strong>
-        </div>
-
-        <div class="cart-total-row">
-            <span>Total</span>
-            <strong id="cartTotal">Rp 0</strong>
-        </div>
-
-        <button type="button" class="checkout-btn" id="checkoutBtn" disabled>
-            Checkout via WhatsApp
-        </button>
-
-        <p class="cart-note">
-            Stok, ongkir, file E-book, dan pembayaran akan dikonfirmasi oleh tim Baca Dulu.
-        </p>
+        <div class="cart-summary-row"><span>Jumlah produk</span><strong id="cartItemCount">0 item</strong></div>
+        <div class="cart-total-row"><span>Total</span><strong id="cartTotal">IDR 0,00</strong></div>
+        <button type="button" class="checkout-btn" id="checkoutBtn" disabled>Checkout via WhatsApp</button>
+        <p class="cart-note">Stok, ongkir, file E-book, dan pembayaran akan dikonfirmasi oleh tim Baca Dulu.</p>
     </div>
 </aside>
 
 <div class="cart-toast" id="cartToast"></div>
-
 </div>
 
 <script>
@@ -475,7 +338,6 @@ document.addEventListener('DOMContentLoaded',function(){
     const clearCartBtn=$('clearCartBtn');
     const cartToast=$('cartToast');
 
-    /* ANIMATION SYSTEM */
     if(!reduceMotion){
         const revealElements=[
             ...document.querySelectorAll('.section-head'),
@@ -492,31 +354,22 @@ document.addEventListener('DOMContentLoaded',function(){
 
         const observer=new IntersectionObserver(entries=>{
             entries.forEach(entry=>{
-                if(entry.isIntersecting){
-                    entry.target.classList.add('bs-visible');
-                }else{
-                    entry.target.classList.remove('bs-visible');
-                }
+                if(entry.isIntersecting)entry.target.classList.add('bs-visible');
+                else entry.target.classList.remove('bs-visible');
             });
-        },{
-            threshold:.08,
-            rootMargin:'0px 0px -5% 0px'
-        });
+        },{threshold:.08,rootMargin:'0px 0px -5% 0px'});
 
         revealElements.forEach(el=>observer.observe(el));
 
         document.querySelectorAll('.book-card').forEach(card=>{
             card.addEventListener('pointermove',event=>{
                 if(window.innerWidth<768)return;
-
                 const rect=card.getBoundingClientRect();
                 const x=(event.clientX-rect.left)/rect.width;
                 const y=(event.clientY-rect.top)/rect.height;
-
                 card.style.setProperty('--rx',`${(.5-y)*2.8}deg`);
                 card.style.setProperty('--ry',`${(x-.5)*4}deg`);
             });
-
             card.addEventListener('pointerleave',()=>{
                 card.style.setProperty('--rx','0deg');
                 card.style.setProperty('--ry','0deg');
@@ -525,7 +378,10 @@ document.addEventListener('DOMContentLoaded',function(){
     }
 
     function rupiah(value){
-        return'Rp '+Number(value||0).toLocaleString('id-ID');
+        return'IDR '+Number(value||0).toLocaleString('id-ID',{
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        });
     }
 
     function escapeHtml(value){
@@ -536,20 +392,13 @@ document.addEventListener('DOMContentLoaded',function(){
 
     function normalizeCart(data){
         if(!Array.isArray(data))return[];
-
         return data.map((item,index)=>{
             const price=Number(item.price??item.priceNum??0);
             const qty=Math.max(1,Number(item.qty??1));
             let format=item.format??'Buku';
             let title=String(item.title??'');
-
-            if(!item.format&&title.toLowerCase().includes('e-book')){
-                format='E-book';
-            }
-
-            if(!item.format&&title.toLowerCase().includes('cetak')){
-                format='Buku Cetak';
-            }
+            if(!item.format&&title.toLowerCase().includes('e-book'))format='E-book';
+            if(!item.format&&title.toLowerCase().includes('cetak'))format='Buku Cetak';
 
             return{
                 key:String(item.key??item.productKey??`legacy-${item.id??index}-${index}`),
@@ -569,9 +418,7 @@ document.addEventListener('DOMContentLoaded',function(){
         try{
             cart=normalizeCart(JSON.parse(localStorage.getItem(CART_KEY)||'[]'));
             localStorage.setItem(CART_KEY,JSON.stringify(cart));
-        }catch(e){
-            cart=[];
-        }
+        }catch(e){cart=[]}
     }
 
     function saveCart(){
@@ -579,13 +426,8 @@ document.addEventListener('DOMContentLoaded',function(){
         renderCart();
     }
 
-    function getCount(){
-        return cart.reduce((total,item)=>total+Number(item.qty),0);
-    }
-
-    function getTotal(){
-        return cart.reduce((total,item)=>total+(Number(item.price)*Number(item.qty)),0);
-    }
+    function getCount(){return cart.reduce((total,item)=>total+Number(item.qty),0)}
+    function getTotal(){return cart.reduce((total,item)=>total+(Number(item.price)*Number(item.qty)),0)}
 
     function openCart(){
         cartDrawer?.classList.add('open');
@@ -600,29 +442,18 @@ document.addEventListener('DOMContentLoaded',function(){
     }
 
     let toastTimer;
-
     function showToast(message,type='normal'){
         if(!cartToast)return;
-
         cartToast.textContent=message;
         cartToast.classList.remove('warning');
-
-        if(type==='warning'){
-            cartToast.classList.add('warning');
-        }
-
+        if(type==='warning')cartToast.classList.add('warning');
         cartToast.classList.add('show');
-
         clearTimeout(toastTimer);
-
-        toastTimer=setTimeout(()=>{
-            cartToast.classList.remove('show','warning');
-        },2200);
+        toastTimer=setTimeout(()=>cartToast.classList.remove('show','warning'),2200);
     }
 
     function animateCartFab(){
         if(!cartFab)return;
-
         cartFab.classList.remove('cart-pop');
         void cartFab.offsetWidth;
         cartFab.classList.add('cart-pop');
@@ -647,12 +478,8 @@ document.addEventListener('DOMContentLoaded',function(){
         }
 
         const existing=cart.find(item=>item.key===product.key);
-
-        if(existing){
-            existing.qty++;
-        }else{
-            cart.push(product);
-        }
+        if(existing)existing.qty++;
+        else cart.push(product);
 
         saveCart();
         animateCartFab();
@@ -661,7 +488,6 @@ document.addEventListener('DOMContentLoaded',function(){
         const oldText=button.textContent;
         button.textContent='✓ Ditambah';
         button.disabled=true;
-
         setTimeout(()=>{
             button.textContent=oldText;
             button.disabled=false;
@@ -673,13 +499,8 @@ document.addEventListener('DOMContentLoaded',function(){
     function changeQty(key,delta){
         const item=cart.find(row=>row.key===key);
         if(!item)return;
-
         item.qty=Number(item.qty)+delta;
-
-        if(item.qty<=0){
-            cart=cart.filter(row=>row.key!==key);
-        }
-
+        if(item.qty<=0)cart=cart.filter(row=>row.key!==key);
         saveCart();
     }
 
@@ -690,9 +511,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
     function clearCart(){
         if(!cart.length)return;
-
         if(!confirm('Kosongkan seluruh isi keranjang?'))return;
-
         cart=[];
         saveCart();
     }
@@ -705,29 +524,11 @@ document.addEventListener('DOMContentLoaded',function(){
             cartCount.textContent=count;
             cartCount.classList.toggle('hide',count===0);
         }
-
-        if(cartHeaderCount){
-            cartHeaderCount.textContent=count===0
-                ?'Belum ada produk'
-                :`${count} produk di keranjang`;
-        }
-
-        if(cartItemCount){
-            cartItemCount.textContent=`${count} item`;
-        }
-
-        if(cartTotal){
-            cartTotal.textContent=rupiah(total);
-        }
-
-        if(checkoutBtn){
-            checkoutBtn.disabled=count===0;
-        }
-
-        if(clearCartBtn){
-            clearCartBtn.classList.toggle('show',count>0);
-        }
-
+        if(cartHeaderCount)cartHeaderCount.textContent=count===0?'Belum ada produk':`${count} produk di keranjang`;
+        if(cartItemCount)cartItemCount.textContent=`${count} item`;
+        if(cartTotal)cartTotal.textContent=rupiah(total);
+        if(checkoutBtn)checkoutBtn.disabled=count===0;
+        if(clearCartBtn)clearCartBtn.classList.toggle('show',count>0);
         if(!cartItems)return;
 
         if(!cart.length){
@@ -742,106 +543,54 @@ document.addEventListener('DOMContentLoaded',function(){
                     </div>
                     <strong>Keranjang masih kosong</strong>
                     <span>Pilih Buku Cetak atau E-book dari katalog.</span>
-                </div>
-            `;
+                </div>`;
             return;
         }
 
         cartItems.innerHTML=cart.map(item=>{
             const subtotal=Number(item.price)*Number(item.qty);
-
-            const formatClass=
-                item.format.toLowerCase().includes('ebook')||
-                item.format.toLowerCase().includes('e-book')
-                    ?'ebook'
-                    :'print';
-
+            const formatClass=item.format.toLowerCase().includes('ebook')||item.format.toLowerCase().includes('e-book')?'ebook':'print';
             const cover=item.cover
                 ?`<img src="${escapeHtml(item.cover)}" alt="${escapeHtml(item.title)}">`
-                :`<div class="cart-cover-placeholder">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path>
-                    </svg>
-                  </div>`;
-
-            const publisher=item.publisher
-                ?` • ${escapeHtml(item.publisher)}`
-                :'';
+                :`<div class="cart-cover-placeholder"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path></svg></div>`;
+            const publisher=item.publisher?` • ${escapeHtml(item.publisher)}`:'';
 
             return`
                 <article class="cart-product">
-                    <div class="cart-product-cover">
-                        ${cover}
-                    </div>
-
+                    <div class="cart-product-cover">${cover}</div>
                     <div class="cart-product-info">
                         <div class="cart-product-top">
-                            <span class="cart-format ${formatClass}">
-                                ${escapeHtml(item.format)}
-                            </span>
-
-                            <button type="button"
-                                class="cart-remove"
-                                data-cart-action="remove"
-                                data-key="${escapeHtml(item.key)}">
-                                ✕
-                            </button>
+                            <span class="cart-format ${formatClass}">${escapeHtml(item.format)}</span>
+                            <button type="button" class="cart-remove" data-cart-action="remove" data-key="${escapeHtml(item.key)}">✕</button>
                         </div>
-
-                        <h4 class="cart-product-title">
-                            ${escapeHtml(item.title)}
-                        </h4>
-
-                        <p class="cart-product-meta">
-                            ${escapeHtml(item.author)}${publisher}
-                        </p>
-
-                        <div class="cart-unit-price">
-                            ${rupiah(item.price)} / item
-                        </div>
-
+                        <h4 class="cart-product-title">${escapeHtml(item.title)}</h4>
+                        <p class="cart-product-meta">${escapeHtml(item.author)}${publisher}</p>
+                        <div class="cart-unit-price">${rupiah(item.price)} / item</div>
                         <div class="cart-product-bottom">
                             <div class="qty-control">
-                                <button type="button"
-                                    data-cart-action="minus"
-                                    data-key="${escapeHtml(item.key)}">−</button>
-
+                                <button type="button" data-cart-action="minus" data-key="${escapeHtml(item.key)}">−</button>
                                 <span>${item.qty}</span>
-
-                                <button type="button"
-                                    data-cart-action="plus"
-                                    data-key="${escapeHtml(item.key)}">+</button>
+                                <button type="button" data-cart-action="plus" data-key="${escapeHtml(item.key)}">+</button>
                             </div>
-
                             <div>
                                 <div class="cart-subtotal-label">Subtotal</div>
                                 <div class="cart-subtotal">${rupiah(subtotal)}</div>
                             </div>
                         </div>
                     </div>
-                </article>
-            `;
+                </article>`;
         }).join('');
     }
 
     document.addEventListener('click',function(event){
         const unavailableButton=event.target.closest('[data-unavailable-message]');
-
         if(unavailableButton){
             event.preventDefault();
-
-            showToast(
-                unavailableButton.dataset.unavailableMessage||
-                'Format buku ini tidak tersedia.',
-                'warning'
-            );
-
+            showToast(unavailableButton.dataset.unavailableMessage||'Format buku ini tidak tersedia.','warning');
             return;
         }
 
         const addButton=event.target.closest('[data-cart-add="1"]');
-
         if(addButton){
             event.preventDefault();
             addProduct(addButton);
@@ -851,10 +600,8 @@ document.addEventListener('DOMContentLoaded',function(){
     cartItems?.addEventListener('click',function(event){
         const button=event.target.closest('[data-cart-action]');
         if(!button)return;
-
         const key=button.dataset.key;
         const action=button.dataset.cartAction;
-
         if(action==='plus')changeQty(key,1);
         if(action==='minus')changeQty(key,-1);
         if(action==='remove')removeItem(key);
@@ -865,7 +612,6 @@ document.addEventListener('DOMContentLoaded',function(){
 
         const lines=cart.map((item,index)=>{
             const subtotal=Number(item.price)*Number(item.qty);
-
             return`${index+1}. ${item.title}
 Format: ${item.format}
 Penulis: ${item.author}
@@ -883,11 +629,7 @@ TOTAL: ${rupiah(getTotal())}
 
 Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih.`;
 
-        window.open(
-            `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`,
-            '_blank',
-            'noopener,noreferrer'
-        );
+        window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');
     }
 
     cartFab?.addEventListener('click',openCart);
@@ -895,12 +637,7 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
     cartOverlay?.addEventListener('click',closeCart);
     clearCartBtn?.addEventListener('click',clearCart);
     checkoutBtn?.addEventListener('click',checkout);
-
-    document.addEventListener('keydown',event=>{
-        if(event.key==='Escape'){
-            closeCart();
-        }
-    });
+    document.addEventListener('keydown',event=>{if(event.key==='Escape')closeCart()});
 
     loadCart();
     renderCart();

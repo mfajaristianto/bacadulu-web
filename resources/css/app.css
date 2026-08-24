@@ -1,84 +1,38 @@
 @import "tailwindcss";
 
-/*
-|--------------------------------------------------------------------------
-| Tailwind Sources
-|--------------------------------------------------------------------------
-| Tailwind v4 harus mengetahui lokasi Blade dan JavaScript Laravel
-| agar utility class seperti flex, gap, px, lg:flex, dll ter-generate.
-|--------------------------------------------------------------------------
-*/
-
 @source "../../vendor/laravel/framework/src/Illuminate/pagination/resources/views/*.blade.php";
 @source "../../storage/framework/views/*.php";
 @source "../**/*.blade.php";
 @source "../**/*.js";
 
-/*
-|--------------------------------------------------------------------------
-| Theme
-|--------------------------------------------------------------------------
-*/
-
-@theme {
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji',
-        'Segoe UI Emoji',
-        'Segoe UI Symbol',
-        'Noto Color Emoji';
-
-    --color-orange-500: #f97316;
-    --color-orange-600: #ea580c;
+@theme{
+    --font-sans:'Inter',ui-sans-serif,system-ui,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
+    --color-orange-500:#f97316;
+    --color-orange-600:#ea580c;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Global
-|--------------------------------------------------------------------------
-*/
+html{scroll-behavior:auto}
+body{font-family:'Inter',ui-sans-serif,system-ui,sans-serif}
 
-html {
-    scroll-behavior: smooth;
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:hidden}
+.lenis.lenis-smooth iframe{pointer-events:none}
+
+@keyframes fadeInUp{
+    from{opacity:0;transform:translateY(30px)}
+    to{opacity:1;transform:translateY(0)}
 }
 
-body {
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+@keyframes fadeInTheLeft{
+    from{opacity:0;transform:translateX(-50px)}
+    to{opacity:1;transform:translateX(0)}
 }
 
-/*
-|--------------------------------------------------------------------------
-| Animation
-|--------------------------------------------------------------------------
-*/
+.animate-fade-in-up{animation:fadeInUp 1s ease-out forwards}
+.animate-slide-in-left{animation:fadeInTheLeft 1s ease-out forwards}
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeInTheLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.animate-fade-in-up {
-    animation: fadeInUp 1s ease-out forwards;
-}
-
-.animate-slide-in-left {
-    animation: fadeInTheLeft 1s ease-out forwards;
+@media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto!important}
 }
