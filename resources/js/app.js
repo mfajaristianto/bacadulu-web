@@ -656,6 +656,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        KATALOG PREMIUM 3D
        TANPA PIN
+       + ANIMASI SAAT DIGESER
     ===================================================== */
     const catalog=
         document.getElementById('katalog');
@@ -675,6 +676,10 @@ document.addEventListener('DOMContentLoaded',()=>{
         const next=
             catalog.querySelector('[data-catalog-next]');
 
+
+        /* =================================================
+           REVEAL AWAL
+        ================================================= */
         if(slides.length){
 
             gsap.from(slides,{
@@ -693,6 +698,10 @@ document.addEventListener('DOMContentLoaded',()=>{
             });
         }
 
+
+        /* =================================================
+           3D BOOK HOVER
+        ================================================= */
         slides.forEach((slide,index)=>{
 
             const card=
@@ -735,6 +744,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                     ease:'power3.out'
                 });
 
+
             card.addEventListener('pointerenter',()=>{
 
                 if(window.innerWidth<768)return;
@@ -760,6 +770,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                 }
             });
 
+
             card.addEventListener('pointermove',e=>{
 
                 if(window.innerWidth<768)return;
@@ -780,6 +791,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                 moveY(py*5-6);
             });
 
+
             card.addEventListener('pointerleave',()=>{
 
                 rotateX(0);
@@ -795,6 +807,8 @@ document.addEventListener('DOMContentLoaded',()=>{
                 });
             });
 
+
+            /* Parallax vertikal kecil */
             gsap.to(slide,{
                 y:index%2===0?-9:9,
                 ease:'none',
@@ -808,32 +822,641 @@ document.addEventListener('DOMContentLoaded',()=>{
             });
         });
 
-        const scrollCatalog=direction=>{
 
-            if(!slider)return;
+        /* =================================================
+           FOCUS ANIMATION SAAT SLIDER DIGESER
 
-            const first=
-                slider.querySelector('.bd-book-slide');
+           Berlaku untuk:
+           - tombol kanan/kiri
+           - drag mouse
+           - touch swipe
+           - trackpad horizontal
+        ================================================= */
+        let catalogFrame=null;
 
-            const gap=
-                parseFloat(getComputedStyle(slider).gap)||18;
+        const updateCatalogFocus=()=>{
 
-            const amount=
-                (first?.getBoundingClientRect().width||260)+gap;
+            if(
+                !slider||
+                !slides.length
+            ){
+                return;
+            }
 
-            slider.scrollBy({
-                left:amount*direction,
-                behavior:'smooth'
+            const sliderRect=
+                slider.getBoundingClientRect();
+
+            const sliderCenter=
+                sliderRect.left+
+                sliderRect.width/2;
+
+            const maxDistance=
+                sliderRect.width*.62;
+
+
+            slides.forEach(slide=>{
+
+                const rect=
+                    slide.getBoundingClientRect();
+
+                const center=
+                    rect.left+
+                    rect.width/2;
+
+                const distance=
+                    Math.abs(
+                        center-
+                        sliderCenter
+                    );
+
+                const normalized=
+                    Math.min(
+                        distance/maxDistance,
+                        1
+                    );
+
+                const scale=
+                    1-
+                    normalized*.055;
+
+                const opacity=
+                    1-
+                    normalized*.23;
+
+                const rotation=
+                    (
+                        center<
+                        sliderCenter
+                            ?1
+                            :-1
+                    )*
+                    normalized*
+                    2.8;
+
+                gsap.to(slide,{
+                    scale,
+                    opacity,
+                    rotationY:rotation,
+                    duration:.34,
+                    ease:'power3.out',
+                    overwrite:'auto'
+                });
             });
         };
 
+
+        const requestCatalogFocus=()=>{
+
+            if(catalogFrame){
+                cancelAnimationFrame(
+                    catalogFrame
+                );
+            }
+
+            catalogFrame=
+                requestAnimationFrame(
+                    updateCatalogFocus
+                );
+        };
+
+
+        if(slider){
+
+            slider.addEventListener(
+                'scroll',
+                requestCatalogFocus,
+                {
+                    passive:true
+                }
+            );
+
+            window.addEventListener(
+                'resize',
+                requestCatalogFocus
+            );
+
+            requestAnimationFrame(()=>{
+                updateCatalogFocus();
+            });
+        }
+
+
+        /* =================================================
+           ACTIVE BOOK PUNCH
+        ================================================= */
+        const animateNearestBook=direction=>{
+
+            if(
+                !slider||
+                !slides.length
+            ){
+                return;
+            }
+
+            const sliderRect=
+                slider.getBoundingClientRect();
+
+            const sliderCenter=
+                sliderRect.left+
+                sliderRect.width/2;
+
+            let nearest=null;
+            let nearestDistance=
+                Infinity;
+
+
+            slides.forEach(slide=>{
+
+                const rect=
+                    slide.getBoundingClientRect();
+
+                const center=
+                    rect.left+
+                    rect.width/2;
+
+                const distance=
+                    Math.abs(
+                        center-
+                        sliderCenter
+                    );
+
+                if(
+                    distance<
+                    nearestDistance
+                ){
+
+                    nearestDistance=
+                        distance;
+
+                    nearest=
+                        slide;
+                }
+            });
+
+
+            if(!nearest)return;
+
+
+            const stage=
+                nearest.querySelector(
+                    '.bd-book-stage'
+                );
+
+
+            const card=
+                nearest.querySelector(
+                    '.bd-home-book'
+                );
+
+
+            if(card){
+
+                gsap.fromTo(card,{
+                    boxShadow:
+                        '0 8px 25px rgba(36,27,82,.055)'
+                },{
+                    boxShadow:
+                        '0 25px 55px rgba(36,27,82,.14)',
+                    duration:.32,
+                    yoyo:true,
+                    repeat:1,
+                    ease:'power2.out'
+                });
+            }
+
+
+            if(stage){
+
+                gsap.fromTo(stage,{
+                    scale:.94,
+                    rotationY:
+                        direction>0
+                            ?-8
+                            :8
+                },{
+                    scale:1,
+                    rotationY:0,
+                    duration:.55,
+                    ease:'back.out(1.7)',
+                    overwrite:'auto'
+                });
+            }
+        };
+
+
+        /* =================================================
+           BUTTON SLIDE TRANSITION
+        ================================================= */
+        let catalogMoving=false;
+
+        const scrollCatalog=direction=>{
+
+            if(
+                !slider||
+                catalogMoving
+            ){
+                return;
+            }
+
+            const first=
+                slider.querySelector(
+                    '.bd-book-slide'
+                );
+
+            if(!first)return;
+
+
+            const gap=
+                parseFloat(
+                    getComputedStyle(slider).gap
+                )||20;
+
+
+            const amount=
+                first
+                    .getBoundingClientRect()
+                    .width+
+                gap;
+
+
+            const current=
+                slider.scrollLeft;
+
+
+            const maxScroll=
+                Math.max(
+                    0,
+                    slider.scrollWidth-
+                    slider.clientWidth
+                );
+
+
+            let target=
+                current+
+                amount*
+                direction;
+
+
+            target=
+                Math.max(
+                    0,
+                    Math.min(
+                        target,
+                        maxScroll
+                    )
+                );
+
+
+            /* Sudah mentok */
+            if(
+                Math.abs(
+                    target-current
+                )<2
+            ){
+
+                /*
+                 * Sedikit feedback kalau tombol
+                 * ditekan saat sudah mentok.
+                 */
+                gsap.fromTo(slider,{
+                    x:
+                        direction>0
+                            ?0
+                            :0
+                },{
+                    x:
+                        direction>0
+                            ?-4
+                            :4,
+                    duration:.1,
+                    yoyo:true,
+                    repeat:1,
+                    ease:'power2.out',
+
+                    onComplete:()=>{
+                        gsap.set(slider,{
+                            x:0
+                        });
+                    }
+                });
+
+                return;
+            }
+
+
+            catalogMoving=true;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CARD YANG SEDANG TERLIHAT
+            |--------------------------------------------------------------------------
+            */
+
+            const sliderRect=
+                slider.getBoundingClientRect();
+
+
+            const currentVisible=
+                slides.filter(slide=>{
+
+                    const rect=
+                        slide.getBoundingClientRect();
+
+                    return(
+                        rect.right>
+                        sliderRect.left&&
+                        rect.left<
+                        sliderRect.right
+                    );
+                });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | TWEEN SCROLLLEFT
+            |--------------------------------------------------------------------------
+            */
+
+            const scrollState={
+                value:current
+            };
+
+
+            const tl=
+                gsap.timeline({
+
+                    defaults:{
+                        overwrite:'auto'
+                    },
+
+                    onComplete:()=>{
+
+                        catalogMoving=false;
+
+                        updateCatalogFocus();
+
+                        animateNearestBook(
+                            direction
+                        );
+                    }
+                });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | 1. CARD PREPARE
+            |--------------------------------------------------------------------------
+            */
+
+            tl.to(currentVisible,{
+                scale:.965,
+                opacity:.72,
+                x:
+                    direction>0
+                        ?-6
+                        :6,
+                duration:.22,
+                stagger:.02,
+                ease:'power2.out'
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | 2. SLIDER MELUNCUR
+            |--------------------------------------------------------------------------
+            */
+
+            tl.to(
+                scrollState,
+                {
+                    value:target,
+                    duration:.72,
+                    ease:'power4.inOut',
+
+                    onUpdate:()=>{
+
+                        slider.scrollLeft=
+                            scrollState.value;
+
+                        requestCatalogFocus();
+                    }
+                },
+                '-=.07'
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | 3. RESET CARD LAMA
+            |--------------------------------------------------------------------------
+            */
+
+            tl.to(
+                currentVisible,
+                {
+                    x:0,
+                    duration:.25,
+                    ease:'power3.out'
+                },
+                '-=.28'
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | 4. CARD BARU MASUK
+            |--------------------------------------------------------------------------
+            */
+
+            tl.add(()=>{
+
+                const newSliderRect=
+                    slider.getBoundingClientRect();
+
+
+                const newVisible=
+                    slides.filter(slide=>{
+
+                        const rect=
+                            slide.getBoundingClientRect();
+
+                        return(
+                            rect.right>
+                            newSliderRect.left&&
+                            rect.left<
+                            newSliderRect.right
+                        );
+                    });
+
+
+                newVisible.forEach(
+                    (
+                        slide,
+                        index
+                    )=>{
+
+                        gsap.fromTo(slide,{
+                            x:
+                                direction>0
+                                    ?22
+                                    :-22,
+                            scale:.94,
+                            opacity:.62
+                        },{
+                            x:0,
+                            scale:1,
+                            opacity:1,
+                            duration:.48,
+                            delay:
+                                index*.025,
+                            ease:
+                                'back.out(1.35)',
+                            overwrite:'auto'
+                        });
+                    }
+                );
+
+            },'-=.2');
+        };
+
+
+        /* =================================================
+           BUTTONS
+        ================================================= */
         prev?.addEventListener('click',()=>{
+
             scrollCatalog(-1);
+
         });
 
+
         next?.addEventListener('click',()=>{
+
             scrollCatalog(1);
+
         });
+
+
+        /* =================================================
+           TOUCH / DRAG FEEDBACK
+        ================================================= */
+        if(slider){
+
+            let dragStartX=0;
+            let lastX=0;
+            let dragging=false;
+
+
+            slider.addEventListener(
+                'pointerdown',
+                e=>{
+
+                    dragStartX=
+                        e.clientX;
+
+                    lastX=
+                        e.clientX;
+
+                    dragging=true;
+                }
+            );
+
+
+            slider.addEventListener(
+                'pointermove',
+                e=>{
+
+                    if(!dragging)return;
+
+                    const delta=
+                        e.clientX-
+                        lastX;
+
+                    lastX=
+                        e.clientX;
+
+
+                    /*
+                     * Sedikit rotation pada semua
+                     * card selama drag.
+                     */
+                    slides.forEach(slide=>{
+
+                        gsap.to(slide,{
+                            rotationY:
+                                Math.max(
+                                    -4,
+                                    Math.min(
+                                        4,
+                                        delta*.12
+                                    )
+                                ),
+                            duration:.18,
+                            ease:'power2.out',
+                            overwrite:'auto'
+                        });
+                    });
+                }
+            );
+
+
+            const finishDrag=e=>{
+
+                if(!dragging)return;
+
+                dragging=false;
+
+
+                const difference=
+                    e.clientX-
+                    dragStartX;
+
+
+                slides.forEach(slide=>{
+
+                    gsap.to(slide,{
+                        rotationY:0,
+                        duration:.45,
+                        ease:'power3.out',
+                        overwrite:'auto'
+                    });
+                });
+
+
+                updateCatalogFocus();
+
+
+                if(
+                    Math.abs(difference)>25
+                ){
+
+                    animateNearestBook(
+                        difference<0
+                            ?1
+                            :-1
+                    );
+                }
+            };
+
+
+            slider.addEventListener(
+                'pointerup',
+                finishDrag
+            );
+
+
+            slider.addEventListener(
+                'pointercancel',
+                ()=>{
+
+                    dragging=false;
+
+                    updateCatalogFocus();
+                }
+            );
+        }
     }
 
     /* =====================================================
@@ -1010,158 +1633,269 @@ document.addEventListener('DOMContentLoaded',()=>{
                 });
 
                 const gap=
-                    parseFloat(getComputedStyle(track).gap)||0;
+                    parseFloat(
+                        getComputedStyle(track).gap
+                    )||0;
 
                 const distance=
-                    track.scrollWidth/2+gap/2;
+                    track.scrollWidth/2+
+                    gap/2;
 
                 if(distance<=0)return;
 
-                marquee=gsap.to(track,{
-                    x:-distance,
-                    duration:34,
-                    ease:'none',
-                    repeat:-1
-                });
+                marquee=
+                    gsap.to(track,{
+                        x:-distance,
+                        duration:34,
+                        ease:'none',
+                        repeat:-1
+                    });
 
-                marquee.timeScale(currentDirection);
+                marquee.timeScale(
+                    currentDirection
+                );
             };
 
-            /*
-             * Tunggu logo/image selesai dihitung agar
-             * scrollWidth marquee benar.
-             */
-            window.addEventListener('load',()=>{
-                createMarquee();
-            });
 
             /*
-             * Tetap dibuat saat DOM siap juga,
-             * lalu load akan mengoreksi ukurannya.
+             * Tunggu logo/image selesai dihitung
              */
-            requestAnimationFrame(()=>{
-                createMarquee();
-            });
+            window.addEventListener(
+                'load',
+                ()=>{
+
+                    createMarquee();
+
+                }
+            );
+
+
+            requestAnimationFrame(
+                ()=>{
+
+                    createMarquee();
+
+                }
+            );
+
 
             ScrollTrigger.create({
+
                 trigger:affiliate,
+
                 start:'top bottom',
+
                 end:'bottom top',
 
                 onUpdate:self=>{
 
                     if(!marquee)return;
 
+
                     currentDirection=
-                        self.direction>0?1:-1;
+                        self.direction>0
+                            ?1
+                            :-1;
+
 
                     gsap.to(marquee,{
-                        timeScale:currentDirection*2.2,
+                        timeScale:
+                            currentDirection*
+                            2.2,
                         duration:.2,
                         overwrite:true
                     });
 
+
                     if(settleTimer){
+
                         settleTimer.kill();
+
                     }
 
+
                     settleTimer=
-                        gsap.delayedCall(.18,()=>{
+                        gsap.delayedCall(
+                            .18,
+                            ()=>{
 
-                            if(!marquee)return;
+                                if(!marquee)return;
 
-                            gsap.to(marquee,{
-                                timeScale:currentDirection,
-                                duration:.75,
-                                ease:'power2.out'
-                            });
-                        });
+
+                                gsap.to(
+                                    marquee,
+                                    {
+                                        timeScale:
+                                            currentDirection,
+
+                                        duration:.75,
+
+                                        ease:
+                                            'power2.out'
+                                    }
+                                );
+
+                            }
+                        );
                 }
             });
 
+
             /* HOVER PAUSE */
-            wrap.addEventListener('mouseenter',()=>{
+            wrap.addEventListener(
+                'mouseenter',
+                ()=>{
 
-                if(!marquee)return;
+                    if(!marquee)return;
 
-                gsap.to(marquee,{
-                    timeScale:0,
-                    duration:.35,
-                    ease:'power2.out'
-                });
-            });
+
+                    gsap.to(marquee,{
+                        timeScale:0,
+                        duration:.35,
+                        ease:'power2.out'
+                    });
+
+                }
+            );
+
 
             /* JALAN LAGI */
-            wrap.addEventListener('mouseleave',()=>{
+            wrap.addEventListener(
+                'mouseleave',
+                ()=>{
 
-                if(!marquee)return;
+                    if(!marquee)return;
 
-                gsap.to(marquee,{
-                    timeScale:currentDirection,
-                    duration:.55,
-                    ease:'power2.out'
-                });
-            });
 
-            window.addEventListener('resize',()=>{
+                    gsap.to(marquee,{
+                        timeScale:
+                            currentDirection,
 
-                clearTimeout(affiliateResizeTimer);
+                        duration:.55,
 
-                affiliateResizeTimer=setTimeout(()=>{
+                        ease:'power2.out'
+                    });
 
-                    createMarquee();
-                    ScrollTrigger.refresh();
+                }
+            );
 
-                },250);
-            });
+
+            window.addEventListener(
+                'resize',
+                ()=>{
+
+                    clearTimeout(
+                        affiliateResizeTimer
+                    );
+
+
+                    affiliateResizeTimer=
+                        setTimeout(
+                            ()=>{
+
+                                createMarquee();
+
+                                ScrollTrigger
+                                    .refresh();
+
+                            },
+                            250
+                        );
+                }
+            );
         }
     }
 
     /* =====================================================
        GLOBAL 3D TILT
     ===================================================== */
-    document.querySelectorAll('[data-bd-tilt]').forEach(card=>{
+    document
+        .querySelectorAll('[data-bd-tilt]')
+        .forEach(card=>{
 
-        gsap.set(card,{
-            transformPerspective:1000,
-            transformStyle:'preserve-3d'
-        });
-
-        const rx=
-            gsap.quickTo(card,'rotationX',{
-                duration:.4,
-                ease:'power3.out'
+            gsap.set(card,{
+                transformPerspective:1000,
+                transformStyle:'preserve-3d'
             });
 
-        const ry=
-            gsap.quickTo(card,'rotationY',{
-                duration:.4,
-                ease:'power3.out'
-            });
 
-        card.addEventListener('pointermove',e=>{
+            const rx=
+                gsap.quickTo(
+                    card,
+                    'rotationX',
+                    {
+                        duration:.4,
+                        ease:'power3.out'
+                    }
+                );
 
-            if(window.innerWidth<768)return;
 
-            const rect=
-                card.getBoundingClientRect();
+            const ry=
+                gsap.quickTo(
+                    card,
+                    'rotationY',
+                    {
+                        duration:.4,
+                        ease:'power3.out'
+                    }
+                );
 
-            const x=
-                (e.clientX-rect.left)/rect.width;
 
-            const y=
-                (e.clientY-rect.top)/rect.height;
+            card.addEventListener(
+                'pointermove',
+                e=>{
 
-            rx((.5-y)*4);
-            ry((x-.5)*5.5);
+                    if(
+                        window.innerWidth<
+                        768
+                    ){
+                        return;
+                    }
+
+
+                    const rect=
+                        card
+                            .getBoundingClientRect();
+
+
+                    const x=
+                        (
+                            e.clientX-
+                            rect.left
+                        )/
+                        rect.width;
+
+
+                    const y=
+                        (
+                            e.clientY-
+                            rect.top
+                        )/
+                        rect.height;
+
+
+                    rx(
+                        (.5-y)*4
+                    );
+
+
+                    ry(
+                        (x-.5)*5.5
+                    );
+                }
+            );
+
+
+            card.addEventListener(
+                'pointerleave',
+                ()=>{
+
+                    rx(0);
+                    ry(0);
+
+                }
+            );
         });
-
-        card.addEventListener('pointerleave',()=>{
-
-            rx(0);
-            ry(0);
-        });
-    });
 
     /* =====================================================
        DEPTH
@@ -1177,25 +1911,28 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        SECTION GLOW
     ===================================================== */
-    document.querySelectorAll('.bd-section-glow').forEach(glow=>{
+    document
+        .querySelectorAll('.bd-section-glow')
+        .forEach(glow=>{
 
-        const section=
-            glow.closest('section');
+            const section=
+                glow.closest('section');
 
-        if(!section)return;
+            if(!section)return;
 
-        gsap.to(glow,{
-            y:75,
-            ease:'none',
 
-            scrollTrigger:{
-                trigger:section,
-                start:'top bottom',
-                end:'bottom top',
-                scrub:1.4
-            }
+            gsap.to(glow,{
+                y:75,
+                ease:'none',
+
+                scrollTrigger:{
+                    trigger:section,
+                    start:'top bottom',
+                    end:'bottom top',
+                    scrub:1.4
+                }
+            });
         });
-    });
 
     /* =====================================================
        MAGNETIC BUTTON
@@ -1204,36 +1941,59 @@ document.addEventListener('DOMContentLoaded',()=>{
         '.bd-wa-btn,.bd-book-detail,.bd-info-read,.bd-publish-action>a'
     ).forEach(button=>{
 
-        button.addEventListener('pointermove',e=>{
+        button.addEventListener(
+            'pointermove',
+            e=>{
 
-            if(window.innerWidth<768)return;
+                if(
+                    window.innerWidth<
+                    768
+                ){
+                    return;
+                }
 
-            const rect=
-                button.getBoundingClientRect();
 
-            const x=
-                e.clientX-rect.left-rect.width/2;
+                const rect=
+                    button
+                        .getBoundingClientRect();
 
-            const y=
-                e.clientY-rect.top-rect.height/2;
 
-            gsap.to(button,{
-                x:x*.08,
-                y:y*.1,
-                duration:.3,
-                ease:'power3.out'
-            });
-        });
+                const x=
+                    e.clientX-
+                    rect.left-
+                    rect.width/2;
 
-        button.addEventListener('pointerleave',()=>{
 
-            gsap.to(button,{
-                x:0,
-                y:0,
-                duration:.6,
-                ease:'elastic.out(1,.45)'
-            });
-        });
+                const y=
+                    e.clientY-
+                    rect.top-
+                    rect.height/2;
+
+
+                gsap.to(button,{
+                    x:x*.08,
+                    y:y*.1,
+                    duration:.3,
+                    ease:'power3.out'
+                });
+            }
+        );
+
+
+        button.addEventListener(
+            'pointerleave',
+            ()=>{
+
+                gsap.to(button,{
+                    x:0,
+                    y:0,
+                    duration:.6,
+                    ease:
+                        'elastic.out(1,.45)'
+                });
+
+            }
+        );
     });
 
     /* =====================================================
@@ -1247,71 +2007,135 @@ document.addEventListener('DOMContentLoaded',()=>{
 
         if(!element)return;
 
-        if(element._bdMoneyTween){
-            element._bdMoneyTween.kill();
+
+        if(
+            element._bdMoneyTween
+        ){
+
+            element
+                ._bdMoneyTween
+                .kill();
+
         }
 
-        let current=
-            Number(element.dataset.value);
 
-        if(!Number.isFinite(current)){
+        let current=
+            Number(
+                element.dataset.value
+            );
+
+
+        if(
+            !Number.isFinite(
+                current
+            )
+        ){
 
             current=
                 Number(
-                    String(element.textContent||'')
-                        .replace(/[^\d]/g,'')
+                    String(
+                        element.textContent||
+                        ''
+                    )
+                    .replace(
+                        /[^\d]/g,
+                        ''
+                    )
                 )||0;
         }
+
 
         const state={
             value:current
         };
 
+
         element._bdMoneyTween=
-            gsap.to(state,{
+            gsap.to(
+                state,
+                {
 
-                value:Number(value||0),
-                duration:.55,
-                ease:'power2.out',
+                    value:
+                        Number(
+                            value||0
+                        ),
 
-                onUpdate:()=>{
+                    duration:.55,
 
-                    element.textContent=
-                        prefix+
-                        Math.round(state.value)
-                            .toLocaleString('id-ID');
-                },
+                    ease:
+                        'power2.out',
 
-                onComplete:()=>{
 
-                    element.dataset.value=
-                        Number(value||0);
+                    onUpdate:()=>{
 
-                    element._bdMoneyTween=null;
+                        element.textContent=
+                            prefix+
+                            Math.round(
+                                state.value
+                            )
+                            .toLocaleString(
+                                'id-ID'
+                            );
+
+                    },
+
+
+                    onComplete:()=>{
+
+                        element.dataset.value=
+                            Number(
+                                value||0
+                            );
+
+
+                        element
+                            ._bdMoneyTween=
+                            null;
+
+                    }
                 }
-            });
+            );
     };
 
     /* =====================================================
        REFRESH
     ===================================================== */
-    window.addEventListener('load',()=>{
-
-        ScrollTrigger.refresh();
-    });
-
-    let resizeTimer=null;
-
-    window.addEventListener('resize',()=>{
-
-        clearTimeout(resizeTimer);
-
-        resizeTimer=setTimeout(()=>{
+    window.addEventListener(
+        'load',
+        ()=>{
 
             ScrollTrigger.refresh();
 
-        },180);
-    });
+        }
+    );
+
+
+    let resizeTimer=null;
+
+
+    window.addEventListener(
+        'resize',
+        ()=>{
+
+            clearTimeout(
+                resizeTimer
+            );
+
+
+            resizeTimer=
+                setTimeout(
+                    ()=>{
+
+                        ScrollTrigger
+                            .refresh();
+
+                    },
+                    180
+                );
+        }
+    );
+
 
     ScrollTrigger.refresh();
+
 });
