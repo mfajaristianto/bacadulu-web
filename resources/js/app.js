@@ -1,12 +1,12 @@
 import './bootstrap';
+import './bookstore-motion';
+
 import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
 gsap.registerPlugin(ScrollTrigger);
-
-/* Digunakan juga oleh script Testimoni */
 window.bdGsap=gsap;
 
 document.addEventListener('DOMContentLoaded',()=>{
