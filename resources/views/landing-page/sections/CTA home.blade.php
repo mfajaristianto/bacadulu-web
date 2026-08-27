@@ -5,45 +5,26 @@
         ->get();
 @endphp
 
-
 {{-- ================================================================
      INFORMASI & AGENDA
-     TEAM-STYLE CARD CAROUSEL
 ================================================================ --}}
-
 <section id="baca-informasi" class="bd-activity-section">
-
     <div class="bd-activity-accent bd-activity-accent-left" aria-hidden="true"></div>
     <div class="bd-activity-accent bd-activity-accent-right" aria-hidden="true"></div>
 
     <div class="bd-activity-container">
 
-        {{-- =========================================================
-             HEADER
-        ========================================================== --}}
+        {{-- HEADER --}}
         <header class="bd-activity-header">
-
             <div class="bd-activity-heading">
-
                 <div class="bd-activity-eyebrow">
-
                     <span class="bd-activity-eyebrow-icon">
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M8 2v3M16 2v3M4 9h16M5 4h14a1 1 0 011 1v15H4V5a1 1 0 011-1z"
-                            />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 2v3M16 2v3M4 9h16M5 4h14a1 1 0 011 1v15H4V5a1 1 0 011-1z"/>
                         </svg>
                     </span>
-
                     <span>Informasi & Agenda</span>
-
                 </div>
 
                 <h2>
@@ -55,78 +36,37 @@
                     Kegiatan, program, agenda, pengumuman, kolaborasi,
                     dan berbagai informasi terbaru dari Baca Dulu.
                 </p>
-
             </div>
-
 
             <div class="bd-activity-header-action">
-
                 @if(!$informasiTerbaru->isEmpty())
-
                     <div class="bd-activity-total">
-                        <strong>
-                            {{ str_pad(
-                                $informasiTerbaru->count(),
-                                2,
-                                '0',
-                                STR_PAD_LEFT
-                            ) }}
-                        </strong>
-
+                        <strong>{{ str_pad($informasiTerbaru->count(), 2, '0', STR_PAD_LEFT) }}</strong>
                         <span>Update Terbaru</span>
                     </div>
-
                 @endif
 
-
                 <a href="{{ route('informasi') }}" class="bd-activity-all">
-
                     Semua Informasi
-
                     <span>
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M5 12h14M13 6l6 6-6 6"
-                            />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
                         </svg>
                     </span>
-
                 </a>
-
             </div>
-
         </header>
 
-
-        {{-- =========================================================
-             DIVIDER
-        ========================================================== --}}
         <div class="bd-activity-header-line">
             <span></span>
         </div>
 
-
         @if($informasiTerbaru->isEmpty())
 
             <div class="bd-activity-empty">
-
                 <span>Update Baca Dulu</span>
-
-                <h3>
-                    Belum ada informasi terbaru.
-                </h3>
-
-                <p>
-                    Kegiatan dan informasi terbaru akan tampil di bagian ini.
-                </p>
-
+                <h3>Belum ada informasi terbaru.</h3>
+                <p>Kegiatan dan informasi terbaru akan tampil di bagian ini.</p>
             </div>
 
         @else
@@ -135,46 +75,18 @@
                  CAROUSEL
             ====================================================== --}}
             <div class="bd-activity-showcase">
-
                 <div class="bd-activity-stage">
 
                     @foreach($informasiTerbaru as $index => $item)
-
                         @php
-                            $judul =
-                                $item->title
-                                ?? $item->judul
-                                ?? 'Informasi Baca Dulu';
-
-                            $url =
-                                !empty($item->slug)
-                                    ? url('/information/' . $item->slug)
-                                    : route('informasi');
-
-                            $gambar =
-                                !empty($item->image)
-                                    ? asset('storage/' . $item->image)
-                                    : null;
-
-                            $kategori =
-                                $item->category
-                                ?? $item->type
-                                ?? 'Informasi';
-
-                            $tanggal =
-                                $item->created_at
-                                    ? $item->created_at->translatedFormat('d M Y')
-                                    : null;
-
-                            $nomor =
-                                str_pad(
-                                    $index + 1,
-                                    2,
-                                    '0',
-                                    STR_PAD_LEFT
-                                );
+                            $judul = $item->title ?? $item->judul ?? 'Informasi Baca Dulu';
+                            $gambar = !empty($item->image) ? asset('storage/' . $item->image) : null;
+                            $kategori = $item->category ?? $item->type ?? 'Informasi';
+                            $tanggal = $item->created_at
+                                ? $item->created_at->translatedFormat('d M Y')
+                                : null;
+                            $nomor = str_pad($index + 1, 2, '0', STR_PAD_LEFT);
                         @endphp
-
 
                         <button
                             type="button"
@@ -183,144 +95,68 @@
                             data-index="{{ $index }}"
                             aria-label="Tampilkan {{ $judul }}"
                         >
-
                             <div class="bd-activity-card-media">
-
                                 @if($gambar)
-
                                     <img
                                         src="{{ $gambar }}"
                                         alt="{{ $judul }}"
                                         loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
                                     >
-
                                 @else
-
                                     <div class="bd-activity-card-placeholder">
-
-                                        <img
-                                            src="{{ asset('img/bacadulu-logo.jpg') }}"
-                                            alt=""
-                                        >
-
-                                        <span>
-                                            Baca Dulu
-                                        </span>
-
+                                        <img src="{{ asset('img/bacadulu-logo.jpg') }}" alt="">
+                                        <span>Baca Dulu</span>
                                     </div>
-
                                 @endif
-
 
                                 <span class="bd-activity-card-number">
                                     {{ $nomor }}
                                 </span>
-
                             </div>
-
 
                             <div class="bd-activity-card-body">
-
                                 <div class="bd-activity-card-meta">
-
-                                    <span>
-                                        {{ $kategori }}
-                                    </span>
-
+                                    <span>{{ $kategori }}</span>
 
                                     @if($tanggal)
-
                                         <i></i>
-
-                                        <time>
-                                            {{ $tanggal }}
-                                        </time>
-
+                                        <time>{{ $tanggal }}</time>
                                     @endif
-
                                 </div>
 
-
-                                <h3>
-                                    {{ $judul }}
-                                </h3>
-
+                                <h3>{{ $judul }}</h3>
 
                                 <div class="bd-activity-card-bottom">
+                                    <span>Lihat Informasi</span>
 
-                                    <span>
-                                        Lihat Informasi
-                                    </span>
-
-                                    <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M5 12h14M13 6l6 6-6 6"
-                                        />
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
                                     </svg>
-
                                 </div>
-
                             </div>
-
                         </button>
-
                     @endforeach
 
                 </div>
 
-
-                {{-- =================================================
-                     CONTROLS
-                ================================================== --}}
+                {{-- CONTROLS --}}
                 <div class="bd-activity-controls">
-
                     <button
                         type="button"
                         id="bdActivityPrev"
                         class="bd-activity-nav"
                         aria-label="Informasi sebelumnya"
                     >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15 18l-6-6 6-6"
-                            />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"/>
                         </svg>
                     </button>
 
-
                     <div class="bd-activity-counter">
-
-                        <strong id="bdActivityCurrent">
-                            01
-                        </strong>
-
+                        <strong id="bdActivityCurrent">01</strong>
                         <span>/</span>
-
-                        <span>
-                            {{ str_pad(
-                                $informasiTerbaru->count(),
-                                2,
-                                '0',
-                                STR_PAD_LEFT
-                            ) }}
-                        </span>
-
+                        <span>{{ str_pad($informasiTerbaru->count(), 2, '0', STR_PAD_LEFT) }}</span>
                     </div>
-
 
                     <button
                         type="button"
@@ -328,46 +164,27 @@
                         class="bd-activity-nav bd-activity-nav-next"
                         aria-label="Informasi berikutnya"
                     >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M9 18l6-6-6-6"
-                            />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/>
                         </svg>
                     </button>
-
                 </div>
-
             </div>
 
-
-
             {{-- =====================================================
-                 ACTIVE INFORMATION DETAILS
+                 ACTIVE INFORMATION PREVIEW
             ====================================================== --}}
             <div class="bd-activity-details">
 
                 @foreach($informasiTerbaru as $index => $item)
-
                     @php
-                        $judul =
-                            $item->title
-                            ?? $item->judul
-                            ?? 'Informasi Baca Dulu';
+                        $judul = $item->title ?? $item->judul ?? 'Informasi Baca Dulu';
 
-                        $url =
-                            !empty($item->slug)
-                                ? url('/information/' . $item->slug)
-                                : route('informasi');
+                        $url = !empty($item->slug)
+                            ? url('/information/' . $item->slug)
+                            : route('informasi');
 
-                        $deskripsi =
-                            $item->excerpt
+                        $deskripsi = $item->excerpt
                             ?? \Illuminate\Support\Str::limit(
                                 html_entity_decode(
                                     strip_tags(
@@ -376,349 +193,339 @@
                                         ?? ''
                                     )
                                 ),
-                                210
+                                180
                             );
 
-                        $kategori =
-                            $item->category
-                            ?? $item->type
-                            ?? 'Informasi';
+                        $kategori = $item->category ?? $item->type ?? 'Informasi';
 
-                        $tanggal =
-                            $item->created_at
-                                ? $item->created_at->translatedFormat('d M Y')
-                                : null;
+                        $tanggal = $item->created_at
+                            ? $item->created_at->translatedFormat('d M Y')
+                            : null;
 
-                        $nomor =
-                            str_pad(
-                                $index + 1,
-                                2,
-                                '0',
-                                STR_PAD_LEFT
-                            );
+                        $nomor = str_pad($index + 1, 2, '0', STR_PAD_LEFT);
                     @endphp
-
 
                     <article
                         class="bd-activity-detail {{ $index === 0 ? 'is-active' : '' }}"
                         data-activity-detail="{{ $index }}"
                         style="{{ $index === 0 ? '' : 'display:none;' }}"
                     >
-
-                        <div class="bd-activity-detail-number">
-                            {{ $nomor }}
+                        <div class="bd-activity-detail-index">
+                            <span>{{ $nomor }}</span>
+                            <small>Update</small>
                         </div>
-
 
                         <div class="bd-activity-detail-main">
+                            <div class="bd-activity-detail-top">
+                                <div class="bd-activity-detail-meta">
+                                    <span>{{ $kategori }}</span>
 
-                            <div class="bd-activity-detail-meta">
+                                    @if($tanggal)
+                                        <i></i>
+                                        <time>{{ $tanggal }}</time>
+                                    @endif
+                                </div>
 
-                                <span>
-                                    {{ $kategori }}
-                                </span>
-
-
-                                @if($tanggal)
-
+                                <span class="bd-activity-detail-active">
                                     <i></i>
-
-                                    <time>
-                                        {{ $tanggal }}
-                                    </time>
-
-                                @endif
-
+                                    Sedang Ditampilkan
+                                </span>
                             </div>
 
-
-                            <h3>
-                                {{ $judul }}
-                            </h3>
-
-                        </div>
-
-
-                        <div class="bd-activity-detail-side">
+                            <h3>{{ $judul }}</h3>
 
                             @if(!empty($deskripsi))
-
-                                <p>
+                                <p class="bd-activity-detail-description">
                                     {{ $deskripsi }}
                                 </p>
-
                             @endif
-
-
-                            <a href="{{ $url }}">
-
-                                Baca Selengkapnya
-
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M5 12h14M13 6l6 6-6 6"
-                                    />
-                                </svg>
-
-                            </a>
-
                         </div>
 
-                    </article>
+                        <div class="bd-activity-detail-action">
+                            <span class="bd-activity-detail-action-label">
+                                Informasi Selengkapnya
+                            </span>
 
+                            <a href="{{ $url }}">
+                                <span>Baca Selengkapnya</span>
+
+                                <span class="bd-activity-detail-arrow">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
+                                    </svg>
+                                </span>
+                            </a>
+                        </div>
+                    </article>
                 @endforeach
 
             </div>
 
-
-            {{-- =====================================================
-                 FOOTER
-            ====================================================== --}}
+            {{-- FOOTER --}}
             <footer class="bd-activity-footer">
-
-                <span>
-                    Gunakan tombol panah untuk melihat update lainnya.
-                </span>
-
+                <div class="bd-activity-footer-note">
+                    <span></span>
+                    Pilih kartu atau gunakan tombol panah untuk melihat update lainnya.
+                </div>
 
                 <a href="{{ route('informasi') }}">
-
                     Lihat Semua Informasi
 
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M5 12h14M13 6l6 6-6 6"
-                        />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
                     </svg>
-
                 </a>
-
             </footer>
 
         @endif
-
     </div>
-
 </section>
 
-
-
 {{-- ================================================================
-     CTA PENERBITAN
-     TETAP ADA
+     CTA PENERBITAN BARU
 ================================================================ --}}
-
-<section class="bd-publish-section">
-
+<section class="bd-publish-section" id="publish-cta">
     <div class="bd-publish-container">
-
         <div class="bd-publish-card">
 
-            {{-- =====================================================
-                 LEFT
-            ====================================================== --}}
+            <div class="bd-publish-grid" aria-hidden="true"></div>
+            <div class="bd-publish-glow bd-publish-glow-one" aria-hidden="true"></div>
+            <div class="bd-publish-glow bd-publish-glow-two" aria-hidden="true"></div>
+
+            <span class="bd-publish-watermark" id="bdPublishWatermark" aria-hidden="true">
+                01
+            </span>
+
+            {{-- LEFT --}}
             <div class="bd-publish-copy">
-
                 <div class="bd-publish-kicker">
-
                     <span class="bd-publish-kicker-icon">
-
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 19.5A2.5 2.5 0 016.5 17H20"
-                            />
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"
-                            />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
                         </svg>
-
                     </span>
 
-                    <span>
-                        Penerbitan Buku
-                    </span>
-
+                    <span>Penerbitan Buku</span>
                 </div>
-
 
                 <h2>
                     Siap mengubah naskah Anda
                     <span>menjadi sebuah buku?</span>
                 </h2>
 
-
                 <p>
-                    Konsultasikan kebutuhan editing, layout, desain sampul,
-                    ISBN, HAKI, pencetakan hingga distribusi bersama
-                    tim Baca Dulu.
+                    Dari naskah awal hingga siap diterbitkan. Baca Dulu membantu
+                    proses editing, layout, desain sampul, ISBN, HAKI,
+                    pencetakan hingga distribusi dalam satu alur penerbitan.
                 </p>
 
+                <div class="bd-publish-trust">
+                    <div class="bd-publish-trust-item">
+                        <span class="bd-publish-trust-dot"></span>
+                        <span>Pendampingan penerbitan</span>
+                    </div>
+
+                    <div class="bd-publish-trust-item">
+                        <span class="bd-publish-trust-dot"></span>
+                        <span>Cetak & digital</span>
+                    </div>
+
+                    <div class="bd-publish-trust-item">
+                        <span class="bd-publish-trust-dot"></span>
+                        <span>ISBN & HAKI</span>
+                    </div>
+                </div>
             </div>
 
-
-            {{-- =====================================================
-                 SERVICES
-            ====================================================== --}}
+            {{-- SERVICES --}}
             <div class="bd-publish-services">
 
-                <div class="bd-publish-service">
-                    <span>01</span>
+                <button
+                    type="button"
+                    class="bd-publish-service is-active"
+                    data-publish-service
+                    data-number="01"
+                >
+                    <span class="bd-publish-service-number">01</span>
 
-                    <div>
+                    <div class="bd-publish-service-copy">
                         <strong>Editing</strong>
-                        <small>Penyuntingan naskah</small>
+                        <small>Penyuntingan dan pemeriksaan naskah</small>
                     </div>
-                </div>
 
+                    <span class="bd-publish-service-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
+                        </svg>
+                    </span>
 
-                <div class="bd-publish-service">
-                    <span>02</span>
+                    <span class="bd-publish-service-progress"></span>
+                </button>
 
-                    <div>
+                <button
+                    type="button"
+                    class="bd-publish-service"
+                    data-publish-service
+                    data-number="02"
+                >
+                    <span class="bd-publish-service-number">02</span>
+
+                    <div class="bd-publish-service-copy">
                         <strong>Layout & Cover</strong>
-                        <small>Tata letak dan sampul</small>
+                        <small>Penataan isi dan desain sampul buku</small>
                     </div>
-                </div>
 
+                    <span class="bd-publish-service-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
+                        </svg>
+                    </span>
 
-                <div class="bd-publish-service">
-                    <span>03</span>
+                    <span class="bd-publish-service-progress"></span>
+                </button>
 
-                    <div>
+                <button
+                    type="button"
+                    class="bd-publish-service"
+                    data-publish-service
+                    data-number="03"
+                >
+                    <span class="bd-publish-service-number">03</span>
+
+                    <div class="bd-publish-service-copy">
                         <strong>ISBN & HAKI</strong>
-                        <small>Administrasi penerbitan</small>
+                        <small>Administrasi dan legalitas penerbitan</small>
                     </div>
-                </div>
 
+                    <span class="bd-publish-service-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
+                        </svg>
+                    </span>
 
-                <div class="bd-publish-service">
-                    <span>04</span>
+                    <span class="bd-publish-service-progress"></span>
+                </button>
 
-                    <div>
+                <button
+                    type="button"
+                    class="bd-publish-service"
+                    data-publish-service
+                    data-number="04"
+                >
+                    <span class="bd-publish-service-number">04</span>
+
+                    <div class="bd-publish-service-copy">
                         <strong>Cetak & E-book</strong>
-                        <small>Format cetak dan digital</small>
+                        <small>Produksi buku fisik dan format digital</small>
                     </div>
-                </div>
+
+                    <span class="bd-publish-service-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
+                        </svg>
+                    </span>
+
+                    <span class="bd-publish-service-progress"></span>
+                </button>
 
             </div>
 
-
-            {{-- =====================================================
-                 ACTION
-            ====================================================== --}}
+            {{-- ACTION --}}
             <div class="bd-publish-action">
+                <div class="bd-publish-action-head">
+                    <span class="bd-publish-action-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4v8z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8M8 14h5"/>
+                        </svg>
+                    </span>
 
-                <span class="bd-publish-action-label">
-                    Mulai Penerbitan
-                </span>
+                    <div>
+                        <span class="bd-publish-action-label">
+                            Mulai Penerbitan
+                        </span>
 
+                        <span class="bd-publish-action-status">
+                            <i></i>
+                            Konsultasi tersedia
+                        </span>
+                    </div>
+                </div>
 
                 <h3>
-                    Konsultasikan naskah Anda bersama tim kami.
+                    Punya naskah yang siap dikembangkan?
                 </h3>
 
+                <p>
+                    Ceritakan kebutuhan penerbitan Anda. Tim kami akan membantu
+                    menentukan proses yang paling sesuai untuk naskah Anda.
+                </p>
 
                 <a
                     href="https://wa.me/6285139461070?text=Halo%20Admin%20BacaDulu,%20saya%20ingin%20konsultasi%20penerbitan%20buku."
                     target="_blank"
                     rel="noopener noreferrer"
+                    class="bd-publish-button"
                 >
+                    <span>Konsultasi Sekarang</span>
 
-                    Konsultasi Sekarang
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M5 12h14M13 6l6 6-6 6"
-                        />
-                    </svg>
-
+                    <span class="bd-publish-button-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/>
+                        </svg>
+                    </span>
                 </a>
 
+                <div class="bd-publish-action-footer">
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2"/>
+                        </svg>
+                    </span>
 
-                <small>
-                    Hubungi Baca Dulu melalui WhatsApp
-                </small>
-
+                    Respon konsultasi melalui WhatsApp
+                </div>
             </div>
 
         </div>
-
     </div>
-
 </section>
-
-
 
 <style>
 /* ================================================================
-   INFORMATION ROOT
+   ROOT INFORMASI
 ================================================================ */
-
 .bd-activity-section{
     --navy:#21194E;
     --orange:#EF5843;
-    --orange-dark:#C84836;
+    --yellow:#F7AA35;
     --text:#25252D;
     --muted:#777982;
     --line:rgba(33,25,78,.10);
-
     position:relative;
     width:100%;
     overflow:hidden;
     padding:92px 0 82px;
     background:#F4F1EB;
-    color:var(--text);
+    color:var(--text)
 }
 
 .bd-activity-section *,
 .bd-publish-section *{
-    box-sizing:border-box;
+    box-sizing:border-box
 }
 
 .bd-activity-section a,
 .bd-publish-section a{
-    text-decoration:none;
+    text-decoration:none
 }
-
-
-/* ================================================================
-   BACKGROUND
-================================================================ */
 
 .bd-activity-accent{
     position:absolute;
-    pointer-events:none;
+    pointer-events:none
 }
 
 .bd-activity-accent-left{
@@ -726,12 +533,7 @@
     left:0;
     width:420px;
     height:100%;
-    background:
-        linear-gradient(
-            90deg,
-            rgba(239,88,67,.065),
-            transparent 72%
-        );
+    background:linear-gradient(90deg,rgba(239,88,67,.065),transparent 72%)
 }
 
 .bd-activity-accent-right{
@@ -740,40 +542,28 @@
     width:430px;
     height:430px;
     border-radius:50%;
-    background:
-        radial-gradient(
-            circle,
-            rgba(239,88,67,.065),
-            transparent 70%
-        );
+    background:radial-gradient(circle,rgba(239,88,67,.065),transparent 70%)
 }
-
-
-/* ================================================================
-   CONTAINER
-================================================================ */
 
 .bd-activity-container{
     position:relative;
     z-index:2;
     width:min(calc(100% - 48px),1280px);
-    margin:0 auto;
+    margin:0 auto
 }
-
 
 /* ================================================================
    HEADER
 ================================================================ */
-
 .bd-activity-header{
     display:flex;
     align-items:flex-end;
     justify-content:space-between;
-    gap:55px;
+    gap:55px
 }
 
 .bd-activity-heading{
-    max-width:760px;
+    max-width:760px
 }
 
 .bd-activity-eyebrow{
@@ -785,7 +575,7 @@
     font-size:9px;
     font-weight:850;
     letter-spacing:.15em;
-    text-transform:uppercase;
+    text-transform:uppercase
 }
 
 .bd-activity-eyebrow-icon{
@@ -795,12 +585,12 @@
     align-items:center;
     justify-content:center;
     border-radius:9px;
-    background:rgba(239,88,67,.09);
+    background:rgba(239,88,67,.09)
 }
 
 .bd-activity-eyebrow-icon svg{
     width:14px;
-    height:14px;
+    height:14px
 }
 
 .bd-activity-heading h2{
@@ -809,11 +599,11 @@
     font-size:clamp(38px,4.5vw,57px);
     line-height:1.02;
     font-weight:820;
-    letter-spacing:-.052em;
+    letter-spacing:-.052em
 }
 
 .bd-activity-heading h2 span{
-    color:var(--orange);
+    color:var(--orange)
 }
 
 .bd-activity-heading p{
@@ -821,19 +611,14 @@
     margin:15px 0 0;
     color:var(--muted);
     font-size:11px;
-    line-height:1.75;
+    line-height:1.75
 }
-
-
-/* ================================================================
-   HEADER ACTION
-================================================================ */
 
 .bd-activity-header-action{
     display:flex;
     align-items:center;
     gap:25px;
-    flex-shrink:0;
+    flex-shrink:0
 }
 
 .bd-activity-total{
@@ -841,14 +626,14 @@
     flex-direction:column;
     align-items:flex-end;
     padding-right:23px;
-    border-right:1px solid var(--line);
+    border-right:1px solid var(--line)
 }
 
 .bd-activity-total strong{
     color:var(--orange);
     font-size:20px;
     line-height:1;
-    font-weight:900;
+    font-weight:900
 }
 
 .bd-activity-total span{
@@ -857,7 +642,7 @@
     font-size:7px;
     font-weight:750;
     letter-spacing:.08em;
-    text-transform:uppercase;
+    text-transform:uppercase
 }
 
 .bd-activity-all{
@@ -866,7 +651,7 @@
     gap:10px;
     color:var(--navy)!important;
     font-size:9px;
-    font-weight:850;
+    font-weight:850
 }
 
 .bd-activity-all > span{
@@ -879,24 +664,19 @@
     background:#fff;
     border:1px solid rgba(33,25,78,.13);
     color:var(--orange);
-    transition:.2s ease;
+    transition:.25s ease
 }
 
 .bd-activity-all:hover > span{
-    background:var(--orange);
-    border-color:var(--orange);
     color:#fff;
+    background:var(--orange);
+    border-color:var(--orange)
 }
 
 .bd-activity-all svg{
     width:12px;
-    height:12px;
+    height:12px
 }
-
-
-/* ================================================================
-   HEADER LINE
-================================================================ */
 
 .bd-activity-header-line{
     position:relative;
@@ -904,80 +684,58 @@
     height:1px;
     margin:30px 0 26px;
     overflow:hidden;
-    background:var(--line);
+    background:var(--line)
 }
 
 .bd-activity-header-line span{
     position:absolute;
-    top:0;
     left:0;
+    top:0;
     width:84px;
     height:1px;
     background:var(--orange);
-    transform-origin:left;
+    transform-origin:left
 }
 
-
 /* ================================================================
-   SHOWCASE
+   CAROUSEL
 ================================================================ */
-
 .bd-activity-showcase{
-    position:relative;
+    position:relative
 }
 
 .bd-activity-stage{
     position:relative;
     width:100%;
     height:455px;
-    overflow:hidden;
+    overflow:hidden
 }
-
-
-/* ================================================================
-   CARD
-================================================================ */
 
 .bd-activity-card{
     position:absolute;
     top:24px;
     left:50%;
-
     width:320px;
     height:395px;
-
     display:flex;
     flex-direction:column;
-
     padding:0;
     overflow:hidden;
-
     border:1px solid rgba(33,25,78,.10);
     border-radius:24px;
-
     background:#fff;
     color:inherit;
     text-align:left;
-
-    box-shadow:
-        0 15px 36px rgba(33,25,78,.08);
-
+    box-shadow:0 15px 36px rgba(33,25,78,.08);
     cursor:pointer;
-
-    transform-origin:center center;
-    will-change:transform,opacity,filter;
+    transform-origin:center;
+    will-change:transform,opacity,filter
 }
 
 .bd-activity-card.is-active{
     border-color:rgba(239,88,67,.18);
-    box-shadow:
-        0 24px 55px rgba(33,25,78,.14);
+    box-shadow:0 24px 55px rgba(33,25,78,.14)
 }
-
-
-/* ================================================================
-   CARD IMAGE
-================================================================ */
 
 .bd-activity-card-media{
     position:relative;
@@ -985,14 +743,14 @@
     height:245px;
     flex-shrink:0;
     overflow:hidden;
-    background:#EEECE7;
+    background:#EEECE7
 }
 
 .bd-activity-card-media img{
     width:100%;
     height:100%;
     display:block;
-    object-fit:cover;
+    object-fit:cover
 }
 
 .bd-activity-card-placeholder{
@@ -1003,14 +761,14 @@
     align-items:center;
     justify-content:center;
     gap:10px;
-    background:#F0EEE9;
+    background:#F0EEE9
 }
 
 .bd-activity-card-placeholder img{
     width:58px;
     height:58px;
     object-fit:contain;
-    border-radius:10px;
+    border-radius:10px
 }
 
 .bd-activity-card-placeholder span{
@@ -1018,60 +776,46 @@
     font-size:8px;
     font-weight:800;
     letter-spacing:.12em;
-    text-transform:uppercase;
+    text-transform:uppercase
 }
 
 .bd-activity-card-number{
     position:absolute;
     top:14px;
     left:14px;
-
     min-width:41px;
     height:30px;
-
     display:flex;
     align-items:center;
     justify-content:center;
-
     padding:0 9px;
-
     border-radius:8px;
     background:#fff;
-
     color:var(--orange);
-
     font-size:8px;
-    font-weight:900;
+    font-weight:900
 }
-
-
-/* ================================================================
-   CARD CONTENT
-================================================================ */
 
 .bd-activity-card-body{
     flex:1;
     display:flex;
     flex-direction:column;
-    padding:18px 18px 17px;
+    padding:18px 18px 17px
 }
 
 .bd-activity-card-meta{
     display:flex;
     align-items:center;
     gap:6px;
-
     color:#99979F;
-
     font-size:6.5px;
     font-weight:750;
-
     text-transform:uppercase;
-    letter-spacing:.07em;
+    letter-spacing:.07em
 }
 
 .bd-activity-card-meta > span{
-    color:var(--orange);
+    color:var(--orange)
 }
 
 .bd-activity-card-meta i{
@@ -1079,23 +823,19 @@
     width:3px;
     height:3px;
     border-radius:50%;
-    background:#CECBD0;
+    background:#CECBD0
 }
 
 .bd-activity-card-body h3{
     margin:9px 0 0;
-
     overflow:hidden;
-
     color:var(--navy);
-
     font-size:15px;
     line-height:1.4;
     font-weight:800;
-
     display:-webkit-box;
     -webkit-line-clamp:2;
-    -webkit-box-orient:vertical;
+    -webkit-box-orient:vertical
 }
 
 .bd-activity-card-bottom{
@@ -1103,35 +843,29 @@
     align-items:center;
     justify-content:space-between;
     gap:15px;
-
     margin-top:auto;
     padding-top:14px;
-
     border-top:1px solid rgba(33,25,78,.08);
-
     color:#8A8891;
-
     font-size:7.5px;
-    font-weight:800;
+    font-weight:800
 }
 
 .bd-activity-card-bottom svg{
     width:12px;
     height:12px;
-    color:var(--orange);
+    color:var(--orange)
 }
 
-
 /* ================================================================
-   NAVIGATION
+   CONTROLS
 ================================================================ */
-
 .bd-activity-controls{
     display:flex;
     align-items:center;
     justify-content:center;
     gap:18px;
-    margin-top:3px;
+    margin-top:3px
 }
 
 .bd-activity-nav{
@@ -1141,25 +875,28 @@
     align-items:center;
     justify-content:center;
     padding:0;
-
     border:1px solid rgba(33,25,78,.13);
     border-radius:12px;
-
     background:#fff;
     color:var(--navy);
-
     cursor:pointer;
+    transition:.25s ease
+}
+
+.bd-activity-nav:hover{
+    transform:translateY(-2px);
+    border-color:rgba(239,88,67,.30)
 }
 
 .bd-activity-nav-next{
-    background:var(--navy);
-    border-color:var(--navy);
     color:#fff;
+    background:var(--navy);
+    border-color:var(--navy)
 }
 
 .bd-activity-nav svg{
     width:14px;
-    height:14px;
+    height:14px
 }
 
 .bd-activity-counter{
@@ -1170,122 +907,244 @@
     gap:5px;
     color:#A4A1A8;
     font-size:8px;
-    font-weight:800;
+    font-weight:800
 }
 
 .bd-activity-counter strong{
     color:var(--orange);
-    font-size:17px;
+    font-size:17px
 }
 
-
 /* ================================================================
-   DETAIL
+   ACTIVE INFORMATION PREVIEW
 ================================================================ */
-
 .bd-activity-details{
-    margin-top:42px;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
+    position:relative;
+    width:min(100%,1080px);
+    margin:38px auto 0
 }
 
 .bd-activity-detail{
+    position:relative;
     display:grid;
-    grid-template-columns:55px minmax(0,1fr) minmax(300px,.8fr);
-    gap:30px;
-    align-items:start;
-
-    padding:29px 0;
+    grid-template-columns:86px minmax(0,1fr) 230px;
+    gap:28px;
+    align-items:stretch;
+    padding:22px;
+    overflow:hidden;
+    border:1px solid rgba(33,25,78,.09);
+    border-radius:20px;
+    background:rgba(255,255,255,.70);
+    box-shadow:0 12px 35px rgba(33,25,78,.045);
+    backdrop-filter:blur(10px)
 }
 
-.bd-activity-detail-number{
+.bd-activity-detail::before{
+    content:"";
+    position:absolute;
+    top:22px;
+    bottom:22px;
+    left:0;
+    width:3px;
+    border-radius:0 999px 999px 0;
+    background:linear-gradient(180deg,var(--orange),var(--yellow))
+}
+
+.bd-activity-detail-index{
+    min-height:122px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    border-radius:15px;
+    background:#fff;
+    border:1px solid rgba(33,25,78,.08)
+}
+
+.bd-activity-detail-index span{
     color:var(--orange);
-    font-size:13px;
-    font-weight:900;
+    font-size:25px;
+    line-height:1;
+    font-weight:900
+}
+
+.bd-activity-detail-index small{
+    color:#A19EA7;
+    font-size:7px;
+    font-weight:850;
+    letter-spacing:.12em;
+    text-transform:uppercase
+}
+
+.bd-activity-detail-main{
+    min-width:0;
+    align-self:center
+}
+
+.bd-activity-detail-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom:9px
 }
 
 .bd-activity-detail-meta{
     display:flex;
     align-items:center;
     gap:7px;
-
-    margin-bottom:8px;
-
     color:#99979F;
-
-    font-size:7px;
-    font-weight:750;
-    letter-spacing:.07em;
-    text-transform:uppercase;
+    font-size:7.5px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase
 }
 
 .bd-activity-detail-meta > span{
-    color:var(--orange);
+    color:var(--orange)
 }
 
 .bd-activity-detail-meta i{
     width:3px;
     height:3px;
-    display:block;
+    flex:0 0 auto;
     border-radius:50%;
-    background:#CCC9CF;
+    background:#CBC8CF
+}
+
+.bd-activity-detail-active{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+    padding:5px 8px;
+    border-radius:999px;
+    color:#777380;
+    background:#F4F1EB;
+    font-size:7px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase
+}
+
+.bd-activity-detail-active i{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:#22C55E;
+    box-shadow:0 0 0 3px rgba(34,197,94,.10)
 }
 
 .bd-activity-detail-main h3{
-    max-width:620px;
+    max-width:650px;
     margin:0;
-
+    overflow:hidden;
     color:var(--navy);
-
-    font-size:clamp(21px,2.3vw,31px);
-    line-height:1.2;
-    font-weight:800;
+    font-size:clamp(20px,2vw,28px);
+    line-height:1.15;
+    font-weight:820;
     letter-spacing:-.035em;
+    text-overflow:ellipsis;
+    white-space:nowrap
 }
 
-.bd-activity-detail-side p{
-    margin:0;
-    color:#757883;
-    font-size:9.5px;
-    line-height:1.75;
+.bd-activity-detail-description{
+    max-width:690px;
+    margin:10px 0 0;
+    overflow:hidden;
+    color:#777982;
+    font-size:10px;
+    line-height:1.65;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical
 }
 
-.bd-activity-detail-side a{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
+.bd-activity-detail-action{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding-left:24px;
+    border-left:1px solid rgba(33,25,78,.08)
+}
 
-    margin-top:14px;
-
-    color:var(--navy)!important;
-
+.bd-activity-detail-action-label{
+    margin-bottom:11px;
+    color:#8E8A96;
     font-size:8px;
+    line-height:1.2;
     font-weight:850;
+    letter-spacing:.09em;
+    text-transform:uppercase
 }
 
-.bd-activity-detail-side a svg{
-    width:11px;
-    height:11px;
-    color:var(--orange);
+.bd-activity-detail-action > a{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    color:var(--navy)!important;
+    font-size:11.5px;
+    line-height:1.3;
+    font-weight:850
 }
 
+.bd-activity-detail-action > a > span:first-child{
+    white-space:nowrap
+}
+
+.bd-activity-detail-arrow{
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    border-radius:50%;
+    color:#fff;
+    background:var(--orange);
+    box-shadow:0 8px 18px rgba(239,88,67,.18);
+    transition:.25s ease
+}
+
+.bd-activity-detail-arrow svg{
+    width:14px;
+    height:14px
+}
+
+.bd-activity-detail-action > a:hover .bd-activity-detail-arrow{
+    background:var(--navy);
+    transform:translateX(3px)
+}
 
 /* ================================================================
    INFORMATION FOOTER
 ================================================================ */
-
 .bd-activity-footer{
+    width:min(100%,1080px);
+    margin:0 auto;
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:25px;
-    padding-top:20px;
+    padding-top:18px
 }
 
-.bd-activity-footer > span{
+.bd-activity-footer-note{
+    display:flex;
+    align-items:center;
+    gap:8px;
     color:#A09EA5;
-    font-size:7px;
-    letter-spacing:.05em;
+    font-size:7px
+}
+
+.bd-activity-footer-note > span{
+    width:5px;
+    height:5px;
+    flex:0 0 auto;
+    border-radius:50%;
+    background:var(--orange)
 }
 
 .bd-activity-footer a{
@@ -1293,23 +1152,19 @@
     align-items:center;
     gap:7px;
     color:var(--orange)!important;
-    font-size:8px;
-    font-weight:850;
+    font-size:8.5px;
+    font-weight:850
 }
 
 .bd-activity-footer svg{
     width:11px;
-    height:11px;
+    height:11px
 }
 
-
-/* ================================================================
-   EMPTY
-================================================================ */
-
+/* EMPTY */
 .bd-activity-empty{
     padding:65px 20px;
-    text-align:center;
+    text-align:center
 }
 
 .bd-activity-empty > span{
@@ -1317,571 +1172,779 @@
     font-size:8px;
     font-weight:850;
     letter-spacing:.15em;
-    text-transform:uppercase;
+    text-transform:uppercase
 }
 
 .bd-activity-empty h3{
     margin:9px 0 0;
     color:var(--navy);
-    font-size:20px;
+    font-size:20px
 }
 
 .bd-activity-empty p{
     margin:7px 0 0;
     color:var(--muted);
-    font-size:10px;
+    font-size:10px
 }
 
-
 /* ================================================================
-   CTA
+   CTA PENERBITAN
 ================================================================ */
-
 .bd-publish-section{
     --navy:#21194E;
     --orange:#EF5843;
     --yellow:#F7AA35;
-
-    padding:0 0 80px;
-    background:#F4F1EB;
+    position:relative;
+    padding:0 0 88px;
+    overflow:hidden;
+    background:#F4F1EB
 }
 
 .bd-publish-container{
     width:min(calc(100% - 48px),1280px);
-    margin:0 auto;
+    margin:0 auto
 }
 
 .bd-publish-card{
     position:relative;
-
+    isolation:isolate;
     display:grid;
-    grid-template-columns:minmax(0,1fr) 265px 285px;
-    gap:42px;
+    grid-template-columns:minmax(0,1.2fr) minmax(260px,.7fr) minmax(300px,.76fr);
+    gap:48px;
     align-items:center;
-
-    padding:48px 50px;
-
+    min-height:430px;
+    padding:56px;
     overflow:hidden;
-
-    border-radius:26px;
-
-    background:var(--navy);
-
-    box-shadow:
-        0 22px 52px rgba(33,25,78,.14);
+    border-radius:30px;
+    background:
+        radial-gradient(circle at 92% 18%,rgba(105,86,178,.16),transparent 28%),
+        linear-gradient(135deg,#21194E 0%,#21194E 55%,#251D58 100%);
+    box-shadow:0 28px 68px rgba(33,25,78,.16)
 }
 
 .bd-publish-card::before{
     content:"";
     position:absolute;
-    top:47px;
-    bottom:47px;
+    z-index:4;
+    top:56px;
+    bottom:56px;
     left:0;
     width:4px;
     border-radius:0 999px 999px 0;
-    background:var(--orange);
+    background:linear-gradient(180deg,var(--orange),var(--yellow))
 }
 
+.bd-publish-grid{
+    position:absolute;
+    z-index:-4;
+    inset:0;
+    opacity:.055;
+    pointer-events:none;
+    background-image:
+        linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px);
+    background-size:54px 54px;
+    -webkit-mask-image:linear-gradient(90deg,transparent 4%,black 45%,black 100%);
+    mask-image:linear-gradient(90deg,transparent 4%,black 45%,black 100%)
+}
+
+.bd-publish-glow{
+    position:absolute;
+    z-index:-3;
+    border-radius:50%;
+    pointer-events:none
+}
+
+.bd-publish-glow-one{
+    width:340px;
+    height:340px;
+    left:-190px;
+    bottom:-235px;
+    background:radial-gradient(circle,rgba(239,88,67,.20),transparent 68%)
+}
+
+.bd-publish-glow-two{
+    width:370px;
+    height:370px;
+    right:-170px;
+    top:-240px;
+    background:radial-gradient(circle,rgba(247,170,53,.13),transparent 70%)
+}
+
+.bd-publish-watermark{
+    position:absolute;
+    z-index:-1;
+    right:30%;
+    bottom:-50px;
+    color:rgba(255,255,255,.026);
+    font-size:190px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:-.08em;
+    pointer-events:none;
+    user-select:none
+}
 
 /* CTA COPY */
-
 .bd-publish-copy{
     position:relative;
     z-index:2;
+    max-width:590px
 }
 
 .bd-publish-kicker{
-    display:flex;
+    display:inline-flex;
     align-items:center;
-    gap:9px;
+    gap:10px;
     color:var(--yellow);
-    font-size:8px;
+    font-size:9px;
+    line-height:1;
     font-weight:850;
-    letter-spacing:.14em;
-    text-transform:uppercase;
+    letter-spacing:.15em;
+    text-transform:uppercase
 }
 
 .bd-publish-kicker-icon{
-    width:29px;
-    height:29px;
+    width:36px;
+    height:36px;
     display:flex;
     align-items:center;
     justify-content:center;
-    border-radius:9px;
-    background:rgba(247,170,53,.10);
+    border:1px solid rgba(247,170,53,.15);
+    border-radius:11px;
+    background:rgba(247,170,53,.09);
+    color:var(--yellow)
 }
 
 .bd-publish-kicker-icon svg{
-    width:14px;
-    height:14px;
+    width:17px;
+    height:17px
 }
 
 .bd-publish-copy h2{
-    max-width:600px;
-    margin:15px 0 0;
-
+    max-width:590px;
+    margin:20px 0 0;
     color:#fff;
-
-    font-size:clamp(29px,3.3vw,43px);
-    line-height:1.1;
-    font-weight:800;
-    letter-spacing:-.045em;
+    font-size:clamp(36px,3.45vw,52px);
+    line-height:1.06;
+    font-weight:820;
+    letter-spacing:-.052em
 }
 
 .bd-publish-copy h2 span{
     display:block;
-    color:rgba(255,255,255,.58);
+    margin-top:4px;
+    color:rgba(255,255,255,.67)
 }
 
 .bd-publish-copy p{
-    max-width:580px;
-    margin:17px 0 0;
-
-    color:rgba(255,255,255,.55);
-
-    font-size:10px;
-    line-height:1.75;
+    max-width:560px;
+    margin:21px 0 0;
+    color:rgba(255,255,255,.58);
+    font-size:11px;
+    line-height:1.82
 }
 
+.bd-publish-trust{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 18px;
+    margin-top:25px
+}
 
-/* CTA SERVICES */
+.bd-publish-trust-item{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:rgba(255,255,255,.48);
+    font-size:8px;
+    font-weight:700
+}
 
+.bd-publish-trust-dot{
+    width:5px;
+    height:5px;
+    flex:0 0 auto;
+    border-radius:50%;
+    background:var(--orange);
+    box-shadow:0 0 0 4px rgba(239,88,67,.08)
+}
+
+/* ================================================================
+   CTA SERVICES
+================================================================ */
 .bd-publish-services{
     position:relative;
-    z-index:2;
-    border-top:1px solid rgba(255,255,255,.11);
+    z-index:3;
+    width:100%;
+    border-top:1px solid rgba(255,255,255,.11)
 }
 
 .bd-publish-service{
+    position:relative;
+    width:100%;
+    min-height:78px;
     display:grid;
-    grid-template-columns:27px minmax(0,1fr);
-    gap:10px;
+    grid-template-columns:34px minmax(0,1fr) 24px;
+    gap:14px;
     align-items:center;
-
-    min-height:65px;
-
+    padding:0 3px;
+    overflow:hidden;
+    border:0;
     border-bottom:1px solid rgba(255,255,255,.11);
+    outline:none;
+    background:transparent;
+    color:inherit;
+    text-align:left;
+    cursor:pointer
 }
 
-.bd-publish-service > span{
+.bd-publish-service-number{
     color:var(--orange);
-    font-size:7px;
+    font-size:9px;
     font-weight:900;
+    transition:.28s ease
+}
+
+.bd-publish-service-copy{
+    min-width:0
 }
 
 .bd-publish-service strong{
     display:block;
     color:#fff;
-    font-size:9px;
-    font-weight:800;
+    font-size:11px;
+    line-height:1.3;
+    font-weight:820;
+    transition:.28s ease
 }
 
 .bd-publish-service small{
     display:block;
-    margin-top:3px;
-    color:rgba(255,255,255,.36);
-    font-size:7px;
+    margin-top:5px;
+    color:rgba(255,255,255,.40);
+    font-size:7.5px;
+    line-height:1.45
 }
 
+.bd-publish-service-arrow{
+    width:24px;
+    height:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--orange);
+    opacity:0;
+    transform:translateX(-6px);
+    transition:.28s ease
+}
 
-/* CTA ACTION */
+.bd-publish-service-arrow svg{
+    width:12px;
+    height:12px
+}
 
+.bd-publish-service-progress{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-1px;
+    height:2px;
+    background:linear-gradient(90deg,var(--orange),var(--yellow));
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .38s cubic-bezier(.22,.8,.22,1)
+}
+
+.bd-publish-service:hover .bd-publish-service-progress,
+.bd-publish-service.is-active .bd-publish-service-progress{
+    transform:scaleX(1)
+}
+
+.bd-publish-service:hover .bd-publish-service-number,
+.bd-publish-service.is-active .bd-publish-service-number{
+    color:var(--yellow);
+    transform:translateX(3px)
+}
+
+.bd-publish-service:hover strong,
+.bd-publish-service.is-active strong{
+    transform:translateX(4px)
+}
+
+.bd-publish-service:hover .bd-publish-service-arrow,
+.bd-publish-service.is-active .bd-publish-service-arrow{
+    opacity:1;
+    transform:translateX(0)
+}
+
+/* ================================================================
+   CTA ACTION
+================================================================ */
 .bd-publish-action{
     position:relative;
+    z-index:3;
+    min-height:304px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:30px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:24px;
+    background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 18px 45px rgba(10,7,33,.12);
+    backdrop-filter:blur(12px)
+}
+
+.bd-publish-action::after{
+    content:"";
+    position:absolute;
+    width:170px;
+    height:170px;
+    right:-100px;
+    bottom:-115px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(239,88,67,.15),transparent 70%);
+    pointer-events:none
+}
+
+.bd-publish-action-head{
+    position:relative;
     z-index:2;
+    display:flex;
+    align-items:center;
+    gap:12px
+}
 
-    padding:25px;
+.bd-publish-action-icon{
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    border-radius:11px;
+    color:var(--orange);
+    background:rgba(239,88,67,.10);
+    border:1px solid rgba(239,88,67,.13)
+}
 
-    border:1px solid rgba(255,255,255,.11);
-    border-radius:19px;
+.bd-publish-action-icon svg{
+    width:17px;
+    height:17px
+}
 
-    background:rgba(255,255,255,.05);
+.bd-publish-action-head > div{
+    display:flex;
+    flex-direction:column;
+    gap:5px
 }
 
 .bd-publish-action-label{
-    display:block;
     color:var(--yellow);
-    font-size:7px;
+    font-size:8px;
+    line-height:1;
     font-weight:850;
     letter-spacing:.12em;
-    text-transform:uppercase;
+    text-transform:uppercase
+}
+
+.bd-publish-action-status{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:rgba(255,255,255,.40);
+    font-size:7px;
+    font-weight:700
+}
+
+.bd-publish-action-status i{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:#4ADE80;
+    box-shadow:0 0 0 4px rgba(74,222,128,.08)
 }
 
 .bd-publish-action h3{
-    margin:11px 0 0;
+    position:relative;
+    z-index:2;
+    max-width:290px;
+    margin:22px 0 0;
     color:#fff;
-    font-size:17px;
-    line-height:1.38;
-    font-weight:800;
+    font-size:23px;
+    line-height:1.28;
+    font-weight:820;
+    letter-spacing:-.025em
 }
 
-.bd-publish-action > a{
-    width:100%;
-    min-height:45px;
+.bd-publish-action > p{
+    position:relative;
+    z-index:2;
+    max-width:310px;
+    margin:12px 0 0;
+    color:rgba(255,255,255,.48);
+    font-size:9px;
+    line-height:1.65
+}
 
+.bd-publish-button{
+    position:relative;
+    z-index:2;
+    width:100%;
+    min-height:52px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:12px;
-
-    margin-top:21px;
-    padding:0 14px;
-
-    border-radius:10px;
-
+    gap:14px;
+    margin-top:24px;
+    padding:0 11px 0 17px;
+    border-radius:13px;
     background:var(--orange);
     color:#fff!important;
-
-    font-size:9px;
+    font-size:10px;
     font-weight:850;
+    transition:.28s ease
 }
 
-.bd-publish-action > a:hover{
-    background:var(--yellow);
+.bd-publish-button:hover{
     color:var(--navy)!important;
+    background:var(--yellow);
+    transform:translateY(-2px);
+    box-shadow:0 12px 24px rgba(247,170,53,.18)
 }
 
-.bd-publish-action > a svg{
+.bd-publish-button-arrow{
+    width:32px;
+    height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    border-radius:9px;
+    background:rgba(255,255,255,.12)
+}
+
+.bd-publish-button-arrow svg{
     width:13px;
-    height:13px;
+    height:13px
 }
 
-.bd-publish-action small{
-    display:block;
-    margin-top:9px;
-    color:rgba(255,255,255,.28);
-    font-size:7px;
+.bd-publish-action-footer{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:12px;
+    color:rgba(255,255,255,.30);
+    font-size:7px
 }
 
+.bd-publish-action-footer > span{
+    width:16px;
+    height:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center
+}
+
+.bd-publish-action-footer svg{
+    width:11px;
+    height:11px
+}
 
 /* ================================================================
-   TABLET
+   RESPONSIVE
 ================================================================ */
-
-@media(max-width:1050px){
-
-    .bd-activity-card{
-        width:295px;
-        height:380px;
-    }
-
-    .bd-activity-card-media{
-        height:230px;
-    }
-
+@media(max-width:1100px){
     .bd-publish-card{
-        grid-template-columns:minmax(0,1fr) 275px;
+        grid-template-columns:minmax(0,1fr) minmax(280px,.82fr);
+        gap:38px;
+        padding:48px
+    }
+
+    .bd-publish-copy{
+        grid-column:1
     }
 
     .bd-publish-services{
-        grid-column:1;
-        display:grid;
-        grid-template-columns:repeat(2,minmax(0,1fr));
-    }
-
-    .bd-publish-service:nth-child(odd){
-        padding-right:15px;
-        border-right:1px solid rgba(255,255,255,.11);
-    }
-
-    .bd-publish-service:nth-child(even){
-        padding-left:15px;
+        grid-column:1
     }
 
     .bd-publish-action{
         grid-column:2;
-        grid-row:1 / 3;
+        grid-row:1 / 3
     }
 
+    .bd-publish-copy h2{
+        font-size:42px
+    }
+
+    .bd-publish-watermark{
+        right:15%;
+        font-size:160px
+    }
 }
 
+@media(max-width:900px){
+    .bd-activity-detail{
+        grid-template-columns:70px minmax(0,1fr)
+    }
 
-/* ================================================================
-   MOBILE TABLET
-================================================================ */
+    .bd-activity-detail-action{
+        grid-column:2;
+        padding:16px 0 0;
+        border-left:0;
+        border-top:1px solid rgba(33,25,78,.08)
+    }
+}
 
 @media(max-width:800px){
-
     .bd-activity-header{
-        align-items:flex-start;
         flex-direction:column;
-        gap:22px;
+        align-items:flex-start;
+        gap:22px
     }
 
     .bd-activity-header-action{
         width:100%;
-        justify-content:space-between;
+        justify-content:space-between
     }
 
     .bd-activity-stage{
-        height:425px;
+        height:425px
     }
 
     .bd-activity-card{
         width:280px;
-        height:365px;
+        height:365px
     }
 
     .bd-activity-card-media{
-        height:215px;
-    }
-
-    .bd-activity-detail{
-        grid-template-columns:42px minmax(0,1fr);
-    }
-
-    .bd-activity-detail-side{
-        grid-column:2;
+        height:215px
     }
 
     .bd-publish-card{
         grid-template-columns:1fr;
-        gap:30px;
-        padding:39px 35px;
+        gap:34px;
+        min-height:auto;
+        padding:42px 36px
     }
 
-    .bd-publish-services{
+    .bd-publish-copy,
+    .bd-publish-services,
+    .bd-publish-action{
         grid-column:auto;
+        grid-row:auto
     }
 
     .bd-publish-action{
-        grid-column:auto;
-        grid-row:auto;
-        max-width:450px;
+        min-height:auto
     }
 
+    .bd-publish-watermark{
+        right:-15px;
+        bottom:-35px;
+        font-size:150px
+    }
 }
 
-
-/* ================================================================
-   MOBILE
-================================================================ */
-
 @media(max-width:600px){
-
     .bd-activity-section{
-        padding:62px 0 55px;
+        padding:62px 0 55px
     }
 
     .bd-activity-container,
     .bd-publish-container{
-        width:min(calc(100% - 30px),1280px);
+        width:min(calc(100% - 30px),1280px)
     }
 
     .bd-activity-heading h2{
-        font-size:37px;
+        font-size:37px
     }
 
     .bd-activity-header-action{
         align-items:flex-start;
-        flex-direction:column;
+        flex-direction:column
     }
 
     .bd-activity-total{
         align-items:flex-start;
         padding-right:0;
-        border-right:0;
+        border-right:0
     }
 
     .bd-activity-stage{
-        height:405px;
+        height:405px
     }
 
     .bd-activity-card{
         width:min(76vw,275px);
         height:350px;
-        border-radius:20px;
+        border-radius:20px
     }
 
     .bd-activity-card-media{
-        height:205px;
+        height:205px
     }
 
     .bd-activity-details{
-        margin-top:30px;
+        width:100%;
+        margin-top:28px
     }
 
     .bd-activity-detail{
-        grid-template-columns:32px minmax(0,1fr);
-        gap:12px;
+        grid-template-columns:1fr;
+        gap:15px;
+        padding:18px
+    }
+
+    .bd-activity-detail-index{
+        width:68px;
+        min-height:56px;
+        flex-direction:row
+    }
+
+    .bd-activity-detail-top{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:8px
     }
 
     .bd-activity-detail-main h3{
-        font-size:23px;
+        font-size:21px;
+        white-space:normal
     }
 
-    .bd-activity-detail-side{
-        grid-column:2;
+    .bd-activity-detail-action{
+        grid-column:auto;
+        padding:15px 0 0;
+        border-left:0;
+        border-top:1px solid rgba(33,25,78,.08)
+    }
+
+    .bd-activity-detail-action > a{
+        width:100%;
+        font-size:11px
     }
 
     .bd-activity-footer{
-        align-items:flex-start;
         flex-direction:column;
-        gap:10px;
+        align-items:flex-start;
+        gap:12px
     }
 
     .bd-publish-section{
-        padding-bottom:60px;
+        padding-bottom:62px
     }
 
     .bd-publish-card{
-        padding:33px 23px;
-        border-radius:22px;
+        gap:29px;
+        padding:34px 23px;
+        border-radius:23px
+    }
+
+    .bd-publish-card::before{
+        top:35px;
+        bottom:35px
     }
 
     .bd-publish-copy h2{
-        font-size:30px;
+        margin-top:17px;
+        font-size:34px
     }
 
-    .bd-publish-services{
-        grid-template-columns:1fr;
+    .bd-publish-copy p{
+        font-size:10px
     }
 
-    .bd-publish-service:nth-child(odd),
-    .bd-publish-service:nth-child(even){
-        padding-left:0;
-        padding-right:0;
-        border-right:0;
+    .bd-publish-trust{
+        gap:9px 13px;
+        margin-top:20px
+    }
+
+    .bd-publish-service{
+        min-height:72px
+    }
+
+    .bd-publish-service strong{
+        font-size:10.5px
     }
 
     .bd-publish-action{
-        max-width:none;
+        padding:24px;
+        border-radius:19px
     }
 
+    .bd-publish-action h3{
+        font-size:21px
+    }
+
+    .bd-publish-button{
+        min-height:50px
+    }
+
+    .bd-publish-watermark{
+        display:none
+    }
 }
 
-
-/* ================================================================
-   REDUCED MOTION
-================================================================ */
-
 @media(prefers-reduced-motion:reduce){
-
     .bd-activity-section *,
     .bd-publish-section *{
-        scroll-behavior:auto!important;
+        scroll-behavior:auto!important
     }
-
 }
 </style>
 
-
-
-{{-- ================================================================
-     GSAP
-================================================================ --}}
-
-@once
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-@endonce
-
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
-    const section =
-        document.getElementById('baca-informasi');
-
-    const publishSection =
-        document.querySelector('.bd-publish-section');
+    const section = document.getElementById('baca-informasi');
+    const publishSection = document.getElementById('publish-cta');
 
     if (!section) return;
 
-    const cards =
-        Array.from(
-            section.querySelectorAll('[data-activity-card]')
-        );
+    const cards = Array.from(section.querySelectorAll('[data-activity-card]'));
+    const details = Array.from(section.querySelectorAll('[data-activity-detail]'));
+    const prevButton = document.getElementById('bdActivityPrev');
+    const nextButton = document.getElementById('bdActivityNext');
+    const currentCounter = document.getElementById('bdActivityCurrent');
 
-    const details =
-        Array.from(
-            section.querySelectorAll('[data-activity-detail]')
-        );
-
-    const prevButton =
-        document.getElementById('bdActivityPrev');
-
-    const nextButton =
-        document.getElementById('bdActivityNext');
-
-    const currentCounter =
-        document.getElementById('bdActivityCurrent');
-
-    const reduceMotion =
-        window.matchMedia(
-            '(prefers-reduced-motion: reduce)'
-        ).matches;
-
-    const finePointer =
-        window.matchMedia(
-            '(hover:hover) and (pointer:fine)'
-        ).matches;
-
-    const hasGSAP =
-        typeof window.gsap !== 'undefined';
-
-    const hasScrollTrigger =
-        typeof window.ScrollTrigger !== 'undefined';
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    const finePointer = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+    const gsap = window.bdGsap || window.gsap || null;
 
     let activeIndex = 0;
     let changing = false;
 
-
     /* ============================================================
-       REGISTER
+       INFORMATION CAROUSEL
     ============================================================ */
-
-    if (hasGSAP && hasScrollTrigger) {
-        gsap.registerPlugin(ScrollTrigger);
-    }
-
-
-    /* ============================================================
-       CARD POSITION HELPER
-    ============================================================ */
-
     function getCardOffset() {
-
         const width = window.innerWidth;
 
-        if (width <= 600) {
-            return Math.min(width * .60, 245);
-        }
-
-        if (width <= 850) {
-            return 235;
-        }
-
-        if (width <= 1100) {
-            return 260;
-        }
+        if (width <= 600) return Math.min(width * .60, 245);
+        if (width <= 850) return 235;
+        if (width <= 1100) return 260;
 
         return 295;
     }
 
-
-    /* ============================================================
-       RENDER CARDS
-    ============================================================ */
-
     function renderCards(animate = true) {
-
         if (!cards.length) return;
 
         const offset = getCardOffset();
         const total = cards.length;
 
         cards.forEach(function (card, index) {
-
             let relative = index - activeIndex;
 
-            if (relative > total / 2) {
-                relative -= total;
-            }
-
-            if (relative < -(total / 2)) {
-                relative += total;
-            }
+            if (relative > total / 2) relative -= total;
+            if (relative < -(total / 2)) relative += total;
 
             let x = 0;
             let scale = 1;
@@ -1891,620 +1954,456 @@ document.addEventListener('DOMContentLoaded', function () {
             let pointerEvents = 'auto';
 
             if (relative === 0) {
-
                 x = 0;
                 scale = 1;
                 opacity = 1;
                 grayscale = 0;
                 zIndex = 6;
-
             } else if (relative === 1) {
-
                 x = offset;
                 scale = .86;
                 opacity = .88;
                 grayscale = .72;
-                zIndex = 5;
-
             } else if (relative === -1) {
-
                 x = -offset;
                 scale = .86;
                 opacity = .88;
                 grayscale = .72;
-                zIndex = 5;
-
             } else if (relative === 2) {
-
                 x = offset * 1.68;
                 scale = .70;
                 opacity = .35;
                 grayscale = 1;
                 zIndex = 3;
-
             } else if (relative === -2) {
-
                 x = -(offset * 1.68);
                 scale = .70;
                 opacity = .35;
                 grayscale = 1;
                 zIndex = 3;
-
             } else {
-
-                x = relative > 0
-                    ? offset * 2
-                    : -(offset * 2);
-
+                x = relative > 0 ? offset * 2 : -(offset * 2);
                 scale = .62;
                 opacity = 0;
                 grayscale = 1;
                 zIndex = 1;
                 pointerEvents = 'none';
-
             }
 
+            card.classList.toggle('is-active', index === activeIndex);
 
-            card.classList.toggle(
-                'is-active',
-                index === activeIndex
-            );
-
-
-            if (hasGSAP && !reduceMotion && animate) {
-
+            if (gsap && !reduceMotion && animate) {
                 gsap.to(card, {
-                    x:x,
-                    xPercent:-50,
-                    scale:scale,
-                    opacity:opacity,
-                    filter:'grayscale(' + grayscale + ')',
-                    zIndex:zIndex,
-                    duration:.58,
-                    ease:'power3.inOut',
-                    pointerEvents:pointerEvents
+                    x,
+                    xPercent: -50,
+                    scale,
+                    opacity,
+                    filter: `grayscale(${grayscale})`,
+                    zIndex,
+                    pointerEvents,
+                    duration: .58,
+                    ease: 'power3.inOut',
+                    overwrite: true
                 });
-
             } else {
-
-                card.style.transform =
-                    'translateX(-50%) translateX(' + x + 'px) scale(' + scale + ')';
-
-                card.style.opacity =
-                    opacity;
-
-                card.style.filter =
-                    'grayscale(' + grayscale + ')';
-
-                card.style.zIndex =
-                    zIndex;
-
-                card.style.pointerEvents =
-                    pointerEvents;
-
+                card.style.transform = `translateX(-50%) translateX(${x}px) scale(${scale})`;
+                card.style.opacity = opacity;
+                card.style.filter = `grayscale(${grayscale})`;
+                card.style.zIndex = zIndex;
+                card.style.pointerEvents = pointerEvents;
             }
-
         });
-
     }
 
-
-    /* ============================================================
-       UPDATE DETAILS
-    ============================================================ */
-
     function updateDetails(previousIndex) {
-
         if (!details.length) return;
 
-        const oldDetail =
-            details[previousIndex];
-
-        const newDetail =
-            details[activeIndex];
+        const oldDetail = details[previousIndex];
+        const newDetail = details[activeIndex];
 
         if (!newDetail) return;
 
-
-        if (
-            !hasGSAP ||
-            reduceMotion ||
-            !oldDetail ||
-            oldDetail === newDetail
-        ) {
-
+        if (!gsap || reduceMotion || !oldDetail || oldDetail === newDetail) {
             details.forEach(function (detail, index) {
-
-                detail.style.display =
-                    index === activeIndex
-                        ? 'grid'
-                        : 'none';
-
-                detail.classList.toggle(
-                    'is-active',
-                    index === activeIndex
-                );
-
+                detail.style.display = index === activeIndex ? 'grid' : 'none';
+                detail.classList.toggle('is-active', index === activeIndex);
             });
 
             return;
         }
 
-
         gsap.to(oldDetail, {
-            autoAlpha:0,
-            y:-8,
-            duration:.19,
-            ease:'power2.in',
-            onComplete:function () {
+            autoAlpha: 0,
+            y: -8,
+            duration: .19,
+            ease: 'power2.in',
 
-                oldDetail.style.display =
-                    'none';
+            onComplete: function () {
+                oldDetail.style.display = 'none';
+                oldDetail.classList.remove('is-active');
 
-                oldDetail.classList.remove(
-                    'is-active'
-                );
-
-
-                newDetail.style.display =
-                    'grid';
-
-                newDetail.classList.add(
-                    'is-active'
-                );
-
+                newDetail.style.display = 'grid';
+                newDetail.classList.add('is-active');
 
                 gsap.fromTo(
                     newDetail,
                     {
-                        autoAlpha:0,
-                        y:10
+                        autoAlpha: 0,
+                        y: 10,
+                        scale: .985
                     },
                     {
-                        autoAlpha:1,
-                        y:0,
-                        duration:.36,
-                        ease:'power3.out'
+                        autoAlpha: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: .38,
+                        ease: 'power3.out'
                     }
                 );
-
             }
         });
-
     }
 
-
-    /* ============================================================
-       CHANGE ACTIVE
-    ============================================================ */
-
     function setActive(nextIndex) {
-
-        if (
-            changing ||
-            !cards[nextIndex] ||
-            nextIndex === activeIndex
-        ) {
-            return;
-        }
+        if (changing || !cards[nextIndex] || nextIndex === activeIndex) return;
 
         changing = true;
 
-        const previousIndex =
-            activeIndex;
-
-        activeIndex =
-            nextIndex;
+        const previousIndex = activeIndex;
+        activeIndex = nextIndex;
 
         if (currentCounter) {
-
-            currentCounter.textContent =
-                String(activeIndex + 1)
-                    .padStart(2, '0');
-
+            currentCounter.textContent = String(activeIndex + 1).padStart(2, '0');
         }
 
         renderCards(true);
         updateDetails(previousIndex);
 
-        window.setTimeout(function () {
+        setTimeout(function () {
             changing = false;
         }, 580);
-
     }
 
-
-    /* ============================================================
-       CARD CLICK
-    ============================================================ */
-
     cards.forEach(function (card, index) {
-
         card.addEventListener('click', function () {
-
             if (index === activeIndex) {
+                const activeDetail = details[activeIndex];
+                const link = activeDetail?.querySelector('a');
 
-                const activeDetail =
-                    details[activeIndex];
-
-                const link =
-                    activeDetail?.querySelector('a');
-
-                if (link) {
-                    link.click();
-                }
+                if (link) link.click();
 
                 return;
             }
 
             setActive(index);
-
         });
-
     });
-
-
-    /* ============================================================
-       PREVIOUS
-    ============================================================ */
 
     prevButton?.addEventListener('click', function () {
+        let next = activeIndex - 1;
 
-        let next =
-            activeIndex - 1;
-
-        if (next < 0) {
-            next = cards.length - 1;
-        }
+        if (next < 0) next = cards.length - 1;
 
         setActive(next);
-
     });
-
-
-    /* ============================================================
-       NEXT
-    ============================================================ */
 
     nextButton?.addEventListener('click', function () {
+        let next = activeIndex + 1;
 
-        let next =
-            activeIndex + 1;
-
-        if (next >= cards.length) {
-            next = 0;
-        }
+        if (next >= cards.length) next = 0;
 
         setActive(next);
-
     });
 
-
-    /* ============================================================
-       RESIZE
-    ============================================================ */
-
-    let resizeTimer;
+    let resizeTimer = null;
 
     window.addEventListener('resize', function () {
-
         clearTimeout(resizeTimer);
 
         resizeTimer = setTimeout(function () {
             renderCards(false);
         }, 120);
-
     });
 
-
     /* ============================================================
-       INTRO GSAP
+       INFORMATION INTRO
     ============================================================ */
-
-    if (
-        hasGSAP &&
-        hasScrollTrigger &&
-        !reduceMotion
-    ) {
-
-        const intro =
-            gsap.timeline({
-                scrollTrigger:{
-                    trigger:section,
-                    start:'top 83%',
-                    once:true
-                },
-                defaults:{
-                    ease:'power3.out'
-                }
-            });
-
-        intro
-            .from('.bd-activity-eyebrow',{
-                autoAlpha:0,
-                y:8,
-                duration:.35
-            })
-
-            .from('.bd-activity-heading h2',{
-                autoAlpha:0,
-                y:18,
-                duration:.55
-            },'-=.17')
-
-            .from('.bd-activity-heading p',{
-                autoAlpha:0,
-                y:10,
-                duration:.40
-            },'-=.29')
-
-            .from('.bd-activity-header-action',{
-                autoAlpha:0,
-                x:10,
-                duration:.40
-            },'-=.30')
-
-            .from('.bd-activity-header-line span',{
-                scaleX:0,
-                duration:.58,
-                ease:'power3.inOut'
-            },'-=.18')
-
-            .from('.bd-activity-stage',{
-                autoAlpha:0,
-                y:20,
-                duration:.58
-            },'-=.12')
-
-            .from('.bd-activity-controls',{
-                autoAlpha:0,
-                y:8,
-                duration:.35
-            },'-=.28')
-
-            .from('.bd-activity-details',{
-                autoAlpha:0,
-                y:13,
-                duration:.45
-            },'-=.20');
-
-    }
-
-
-    /* ============================================================
-       ACTIVE CARD HOVER
-    ============================================================ */
-
-    if (
-        hasGSAP &&
-        !reduceMotion &&
-        finePointer
-    ) {
-
-        cards.forEach(function (card) {
-
-            const image =
-                card.querySelector(
-                    '.bd-activity-card-media img'
-                );
-
-            card.addEventListener(
-                'mouseenter',
-                function () {
-
-                    if (
-                        !card.classList.contains(
-                            'is-active'
-                        )
-                    ) {
-                        return;
-                    }
-
-                    if (image) {
-
-                        gsap.to(image,{
-                            scale:1.025,
-                            duration:.4,
-                            ease:'power2.out'
-                        });
-
-                    }
-
-                }
-            );
-
-
-            card.addEventListener(
-                'mouseleave',
-                function () {
-
-                    if (image) {
-
-                        gsap.to(image,{
-                            scale:1,
-                            duration:.5,
-                            ease:'power3.out'
-                        });
-
-                    }
-
-                }
-            );
-
+    if (gsap && !reduceMotion) {
+        const intro = gsap.timeline({
+            scrollTrigger: {
+                trigger: section,
+                start: 'top 83%',
+                once: true
+            },
+            defaults: {
+                ease: 'power3.out'
+            }
         });
 
+        intro
+            .from(section.querySelector('.bd-activity-eyebrow'), {
+                autoAlpha: 0,
+                y: 8,
+                duration: .35
+            })
+            .from(section.querySelector('.bd-activity-heading h2'), {
+                autoAlpha: 0,
+                y: 18,
+                duration: .55
+            }, '-=.17')
+            .from(section.querySelector('.bd-activity-heading p'), {
+                autoAlpha: 0,
+                y: 10,
+                duration: .4
+            }, '-=.29')
+            .from(section.querySelector('.bd-activity-header-action'), {
+                autoAlpha: 0,
+                x: 10,
+                duration: .4
+            }, '-=.3')
+            .from(section.querySelector('.bd-activity-stage'), {
+                autoAlpha: 0,
+                y: 20,
+                duration: .58
+            }, '-=.2')
+            .from(section.querySelector('.bd-activity-controls'), {
+                autoAlpha: 0,
+                y: 8,
+                duration: .35
+            }, '-=.28')
+            .from(section.querySelector('.bd-activity-details'), {
+                autoAlpha: 0,
+                y: 13,
+                duration: .45
+            }, '-=.2');
     }
-
 
     /* ============================================================
-       NAV BUTTON PRESS
+       INFORMATION HOVER
     ============================================================ */
+    if (gsap && !reduceMotion && finePointer) {
+        cards.forEach(function (card) {
+            const image = card.querySelector('.bd-activity-card-media img');
 
-    if (
-        hasGSAP &&
-        !reduceMotion
-    ) {
+            card.addEventListener('mouseenter', function () {
+                if (!card.classList.contains('is-active') || !image) return;
 
-        [prevButton, nextButton]
-            .filter(Boolean)
-            .forEach(function (button) {
-
-                button.addEventListener(
-                    'pointerdown',
-                    function () {
-
-                        gsap.to(button,{
-                            scale:.91,
-                            duration:.07
-                        });
-
-                    }
-                );
-
-                button.addEventListener(
-                    'pointerup',
-                    function () {
-
-                        gsap.to(button,{
-                            scale:1,
-                            duration:.18,
-                            ease:'power2.out'
-                        });
-
-                    }
-                );
-
+                gsap.to(image, {
+                    scale: 1.025,
+                    duration: .4,
+                    ease: 'power2.out'
+                });
             });
 
-    }
+            card.addEventListener('mouseleave', function () {
+                if (!image) return;
 
+                gsap.to(image, {
+                    scale: 1,
+                    duration: .5,
+                    ease: 'power3.out'
+                });
+            });
+        });
+    }
 
     /* ============================================================
        CTA INTRO
     ============================================================ */
+    if (publishSection && gsap && !reduceMotion) {
+        const publishCard = publishSection.querySelector('.bd-publish-card');
+        const publishCopy = publishSection.querySelector('.bd-publish-copy');
+        const publishServices = publishSection.querySelectorAll('.bd-publish-service');
+        const publishAction = publishSection.querySelector('.bd-publish-action');
 
-    if (
-        publishSection &&
-        hasGSAP &&
-        hasScrollTrigger &&
-        !reduceMotion
-    ) {
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: publishSection,
+                start: 'top 88%',
+                once: true
+            },
+            defaults: {
+                ease: 'power3.out'
+            }
+        });
 
-        const cta =
-            gsap.timeline({
-                scrollTrigger:{
-                    trigger:publishSection,
-                    start:'top 88%',
-                    once:true
-                },
-                defaults:{
-                    ease:'power3.out'
-                }
+        tl.from(publishCard, {
+            autoAlpha: 0,
+            y: 28,
+            scale: .98,
+            duration: .7
+        });
+
+        tl.from(publishCopy.children, {
+            autoAlpha: 0,
+            x: -16,
+            duration: .42,
+            stagger: .06
+        }, '-=.4');
+
+        tl.from(publishServices, {
+            autoAlpha: 0,
+            x: 16,
+            duration: .38,
+            stagger: .07
+        }, '-=.32');
+
+        tl.from(publishAction, {
+            autoAlpha: 0,
+            x: 22,
+            scale: .97,
+            duration: .5
+        }, '-=.35');
+    }
+
+    /* ============================================================
+       CTA SERVICES
+    ============================================================ */
+    if (publishSection) {
+        const publishServices = Array.from(
+            publishSection.querySelectorAll('[data-publish-service]')
+        );
+
+        const watermark = publishSection.querySelector('#bdPublishWatermark');
+
+        function activatePublishService(index) {
+            publishServices.forEach(function (service, serviceIndex) {
+                service.classList.toggle('is-active', serviceIndex === index);
             });
 
-        cta
-            .from('.bd-publish-card',{
-                autoAlpha:0,
-                y:20,
-                duration:.60
-            })
+            if (!watermark) return;
 
-            .from('.bd-publish-copy > *',{
-                autoAlpha:0,
-                y:9,
-                duration:.36,
-                stagger:.045
-            },'-=.30')
+            const number = publishServices[index]?.dataset.number || '01';
 
-            .from('.bd-publish-service',{
-                autoAlpha:0,
-                x:8,
-                duration:.30,
-                stagger:.05
-            },'-=.24')
+            if (gsap && !reduceMotion) {
+                gsap.to(watermark, {
+                    autoAlpha: 0,
+                    y: 8,
+                    duration: .12,
+                    overwrite: true,
 
-            .from('.bd-publish-action',{
-                autoAlpha:0,
-                x:13,
-                duration:.43
-            },'-=.28');
+                    onComplete: function () {
+                        watermark.textContent = number;
 
-    }
-
-
-    /* ============================================================
-       CTA HOVER
-    ============================================================ */
-
-    if (
-        publishSection &&
-        hasGSAP &&
-        !reduceMotion &&
-        finePointer
-    ) {
-
-        const button =
-            publishSection.querySelector(
-                '.bd-publish-action > a'
-            );
-
-        const arrow =
-            button?.querySelector('svg');
-
-        if (button && arrow) {
-
-            button.addEventListener(
-                'mouseenter',
-                function () {
-
-                    gsap.to(arrow,{
-                        x:4,
-                        duration:.18,
-                        ease:'power2.out'
-                    });
-
-                }
-            );
-
-            button.addEventListener(
-                'mouseleave',
-                function () {
-
-                    gsap.to(arrow,{
-                        x:0,
-                        duration:.28,
-                        ease:'power3.out'
-                    });
-
-                }
-            );
-
+                        gsap.fromTo(
+                            watermark,
+                            {
+                                autoAlpha: 0,
+                                y: 8
+                            },
+                            {
+                                autoAlpha: 1,
+                                y: 0,
+                                duration: .28,
+                                ease: 'power3.out',
+                                overwrite: true
+                            }
+                        );
+                    }
+                });
+            } else {
+                watermark.textContent = number;
+            }
         }
 
+        publishServices.forEach(function (service, index) {
+            service.addEventListener('mouseenter', function () {
+                if (!finePointer) return;
+
+                activatePublishService(index);
+            });
+
+            service.addEventListener('focus', function () {
+                activatePublishService(index);
+            });
+
+            service.addEventListener('click', function () {
+                activatePublishService(index);
+            });
+        });
+
+        /* ACTION CARD TILT */
+        const publishAction = publishSection.querySelector('.bd-publish-action');
+
+        if (gsap && !reduceMotion && finePointer && publishAction) {
+            publishAction.addEventListener('pointermove', function (e) {
+                const rect = publishAction.getBoundingClientRect();
+
+                const x = (e.clientX - rect.left) / rect.width - .5;
+                const y = (e.clientY - rect.top) / rect.height - .5;
+
+                gsap.to(publishAction, {
+                    rotationY: x * 2.2,
+                    rotationX: -y * 1.8,
+                    transformPerspective: 900,
+                    duration: .5,
+                    ease: 'power3.out',
+                    overwrite: true
+                });
+            });
+
+            publishAction.addEventListener('pointerleave', function () {
+                gsap.to(publishAction, {
+                    rotationY: 0,
+                    rotationX: 0,
+                    duration: .6,
+                    ease: 'power3.out',
+                    overwrite: true
+                });
+            });
+        }
+
+        /* BUTTON */
+        const publishButton = publishSection.querySelector('.bd-publish-button');
+        const publishArrow = publishSection.querySelector('.bd-publish-button-arrow');
+
+        if (gsap && !reduceMotion && publishButton && publishArrow) {
+            publishButton.addEventListener('mouseenter', function () {
+                gsap.to(publishArrow, {
+                    x: 3,
+                    duration: .18,
+                    ease: 'power2.out'
+                });
+            });
+
+            publishButton.addEventListener('mouseleave', function () {
+                gsap.to(publishArrow, {
+                    x: 0,
+                    duration: .28,
+                    ease: 'power3.out'
+                });
+            });
+        }
+
+        /* AMBIENT GLOW */
+        const glowOne = publishSection.querySelector('.bd-publish-glow-one');
+        const glowTwo = publishSection.querySelector('.bd-publish-glow-two');
+
+        if (gsap && !reduceMotion) {
+            if (glowOne) {
+                gsap.to(glowOne, {
+                    x: 32,
+                    y: -18,
+                    duration: 7,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'sine.inOut'
+                });
+            }
+
+            if (glowTwo) {
+                gsap.to(glowTwo, {
+                    x: -28,
+                    y: 20,
+                    duration: 8,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'sine.inOut'
+                });
+            }
+        }
     }
-
-
-    /* ============================================================
-       INITIAL STATE
-    ============================================================ */
 
     renderCards(false);
-
-
-    /* ============================================================
-       REFRESH
-    ============================================================ */
-
-    if (
-        hasScrollTrigger &&
-        !reduceMotion
-    ) {
-
-        setTimeout(function () {
-            ScrollTrigger.refresh();
-        },180);
-
-    }
-
 });
 </script>

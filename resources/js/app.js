@@ -2,40 +2,37 @@ import './bootstrap';
 import './bookstore-motion';
 
 import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
 gsap.registerPlugin(ScrollTrigger);
-window.bdGsap=gsap;
+window.bdGsap = gsap;
 
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.__bdMotionReady) return;
+    window.__bdMotionReady = true;
 
-    if(window.__bdMotionReady)return;
-    window.__bdMotionReady=true;
-
-    const reduceMotion=
-        window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-
-    const home=document.querySelector('.bd-home');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    const home = document.querySelector('.bd-home');
 
     /* =====================================================
        LENIS
     ===================================================== */
-    const lenis=new Lenis({
-        autoRaf:false,
-        duration:1.1,
-        smoothWheel:true,
-        wheelMultiplier:.9,
-        touchMultiplier:1
+    const lenis = new Lenis({
+        autoRaf: false,
+        duration: 1.1,
+        smoothWheel: true,
+        wheelMultiplier: .9,
+        touchMultiplier: 1
     });
 
-    window.bdLenis=lenis;
+    window.bdLenis = lenis;
 
-    lenis.on('scroll',ScrollTrigger.update);
+    lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add(time=>{
-        lenis.raf(time*1000);
+    gsap.ticker.add(time => {
+        lenis.raf(time * 1000);
     });
 
     gsap.ticker.lagSmoothing(0);
@@ -43,28 +40,26 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        ANCHOR
     ===================================================== */
-    document.querySelectorAll('a[href^="#"]').forEach(link=>{
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', e => {
+            const href = link.getAttribute('href');
 
-        link.addEventListener('click',e=>{
+            if (!href || href === '#') return;
 
-            const href=link.getAttribute('href');
+            const target = document.querySelector(href);
 
-            if(!href||href==='#')return;
-
-            const target=document.querySelector(href);
-
-            if(!target)return;
+            if (!target) return;
 
             e.preventDefault();
 
-            lenis.scrollTo(target,{
-                offset:-80,
-                duration:1.1
+            lenis.scrollTo(target, {
+                offset: -80,
+                duration: 1.1
             });
         });
     });
 
-    if(!home){
+    if (!home) {
         ScrollTrigger.refresh();
         return;
     }
@@ -72,16 +67,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        REDUCED MOTION
     ===================================================== */
-    if(reduceMotion){
-
-        document.querySelectorAll('[data-bd-reveal]').forEach(el=>{
-
-            gsap.set(el,{
-                opacity:1,
-                x:0,
-                y:0,
-                scale:1,
-                filter:'none'
+    if (reduceMotion) {
+        document.querySelectorAll('[data-bd-reveal]').forEach(el => {
+            gsap.set(el, {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                scale: 1,
+                filter: 'none'
             });
         });
 
@@ -91,47 +84,42 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        GLOBAL REVEAL
     ===================================================== */
-    document.querySelectorAll('[data-bd-reveal]').forEach(el=>{
+    document.querySelectorAll('[data-bd-reveal]').forEach(el => {
+        if (el.closest('#home')) return;
 
-        if(el.closest('#home'))return;
+        const type = el.dataset.bdReveal || 'up';
+        const delay = Number(el.dataset.bdDelay || 0) / 1000;
 
-        const type=
-            el.dataset.bdReveal||'up';
-
-        const delay=
-            Number(el.dataset.bdDelay||0)/1000;
-
-        const from={
-            opacity:0,
-            x:0,
-            y:0,
-            scale:1,
-            filter:'blur(4px)'
+        const from = {
+            opacity: 0,
+            x: 0,
+            y: 0,
+            scale: 1,
+            filter: 'blur(4px)'
         };
 
-        if(type==='up')from.y=42;
-        if(type==='left')from.x=-48;
-        if(type==='right')from.x=48;
+        if (type === 'up') from.y = 42;
+        if (type === 'left') from.x = -48;
+        if (type === 'right') from.x = 48;
 
-        if(type==='zoom'){
-            from.scale=.94;
-            from.y=18;
+        if (type === 'zoom') {
+            from.scale = .94;
+            from.y = 18;
         }
 
-        gsap.fromTo(el,from,{
-            opacity:1,
-            x:0,
-            y:0,
-            scale:1,
-            filter:'blur(0px)',
-            duration:.85,
+        gsap.fromTo(el, from, {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: .85,
             delay,
-            ease:'power3.out',
-
-            scrollTrigger:{
-                trigger:el,
-                start:'top 88%',
-                toggleActions:'play none none reverse'
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 88%',
+                toggleActions: 'play none none reverse'
             }
         });
     });
@@ -139,515 +127,616 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        HERO
     ===================================================== */
-    const hero=document.getElementById('home');
+    const hero = document.getElementById('home');
 
-    if(hero){
+    if (hero) {
+        const badge = hero.querySelector('.bd-hero-badge');
+        const lines = hero.querySelectorAll('.bd-hero-line>span');
+        const desc = hero.querySelector('.bd-hero-desc');
+        const button = hero.querySelector('.bd-wa-btn');
+        const visual = hero.querySelector('.bd-hero-visual');
+        const cards = hero.querySelectorAll('.bd-floating-card');
+        const orbits = hero.querySelectorAll('.bd-hero-orbit');
+        const dots = hero.querySelector('.bd-hero-dots');
+        const background = hero.querySelector('.bd-hero-bg');
+        const grid = hero.querySelector('.bd-hero-grid');
+        const glow = hero.querySelector('.bd-hero-glow');
 
-        const badge=
-            hero.querySelector('.bd-hero-badge');
-
-        const lines=
-            hero.querySelectorAll('.bd-hero-line>span');
-
-        const desc=
-            hero.querySelector('.bd-hero-desc');
-
-        const button=
-            hero.querySelector('.bd-wa-btn');
-
-        const visual=
-            hero.querySelector('.bd-hero-visual');
-
-        const cards=
-            hero.querySelectorAll('.bd-floating-card');
-
-        const orbits=
-            hero.querySelectorAll('.bd-hero-orbit');
-
-        const dots=
-            hero.querySelector('.bd-hero-dots');
-
-        const background=
-            hero.querySelector('.bd-hero-bg');
-
-        const grid=
-            hero.querySelector('.bd-hero-grid');
-
-        const glow=
-            hero.querySelector('.bd-hero-glow');
-
-        if(lines.length){
-            gsap.set(lines,{
-                yPercent:110,
-                opacity:0
+        if (lines.length) {
+            gsap.set(lines, {
+                yPercent: 110,
+                opacity: 0
             });
         }
 
-        if(badge){
-            gsap.set(badge,{
-                opacity:0,
-                y:20
+        if (badge) {
+            gsap.set(badge, {
+                opacity: 0,
+                y: 20
             });
         }
 
-        if(desc){
-            gsap.set(desc,{
-                opacity:0,
-                y:22
+        if (desc) {
+            gsap.set(desc, {
+                opacity: 0,
+                y: 22
             });
         }
 
-        if(button){
-            gsap.set(button,{
-                opacity:0,
-                y:20
+        if (button) {
+            gsap.set(button, {
+                opacity: 0,
+                y: 20
             });
         }
 
-        if(visual){
-            gsap.set(visual,{
-                opacity:0,
-                x:55,
-                scale:.92
+        if (visual) {
+            gsap.set(visual, {
+                opacity: 0,
+                x: 55,
+                scale: .92
             });
         }
 
-        if(cards.length){
-            gsap.set(cards,{
-                opacity:0
+        if (cards.length) {
+            gsap.set(cards, {
+                opacity: 0
             });
         }
 
-        if(orbits.length){
-            gsap.set(orbits,{
-                opacity:0
+        if (orbits.length) {
+            gsap.set(orbits, {
+                opacity: 0
             });
         }
 
-        if(dots){
-            gsap.set(dots,{
-                opacity:0
+        if (dots) {
+            gsap.set(dots, {
+                opacity: 0
             });
         }
 
-        const tl=gsap.timeline({
-            defaults:{
-                ease:'power4.out'
+        const tl = gsap.timeline({
+            defaults: {
+                ease: 'power4.out'
             }
         });
 
-        if(badge){
-
-            tl.to(badge,{
-                opacity:1,
-                y:0,
-                duration:.6
+        if (badge) {
+            tl.to(badge, {
+                opacity: 1,
+                y: 0,
+                duration: .6
             });
         }
 
-        if(lines.length){
-
-            tl.to(lines,{
-                opacity:1,
-                yPercent:0,
-                duration:.9,
-                stagger:.12
-            },'-=.3');
+        if (lines.length) {
+            tl.to(lines, {
+                opacity: 1,
+                yPercent: 0,
+                duration: .9,
+                stagger: .12
+            }, '-=.3');
         }
 
-        if(desc){
-
-            tl.to(desc,{
-                opacity:1,
-                y:0,
-                duration:.7
-            },'-=.5');
+        if (desc) {
+            tl.to(desc, {
+                opacity: 1,
+                y: 0,
+                duration: .7
+            }, '-=.5');
         }
 
-        if(button){
-
-            tl.to(button,{
-                opacity:1,
-                y:0,
-                duration:.6
-            },'-=.45');
+        if (button) {
+            tl.to(button, {
+                opacity: 1,
+                y: 0,
+                duration: .6
+            }, '-=.45');
         }
 
-        if(visual){
-
-            tl.to(visual,{
-                opacity:1,
-                x:0,
-                scale:1,
-                duration:1
-            },'-=.75');
+        if (visual) {
+            tl.to(visual, {
+                opacity: 1,
+                x: 0,
+                scale: 1,
+                duration: 1
+            }, '-=.75');
         }
 
-        if(orbits.length){
-
-            tl.to(orbits,{
-                opacity:1,
-                duration:.5,
-                stagger:.1
-            },'-=.55');
+        if (orbits.length) {
+            tl.to(orbits, {
+                opacity: 1,
+                duration: .5,
+                stagger: .1
+            }, '-=.55');
         }
 
-        if(cards.length){
-
-            tl.to(cards,{
-                opacity:1,
-                duration:.45,
-                stagger:.1
-            },'-=.45');
+        if (cards.length) {
+            tl.to(cards, {
+                opacity: 1,
+                duration: .45,
+                stagger: .1
+            }, '-=.45');
         }
 
-        if(dots){
-
-            tl.to(dots,{
-                opacity:1,
-                duration:.4
-            },'-=.2');
+        if (dots) {
+            tl.to(dots, {
+                opacity: 1,
+                duration: .4
+            }, '-=.2');
         }
 
-        if(background){
-
-            gsap.to(background,{
-                yPercent:9,
-                scale:1.05,
-                ease:'none',
-
-                scrollTrigger:{
-                    trigger:hero,
-                    start:'top top',
-                    end:'bottom top',
-                    scrub:1.2
+        if (background) {
+            gsap.to(background, {
+                yPercent: 9,
+                scale: 1.05,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: hero,
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 1.2
                 }
             });
         }
 
-        if(grid){
-
-            gsap.to(grid,{
-                y:55,
-                ease:'none',
-
-                scrollTrigger:{
-                    trigger:hero,
-                    start:'top top',
-                    end:'bottom top',
-                    scrub:1.3
+        if (grid) {
+            gsap.to(grid, {
+                y: 55,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: hero,
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 1.3
                 }
             });
         }
 
-        if(glow){
-
-            gsap.to(glow,{
-                x:-35,
-                y:65,
-                scale:1.1,
-                ease:'none',
-
-                scrollTrigger:{
-                    trigger:hero,
-                    start:'top top',
-                    end:'bottom top',
-                    scrub:1.4
+        if (glow) {
+            gsap.to(glow, {
+                x: -35,
+                y: 65,
+                scale: 1.1,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: hero,
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 1.4
                 }
             });
         }
 
-        if(visual){
+        if (visual) {
+            hero.addEventListener('pointermove', e => {
+                if (window.innerWidth < 1024) return;
 
-            hero.addEventListener('pointermove',e=>{
+                const rect = hero.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - .5;
+                const y = (e.clientY - rect.top) / rect.height - .5;
 
-                if(window.innerWidth<1024)return;
-
-                const rect=
-                    hero.getBoundingClientRect();
-
-                const x=
-                    (e.clientX-rect.left)/rect.width-.5;
-
-                const y=
-                    (e.clientY-rect.top)/rect.height-.5;
-
-                gsap.to(visual,{
-                    rotationY:x*4,
-                    rotationX:-y*3,
-                    duration:.8,
-                    ease:'power3.out',
-                    overwrite:'auto'
+                gsap.to(visual, {
+                    rotationY: x * 4,
+                    rotationX: -y * 3,
+                    duration: .8,
+                    ease: 'power3.out',
+                    overwrite: 'auto'
                 });
             });
 
-            hero.addEventListener('pointerleave',()=>{
-
-                gsap.to(visual,{
-                    rotationY:0,
-                    rotationX:0,
-                    duration:.8,
-                    ease:'power3.out',
-                    overwrite:'auto'
+            hero.addEventListener('pointerleave', () => {
+                gsap.to(visual, {
+                    rotationY: 0,
+                    rotationX: 0,
+                    duration: .8,
+                    ease: 'power3.out',
+                    overwrite: 'auto'
                 });
             });
         }
     }
 
     /* =====================================================
-       ALUR STORYTELLING
-       PIN HANYA DI ALUR
+       ALUR PENERBITAN
+       SCROLL → AUTO LOOP → HOVER/CLICK PAUSE
     ===================================================== */
-    const processSection=
-        document.getElementById('alur');
+    const processSection = document.getElementById('alur');
 
-    if(processSection){
-
-        const stage=
-            processSection.querySelector('.bd-process-stage');
-
-        const items=[
-            ...processSection.querySelectorAll('.bd-process-item')
+    if (processSection) {
+        const stage = processSection.querySelector('.bd-process-stage');
+        const items = [
+            ...processSection.querySelectorAll('[data-process-item], .bd-process-item')
         ];
+        const nodes = [
+            ...processSection.querySelectorAll('[data-process-node]')
+        ];
+        const progress = processSection.querySelector('.bd-process-progress');
+        const hint = processSection.querySelector('.bd-process-scroll-hint');
+        const media = gsap.matchMedia();
 
-        const progress=
-            processSection.querySelector('.bd-process-progress');
+        media.add('(min-width:1024px)', () => {
+            if (!stage || !items.length) return;
 
-        const hint=
-            processSection.querySelector('.bd-process-scroll-hint');
+            let currentStep = -1;
+            let autoIndex = -1;
+            let autoCall = null;
+            let autoStartDelay = null;
+            let pointerInside = false;
+            let manualPause = false;
+            let processCompleted = false;
+            let processVisible = true;
 
-        const media=
-            gsap.matchMedia();
+            const thresholds = [.08, .31, .54, .77];
 
-        /* DESKTOP */
-        media.add('(min-width:1024px)',()=>{
-
-            if(!stage||!items.length)return;
-
-            gsap.set(items,{
-                opacity:.28,
-                y:55,
-                scale:.94
+            const progressValues = items.map((item, index) => {
+                if (items.length <= 1) return 1;
+                return index / (items.length - 1);
             });
 
-            if(progress){
-
-                gsap.set(progress,{
-                    scaleX:0,
-                    transformOrigin:'left center'
-                });
-            }
-
-            if(hint){
-
-                gsap.set(hint,{
-                    opacity:.55
-                });
-            }
-
-            items.forEach(item=>{
-
-                const card=
-                    item.querySelector('.bd-process-card');
-
-                const number=
-                    item.querySelector('.bd-process-number');
-
-                const icon=
-                    item.querySelector('.bd-process-icon');
-
-                const check=
-                    item.querySelector('.bd-process-check');
-
-                if(card){
-
-                    gsap.set(card,{
-                        backgroundColor:'#F8FAFC',
-                        borderColor:'#F1F5F9',
-                        boxShadow:'0 0 0 rgba(36,27,82,0)'
-                    });
+            const stopAuto = () => {
+                if (autoCall) {
+                    autoCall.kill();
+                    autoCall = null;
                 }
 
-                if(number){
+                if (autoStartDelay) {
+                    autoStartDelay.kill();
+                    autoStartDelay = null;
+                }
+            };
 
-                    gsap.set(number,{
-                        color:'#CBD5E1'
-                    });
+            const pulseStep = index => {
+                const item = items[index];
+                const node = nodes[index];
+
+                if (!item) return;
+
+                const card = item.querySelector('.bd-process-card');
+                const icon = node?.querySelector('.bd-process-node-icon');
+
+                if (card) {
+                    gsap.timeline()
+                        .to(card, {
+                            y: -5,
+                            duration: .2,
+                            ease: 'power2.out',
+                            overwrite: true
+                        })
+                        .to(card, {
+                            y: 0,
+                            duration: .35,
+                            ease: 'back.out(1.7)',
+                            clearProps: 'y'
+                        });
                 }
 
-                if(icon){
-
-                    gsap.set(icon,{
-                        scale:.9
+                if (icon) {
+                    gsap.fromTo(icon, {
+                        scale: 1
+                    }, {
+                        scale: 1.14,
+                        duration: .22,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: 'power2.out',
+                        overwrite: true,
+                        clearProps: 'scale'
                     });
                 }
+            };
 
-                if(check){
+            const applyStep = (index, options = {}) => {
+                const {
+                    pulse = false,
+                    animateProgress = true
+                } = options;
 
-                    gsap.set(check,{
-                        opacity:.15,
-                        scale:.65
-                    });
-                }
-            });
+                currentStep = index;
 
-            const story=
-                gsap.timeline({
+                items.forEach((item, i) => {
+                    item.classList.remove('is-active', 'is-complete');
 
-                    scrollTrigger:{
-                        trigger:stage,
-                        start:'top 18%',
-                        end:'+=850',
-                        pin:true,
-                        scrub:.8,
-                        anticipatePin:1,
-                        invalidateOnRefresh:true
+                    if (index < 0) return;
+
+                    if (i < index) {
+                        item.classList.add('is-complete');
+                    }
+
+                    if (i === index) {
+                        item.classList.add('is-active');
                     }
                 });
 
-            items.forEach((item,index)=>{
+                nodes.forEach((node, i) => {
+                    node.classList.remove('is-active', 'is-complete');
 
-                const card=
-                    item.querySelector('.bd-process-card');
+                    if (index < 0) return;
 
-                const number=
-                    item.querySelector('.bd-process-number');
+                    if (i < index) {
+                        node.classList.add('is-complete');
+                    }
 
-                const icon=
-                    item.querySelector('.bd-process-icon');
+                    if (i === index) {
+                        node.classList.add('is-active');
+                    }
+                });
 
-                const check=
-                    item.querySelector('.bd-process-check');
+                if (progress) {
+                    const target = index < 0 ? 0 : progressValues[index];
 
-                const position=
-                    index*.9;
-
-                story.to(item,{
-                    opacity:1,
-                    y:0,
-                    scale:1,
-                    duration:.65,
-                    ease:'power3.out'
-                },position);
-
-                if(card){
-
-                    story.to(card,{
-                        backgroundColor:'#FFFFFF',
-                        borderColor:'rgba(239,88,67,.38)',
-                        boxShadow:'0 22px 45px rgba(36,27,82,.10)',
-                        duration:.55
-                    },position);
+                    if (animateProgress) {
+                        gsap.to(progress, {
+                            scaleX: target,
+                            duration: .38,
+                            ease: 'power3.out',
+                            overwrite: true
+                        });
+                    } else {
+                        gsap.set(progress, {
+                            scaleX: target
+                        });
+                    }
                 }
 
-                if(number){
+                if (pulse && index >= 0) {
+                    pulseStep(index);
+                }
+            };
 
-                    story.to(number,{
-                        color:'#EF5843',
-                        duration:.35
-                    },position);
+            const runAutoLoop = () => {
+                if (
+                    pointerInside ||
+                    manualPause ||
+                    !processCompleted ||
+                    !processVisible
+                ) {
+                    return;
                 }
 
-                if(icon){
+                autoIndex = (autoIndex + 1) % items.length;
 
-                    story.to(icon,{
-                        scale:1.13,
-                        rotation:-5,
-                        duration:.4,
-                        ease:'back.out(2)'
-                    },position);
+                applyStep(autoIndex, {
+                    pulse: true,
+                    animateProgress: true
+                });
 
-                    story.to(icon,{
-                        scale:1,
-                        rotation:0,
-                        duration:.35
-                    },position+.38);
+                autoCall = gsap.delayedCall(1.75, runAutoLoop);
+            };
+
+            const scheduleAuto = (delay = 1) => {
+                stopAuto();
+
+                if (
+                    pointerInside ||
+                    manualPause ||
+                    !processCompleted ||
+                    !processVisible
+                ) {
+                    return;
                 }
 
-                if(check){
+                autoStartDelay = gsap.delayedCall(delay, () => {
+                    autoStartDelay = null;
+                    autoIndex = -1;
+                    runAutoLoop();
+                });
+            };
 
-                    story.to(check,{
-                        opacity:1,
-                        scale:1,
-                        duration:.35,
-                        ease:'back.out(2)'
-                    },position+.2);
-                }
+            const getStepFromProgress = value => {
+                let step = -1;
 
-                if(progress){
+                thresholds.forEach((threshold, index) => {
+                    if (value >= threshold) {
+                        step = index;
+                    }
+                });
 
-                    story.to(progress,{
-                        scaleX:(index+1)/items.length,
-                        duration:.6,
-                        ease:'none'
-                    },position);
+                return step;
+            };
+
+            if (progress) {
+                gsap.set(progress, {
+                    scaleX: 0,
+                    transformOrigin: 'left center'
+                });
+            }
+
+            applyStep(-1, {
+                animateProgress: false
+            });
+
+            const processTrigger = ScrollTrigger.create({
+                trigger: stage,
+                start: 'top 18%',
+                end: '+=1150',
+                pin: true,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+
+                onEnter: () => {
+                    processVisible = true;
+                },
+
+                onEnterBack: () => {
+                    processVisible = true;
+                    stopAuto();
+                    processCompleted = false;
+                },
+
+                onUpdate: self => {
+                    const nextStep = getStepFromProgress(self.progress);
+
+                    if (self.progress < .98) {
+                        if (processCompleted) {
+                            stopAuto();
+                        }
+
+                        processCompleted = false;
+                    }
+
+                    if (!processCompleted && nextStep !== currentStep) {
+                        applyStep(nextStep, {
+                            pulse: nextStep >= 0,
+                            animateProgress: true
+                        });
+                    }
+
+                    if (self.progress >= .98 && !processCompleted) {
+                        processCompleted = true;
+
+                        applyStep(items.length - 1, {
+                            pulse: true,
+                            animateProgress: true
+                        });
+
+                        scheduleAuto(1);
+                    }
+                },
+
+                onLeave: () => {
+                    processVisible = false;
+                    stopAuto();
+                },
+
+                onLeaveBack: () => {
+                    processVisible = false;
+                    processCompleted = false;
+                    manualPause = false;
+
+                    stopAuto();
+
+                    applyStep(-1, {
+                        animateProgress: true
+                    });
                 }
             });
 
-            if(hint){
+            const handlePointerEnter = () => {
+                pointerInside = true;
+                stopAuto();
+            };
 
-                story.to(hint,{
-                    opacity:0,
-                    y:8,
-                    duration:.35
-                },3.2);
-            }
+            const handlePointerLeave = () => {
+                pointerInside = false;
+                manualPause = false;
 
-            return()=>{
+                if (processCompleted && processVisible) {
+                    scheduleAuto(.7);
+                }
+            };
 
-                story.scrollTrigger?.kill();
-                story.kill();
+            stage.addEventListener('pointerenter', handlePointerEnter);
+            stage.addEventListener('pointerleave', handlePointerLeave);
+
+            const cardClickHandlers = [];
+
+            items.forEach((item, index) => {
+                const handler = () => {
+                    if (!processCompleted) return;
+
+                    manualPause = true;
+                    autoIndex = index;
+
+                    stopAuto();
+
+                    applyStep(index, {
+                        pulse: true,
+                        animateProgress: true
+                    });
+                };
+
+                cardClickHandlers.push(handler);
+                item.addEventListener('click', handler);
+            });
+
+            return () => {
+                stopAuto();
+                processTrigger.kill();
+
+                stage.removeEventListener('pointerenter', handlePointerEnter);
+                stage.removeEventListener('pointerleave', handlePointerLeave);
+
+                items.forEach((item, index) => {
+                    item.removeEventListener('click', cardClickHandlers[index]);
+                    item.classList.remove('is-active', 'is-complete');
+                });
+
+                nodes.forEach(node => {
+                    node.classList.remove('is-active', 'is-complete');
+                });
+
+                if (progress) {
+                    gsap.killTweensOf(progress);
+                    gsap.set(progress, {
+                        clearProps: 'transform'
+                    });
+                }
             };
         });
 
-        /* MOBILE/TABLET */
-        media.add('(max-width:1023px)',()=>{
+        /* =================================================
+           MOBILE / TABLET
+           TETAP SCROLL MANUAL
+        ================================================= */
+        media.add('(max-width:1023px)', () => {
+            items.forEach(item => {
+                const card = item.querySelector('.bd-process-card');
+                const check = item.querySelector('.bd-process-check');
+                const icon = item.querySelector('.bd-process-mobile-icon');
 
-            items.forEach((item,index)=>{
-
-                const icon=
-                    item.querySelector('.bd-process-icon');
-
-                const check=
-                    item.querySelector('.bd-process-check');
-
-                const tl=
-                    gsap.timeline({
-
-                        scrollTrigger:{
-                            trigger:item,
-                            start:'top 87%',
-                            toggleActions:'play none none reverse'
-                        }
-                    });
-
-                tl.from(item,{
-                    opacity:0,
-                    y:42,
-                    scale:.96,
-                    duration:.7,
-                    delay:index*.04,
-                    ease:'power3.out'
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: item,
+                        start: 'top 92%',
+                        end: 'top 65%',
+                        scrub: true
+                    }
                 });
 
-                if(icon){
+                tl.fromTo(item, {
+                    opacity: .45,
+                    y: 28,
+                    scale: .98
+                }, {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 1,
+                    ease: 'none'
+                });
 
-                    tl.from(icon,{
-                        scale:.7,
-                        rotation:-8,
-                        duration:.42,
-                        ease:'back.out(2)'
-                    },'-=.48');
+                if (card) {
+                    tl.fromTo(card, {
+                        borderColor: '#E8EDF3'
+                    }, {
+                        borderColor: 'rgba(239,88,67,.28)',
+                        duration: 1,
+                        ease: 'none'
+                    }, 0);
                 }
 
-                if(check){
+                if (icon) {
+                    tl.fromTo(icon, {
+                        scale: .88
+                    }, {
+                        scale: 1,
+                        duration: 1,
+                        ease: 'none'
+                    }, 0);
+                }
 
-                    tl.to(check,{
-                        opacity:1,
-                        scale:1,
-                        duration:.35,
-                        ease:'back.out(2)'
-                    },'-=.28');
+                if (check) {
+                    tl.fromTo(check, {
+                        opacity: .15,
+                        scale: .72
+                    }, {
+                        opacity: 1,
+                        scale: 1,
+                        duration: 1,
+                        ease: 'none'
+                    }, 0);
                 }
             });
         });
@@ -655,487 +744,269 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     /* =====================================================
        KATALOG PREMIUM 3D
-       TANPA PIN
-       + ANIMASI SAAT DIGESER
     ===================================================== */
-    const catalog=
-        document.getElementById('katalog');
+    const catalog = document.getElementById('katalog');
 
-    if(catalog){
-
-        const slider=
-            catalog.querySelector('.bd-book-slider');
-
-        const slides=[
+    if (catalog) {
+        const slider = catalog.querySelector('.bd-book-slider');
+        const slides = [
             ...catalog.querySelectorAll('[data-bd-catalog-item]')
         ];
+        const prev = catalog.querySelector('[data-catalog-prev]');
+        const next = catalog.querySelector('[data-catalog-next]');
 
-        const prev=
-            catalog.querySelector('[data-catalog-prev]');
-
-        const next=
-            catalog.querySelector('[data-catalog-next]');
-
-
-        /* =================================================
-           REVEAL AWAL
-        ================================================= */
-        if(slides.length){
-
-            gsap.from(slides,{
-                opacity:0,
-                y:60,
-                scale:.92,
-                rotationY:-10,
-                stagger:.09,
-                duration:.9,
-                ease:'power4.out',
-
-                scrollTrigger:{
-                    trigger:catalog,
-                    start:'top 82%'
+        /* REVEAL AWAL */
+        if (slides.length) {
+            gsap.from(slides, {
+                opacity: 0,
+                y: 60,
+                scale: .92,
+                rotationY: -10,
+                stagger: .09,
+                duration: .9,
+                ease: 'power4.out',
+                scrollTrigger: {
+                    trigger: catalog,
+                    start: 'top 82%'
                 }
             });
         }
 
+        /* 3D BOOK HOVER */
+        slides.forEach((slide, index) => {
+            const card = slide.querySelector('.bd-home-book');
+            const stage = slide.querySelector('.bd-book-stage');
+            const shine = slide.querySelector('.bd-book-shine');
 
-        /* =================================================
-           3D BOOK HOVER
-        ================================================= */
-        slides.forEach((slide,index)=>{
+            if (!card || !stage) return;
 
-            const card=
-                slide.querySelector('.bd-home-book');
-
-            const stage=
-                slide.querySelector('.bd-book-stage');
-
-            const shine=
-                slide.querySelector('.bd-book-shine');
-
-            if(!card||!stage)return;
-
-            gsap.set(stage,{
-                transformPerspective:900,
-                transformStyle:'preserve-3d'
+            gsap.set(stage, {
+                transformPerspective: 900,
+                transformStyle: 'preserve-3d'
             });
 
-            const rotateX=
-                gsap.quickTo(stage,'rotationX',{
-                    duration:.5,
-                    ease:'power3.out'
+            const rotateX = gsap.quickTo(stage, 'rotationX', {
+                duration: .5,
+                ease: 'power3.out'
+            });
+
+            const rotateY = gsap.quickTo(stage, 'rotationY', {
+                duration: .5,
+                ease: 'power3.out'
+            });
+
+            const moveX = gsap.quickTo(stage, 'x', {
+                duration: .5,
+                ease: 'power3.out'
+            });
+
+            const moveY = gsap.quickTo(stage, 'y', {
+                duration: .5,
+                ease: 'power3.out'
+            });
+
+            card.addEventListener('pointerenter', () => {
+                if (window.innerWidth < 768) return;
+
+                gsap.to(stage, {
+                    scale: 1.07,
+                    y: -6,
+                    duration: .45,
+                    ease: 'power3.out'
                 });
 
-            const rotateY=
-                gsap.quickTo(stage,'rotationY',{
-                    duration:.5,
-                    ease:'power3.out'
-                });
-
-            const moveX=
-                gsap.quickTo(stage,'x',{
-                    duration:.5,
-                    ease:'power3.out'
-                });
-
-            const moveY=
-                gsap.quickTo(stage,'y',{
-                    duration:.5,
-                    ease:'power3.out'
-                });
-
-
-            card.addEventListener('pointerenter',()=>{
-
-                if(window.innerWidth<768)return;
-
-                gsap.to(stage,{
-                    scale:1.07,
-                    y:-6,
-                    duration:.45,
-                    ease:'power3.out'
-                });
-
-                if(shine){
-
-                    gsap.fromTo(shine,{
-                        xPercent:-180,
-                        opacity:0
-                    },{
-                        xPercent:260,
-                        opacity:.8,
-                        duration:.9,
-                        ease:'power2.out'
+                if (shine) {
+                    gsap.fromTo(shine, {
+                        xPercent: -180,
+                        opacity: 0
+                    }, {
+                        xPercent: 260,
+                        opacity: .8,
+                        duration: .9,
+                        ease: 'power2.out'
                     });
                 }
             });
 
+            card.addEventListener('pointermove', e => {
+                if (window.innerWidth < 768) return;
 
-            card.addEventListener('pointermove',e=>{
+                const rect = card.getBoundingClientRect();
+                const px = (e.clientX - rect.left) / rect.width - .5;
+                const py = (e.clientY - rect.top) / rect.height - .5;
 
-                if(window.innerWidth<768)return;
-
-                const rect=
-                    card.getBoundingClientRect();
-
-                const px=
-                    (e.clientX-rect.left)/rect.width-.5;
-
-                const py=
-                    (e.clientY-rect.top)/rect.height-.5;
-
-                rotateY(px*18);
-                rotateX(-py*11);
-
-                moveX(px*9);
-                moveY(py*5-6);
+                rotateY(px * 18);
+                rotateX(-py * 11);
+                moveX(px * 9);
+                moveY(py * 5 - 6);
             });
 
-
-            card.addEventListener('pointerleave',()=>{
-
+            card.addEventListener('pointerleave', () => {
                 rotateX(0);
                 rotateY(0);
-
                 moveX(0);
                 moveY(0);
 
-                gsap.to(stage,{
-                    scale:1,
-                    duration:.6,
-                    ease:'elastic.out(1,.45)'
+                gsap.to(stage, {
+                    scale: 1,
+                    duration: .6,
+                    ease: 'elastic.out(1,.45)'
                 });
             });
 
-
-            /* Parallax vertikal kecil */
-            gsap.to(slide,{
-                y:index%2===0?-9:9,
-                ease:'none',
-
-                scrollTrigger:{
-                    trigger:catalog,
-                    start:'top bottom',
-                    end:'bottom top',
-                    scrub:1.4
+            gsap.to(slide, {
+                y: index % 2 === 0 ? -9 : 9,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: catalog,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: 1.4
                 }
             });
         });
 
+        /* FOCUS SLIDER */
+        let catalogFrame = null;
 
-        /* =================================================
-           FOCUS ANIMATION SAAT SLIDER DIGESER
+        const updateCatalogFocus = () => {
+            if (!slider || !slides.length) return;
 
-           Berlaku untuk:
-           - tombol kanan/kiri
-           - drag mouse
-           - touch swipe
-           - trackpad horizontal
-        ================================================= */
-        let catalogFrame=null;
+            const sliderRect = slider.getBoundingClientRect();
+            const sliderCenter = sliderRect.left + sliderRect.width / 2;
+            const maxDistance = sliderRect.width * .62;
 
-        const updateCatalogFocus=()=>{
+            slides.forEach(slide => {
+                const rect = slide.getBoundingClientRect();
+                const center = rect.left + rect.width / 2;
+                const distance = Math.abs(center - sliderCenter);
+                const normalized = Math.min(distance / maxDistance, 1);
 
-            if(
-                !slider||
-                !slides.length
-            ){
-                return;
-            }
+                const scale = 1 - normalized * .055;
+                const opacity = 1 - normalized * .23;
 
-            const sliderRect=
-                slider.getBoundingClientRect();
-
-            const sliderCenter=
-                sliderRect.left+
-                sliderRect.width/2;
-
-            const maxDistance=
-                sliderRect.width*.62;
-
-
-            slides.forEach(slide=>{
-
-                const rect=
-                    slide.getBoundingClientRect();
-
-                const center=
-                    rect.left+
-                    rect.width/2;
-
-                const distance=
-                    Math.abs(
-                        center-
-                        sliderCenter
-                    );
-
-                const normalized=
-                    Math.min(
-                        distance/maxDistance,
-                        1
-                    );
-
-                const scale=
-                    1-
-                    normalized*.055;
-
-                const opacity=
-                    1-
-                    normalized*.23;
-
-                const rotation=
-                    (
-                        center<
-                        sliderCenter
-                            ?1
-                            :-1
-                    )*
-                    normalized*
+                const rotation =
+                    (center < sliderCenter ? 1 : -1) *
+                    normalized *
                     2.8;
 
-                gsap.to(slide,{
+                gsap.to(slide, {
                     scale,
                     opacity,
-                    rotationY:rotation,
-                    duration:.34,
-                    ease:'power3.out',
-                    overwrite:'auto'
+                    rotationY: rotation,
+                    duration: .34,
+                    ease: 'power3.out',
+                    overwrite: 'auto'
                 });
             });
         };
 
-
-        const requestCatalogFocus=()=>{
-
-            if(catalogFrame){
-                cancelAnimationFrame(
-                    catalogFrame
-                );
+        const requestCatalogFocus = () => {
+            if (catalogFrame) {
+                cancelAnimationFrame(catalogFrame);
             }
 
-            catalogFrame=
-                requestAnimationFrame(
-                    updateCatalogFocus
-                );
+            catalogFrame = requestAnimationFrame(updateCatalogFocus);
         };
 
+        if (slider) {
+            slider.addEventListener('scroll', requestCatalogFocus, {
+                passive: true
+            });
 
-        if(slider){
+            window.addEventListener('resize', requestCatalogFocus);
 
-            slider.addEventListener(
-                'scroll',
-                requestCatalogFocus,
-                {
-                    passive:true
-                }
-            );
-
-            window.addEventListener(
-                'resize',
-                requestCatalogFocus
-            );
-
-            requestAnimationFrame(()=>{
+            requestAnimationFrame(() => {
                 updateCatalogFocus();
             });
         }
 
+        /* ACTIVE BOOK */
+        const animateNearestBook = direction => {
+            if (!slider || !slides.length) return;
 
-        /* =================================================
-           ACTIVE BOOK PUNCH
-        ================================================= */
-        const animateNearestBook=direction=>{
+            const sliderRect = slider.getBoundingClientRect();
+            const sliderCenter = sliderRect.left + sliderRect.width / 2;
 
-            if(
-                !slider||
-                !slides.length
-            ){
-                return;
-            }
+            let nearest = null;
+            let nearestDistance = Infinity;
 
-            const sliderRect=
-                slider.getBoundingClientRect();
+            slides.forEach(slide => {
+                const rect = slide.getBoundingClientRect();
+                const center = rect.left + rect.width / 2;
+                const distance = Math.abs(center - sliderCenter);
 
-            const sliderCenter=
-                sliderRect.left+
-                sliderRect.width/2;
-
-            let nearest=null;
-            let nearestDistance=
-                Infinity;
-
-
-            slides.forEach(slide=>{
-
-                const rect=
-                    slide.getBoundingClientRect();
-
-                const center=
-                    rect.left+
-                    rect.width/2;
-
-                const distance=
-                    Math.abs(
-                        center-
-                        sliderCenter
-                    );
-
-                if(
-                    distance<
-                    nearestDistance
-                ){
-
-                    nearestDistance=
-                        distance;
-
-                    nearest=
-                        slide;
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearest = slide;
                 }
             });
 
+            if (!nearest) return;
 
-            if(!nearest)return;
+            const stage = nearest.querySelector('.bd-book-stage');
+            const card = nearest.querySelector('.bd-home-book');
 
-
-            const stage=
-                nearest.querySelector(
-                    '.bd-book-stage'
-                );
-
-
-            const card=
-                nearest.querySelector(
-                    '.bd-home-book'
-                );
-
-
-            if(card){
-
-                gsap.fromTo(card,{
-                    boxShadow:
-                        '0 8px 25px rgba(36,27,82,.055)'
-                },{
-                    boxShadow:
-                        '0 25px 55px rgba(36,27,82,.14)',
-                    duration:.32,
-                    yoyo:true,
-                    repeat:1,
-                    ease:'power2.out'
+            if (card) {
+                gsap.fromTo(card, {
+                    boxShadow: '0 8px 25px rgba(36,27,82,.055)'
+                }, {
+                    boxShadow: '0 25px 55px rgba(36,27,82,.14)',
+                    duration: .32,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: 'power2.out'
                 });
             }
 
-
-            if(stage){
-
-                gsap.fromTo(stage,{
-                    scale:.94,
-                    rotationY:
-                        direction>0
-                            ?-8
-                            :8
-                },{
-                    scale:1,
-                    rotationY:0,
-                    duration:.55,
-                    ease:'back.out(1.7)',
-                    overwrite:'auto'
+            if (stage) {
+                gsap.fromTo(stage, {
+                    scale: .94,
+                    rotationY: direction > 0 ? -8 : 8
+                }, {
+                    scale: 1,
+                    rotationY: 0,
+                    duration: .55,
+                    ease: 'back.out(1.7)',
+                    overwrite: 'auto'
                 });
             }
         };
 
+        /* BUTTON SLIDER */
+        let catalogMoving = false;
 
-        /* =================================================
-           BUTTON SLIDE TRANSITION
-        ================================================= */
-        let catalogMoving=false;
+        const scrollCatalog = direction => {
+            if (!slider || catalogMoving) return;
 
-        const scrollCatalog=direction=>{
+            const first = slider.querySelector('.bd-book-slide');
 
-            if(
-                !slider||
-                catalogMoving
-            ){
-                return;
-            }
+            if (!first) return;
 
-            const first=
-                slider.querySelector(
-                    '.bd-book-slide'
-                );
+            const gap = parseFloat(getComputedStyle(slider).gap) || 20;
+            const amount = first.getBoundingClientRect().width + gap;
+            const current = slider.scrollLeft;
+            const maxScroll = Math.max(0, slider.scrollWidth - slider.clientWidth);
 
-            if(!first)return;
+            let target = current + amount * direction;
 
+            target = Math.max(
+                0,
+                Math.min(target, maxScroll)
+            );
 
-            const gap=
-                parseFloat(
-                    getComputedStyle(slider).gap
-                )||20;
-
-
-            const amount=
-                first
-                    .getBoundingClientRect()
-                    .width+
-                gap;
-
-
-            const current=
-                slider.scrollLeft;
-
-
-            const maxScroll=
-                Math.max(
-                    0,
-                    slider.scrollWidth-
-                    slider.clientWidth
-                );
-
-
-            let target=
-                current+
-                amount*
-                direction;
-
-
-            target=
-                Math.max(
-                    0,
-                    Math.min(
-                        target,
-                        maxScroll
-                    )
-                );
-
-
-            /* Sudah mentok */
-            if(
-                Math.abs(
-                    target-current
-                )<2
-            ){
-
-                /*
-                 * Sedikit feedback kalau tombol
-                 * ditekan saat sudah mentok.
-                 */
-                gsap.fromTo(slider,{
-                    x:
-                        direction>0
-                            ?0
-                            :0
-                },{
-                    x:
-                        direction>0
-                            ?-4
-                            :4,
-                    duration:.1,
-                    yoyo:true,
-                    repeat:1,
-                    ease:'power2.out',
-
-                    onComplete:()=>{
-                        gsap.set(slider,{
-                            x:0
+            if (Math.abs(target - current) < 2) {
+                gsap.fromTo(slider, {
+                    x: 0
+                }, {
+                    x: direction > 0 ? -4 : 4,
+                    duration: .1,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        gsap.set(slider, {
+                            x: 0
                         });
                     }
                 });
@@ -1143,345 +1014,182 @@ document.addEventListener('DOMContentLoaded',()=>{
                 return;
             }
 
+            catalogMoving = true;
 
-            catalogMoving=true;
+            const sliderRect = slider.getBoundingClientRect();
 
+            const currentVisible = slides.filter(slide => {
+                const rect = slide.getBoundingClientRect();
 
-            /*
-            |--------------------------------------------------------------------------
-            | CARD YANG SEDANG TERLIHAT
-            |--------------------------------------------------------------------------
-            */
+                return (
+                    rect.right > sliderRect.left &&
+                    rect.left < sliderRect.right
+                );
+            });
 
-            const sliderRect=
-                slider.getBoundingClientRect();
-
-
-            const currentVisible=
-                slides.filter(slide=>{
-
-                    const rect=
-                        slide.getBoundingClientRect();
-
-                    return(
-                        rect.right>
-                        sliderRect.left&&
-                        rect.left<
-                        sliderRect.right
-                    );
-                });
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | TWEEN SCROLLLEFT
-            |--------------------------------------------------------------------------
-            */
-
-            const scrollState={
-                value:current
+            const scrollState = {
+                value: current
             };
 
-
-            const tl=
-                gsap.timeline({
-
-                    defaults:{
-                        overwrite:'auto'
-                    },
-
-                    onComplete:()=>{
-
-                        catalogMoving=false;
-
-                        updateCatalogFocus();
-
-                        animateNearestBook(
-                            direction
-                        );
-                    }
-                });
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 1. CARD PREPARE
-            |--------------------------------------------------------------------------
-            */
-
-            tl.to(currentVisible,{
-                scale:.965,
-                opacity:.72,
-                x:
-                    direction>0
-                        ?-6
-                        :6,
-                duration:.22,
-                stagger:.02,
-                ease:'power2.out'
+            const tl = gsap.timeline({
+                defaults: {
+                    overwrite: 'auto'
+                },
+                onComplete: () => {
+                    catalogMoving = false;
+                    updateCatalogFocus();
+                    animateNearestBook(direction);
+                }
             });
 
+            tl.to(currentVisible, {
+                scale: .965,
+                opacity: .72,
+                x: direction > 0 ? -6 : 6,
+                duration: .22,
+                stagger: .02,
+                ease: 'power2.out'
+            });
 
-            /*
-            |--------------------------------------------------------------------------
-            | 2. SLIDER MELUNCUR
-            |--------------------------------------------------------------------------
-            */
-
-            tl.to(
-                scrollState,
-                {
-                    value:target,
-                    duration:.72,
-                    ease:'power4.inOut',
-
-                    onUpdate:()=>{
-
-                        slider.scrollLeft=
-                            scrollState.value;
-
-                        requestCatalogFocus();
-                    }
-                },
-                '-=.07'
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 3. RESET CARD LAMA
-            |--------------------------------------------------------------------------
-            */
-
-            tl.to(
-                currentVisible,
-                {
-                    x:0,
-                    duration:.25,
-                    ease:'power3.out'
-                },
-                '-=.28'
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 4. CARD BARU MASUK
-            |--------------------------------------------------------------------------
-            */
-
-            tl.add(()=>{
-
-                const newSliderRect=
-                    slider.getBoundingClientRect();
-
-
-                const newVisible=
-                    slides.filter(slide=>{
-
-                        const rect=
-                            slide.getBoundingClientRect();
-
-                        return(
-                            rect.right>
-                            newSliderRect.left&&
-                            rect.left<
-                            newSliderRect.right
-                        );
-                    });
-
-
-                newVisible.forEach(
-                    (
-                        slide,
-                        index
-                    )=>{
-
-                        gsap.fromTo(slide,{
-                            x:
-                                direction>0
-                                    ?22
-                                    :-22,
-                            scale:.94,
-                            opacity:.62
-                        },{
-                            x:0,
-                            scale:1,
-                            opacity:1,
-                            duration:.48,
-                            delay:
-                                index*.025,
-                            ease:
-                                'back.out(1.35)',
-                            overwrite:'auto'
-                        });
-                    }
-                );
-
-            },'-=.2');
-        };
-
-
-        /* =================================================
-           BUTTONS
-        ================================================= */
-        prev?.addEventListener('click',()=>{
-
-            scrollCatalog(-1);
-
-        });
-
-
-        next?.addEventListener('click',()=>{
-
-            scrollCatalog(1);
-
-        });
-
-
-        /* =================================================
-           TOUCH / DRAG FEEDBACK
-        ================================================= */
-        if(slider){
-
-            let dragStartX=0;
-            let lastX=0;
-            let dragging=false;
-
-
-            slider.addEventListener(
-                'pointerdown',
-                e=>{
-
-                    dragStartX=
-                        e.clientX;
-
-                    lastX=
-                        e.clientX;
-
-                    dragging=true;
+            tl.to(scrollState, {
+                value: target,
+                duration: .72,
+                ease: 'power4.inOut',
+                onUpdate: () => {
+                    slider.scrollLeft = scrollState.value;
+                    requestCatalogFocus();
                 }
-            );
+            }, '-=.07');
 
+            tl.to(currentVisible, {
+                x: 0,
+                duration: .25,
+                ease: 'power3.out'
+            }, '-=.28');
 
-            slider.addEventListener(
-                'pointermove',
-                e=>{
+            tl.add(() => {
+                const newSliderRect = slider.getBoundingClientRect();
 
-                    if(!dragging)return;
+                const newVisible = slides.filter(slide => {
+                    const rect = slide.getBoundingClientRect();
 
-                    const delta=
-                        e.clientX-
-                        lastX;
-
-                    lastX=
-                        e.clientX;
-
-
-                    /*
-                     * Sedikit rotation pada semua
-                     * card selama drag.
-                     */
-                    slides.forEach(slide=>{
-
-                        gsap.to(slide,{
-                            rotationY:
-                                Math.max(
-                                    -4,
-                                    Math.min(
-                                        4,
-                                        delta*.12
-                                    )
-                                ),
-                            duration:.18,
-                            ease:'power2.out',
-                            overwrite:'auto'
-                        });
-                    });
-                }
-            );
-
-
-            const finishDrag=e=>{
-
-                if(!dragging)return;
-
-                dragging=false;
-
-
-                const difference=
-                    e.clientX-
-                    dragStartX;
-
-
-                slides.forEach(slide=>{
-
-                    gsap.to(slide,{
-                        rotationY:0,
-                        duration:.45,
-                        ease:'power3.out',
-                        overwrite:'auto'
-                    });
+                    return (
+                        rect.right > newSliderRect.left &&
+                        rect.left < newSliderRect.right
+                    );
                 });
 
+                newVisible.forEach((slide, index) => {
+                    gsap.fromTo(slide, {
+                        x: direction > 0 ? 22 : -22,
+                        scale: .94,
+                        opacity: .62
+                    }, {
+                        x: 0,
+                        scale: 1,
+                        opacity: 1,
+                        duration: .48,
+                        delay: index * .025,
+                        ease: 'back.out(1.35)',
+                        overwrite: 'auto'
+                    });
+                });
+            }, '-=.2');
+        };
+
+        prev?.addEventListener('click', () => {
+            scrollCatalog(-1);
+        });
+
+        next?.addEventListener('click', () => {
+            scrollCatalog(1);
+        });
+
+        /* TOUCH / DRAG */
+        if (slider) {
+            let dragStartX = 0;
+            let lastX = 0;
+            let dragging = false;
+
+            slider.addEventListener('pointerdown', e => {
+                dragStartX = e.clientX;
+                lastX = e.clientX;
+                dragging = true;
+            });
+
+            slider.addEventListener('pointermove', e => {
+                if (!dragging) return;
+
+                const delta = e.clientX - lastX;
+                lastX = e.clientX;
+
+                slides.forEach(slide => {
+                    gsap.to(slide, {
+                        rotationY: Math.max(
+                            -4,
+                            Math.min(4, delta * .12)
+                        ),
+                        duration: .18,
+                        ease: 'power2.out',
+                        overwrite: 'auto'
+                    });
+                });
+            });
+
+            const finishDrag = e => {
+                if (!dragging) return;
+
+                dragging = false;
+
+                const difference = e.clientX - dragStartX;
+
+                slides.forEach(slide => {
+                    gsap.to(slide, {
+                        rotationY: 0,
+                        duration: .45,
+                        ease: 'power3.out',
+                        overwrite: 'auto'
+                    });
+                });
 
                 updateCatalogFocus();
 
-
-                if(
-                    Math.abs(difference)>25
-                ){
-
+                if (Math.abs(difference) > 25) {
                     animateNearestBook(
-                        difference<0
-                            ?1
-                            :-1
+                        difference < 0 ? 1 : -1
                     );
                 }
             };
 
+            slider.addEventListener('pointerup', finishDrag);
 
-            slider.addEventListener(
-                'pointerup',
-                finishDrag
-            );
-
-
-            slider.addEventListener(
-                'pointercancel',
-                ()=>{
-
-                    dragging=false;
-
-                    updateCatalogFocus();
-                }
-            );
+            slider.addEventListener('pointercancel', () => {
+                dragging = false;
+                updateCatalogFocus();
+            });
         }
     }
 
     /* =====================================================
        INFORMATION PARALLAX
     ===================================================== */
-    document.querySelectorAll('.bd-info-card').forEach(card=>{
+    document.querySelectorAll('.bd-info-card').forEach(card => {
+        const image = card.querySelector('.bd-info-image img');
 
-        const image=
-            card.querySelector('.bd-info-image img');
+        if (!image) return;
 
-        if(!image)return;
-
-        gsap.fromTo(image,{
-            yPercent:-4,
-            scale:1.06
-        },{
-            yPercent:4,
-            scale:1.06,
-            ease:'none',
-
-            scrollTrigger:{
-                trigger:card,
-                start:'top bottom',
-                end:'bottom top',
-                scrub:1.2
+        gsap.fromTo(image, {
+            yPercent: -4,
+            scale: 1.06
+        }, {
+            yPercent: 4,
+            scale: 1.06,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: card,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1.2
             }
         });
     });
@@ -1489,83 +1197,66 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        CTA
     ===================================================== */
-    const cta=
-        document.querySelector('.bd-cta-section');
+    const cta = document.querySelector('.bd-cta-section');
 
-    if(cta){
+    if (cta) {
+        const card = cta.querySelector('.bd-publish-card');
+        const pills = cta.querySelectorAll('.bd-cta-pill');
+        const action = cta.querySelector('.bd-publish-action');
+        const background = cta.querySelector('.bd-cta-background');
 
-        const card=
-            cta.querySelector('.bd-publish-card');
-
-        const pills=
-            cta.querySelectorAll('.bd-cta-pill');
-
-        const action=
-            cta.querySelector('.bd-publish-action');
-
-        const background=
-            cta.querySelector('.bd-cta-background');
-
-        if(card){
-
-            gsap.from(card,{
-                opacity:0,
-                y:55,
-                scale:.95,
-                duration:1,
-                ease:'power4.out',
-
-                scrollTrigger:{
-                    trigger:cta,
-                    start:'top 80%'
+        if (card) {
+            gsap.from(card, {
+                opacity: 0,
+                y: 55,
+                scale: .95,
+                duration: 1,
+                ease: 'power4.out',
+                scrollTrigger: {
+                    trigger: cta,
+                    start: 'top 80%'
                 }
             });
         }
 
-        if(pills.length){
-
-            gsap.from(pills,{
-                opacity:0,
-                y:15,
-                scale:.92,
-                stagger:.08,
-                duration:.5,
-                ease:'back.out(1.6)',
-
-                scrollTrigger:{
-                    trigger:cta,
-                    start:'top 72%'
+        if (pills.length) {
+            gsap.from(pills, {
+                opacity: 0,
+                y: 15,
+                scale: .92,
+                stagger: .08,
+                duration: .5,
+                ease: 'back.out(1.6)',
+                scrollTrigger: {
+                    trigger: cta,
+                    start: 'top 72%'
                 }
             });
         }
 
-        if(action){
-
-            gsap.from(action,{
-                opacity:0,
-                x:35,
-                duration:.8,
-                ease:'power3.out',
-
-                scrollTrigger:{
-                    trigger:cta,
-                    start:'top 72%'
+        if (action) {
+            gsap.from(action, {
+                opacity: 0,
+                x: 35,
+                duration: .8,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: cta,
+                    start: 'top 72%'
                 }
             });
         }
 
-        if(background){
-
-            gsap.to(background,{
-                scale:1.1,
-                y:30,
-                ease:'none',
-
-                scrollTrigger:{
-                    trigger:cta,
-                    start:'top bottom',
-                    end:'bottom top',
-                    scrub:1.2
+        if (background) {
+            gsap.to(background, {
+                scale: 1.1,
+                y: 30,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: cta,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: 1.2
                 }
             });
         }
@@ -1574,25 +1265,21 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        TESTIMONI GLOW
     ===================================================== */
-    const testimonial=
-        document.getElementById('testimoni');
+    const testimonial = document.getElementById('testimoni');
 
-    if(testimonial){
-
+    if (testimonial) {
         testimonial
             .querySelectorAll('.bdt-glow')
-            .forEach((glow,index)=>{
-
-                gsap.to(glow,{
-                    y:index===0?60:-60,
-                    x:index===0?28:-28,
-                    ease:'none',
-
-                    scrollTrigger:{
-                        trigger:testimonial,
-                        start:'top bottom',
-                        end:'bottom top',
-                        scrub:1.4
+            .forEach((glow, index) => {
+                gsap.to(glow, {
+                    y: index === 0 ? 60 : -60,
+                    x: index === 0 ? 28 : -28,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: testimonial,
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: 1.4
                     }
                 });
             });
@@ -1601,208 +1288,123 @@ document.addEventListener('DOMContentLoaded',()=>{
     /* =====================================================
        AFILIASI INFINITE MARQUEE
     ===================================================== */
-    const affiliate=
-        document.getElementById('afiliasi');
+    const affiliate = document.getElementById('afiliasi');
 
-    if(affiliate){
+    if (affiliate) {
+        const wrap = affiliate.querySelector('.bd-affiliate-wrap');
+        const track = affiliate.querySelector('.bd-affiliate-track');
 
-        const wrap=
-            affiliate.querySelector('.bd-affiliate-wrap');
+        if (wrap && track) {
+            let marquee = null;
+            let settleTimer = null;
+            let affiliateResizeTimer = null;
+            let currentDirection = 1;
 
-        const track=
-            affiliate.querySelector('.bd-affiliate-track');
-
-        if(wrap&&track){
-
-            let marquee=null;
-            let settleTimer=null;
-            let affiliateResizeTimer=null;
-            let currentDirection=1;
-
-            const createMarquee=()=>{
-
-                if(marquee){
+            const createMarquee = () => {
+                if (marquee) {
                     marquee.kill();
-                    marquee=null;
+                    marquee = null;
                 }
 
                 gsap.killTweensOf(track);
 
-                gsap.set(track,{
-                    x:0
+                gsap.set(track, {
+                    x: 0
                 });
 
-                const gap=
+                const gap =
                     parseFloat(
                         getComputedStyle(track).gap
-                    )||0;
+                    ) || 0;
 
-                const distance=
-                    track.scrollWidth/2+
-                    gap/2;
+                const distance =
+                    track.scrollWidth / 2 +
+                    gap / 2;
 
-                if(distance<=0)return;
+                if (distance <= 0) return;
 
-                marquee=
-                    gsap.to(track,{
-                        x:-distance,
-                        duration:34,
-                        ease:'none',
-                        repeat:-1
-                    });
+                marquee = gsap.to(track, {
+                    x: -distance,
+                    duration: 34,
+                    ease: 'none',
+                    repeat: -1
+                });
 
-                marquee.timeScale(
-                    currentDirection
-                );
+                marquee.timeScale(currentDirection);
             };
 
+            window.addEventListener('load', () => {
+                createMarquee();
+            });
 
-            /*
-             * Tunggu logo/image selesai dihitung
-             */
-            window.addEventListener(
-                'load',
-                ()=>{
-
-                    createMarquee();
-
-                }
-            );
-
-
-            requestAnimationFrame(
-                ()=>{
-
-                    createMarquee();
-
-                }
-            );
-
+            requestAnimationFrame(() => {
+                createMarquee();
+            });
 
             ScrollTrigger.create({
+                trigger: affiliate,
+                start: 'top bottom',
+                end: 'bottom top',
 
-                trigger:affiliate,
+                onUpdate: self => {
+                    if (!marquee) return;
 
-                start:'top bottom',
+                    currentDirection =
+                        self.direction > 0 ? 1 : -1;
 
-                end:'bottom top',
-
-                onUpdate:self=>{
-
-                    if(!marquee)return;
-
-
-                    currentDirection=
-                        self.direction>0
-                            ?1
-                            :-1;
-
-
-                    gsap.to(marquee,{
+                    gsap.to(marquee, {
                         timeScale:
-                            currentDirection*
-                            2.2,
-                        duration:.2,
-                        overwrite:true
+                            currentDirection * 2.2,
+                        duration: .2,
+                        overwrite: true
                     });
 
-
-                    if(settleTimer){
-
+                    if (settleTimer) {
                         settleTimer.kill();
-
                     }
 
+                    settleTimer = gsap.delayedCall(.18, () => {
+                        if (!marquee) return;
 
-                    settleTimer=
-                        gsap.delayedCall(
-                            .18,
-                            ()=>{
-
-                                if(!marquee)return;
-
-
-                                gsap.to(
-                                    marquee,
-                                    {
-                                        timeScale:
-                                            currentDirection,
-
-                                        duration:.75,
-
-                                        ease:
-                                            'power2.out'
-                                    }
-                                );
-
-                            }
-                        );
+                        gsap.to(marquee, {
+                            timeScale: currentDirection,
+                            duration: .75,
+                            ease: 'power2.out'
+                        });
+                    });
                 }
             });
 
+            wrap.addEventListener('mouseenter', () => {
+                if (!marquee) return;
 
-            /* HOVER PAUSE */
-            wrap.addEventListener(
-                'mouseenter',
-                ()=>{
+                gsap.to(marquee, {
+                    timeScale: 0,
+                    duration: .35,
+                    ease: 'power2.out'
+                });
+            });
 
-                    if(!marquee)return;
+            wrap.addEventListener('mouseleave', () => {
+                if (!marquee) return;
 
+                gsap.to(marquee, {
+                    timeScale: currentDirection,
+                    duration: .55,
+                    ease: 'power2.out'
+                });
+            });
 
-                    gsap.to(marquee,{
-                        timeScale:0,
-                        duration:.35,
-                        ease:'power2.out'
-                    });
+            window.addEventListener('resize', () => {
+                clearTimeout(
+                    affiliateResizeTimer
+                );
 
-                }
-            );
-
-
-            /* JALAN LAGI */
-            wrap.addEventListener(
-                'mouseleave',
-                ()=>{
-
-                    if(!marquee)return;
-
-
-                    gsap.to(marquee,{
-                        timeScale:
-                            currentDirection,
-
-                        duration:.55,
-
-                        ease:'power2.out'
-                    });
-
-                }
-            );
-
-
-            window.addEventListener(
-                'resize',
-                ()=>{
-
-                    clearTimeout(
-                        affiliateResizeTimer
-                    );
-
-
-                    affiliateResizeTimer=
-                        setTimeout(
-                            ()=>{
-
-                                createMarquee();
-
-                                ScrollTrigger
-                                    .refresh();
-
-                            },
-                            250
-                        );
-                }
-            );
+                affiliateResizeTimer = setTimeout(() => {
+                    createMarquee();
+                    ScrollTrigger.refresh();
+                }, 250);
+            });
         }
     }
 
@@ -1811,101 +1413,65 @@ document.addEventListener('DOMContentLoaded',()=>{
     ===================================================== */
     document
         .querySelectorAll('[data-bd-tilt]')
-        .forEach(card=>{
-
-            gsap.set(card,{
-                transformPerspective:1000,
-                transformStyle:'preserve-3d'
+        .forEach(card => {
+            gsap.set(card, {
+                transformPerspective: 1000,
+                transformStyle: 'preserve-3d'
             });
 
-
-            const rx=
-                gsap.quickTo(
-                    card,
-                    'rotationX',
-                    {
-                        duration:.4,
-                        ease:'power3.out'
-                    }
-                );
-
-
-            const ry=
-                gsap.quickTo(
-                    card,
-                    'rotationY',
-                    {
-                        duration:.4,
-                        ease:'power3.out'
-                    }
-                );
-
-
-            card.addEventListener(
-                'pointermove',
-                e=>{
-
-                    if(
-                        window.innerWidth<
-                        768
-                    ){
-                        return;
-                    }
-
-
-                    const rect=
-                        card
-                            .getBoundingClientRect();
-
-
-                    const x=
-                        (
-                            e.clientX-
-                            rect.left
-                        )/
-                        rect.width;
-
-
-                    const y=
-                        (
-                            e.clientY-
-                            rect.top
-                        )/
-                        rect.height;
-
-
-                    rx(
-                        (.5-y)*4
-                    );
-
-
-                    ry(
-                        (x-.5)*5.5
-                    );
+            const rx = gsap.quickTo(
+                card,
+                'rotationX',
+                {
+                    duration: .4,
+                    ease: 'power3.out'
                 }
             );
 
-
-            card.addEventListener(
-                'pointerleave',
-                ()=>{
-
-                    rx(0);
-                    ry(0);
-
+            const ry = gsap.quickTo(
+                card,
+                'rotationY',
+                {
+                    duration: .4,
+                    ease: 'power3.out'
                 }
             );
+
+            card.addEventListener('pointermove', e => {
+                if (window.innerWidth < 768) {
+                    return;
+                }
+
+                const rect =
+                    card.getBoundingClientRect();
+
+                const x =
+                    (e.clientX - rect.left) /
+                    rect.width;
+
+                const y =
+                    (e.clientY - rect.top) /
+                    rect.height;
+
+                rx((.5 - y) * 4);
+                ry((x - .5) * 5.5);
+            });
+
+            card.addEventListener('pointerleave', () => {
+                rx(0);
+                ry(0);
+            });
         });
 
     /* =====================================================
        DEPTH
     ===================================================== */
-    gsap.set('.bd-depth-1',{
-        z:14
+    gsap.set('.bd-depth-1', {
+        z: 14
     });
 
-    gsap.set('.bd-depth-2',{
-        z:26
+    gsap.set('.bd-depth-2', {
+        z: 26
     });
 
     /* =====================================================
@@ -1913,23 +1479,19 @@ document.addEventListener('DOMContentLoaded',()=>{
     ===================================================== */
     document
         .querySelectorAll('.bd-section-glow')
-        .forEach(glow=>{
+        .forEach(glow => {
+            const section = glow.closest('section');
 
-            const section=
-                glow.closest('section');
+            if (!section) return;
 
-            if(!section)return;
-
-
-            gsap.to(glow,{
-                y:75,
-                ease:'none',
-
-                scrollTrigger:{
-                    trigger:section,
-                    start:'top bottom',
-                    end:'bottom top',
-                    scrub:1.4
+            gsap.to(glow, {
+                y: 75,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: 1.4
                 }
             });
         });
@@ -1939,203 +1501,116 @@ document.addEventListener('DOMContentLoaded',()=>{
     ===================================================== */
     document.querySelectorAll(
         '.bd-wa-btn,.bd-book-detail,.bd-info-read,.bd-publish-action>a'
-    ).forEach(button=>{
-
-        button.addEventListener(
-            'pointermove',
-            e=>{
-
-                if(
-                    window.innerWidth<
-                    768
-                ){
-                    return;
-                }
-
-
-                const rect=
-                    button
-                        .getBoundingClientRect();
-
-
-                const x=
-                    e.clientX-
-                    rect.left-
-                    rect.width/2;
-
-
-                const y=
-                    e.clientY-
-                    rect.top-
-                    rect.height/2;
-
-
-                gsap.to(button,{
-                    x:x*.08,
-                    y:y*.1,
-                    duration:.3,
-                    ease:'power3.out'
-                });
+    ).forEach(button => {
+        button.addEventListener('pointermove', e => {
+            if (window.innerWidth < 768) {
+                return;
             }
-        );
 
+            const rect =
+                button.getBoundingClientRect();
 
-        button.addEventListener(
-            'pointerleave',
-            ()=>{
+            const x =
+                e.clientX -
+                rect.left -
+                rect.width / 2;
 
-                gsap.to(button,{
-                    x:0,
-                    y:0,
-                    duration:.6,
-                    ease:
-                        'elastic.out(1,.45)'
-                });
+            const y =
+                e.clientY -
+                rect.top -
+                rect.height / 2;
 
-            }
-        );
+            gsap.to(button, {
+                x: x * .08,
+                y: y * .1,
+                duration: .3,
+                ease: 'power3.out'
+            });
+        });
+
+        button.addEventListener('pointerleave', () => {
+            gsap.to(button, {
+                x: 0,
+                y: 0,
+                duration: .6,
+                ease: 'elastic.out(1,.45)'
+            });
+        });
     });
 
     /* =====================================================
        KALKULATOR MONEY
     ===================================================== */
-    window.bdAnimateMoney=(
+    window.bdAnimateMoney = (
         element,
         value,
-        prefix='Rp '
-    )=>{
+        prefix = 'Rp '
+    ) => {
+        if (!element) return;
 
-        if(!element)return;
-
-
-        if(
-            element._bdMoneyTween
-        ){
-
-            element
-                ._bdMoneyTween
-                .kill();
-
+        if (element._bdMoneyTween) {
+            element._bdMoneyTween.kill();
         }
 
-
-        let current=
+        let current =
             Number(
                 element.dataset.value
             );
 
-
-        if(
-            !Number.isFinite(
-                current
-            )
-        ){
-
-            current=
+        if (!Number.isFinite(current)) {
+            current =
                 Number(
                     String(
-                        element.textContent||
-                        ''
-                    )
-                    .replace(
-                        /[^\d]/g,
-                        ''
-                    )
-                )||0;
+                        element.textContent || ''
+                    ).replace(/[^\d]/g, '')
+                ) || 0;
         }
 
-
-        const state={
-            value:current
+        const state = {
+            value: current
         };
 
+        element._bdMoneyTween = gsap.to(
+            state,
+            {
+                value: Number(value || 0),
+                duration: .55,
+                ease: 'power2.out',
 
-        element._bdMoneyTween=
-            gsap.to(
-                state,
-                {
+                onUpdate: () => {
+                    element.textContent =
+                        prefix +
+                        Math.round(
+                            state.value
+                        ).toLocaleString('id-ID');
+                },
 
-                    value:
-                        Number(
-                            value||0
-                        ),
+                onComplete: () => {
+                    element.dataset.value =
+                        Number(value || 0);
 
-                    duration:.55,
-
-                    ease:
-                        'power2.out',
-
-
-                    onUpdate:()=>{
-
-                        element.textContent=
-                            prefix+
-                            Math.round(
-                                state.value
-                            )
-                            .toLocaleString(
-                                'id-ID'
-                            );
-
-                    },
-
-
-                    onComplete:()=>{
-
-                        element.dataset.value=
-                            Number(
-                                value||0
-                            );
-
-
-                        element
-                            ._bdMoneyTween=
-                            null;
-
-                    }
+                    element._bdMoneyTween = null;
                 }
-            );
+            }
+        );
     };
 
     /* =====================================================
        REFRESH
     ===================================================== */
-    window.addEventListener(
-        'load',
-        ()=>{
+    window.addEventListener('load', () => {
+        ScrollTrigger.refresh();
+    });
 
+    let resizeTimer = null;
+
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+
+        resizeTimer = setTimeout(() => {
             ScrollTrigger.refresh();
-
-        }
-    );
-
-
-    let resizeTimer=null;
-
-
-    window.addEventListener(
-        'resize',
-        ()=>{
-
-            clearTimeout(
-                resizeTimer
-            );
-
-
-            resizeTimer=
-                setTimeout(
-                    ()=>{
-
-                        ScrollTrigger
-                            .refresh();
-
-                    },
-                    180
-                );
-        }
-    );
-
+        }, 180);
+    });
 
     ScrollTrigger.refresh();
-
 });
