@@ -1,0 +1,6 @@
+.env
+.env.example.backup
+node_modules
+.git
+storage/logs/*.log
+database/*.sqlite
