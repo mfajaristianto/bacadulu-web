@@ -214,16 +214,49 @@ if ($uri === '/up') {
 
     header('Content-Type: text/plain; charset=UTF-8');
 
-    echo "BacaDulu Laravel BOOT OK\n";
+    echo "BacaDulu Laravel Diagnostic\n";
+    echo "====================================\n\n";
+
     echo "PHP: " . PHP_VERSION . "\n";
-    echo "Environment: " . $app->environment() . "\n";
+    echo "Environment: " . $app->environment() . "\n\n";
 
-    echo 'View service: ';
-    echo $app->bound('view')
-        ? 'OK'
-        : 'NOT REGISTERED';
+    echo "SESSION DRIVER:\n";
+    var_export(config('session.driver'));
+    echo "\n\n";
 
-    echo "\n";
+    echo "CACHE DEFAULT:\n";
+    var_export(config('cache.default'));
+    echo "\n\n";
+
+    echo "QUEUE DEFAULT:\n";
+    var_export(config('queue.default'));
+    echo "\n\n";
+
+    echo "DATABASE DEFAULT:\n";
+    var_export(config('database.default'));
+    echo "\n\n";
+
+    echo "AUTH GUARD:\n";
+    var_export(config('auth.defaults.guard'));
+    echo "\n\n";
+
+    echo "FILESYSTEM DEFAULT:\n";
+    var_export(config('filesystems.default'));
+    echo "\n\n";
+
+    echo "MAIL DEFAULT:\n";
+    var_export(config('mail.default'));
+    echo "\n\n";
+
+    echo "LOGGING DEFAULT:\n";
+    var_export(config('logging.default'));
+    echo "\n\n";
+
+    echo "BROADCAST DEFAULT:\n";
+    var_export(config('broadcasting.default'));
+    echo "\n\n";
+
+    echo "====================================\n";
 
     exit;
 }
