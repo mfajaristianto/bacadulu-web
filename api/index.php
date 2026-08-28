@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
-| Prepare writable directories for Vercel
+| Vercel writable directories
 |--------------------------------------------------------------------------
 */
 
@@ -29,40 +29,62 @@ foreach ($tmpDirectories as $directory) {
 
 /*
 |--------------------------------------------------------------------------
-| Tell Laravel to use writable Vercel directories
+| Laravel writable paths
 |--------------------------------------------------------------------------
 */
 
-putenv('LARAVEL_STORAGE_PATH=/tmp/storage');
-$_ENV['LARAVEL_STORAGE_PATH'] = '/tmp/storage';
-$_SERVER['LARAVEL_STORAGE_PATH'] = '/tmp/storage';
+$vercelEnv = [
+    'LARAVEL_STORAGE_PATH' => '/tmp/storage',
 
-putenv('VIEW_COMPILED_PATH=/tmp/views');
-$_ENV['VIEW_COMPILED_PATH'] = '/tmp/views';
-$_SERVER['VIEW_COMPILED_PATH'] = '/tmp/views';
+    'VIEW_COMPILED_PATH' => '/tmp/views',
+
+    'APP_CONFIG_CACHE' => '/tmp/config.php',
+    'APP_EVENTS_CACHE' => '/tmp/events.php',
+    'APP_PACKAGES_CACHE' => '/tmp/packages.php',
+    'APP_ROUTES_CACHE' => '/tmp/routes.php',
+    'APP_SERVICES_CACHE' => '/tmp/services.php',
+];
+
+foreach ($vercelEnv as $key => $value) {
+    putenv("$key=$value");
+
+    $_ENV[$key] = $value;
+    $_SERVER[$key] = $value;
+}
 
 /*
 |--------------------------------------------------------------------------
-| Serve Static Files From /public
+| Request URI
 |--------------------------------------------------------------------------
 */
 
 $uri = urldecode(
-    parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/'
+    parse_url(
+        $_SERVER['REQUEST_URI'] ?? '/',
+        PHP_URL_PATH
+    ) ?: '/'
 );
+
+/*
+|--------------------------------------------------------------------------
+| Serve static files
+|--------------------------------------------------------------------------
+*/
 
 $publicDirectory = realpath(__DIR__ . '/../public');
 
 if ($uri !== '/' && $publicDirectory !== false) {
 
-    $requestedPath = __DIR__ . '/../public/' . ltrim($uri, '/');
-    $requestedFile = realpath($requestedPath);
+    $requestedFile = realpath(
+        __DIR__ . '/../public/' . ltrim($uri, '/')
+    );
 
     if (
         $requestedFile !== false &&
         str_starts_with($requestedFile, $publicDirectory) &&
         is_file($requestedFile)
     ) {
+
         $extension = strtolower(
             pathinfo($requestedFile, PATHINFO_EXTENSION)
         );
@@ -91,18 +113,15 @@ if ($uri !== '/' && $publicDirectory !== false) {
             );
         }
 
-        header(
-            'Content-Length: ' . filesize($requestedFile)
-        );
-
         readfile($requestedFile);
+
         exit;
     }
 }
 
 /*
 |--------------------------------------------------------------------------
-| Load Composer
+| Composer
 |--------------------------------------------------------------------------
 */
 
@@ -110,69 +129,140 @@ require __DIR__ . '/../vendor/autoload.php';
 
 /*
 |--------------------------------------------------------------------------
-| Bootstrap Laravel
+| Laravel application
 |--------------------------------------------------------------------------
 */
 
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app = require __DIR__ . '/../bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------
-| Handle Request
+| Bootstrap Laravel manually
 |--------------------------------------------------------------------------
 |
-| Untuk sementara kita bungkus proses Laravel dengan try/catch.
-| Tujuannya supaya Vercel menampilkan penyebab error sebenarnya.
+| Ini sengaja dilakukan manual supaya error bootstrap ASLI tidak ditelan
+| oleh Laravel Exception Handler.
 |
 */
 
 try {
 
-    $request = Request::capture();
+    $app->bootstrapWith([
+        \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
+        \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
+        \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+        \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
+        \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
+        \Illuminate\Foundation\Bootstrap\BootProviders::class,
+    ]);
 
-    $app->handleRequest($request);
-
-} catch (Throwable $exception) {
+} catch (\Throwable $exception) {
 
     http_response_code(500);
 
     header('Content-Type: text/plain; charset=UTF-8');
 
     echo "========================================\n";
-    echo "BacaDulu Laravel Vercel Diagnostic\n";
+    echo "BacaDulu BOOT ERROR\n";
     echo "========================================\n\n";
 
-    $current = $exception;
-    $number = 1;
+    echo "TYPE:\n";
+    echo get_class($exception) . "\n\n";
 
-    while ($current !== null) {
+    echo "MESSAGE:\n";
+    echo $exception->getMessage() . "\n\n";
 
-        echo "ERROR #{$number}\n";
-        echo "----------------------------------------\n";
+    echo "FILE:\n";
+    echo $exception->getFile() . "\n\n";
+
+    echo "LINE:\n";
+    echo $exception->getLine() . "\n\n";
+
+    echo "----------------------------------------\n";
+
+    $previous = $exception->getPrevious();
+
+    if ($previous) {
+
+        echo "PREVIOUS ERROR\n\n";
 
         echo "TYPE:\n";
-        echo get_class($current) . "\n\n";
+        echo get_class($previous) . "\n\n";
 
         echo "MESSAGE:\n";
-        echo $current->getMessage() . "\n\n";
+        echo $previous->getMessage() . "\n\n";
 
         echo "FILE:\n";
-        echo $current->getFile() . "\n\n";
+        echo $previous->getFile() . "\n\n";
 
         echo "LINE:\n";
-        echo $current->getLine() . "\n\n";
-
-        $current = $current->getPrevious();
-        $number++;
-
-        if ($number > 10) {
-            break;
-        }
+        echo $previous->getLine() . "\n";
     }
 
+    echo "\n========================================\n";
+
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Special Vercel health diagnostic
+|--------------------------------------------------------------------------
+*/
+
+if ($uri === '/up') {
+
+    header('Content-Type: text/plain; charset=UTF-8');
+
+    echo "BacaDulu Laravel BOOT OK\n";
+    echo "PHP: " . PHP_VERSION . "\n";
+    echo "Environment: " . $app->environment() . "\n";
+
+    echo 'View service: ';
+    echo $app->bound('view')
+        ? 'OK'
+        : 'NOT REGISTERED';
+
+    echo "\n";
+
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Handle normal Laravel request
+|--------------------------------------------------------------------------
+*/
+
+try {
+
+    $app->handleRequest(
+        Request::capture()
+    );
+
+} catch (\Throwable $exception) {
+
+    http_response_code(500);
+
+    header('Content-Type: text/plain; charset=UTF-8');
+
     echo "========================================\n";
-    echo "END DIAGNOSTIC\n";
-    echo "========================================\n";
+    echo "BacaDulu REQUEST ERROR\n";
+    echo "========================================\n\n";
+
+    echo "TYPE:\n";
+    echo get_class($exception) . "\n\n";
+
+    echo "MESSAGE:\n";
+    echo $exception->getMessage() . "\n\n";
+
+    echo "FILE:\n";
+    echo $exception->getFile() . "\n\n";
+
+    echo "LINE:\n";
+    echo $exception->getLine() . "\n";
+
+    echo "\n========================================\n";
 
     exit;
 }
