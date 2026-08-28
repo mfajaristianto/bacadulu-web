@@ -12,14 +12,32 @@ class AdminOtpMail extends Mailable
 
     public string $otp;
 
-    public function __construct(string $otp)
-    {
+    public array $loginInfo;
+
+    public function __construct(
+        string $otp,
+        array $loginInfo = []
+    ) {
         $this->otp = $otp;
+
+        $this->loginInfo = $loginInfo;
     }
 
     public function build()
     {
-        return $this->subject('Kode OTP Login Admin Bacadulu')
-    ->view('emails.admin-otp');
+        $googleEmail =
+            $this->loginInfo[
+                'google_email'
+            ]
+            ?? 'Akun Google';
+
+        return $this
+            ->subject(
+                'Kode OTP Admin Baca Dulu — ' .
+                $googleEmail
+            )
+            ->view(
+                'emails.admin-otp'
+            );
     }
 }

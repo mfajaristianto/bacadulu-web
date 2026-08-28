@@ -35,10 +35,34 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Google OAuth
+    |--------------------------------------------------------------------------
+    |
+    | Digunakan untuk login menggunakan akun Google / Socialite.
+    |
+    */
+
     'google' => [
-    'client_id' => env('GOOGLE_CLIENT_ID'),
-    'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-    'redirect' => env('GOOGLE_REDIRECT_URI'),
-],
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Authentication
+    |--------------------------------------------------------------------------
+    |
+    | ADMIN_EMAIL     = Gmail yang diperbolehkan login sebagai admin.
+    | ADMIN_OTP_EMAIL = Gmail yang menerima kode OTP admin.
+    |
+    */
+
+    'admin_auth' => [
+        'email' => env('ADMIN_EMAIL'),
+        'otp_email' => env('ADMIN_OTP_EMAIL'),
+    ],
 
 ];

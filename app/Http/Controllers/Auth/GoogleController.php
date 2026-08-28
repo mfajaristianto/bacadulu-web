@@ -67,7 +67,7 @@ class GoogleController extends Controller
                 |--------------------------------------------------------------------------
                 */
 
-                $adminEmail = 'adminbacadulu@gmail.com';
+                $adminEmail = config('services.admin_auth.email');
 
                 if ($googleUser->email === $adminEmail) {
 

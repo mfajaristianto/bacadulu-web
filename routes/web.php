@@ -17,7 +17,6 @@ use App\Http\Controllers\DataArticleController;
 use App\Http\Controllers\ConferenceController;
 use App\Http\Controllers\BookstoreController;
 use App\Http\Controllers\HakiController;
-use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommentController;
@@ -43,6 +42,7 @@ use App\Http\Controllers\Auth\GoogleController;
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminGoogleVerificationController;
 use App\Http\Controllers\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InformationAdminController;
@@ -95,7 +95,7 @@ Route::get('/login', function () {
 
 /*
 |--------------------------------------------------------------------------
-| GOOGLE LOGIN
+| GOOGLE LOGIN USER / PENULIS
 |--------------------------------------------------------------------------
 */
 
@@ -165,6 +165,51 @@ Route::post(
         'login'
     ]
 )->name('admin.login.submit');
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN GOOGLE IDENTITY VERIFICATION
+|--------------------------------------------------------------------------
+|
+| Verifikasi ini berbeda dari Google Login user/penulis.
+|
+| Alur:
+|
+| Login admin
+| -> Email + password benar
+| -> Pilih akun Google pemohon
+| -> Google callback
+| -> Kirim OTP
+|
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/panel-adminbaca/google-verification',
+    [
+        AdminGoogleVerificationController::class,
+        'show'
+    ]
+)->name('admin.google.verify');
+
+
+Route::get(
+    '/panel-adminbaca/google-verification/redirect',
+    [
+        AdminGoogleVerificationController::class,
+        'redirect'
+    ]
+)->name('admin.google.redirect');
+
+
+Route::get(
+    '/panel-adminbaca/google-verification/callback',
+    [
+        AdminGoogleVerificationController::class,
+        'callback'
+    ]
+)->name('admin.google.callback');
 
 
 /*
@@ -348,24 +393,13 @@ Route::get(
 |--------------------------------------------------------------------------
 | CEK RESI
 |--------------------------------------------------------------------------
+|
+| Sementara dinonaktifkan karena ShipmentController belum tersedia.
+|
+| Jangan diaktifkan sebelum ShipmentController benar-benar dibuat.
+|
+|--------------------------------------------------------------------------
 */
-
-Route::get(
-    '/cek-resi',
-    [
-        ShipmentController::class,
-        'index'
-    ]
-)->name('cek-resi');
-
-
-Route::post(
-    '/cek-resi',
-    [
-        ShipmentController::class,
-        'track'
-    ]
-)->name('cek-resi.track');
 
 
 /*
@@ -750,35 +784,6 @@ Route::get(
 |--------------------------------------------------------------------------
 | EVENT PUBLIC
 |--------------------------------------------------------------------------
-|
-| Event publik menggunakan EventController.
-|
-| Controller:
-|
-| app/Http/Controllers/EventController.php
-|
-| View index:
-|
-| resources/views/event/index.blade.php
-|
-| View detail:
-|
-| resources/views/event/show.blade.php
-|
-|--------------------------------------------------------------------------
-*/
-
-
-/*
-|--------------------------------------------------------------------------
-| EVENT INDEX
-|--------------------------------------------------------------------------
-|
-| URL:
-|
-| /event
-|
-|--------------------------------------------------------------------------
 */
 
 Route::get(
@@ -789,18 +794,6 @@ Route::get(
     ]
 )->name('event.index');
 
-
-/*
-|--------------------------------------------------------------------------
-| EVENT DETAIL
-|--------------------------------------------------------------------------
-|
-| URL contoh:
-|
-| /event/seminar-super-penting
-|
-|--------------------------------------------------------------------------
-*/
 
 Route::get(
     '/event/{slug}',
@@ -1078,14 +1071,6 @@ Route::middleware([
         /*
         |--------------------------------------------------------------------------
         | EVENTS ADMIN
-        |--------------------------------------------------------------------------
-        |
-        | Ini khusus CMS Admin.
-        |
-        | URL:
-        |
-        | /admin/events
-        |
         |--------------------------------------------------------------------------
         */
 
