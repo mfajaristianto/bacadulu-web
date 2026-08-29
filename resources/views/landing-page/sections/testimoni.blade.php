@@ -1,2226 +1,1275 @@
 @php
-    $bukuTerbaru = \App\Models\Book::query()
-        ->latest()
-        ->take(5)
-        ->get();
+    $testimoniItems = [
+        ['image' => asset('img/Bentara.jpg'), 'name' => 'Bentara Campus', 'label' => 'Kolaborasi Pendidikan', 'alt' => 'Dokumentasi Bentara Campus'],
+        ['image' => asset('img/Bina.jpg'), 'name' => 'Bina Cendikia', 'label' => 'Kolaborasi Penerbitan', 'alt' => 'Dokumentasi Bina Cendikia'],
+        ['image' => asset('img/Fdi.jpg'), 'name' => 'FDI Partners', 'label' => 'Kolaborasi Profesional', 'alt' => 'Dokumentasi FDI Partners'],
+        ['image' => asset('img/Kadin.jpg'), 'name' => 'KADIN', 'label' => 'Kolaborasi Institusi', 'alt' => 'Dokumentasi KADIN'],
+        ['image' => asset('img/Fermartian.jpg'), 'name' => 'Fermartian', 'label' => 'Kolaborasi Mitra', 'alt' => 'Dokumentasi Fermartian'],
+    ];
 
-    $jumlahBukuTerbaru = $bukuTerbaru->count();
+    $jumlahTestimoni = count($testimoniItems);
 @endphp
 
-<section id="katalog" class="bd-editorial-books">
+<section id="testimoni" class="bd-testi">
+    <div class="bd-testi-bg-grid" aria-hidden="true"></div>
+    <div class="bd-testi-glow bd-testi-glow-one" aria-hidden="true"></div>
+    <div class="bd-testi-glow bd-testi-glow-two" aria-hidden="true"></div>
 
-    <div class="bd-editorial-grid-bg" aria-hidden="true"></div>
-    <div class="bd-orange-accent bd-orange-accent-left" aria-hidden="true"></div>
-    <div class="bd-orange-accent bd-orange-accent-right" aria-hidden="true"></div>
-
-    <div class="bd-editorial-container">
-
-        {{-- HEADER --}}
-        <header class="bd-editorial-header">
-
-            <div class="bd-editorial-heading">
-
-                <div class="bd-editorial-kicker">
-
-                    <span class="bd-editorial-kicker-icon">
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="1.8">
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"
-                            />
+    <div class="bd-testi-container">
+        <header class="bd-testi-header">
+            <div class="bd-testi-heading">
+                <div class="bd-testi-kicker">
+                    <span class="bd-testi-kicker-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 17h4l2-4V7H7v10z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 17h4l2-4V7h-6v10z"/>
                         </svg>
                     </span>
-
-                    <span>Baca Dulu Bookstore</span>
-
+                    <span>Cerita Mitra</span>
                 </div>
 
-                <h2>Terbitan Terbaru</h2>
+                <h2>Kepercayaan yang <span>tumbuh bersama.</span></h2>
 
                 <p>
-                    Temukan buku terbaru pilihan Baca Dulu dalam format cetak
-                    maupun digital untuk menemani perjalanan membaca Anda.
+                    Dokumentasi dan bentuk kepercayaan dari mitra yang telah
+                    berkolaborasi bersama Baca Dulu.
                 </p>
-
             </div>
 
-            <div class="bd-editorial-header-right">
-
-                @if(!$bukuTerbaru->isEmpty())
-
-                    <div class="bd-editorial-counter">
-                        <strong id="bdEditorialCurrent">01</strong>
-                        <span>/</span>
-                        <span>
-                            {{ str_pad($jumlahBukuTerbaru, 2, '0', STR_PAD_LEFT) }}
-                        </span>
-                    </div>
-
-                @endif
-
-                <a
-                    href="{{ route('portofolio.bookstore') }}"
-                    class="bd-editorial-all"
-                >
-                    <span>Seluruh Koleksi</span>
-
-                    <svg viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="1.8">
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M5 12h14M13 6l6 6-6 6"
-                        />
-                    </svg>
-                </a>
-
+            <div class="bd-testi-header-counter" aria-label="Posisi testimoni">
+                <strong id="bdTestiHeaderCurrent">01</strong>
+                <span>/</span>
+                <span>{{ str_pad($jumlahTestimoni, 2, '0', STR_PAD_LEFT) }}</span>
             </div>
-
         </header>
 
-
-        @if($bukuTerbaru->isEmpty())
-
-            <div class="bd-editorial-empty">
-
-                <span>Katalog</span>
-
-                <h3>
-                    Belum ada terbitan terbaru.
-                </h3>
-
-                <p>
-                    Koleksi terbaru akan ditampilkan di bagian ini.
-                </p>
-
-            </div>
-
-        @else
-
-            <div class="bd-editorial-layout">
-
-                {{-- =====================================================
-                     FEATURE BOOK
-                ====================================================== --}}
-                <div
-                    class="bd-feature-stage"
-                    id="bdFeatureStage"
-                >
-
-                    @foreach($bukuTerbaru as $index => $b)
-
-                        @php
-                            $cover = $b->cover
-                                ? asset('storage/' . $b->cover)
-                                : null;
-
-                            $bookNumber = str_pad(
-                                $index + 1,
-                                2,
-                                '0',
-                                STR_PAD_LEFT
-                            );
-
-                            $category = $b->category ?? 'Buku';
-                        @endphp
-
-
-                        <article
-                            class="
-                                bd-feature-panel
-                                {{ $index === 0 ? 'is-active' : '' }}
-                            "
-                            data-feature-panel="{{ $index }}"
-                            style="{{ $index === 0 ? '' : 'display:none;' }}"
+        <div class="bd-testi-carousel">
+            <div class="bd-testi-stage" id="bdTestiStage">
+                @foreach($testimoniItems as $index => $item)
+                    <article
+                        class="bd-testi-card {{ $index === 0 ? 'is-active' : '' }}"
+                        data-testi-card="{{ $index }}"
+                    >
+                        <button
+                            type="button"
+                            class="bd-testi-card-button"
+                            data-testi-open="{{ $index }}"
+                            aria-label="Lihat dokumentasi {{ $item['name'] }}"
                         >
+                            <div class="bd-testi-media">
+                                <img
+                                    src="{{ $item['image'] }}"
+                                    alt="{{ $item['alt'] }}"
+                                    loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                    draggable="false"
+                                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                                >
 
-                            {{-- COVER --}}
-                            <div class="bd-feature-cover-wrap">
+                                <div class="bd-testi-image-fallback">
+                                    <span>Baca Dulu</span>
+                                    <strong>{{ $item['name'] }}</strong>
+                                </div>
 
-                                <div class="bd-feature-cover-frame">
+                                <div class="bd-testi-overlay"></div>
 
-                                    <span class="bd-feature-cover-number">
-                                        {{ $bookNumber }}
+                                <div class="bd-testi-card-head">
+                                    <span class="bd-testi-card-number">
+                                        {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                                     </span>
 
-                                    <a
-                                        href="{{ route('portofolio.bookstore.show', ['book' => $b->slug]) }}"
-                                        class="bd-feature-cover-link"
-                                        aria-label="Lihat detail {{ $b->title }}"
-                                    >
-
-                                        @if($cover)
-
-                                            <img
-                                                src="{{ $cover }}"
-                                                alt="{{ $b->title }}"
-                                                class="bd-feature-cover"
-                                                loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                                                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                                            >
-
-                                            <div class="bd-feature-placeholder bd-cover-error-fallback">
-
-                                                <span class="bd-placeholder-brand">
-                                                    Baca Dulu
-                                                </span>
-
-                                                <div>
-                                                    <strong>
-                                                        {{ \Illuminate\Support\Str::limit($b->title, 60) }}
-                                                    </strong>
-
-                                                    <small>
-                                                        {{ $b->author }}
-                                                    </small>
-                                                </div>
-
-                                            </div>
-
-                                        @else
-
-                                            <div class="bd-feature-placeholder">
-
-                                                <span class="bd-placeholder-brand">
-                                                    Baca Dulu
-                                                </span>
-
-                                                <div>
-                                                    <strong>
-                                                        {{ \Illuminate\Support\Str::limit($b->title, 60) }}
-                                                    </strong>
-
-                                                    <small>
-                                                        {{ $b->author }}
-                                                    </small>
-                                                </div>
-
-                                            </div>
-
-                                        @endif
-
-                                    </a>
-
-                                </div>
-
-
-                                <div class="bd-feature-cover-caption">
-                                    <span class="bd-caption-line"></span>
-                                    <span>Terbitan {{ $bookNumber }}</span>
-                                </div>
-
-                            </div>
-
-
-                            {{-- COPY --}}
-                            <div class="bd-feature-copy">
-
-                                <div class="bd-feature-category">
-                                    {{ $category }}
-                                </div>
-
-                                <h3>
-                                    {{ $b->title }}
-                                </h3>
-
-                                <p class="bd-feature-author">
-                                    <span>Oleh</span>
-                                    {{ $b->author }}
-                                </p>
-
-
-                                <div class="bd-feature-divider"></div>
-
-
-                                <span class="bd-feature-format-label">
-                                    Pilihan Format
-                                </span>
-
-
-                                <div class="bd-feature-pricing">
-
-                                    {{-- CETAK --}}
-                                    <div class="bd-price-item">
-
-                                        <div class="bd-price-type">
-
-                                            <span class="bd-price-icon">
-                                                <svg viewBox="0 0 24 24"
-                                                     fill="none"
-                                                     stroke="currentColor"
-                                                     stroke-width="1.7">
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"
-                                                    />
-                                                </svg>
-                                            </span>
-
-                                            <div>
-                                                <span>Buku Cetak</span>
-                                                <small>Physical Edition</small>
-                                            </div>
-
-                                        </div>
-
-
-                                        <div class="bd-price-value">
-
-                                            @if($b->has_print && $b->print_price !== null)
-
-                                                @if($b->has_active_print_discount)
-
-                                                    <div class="bd-old-price">
-                                                        IDR {{ number_format((float)$b->print_price, 2, ',', '.') }}
-                                                    </div>
-
-                                                @endif
-
-
-                                                <div class="bd-current-price-row">
-
-                                                    <strong>
-                                                        IDR {{ number_format((float)$b->effective_print_price, 2, ',', '.') }}
-                                                    </strong>
-
-                                                    @if($b->has_active_print_discount)
-
-                                                        <span class="bd-price-discount">
-                                                            -{{ number_format((float)$b->print_discount_percent, 0) }}%
-                                                        </span>
-
-                                                    @endif
-
-                                                </div>
-
-                                            @else
-
-                                                <span class="bd-not-available">
-                                                    Tidak tersedia
-                                                </span>
-
-                                            @endif
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {{-- EBOOK --}}
-                                    <div class="bd-price-item">
-
-                                        <div class="bd-price-type">
-
-                                            <span class="bd-price-icon">
-                                                <svg viewBox="0 0 24 24"
-                                                     fill="none"
-                                                     stroke="currentColor"
-                                                     stroke-width="1.7">
-                                                    <rect
-                                                        x="5"
-                                                        y="3"
-                                                        width="14"
-                                                        height="18"
-                                                        rx="2"
-                                                    />
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        d="M9 7h6M9 11h6"
-                                                    />
-                                                </svg>
-                                            </span>
-
-                                            <div>
-                                                <span>E-book</span>
-                                                <small>Digital Edition</small>
-                                            </div>
-
-                                        </div>
-
-
-                                        <div class="bd-price-value">
-
-                                            @if($b->has_ebook && $b->ebook_price !== null)
-
-                                                @if($b->has_active_ebook_discount)
-
-                                                    <div class="bd-old-price">
-                                                        IDR {{ number_format((float)$b->ebook_price, 2, ',', '.') }}
-                                                    </div>
-
-                                                @endif
-
-
-                                                <div class="bd-current-price-row">
-
-                                                    <strong>
-                                                        IDR {{ number_format((float)$b->effective_ebook_price, 2, ',', '.') }}
-                                                    </strong>
-
-                                                    @if($b->has_active_ebook_discount)
-
-                                                        <span class="bd-price-discount">
-                                                            -{{ number_format((float)$b->ebook_discount_percent, 0) }}%
-                                                        </span>
-
-                                                    @endif
-
-                                                </div>
-
-                                            @else
-
-                                                <span class="bd-not-available">
-                                                    Tidak tersedia
-                                                </span>
-
-                                            @endif
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div class="bd-feature-action-row">
-
-                                    <a
-                                        href="{{ route('portofolio.bookstore.show', ['book' => $b->slug]) }}"
-                                        class="bd-feature-detail"
-                                    >
-
-                                        <span>
-                                            Lihat Detail Buku
-                                        </span>
-
-                                        <svg viewBox="0 0 24 24"
-                                             fill="none"
-                                             stroke="currentColor"
-                                             stroke-width="1.8">
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M5 12h14M13 6l6 6-6 6"
-                                            />
+                                    <span class="bd-testi-expand">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/>
                                         </svg>
-
-                                    </a>
-
+                                    </span>
                                 </div>
 
+                                <div class="bd-testi-card-caption">
+                                    <span>{{ $item['label'] }}</span>
+                                    <strong>{{ $item['name'] }}</strong>
+                                </div>
                             </div>
+                        </button>
+                    </article>
+                @endforeach
+            </div>
 
-                        </article>
-
-                    @endforeach
-
+            <div class="bd-testi-controls">
+                <div class="bd-testi-counter">
+                    <strong id="bdTestiCurrent">01</strong>
+                    <span>/</span>
+                    <span>{{ str_pad($jumlahTestimoni, 2, '0', STR_PAD_LEFT) }}</span>
                 </div>
 
+                <div class="bd-testi-dots" aria-label="Pilih testimoni">
+                    @foreach($testimoniItems as $index => $item)
+                        <button
+                            type="button"
+                            class="bd-testi-dot {{ $index === 0 ? 'is-active' : '' }}"
+                            data-testi-dot="{{ $index }}"
+                            aria-label="Testimoni {{ $index + 1 }}"
+                        >
+                            <span></span>
+                        </button>
+                    @endforeach
+                </div>
 
-                {{-- =====================================================
-                     INDEX DESKTOP
-                ====================================================== --}}
-                <aside class="bd-book-index">
+                <div class="bd-testi-nav-group">
+                    <button
+                        type="button"
+                        id="bdTestiPrev"
+                        class="bd-testi-nav"
+                        aria-label="Testimoni sebelumnya"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </button>
 
-                    <div class="bd-index-header">
-                        <span>Terbitan</span>
-                        <strong>{{ $jumlahBukuTerbaru }} Buku</strong>
-                    </div>
-
-
-                    <div class="bd-index-list">
-
-                        @foreach($bukuTerbaru as $index => $b)
-
-                            @php
-                                $cover = $b->cover
-                                    ? asset('storage/' . $b->cover)
-                                    : null;
-
-                                $bookNumber = str_pad(
-                                    $index + 1,
-                                    2,
-                                    '0',
-                                    STR_PAD_LEFT
-                                );
-                            @endphp
-
-
-                            <button
-                                type="button"
-                                class="
-                                    bd-index-item
-                                    {{ $index === 0 ? 'is-active' : '' }}
-                                "
-                                data-book-index="{{ $index }}"
-                            >
-
-                                <span class="bd-index-number">
-                                    {{ $bookNumber }}
-                                </span>
-
-
-                                <div class="bd-index-thumb">
-
-                                    @if($cover)
-
-                                        <img
-                                            src="{{ $cover }}"
-                                            alt=""
-                                            loading="lazy"
-                                            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                                        >
-
-                                        <div class="bd-index-thumb-fallback bd-index-error-fallback">
-                                            BD
-                                        </div>
-
-                                    @else
-
-                                        <div class="bd-index-thumb-fallback">
-                                            BD
-                                        </div>
-
-                                    @endif
-
-                                </div>
-
-
-                                <div class="bd-index-copy">
-
-                                    <strong>
-                                        {{ \Illuminate\Support\Str::limit($b->title, 46) }}
-                                    </strong>
-
-                                    <span>
-                                        {{ $b->author }}
-                                    </span>
-
-                                </div>
-
-
-                                <span class="bd-index-arrow">
-
-                                    <svg viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="1.8">
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M9 5l7 7-7 7"
-                                        />
-                                    </svg>
-
-                                </span>
-
-                            </button>
-
-                        @endforeach
-
-                    </div>
-
-
-                    {{-- =================================================
-                         CONTROLS
-                    ================================================== --}}
-                    <div class="bd-index-footer">
-
-                        <div class="bd-index-mobile-label">
-
-                            <strong id="bdEditorialMobileCurrent">
-                                01
-                            </strong>
-
-                            <span>/</span>
-
-                            <span>
-                                {{ str_pad($jumlahBukuTerbaru, 2, '0', STR_PAD_LEFT) }}
-                            </span>
-
-                        </div>
-
-
-                        <div class="bd-index-nav">
-
-                            <button
-                                type="button"
-                                id="bdEditorialPrev"
-                                aria-label="Buku sebelumnya"
-                            >
-                                <svg viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="1.8">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M15 18l-6-6 6-6"
-                                    />
-                                </svg>
-                            </button>
-
-
-                            <button
-                                type="button"
-                                id="bdEditorialNext"
-                                class="bd-index-nav-primary"
-                                aria-label="Buku berikutnya"
-                            >
-                                <svg viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="1.8">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M9 18l6-6-6-6"
-                                    />
-                                </svg>
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </aside>
-
+                    <button
+                        type="button"
+                        id="bdTestiNext"
+                        class="bd-testi-nav bd-testi-nav-next"
+                        aria-label="Testimoni berikutnya"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
-        @endif
+            <div class="bd-testi-active-info">
+                <div class="bd-testi-active-number">
+                    <small>TESTIMONI</small>
+                    <strong id="bdTestiInfoNumber">01</strong>
+                </div>
 
+                <div class="bd-testi-active-copy">
+                    <span id="bdTestiInfoLabel">
+                        {{ $testimoniItems[0]['label'] }}
+                    </span>
+
+                    <h3 id="bdTestiInfoName">
+                        {{ $testimoniItems[0]['name'] }}
+                    </h3>
+                </div>
+
+                <p>
+                    Dokumentasi kolaborasi dan kepercayaan bersama Baca Dulu.
+                </p>
+            </div>
+        </div>
     </div>
 
+    <div
+        id="bdTestiLightbox"
+        class="bd-testi-lightbox"
+        aria-hidden="true"
+    >
+        <button
+            type="button"
+            id="bdTestiLightboxClose"
+            class="bd-testi-lightbox-close"
+            aria-label="Tutup gambar"
+        >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <div class="bd-testi-lightbox-inner">
+            <img id="bdTestiLightboxImage" src="" alt="">
+        </div>
+    </div>
 </section>
 
-
 <style>
-.bd-editorial-books{
+.bd-testi{
     --navy:#241B52;
     --orange:#EF5843;
-    --orange-dark:#C84735;
-    --muted:#737580;
-
+    --gold:#F7AA35;
     position:relative;
     width:100%;
     max-width:100%;
-    overflow-x:clip;
-
-    padding:86px 0 88px;
-
-    background:#fff;
+    padding:68px 0 66px;
+    overflow:hidden;
+    background:linear-gradient(180deg,#F5F2EC 0%,#F4F1EB 100%);
     color:#27272D;
 }
 
-.bd-editorial-books *{
+.bd-testi *,
+.bd-testi *::before,
+.bd-testi *::after{
     box-sizing:border-box;
 }
 
-.bd-editorial-grid-bg{
+.bd-testi-bg-grid{
     position:absolute;
     inset:0;
     pointer-events:none;
-    opacity:.58;
-
+    opacity:.3;
     background-image:
-        linear-gradient(rgba(36,27,82,.035) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(36,27,82,.035) 1px,transparent 1px);
-
-    background-size:42px 42px;
+        linear-gradient(rgba(36,27,82,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(36,27,82,.025) 1px,transparent 1px);
+    background-size:52px 52px;
 }
 
-.bd-orange-accent{
+.bd-testi-glow{
     position:absolute;
-    pointer-events:none;
     border-radius:50%;
+    pointer-events:none;
 }
 
-.bd-orange-accent-left{
+.bd-testi-glow-one{
+    width:430px;
+    height:430px;
+    left:-280px;
+    top:40px;
+    background:radial-gradient(circle,rgba(239,88,67,.1),transparent 70%);
+}
+
+.bd-testi-glow-two{
     width:470px;
     height:470px;
-
-    left:-220px;
-    top:-270px;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(239,88,67,.11),
-            transparent 70%
-        );
+    right:-290px;
+    bottom:-260px;
+    background:radial-gradient(circle,rgba(247,170,53,.09),transparent 70%);
 }
 
-.bd-orange-accent-right{
-    width:520px;
-    height:520px;
-
-    right:-270px;
-    bottom:-290px;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(247,170,53,.09),
-            transparent 70%
-        );
-}
-
-.bd-editorial-container{
+.bd-testi-container{
     position:relative;
     z-index:2;
-
     width:min(calc(100% - 56px),1380px);
     margin:0 auto;
 }
 
-
-/* HEADER */
-.bd-editorial-header{
+.bd-testi-header{
+    width:min(100%,1120px);
     display:flex;
     align-items:flex-end;
     justify-content:space-between;
-    gap:40px;
-
-    margin-bottom:32px;
-    padding-bottom:23px;
-
-    border-bottom:1px solid rgba(239,88,67,.15);
+    gap:30px;
+    margin:0 auto 24px;
+    padding-bottom:20px;
+    border-bottom:1px solid rgba(36,27,82,.1);
 }
 
-.bd-editorial-heading{
-    max-width:700px;
+.bd-testi-heading{
+    max-width:660px;
 }
 
-.bd-editorial-kicker{
+.bd-testi-kicker{
     display:flex;
     align-items:center;
     gap:8px;
-
-    margin-bottom:11px;
-
+    margin-bottom:9px;
     color:var(--orange);
-
     font-size:8px;
     font-weight:850;
     letter-spacing:.15em;
     text-transform:uppercase;
 }
 
-.bd-editorial-kicker-icon{
+.bd-testi-kicker-icon{
     width:27px;
     height:27px;
-
     display:flex;
     align-items:center;
     justify-content:center;
-
     border-radius:8px;
-
-    background:rgba(239,88,67,.08);
+    background:rgba(239,88,67,.09);
 }
 
-.bd-editorial-kicker-icon svg{
+.bd-testi-kicker-icon svg{
     width:13px;
     height:13px;
 }
 
-.bd-editorial-heading h2{
+.bd-testi-heading h2{
     margin:0;
-
     color:var(--navy);
-
-    font-size:clamp(34px,3.5vw,47px);
+    font-size:clamp(30px,3.2vw,43px);
     line-height:1.04;
-
     font-weight:850;
     letter-spacing:-.045em;
 }
 
-.bd-editorial-heading p{
-    max-width:590px;
-
-    margin:12px 0 0;
-
-    color:var(--muted);
-
-    font-size:11px;
-    line-height:1.72;
+.bd-testi-heading h2 span{
+    color:var(--orange);
 }
 
-.bd-editorial-header-right{
-    display:flex;
-    align-items:center;
-    gap:21px;
-
-    flex:0 0 auto;
+.bd-testi-heading p{
+    max-width:570px;
+    margin:10px 0 0;
+    color:#777982;
+    font-size:10px;
+    line-height:1.7;
 }
 
-.bd-editorial-counter{
+.bd-testi-header-counter{
     display:flex;
     align-items:baseline;
     gap:5px;
-
-    color:#A5A3AA;
-
+    flex:0 0 auto;
+    color:#AAA7AE;
     font-size:8px;
     font-weight:800;
 }
 
-.bd-editorial-counter strong{
+.bd-testi-header-counter strong{
     color:var(--orange);
-    font-size:18px;
+    font-size:19px;
 }
 
-.bd-editorial-all{
-    display:flex;
-    align-items:center;
-    gap:8px;
-
-    padding-bottom:5px;
-
-    border-bottom:1px solid rgba(239,88,67,.32);
-
-    color:var(--orange-dark)!important;
-
-    font-size:9px;
-    font-weight:850;
-
-    text-decoration:none;
-}
-
-.bd-editorial-all svg{
-    width:13px;
-    height:13px;
-}
-
-
-/* LAYOUT */
-.bd-editorial-layout{
-    display:grid;
-
-    grid-template-columns:
-        minmax(0,1fr)
-        320px;
-
-    gap:22px;
-}
-
-
-/* FEATURE */
-.bd-feature-stage{
+.bd-testi-carousel{
     position:relative;
-
-    min-width:0;
+    width:100%;
+    max-width:100%;
     overflow:hidden;
-
-    padding:38px;
-
-    border:1px solid rgba(239,88,67,.13);
-    border-radius:28px;
-
-    background:#fff;
-
-    box-shadow:
-        0 16px 42px
-        rgba(36,27,82,.055);
 }
 
-.bd-feature-panel{
+.bd-testi-stage{
     position:relative;
-
-    display:grid;
-
-    grid-template-columns:
-        265px
-        minmax(0,1fr);
-
-    gap:48px;
-
-    align-items:center;
-
-    min-height:455px;
+    width:100%;
+    max-width:100%;
+    height:345px;
+    overflow:hidden;
+    perspective:1200px;
 }
 
-.bd-feature-cover-wrap{
-    min-width:0;
-}
-
-.bd-feature-cover-frame{
-    position:relative;
-
-    width:238px;
-
-    margin:0 auto;
-
-    padding:15px;
-
-    border:1px solid rgba(239,88,67,.12);
-    border-radius:23px;
-
-    background:#fff;
-
-    box-shadow:
-        0 13px 32px
-        rgba(36,27,82,.07);
-}
-
-.bd-feature-cover-number{
+.bd-testi-card{
+    --testi-x:0px;
+    --testi-scale:1;
+    --testi-rotate:0deg;
     position:absolute;
-
-    z-index:5;
-
-    left:10px;
-    top:10px;
-
-    min-width:40px;
-    height:29px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:0 9px;
-
-    border:1px solid rgba(239,88,67,.15);
-    border-radius:9px;
-
-    background:rgba(255,255,255,.96);
-
-    color:var(--orange);
-
-    font-size:9px;
-    font-weight:900;
+    left:50%;
+    top:8px;
+    width:290px;
+    height:318px;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transform:
+        translateX(-50%)
+        translateX(var(--testi-x))
+        scale(var(--testi-scale))
+        rotateY(var(--testi-rotate));
+    transform-origin:center;
+    transition:
+        transform .48s cubic-bezier(.22,.8,.25,1),
+        opacity .38s ease;
 }
 
-.bd-feature-cover-link{
-    display:block;
-
-    width:208px;
-    height:294px;
-
-    margin:0 auto;
+.bd-testi-card.is-active{
+    pointer-events:auto;
 }
 
-.bd-feature-cover{
+.bd-testi-card-button{
     display:block;
-
     width:100%;
     height:100%;
-
-    object-fit:cover;
-
-    border-radius:14px;
-
-    box-shadow:
-        7px 12px 24px
-        rgba(31,27,55,.14);
-}
-
-.bd-feature-placeholder{
-    width:100%;
-    height:100%;
-
-    flex-direction:column;
-    justify-content:space-between;
-
-    padding:22px;
-
-    border-radius:14px;
-
-    color:#fff;
-
-    background:
-        linear-gradient(
-            145deg,
-            #EF5843,
-            #E97440
-        );
-}
-
-.bd-feature-cover-link >
-.bd-feature-placeholder:not(.bd-cover-error-fallback){
-    display:flex;
-}
-
-.bd-cover-error-fallback{
-    display:none;
-}
-
-.bd-placeholder-brand{
-    font-size:7px;
-    font-weight:850;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-}
-
-.bd-feature-placeholder strong{
-    display:block;
-
-    font-size:17px;
-    line-height:1.3;
-}
-
-.bd-feature-placeholder small{
-    display:block;
-    margin-top:8px;
-    font-size:8px;
-}
-
-.bd-feature-cover-caption{
-    width:208px;
-
-    display:flex;
-    align-items:center;
-    gap:7px;
-
-    margin:11px auto 0;
-
-    color:#94919A;
-
-    font-size:7px;
-    font-weight:800;
-
-    text-transform:uppercase;
-}
-
-.bd-caption-line{
-    width:18px;
-    height:1px;
-
-    background:var(--orange);
-}
-
-
-/* FEATURE COPY */
-.bd-feature-copy{
-    min-width:0;
-}
-
-.bd-feature-category{
-    display:inline-flex;
-    align-items:center;
-
-    min-height:29px;
-
-    padding:0 11px;
-
-    border-radius:8px;
-
-    color:var(--orange);
-
-    background:rgba(239,88,67,.065);
-
-    font-size:7px;
-    font-weight:850;
-
-    letter-spacing:.14em;
-    text-transform:uppercase;
-}
-
-.bd-feature-copy h3{
-    max-width:590px;
-
-    margin:14px 0 0;
-
-    color:var(--navy);
-
-    font-size:clamp(26px,2.7vw,38px);
-    line-height:1.12;
-
-    font-weight:850;
-    letter-spacing:-.04em;
-
-    overflow-wrap:anywhere;
-}
-
-.bd-feature-author{
-    margin:12px 0 0;
-
-    color:#666873;
-
-    font-size:11px;
-    font-weight:650;
-}
-
-.bd-feature-author span{
-    margin-right:4px;
-
-    color:#AAAAAF;
-    font-weight:500;
-}
-
-.bd-feature-divider{
-    width:100%;
-    height:1px;
-
-    margin:23px 0 19px;
-
-    background:rgba(36,27,82,.09);
-}
-
-.bd-feature-format-label{
-    display:block;
-
-    margin-bottom:7px;
-
-    color:#9A98A0;
-
-    font-size:7px;
-    font-weight:800;
-
-    letter-spacing:.13em;
-    text-transform:uppercase;
-}
-
-.bd-feature-pricing{
-    border-top:1px solid rgba(36,27,82,.08);
-}
-
-.bd-price-item{
-    min-height:68px;
-
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    gap:16px;
-
-    padding:11px 0;
-
-    border-bottom:1px solid rgba(36,27,82,.08);
-}
-
-.bd-price-type{
-    min-width:0;
-
-    display:flex;
-    align-items:center;
-
-    gap:10px;
-}
-
-.bd-price-icon{
-    width:31px;
-    height:31px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    flex:0 0 31px;
-
-    border-radius:9px;
-
-    background:rgba(239,88,67,.07);
-    color:var(--orange);
-}
-
-.bd-price-icon svg{
-    width:15px;
-    height:15px;
-}
-
-.bd-price-type > div > span{
-    display:block;
-
-    color:var(--navy);
-
-    font-size:10px;
-    font-weight:800;
-}
-
-.bd-price-type small{
-    display:block;
-
-    margin-top:2px;
-
-    color:#A2A0A7;
-
-    font-size:7px;
-}
-
-.bd-price-value{
-    min-width:145px;
-    text-align:right;
-}
-
-.bd-old-price{
-    color:#AAA8AD;
-
-    font-size:7px;
-
-    text-decoration:line-through;
-}
-
-.bd-current-price-row{
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-
-    gap:6px;
-}
-
-.bd-price-value strong{
-    color:var(--navy);
-
-    font-size:12px;
-    font-weight:850;
-}
-
-.bd-price-discount{
-    padding:4px 6px;
-
-    border-radius:6px;
-
-    background:rgba(239,88,67,.08);
-
-    color:var(--orange);
-
-    font-size:6px;
-    font-weight:850;
-}
-
-.bd-not-available{
-    color:#A8A6AC;
-
-    font-size:8px;
-}
-
-.bd-feature-action-row{
-    margin-top:21px;
-}
-
-.bd-feature-detail{
-    min-height:43px;
-
-    display:inline-flex;
-    align-items:center;
-
-    gap:10px;
-
-    padding:0 16px;
-
-    border-radius:10px;
-
-    color:#fff!important;
-    background:var(--navy);
-
-    font-size:8px;
-    font-weight:850;
-
-    text-decoration:none;
-}
-
-.bd-feature-detail svg{
-    width:13px;
-    height:13px;
-}
-
-
-/* INDEX */
-.bd-book-index{
-    display:flex;
-    flex-direction:column;
-
-    overflow:hidden;
-
-    border:1px solid rgba(239,88,67,.12);
-    border-radius:24px;
-
-    background:#fff;
-
-    box-shadow:
-        0 14px 38px
-        rgba(36,27,82,.045);
-}
-
-.bd-index-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    padding:17px 18px;
-
-    border-bottom:1px solid rgba(36,27,82,.08);
-}
-
-.bd-index-header span{
-    color:#9B99A0;
-
-    font-size:7px;
-    font-weight:850;
-
-    text-transform:uppercase;
-}
-
-.bd-index-header strong{
-    color:var(--navy);
-
-    font-size:8px;
-}
-
-.bd-index-list{
-    flex:1;
-}
-
-.bd-index-item{
-    position:relative;
-
-    width:100%;
-    min-height:88px;
-
-    display:grid;
-
-    grid-template-columns:
-        24px
-        45px
-        minmax(0,1fr)
-        15px;
-
-    align-items:center;
-
-    gap:10px;
-
-    padding:12px 14px;
-
+    padding:0;
     border:0;
-    border-bottom:1px solid rgba(36,27,82,.07);
-
     background:transparent;
-
-    text-align:left;
-
     cursor:pointer;
 }
 
-.bd-index-item.is-active{
-    background:rgba(239,88,67,.055);
-}
-
-.bd-index-item.is-active::before{
-    content:"";
-
-    position:absolute;
-
-    left:0;
-    top:12px;
-    bottom:12px;
-
-    width:3px;
-
-    border-radius:0 999px 999px 0;
-
-    background:var(--orange);
-}
-
-.bd-index-number{
-    color:#AAA8AE;
-
-    font-size:7px;
-    font-weight:900;
-}
-
-.bd-index-item.is-active
-.bd-index-number{
-    color:var(--orange);
-}
-
-.bd-index-thumb{
-    width:42px;
-    height:57px;
-
+.bd-testi-media{
+    position:relative;
+    width:100%;
+    height:100%;
     overflow:hidden;
-
-    border-radius:8px;
-
-    background:#F2F1EE;
+    border:1px solid rgba(36,27,82,.09);
+    border-radius:20px;
+    background:#fff;
+    box-shadow:0 16px 36px rgba(36,27,82,.1);
 }
 
-.bd-index-thumb img{
-    width:100%;
-    height:100%;
+.bd-testi-card.is-active .bd-testi-media{
+    border-color:rgba(239,88,67,.2);
+    box-shadow:0 22px 45px rgba(36,27,82,.14);
+}
 
+.bd-testi-media>img{
     display:block;
-
-    object-fit:cover;
-}
-
-.bd-index-thumb-fallback{
     width:100%;
     height:100%;
+    padding:8px;
+    object-fit:contain;
+    object-position:center;
+    background:#fff;
+    border-radius:19px;
+}
 
+.bd-testi-image-fallback{
+    position:absolute;
+    inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    padding:20px;
+    color:#fff;
+    text-align:center;
+    background:linear-gradient(145deg,#241B52,#332875);
+}
+
+.bd-testi-image-fallback span{
+    color:var(--gold);
+    font-size:7px;
+    font-weight:850;
+    text-transform:uppercase;
+}
+
+.bd-testi-image-fallback strong{
+    font-size:19px;
+}
+
+.bd-testi-overlay{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+        linear-gradient(
+            180deg,
+            transparent 57%,
+            rgba(17,12,49,.04) 67%,
+            rgba(17,12,49,.82) 100%
+        );
+}
+
+.bd-testi-card-head{
+    position:absolute;
+    z-index:5;
+    left:12px;
+    right:12px;
+    top:12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.bd-testi-card-number{
+    min-width:36px;
+    height:27px;
     display:flex;
     align-items:center;
     justify-content:center;
-
-    color:#fff;
-
-    background:var(--orange);
-
-    font-size:7px;
+    padding:0 8px;
+    border-radius:8px;
+    background:rgba(255,255,255,.96);
+    color:var(--orange);
+    font-size:8px;
     font-weight:900;
 }
 
-.bd-index-error-fallback{
-    display:none;
-}
-
-.bd-index-copy{
-    min-width:0;
-}
-
-.bd-index-copy strong{
-    display:-webkit-box;
-
-    overflow:hidden;
-
+.bd-testi-expand{
+    width:29px;
+    height:29px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:rgba(255,255,255,.95);
     color:var(--navy);
-
-    font-size:9px;
-    line-height:1.4;
-
-    font-weight:750;
-
-    -webkit-line-clamp:2;
-    -webkit-box-orient:vertical;
 }
 
-.bd-index-copy span{
-    display:block;
-
-    margin-top:3px;
-
-    overflow:hidden;
-
-    color:#8D8C93;
-
-    font-size:7px;
-
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-.bd-index-arrow{
-    color:#AAA8AE;
-}
-
-.bd-index-arrow svg{
+.bd-testi-expand svg{
     width:12px;
     height:12px;
 }
 
-.bd-index-item.is-active
-.bd-index-arrow{
-    color:var(--orange);
+.bd-testi-card-caption{
+    position:absolute;
+    z-index:5;
+    left:17px;
+    right:17px;
+    bottom:16px;
 }
 
+.bd-testi-card-caption span{
+    display:block;
+    margin-bottom:4px;
+    color:rgba(255,255,255,.7);
+    font-size:6px;
+    font-weight:850;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
 
-/* CONTROLS */
-.bd-index-footer{
-    display:flex;
+.bd-testi-card-caption strong{
+    display:block;
+    color:#fff;
+    font-size:16px;
+    line-height:1.2;
+    font-weight:850;
+}
+
+.bd-testi-controls{
+    width:min(100%,700px);
+    display:grid;
+    grid-template-columns:auto 1fr auto;
     align-items:center;
-    justify-content:space-between;
-
-    gap:12px;
-
-    padding:13px 14px;
-
-    border-top:1px solid rgba(36,27,82,.08);
+    gap:14px;
+    margin:8px auto 0;
 }
 
-.bd-index-mobile-label{
+.bd-testi-counter{
     display:flex;
     align-items:baseline;
-
     gap:5px;
-
-    color:#A19FA6;
-
+    min-width:65px;
+    color:#AAA7AE;
     font-size:8px;
     font-weight:800;
 }
 
-.bd-index-mobile-label strong{
+.bd-testi-counter strong{
     color:var(--orange);
-
-    font-size:17px;
+    font-size:18px;
 }
 
-.bd-index-nav{
-    display:flex;
-    align-items:center;
-
-    gap:7px;
-
-    margin-left:auto;
-}
-
-.bd-index-nav button{
-    width:42px;
-    height:42px;
-
+.bd-testi-dots{
     display:flex;
     align-items:center;
     justify-content:center;
+    gap:4px;
+}
 
+.bd-testi-dot{
+    width:21px;
+    height:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     padding:0;
-
-    border:1px solid rgba(36,27,82,.12);
-    border-radius:11px;
-
-    background:#fff;
-    color:var(--navy);
-
+    border:0;
+    background:transparent;
     cursor:pointer;
 }
 
-.bd-index-nav .bd-index-nav-primary{
-    border-color:var(--navy);
+.bd-testi-dot span{
+    display:block;
+    width:12px;
+    height:2px;
+    border-radius:999px;
+    background:rgba(36,27,82,.18);
+    transition:.22s ease;
+}
 
+.bd-testi-dot.is-active span{
+    width:21px;
+    background:var(--orange);
+}
+
+.bd-testi-nav-group{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.bd-testi-nav{
+    width:43px;
+    height:43px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    border:1px solid rgba(36,27,82,.13);
+    border-radius:11px;
+    background:#fff;
+    color:var(--navy);
+    cursor:pointer;
+}
+
+.bd-testi-nav-next{
+    border-color:var(--navy);
     background:var(--navy);
     color:#fff;
 }
 
-.bd-index-nav svg{
+.bd-testi-nav svg{
     width:14px;
     height:14px;
 }
 
-
-/* EMPTY */
-.bd-editorial-empty{
-    padding:60px 25px;
-
-    border:1px solid rgba(239,88,67,.12);
-    border-radius:26px;
-
-    text-align:center;
+.bd-testi-active-info{
+    width:min(100%,800px);
+    display:grid;
+    grid-template-columns:68px minmax(0,1fr) minmax(190px,.7fr);
+    align-items:center;
+    gap:17px;
+    margin:17px auto 0;
+    padding:13px 15px;
+    border:1px solid rgba(36,27,82,.08);
+    border-radius:15px;
+    background:rgba(255,255,255,.67);
 }
 
-.bd-editorial-empty > span{
-    color:var(--orange);
+.bd-testi-active-number{
+    min-height:47px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    border:1px solid rgba(36,27,82,.07);
+    border-radius:10px;
+    background:#fff;
+}
 
-    font-size:8px;
+.bd-testi-active-number small{
+    color:#AAA6AE;
+    font-size:5px;
     font-weight:850;
 }
 
-.bd-editorial-empty h3{
-    margin:9px 0 0;
+.bd-testi-active-number strong{
+    color:var(--orange);
+    font-size:16px;
+}
 
+.bd-testi-active-copy{
+    min-width:0;
+}
+
+.bd-testi-active-copy>span{
+    display:block;
+    color:var(--orange);
+    font-size:6px;
+    font-weight:850;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+
+.bd-testi-active-copy h3{
+    margin:3px 0 0;
     color:var(--navy);
-
-    font-size:20px;
+    font-size:18px;
+    line-height:1.2;
+    font-weight:850;
+    overflow-wrap:anywhere;
 }
 
-.bd-editorial-empty p{
-    margin:7px 0 0;
-
-    color:var(--muted);
-
-    font-size:11px;
+.bd-testi-active-info>p{
+    margin:0;
+    padding-left:16px;
+    border-left:1px solid rgba(36,27,82,.08);
+    color:#89868F;
+    font-size:7px;
+    line-height:1.6;
 }
 
-
-/* ================================================================
-   LAPTOP
-================================================================ */
-@media(max-width:1150px){
-
-    .bd-editorial-layout{
-        grid-template-columns:
-            minmax(0,1fr)
-            280px;
-    }
-
-    .bd-feature-stage{
-        padding:30px;
-    }
-
-    .bd-feature-panel{
-        grid-template-columns:
-            220px
-            minmax(0,1fr);
-
-        gap:35px;
-    }
-
-    .bd-feature-cover-frame{
-        width:205px;
-    }
-
-    .bd-feature-cover-link{
-        width:175px;
-        height:248px;
-    }
-
-    .bd-feature-cover-caption{
-        width:175px;
-    }
+/* TOUCH */
+html[data-baca-input="touch"] .bd-testi-stage{
+    height:auto;
+    overflow:hidden;
+    perspective:none;
+    touch-action:pan-y;
+    overscroll-behavior-x:contain;
 }
 
-
-/* ================================================================
-   TOUCH / TABLET
-   Tidak ada horizontal index carousel.
-================================================================ */
-html[data-baca-input="touch"]
-.bd-editorial-layout{
-    grid-template-columns:1fr;
+html[data-baca-input="touch"] .bd-testi-card{
+    position:relative;
+    left:auto;
+    top:auto;
+    width:min(100%,300px);
+    height:auto;
+    aspect-ratio:290/318;
+    margin:0 auto;
+    transform:none!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto;
 }
 
-html[data-baca-input="touch"]
-.bd-book-index{
-    overflow:visible;
-
-    border:0;
-
-    border-radius:0;
-
-    background:transparent;
-
-    box-shadow:none;
+html[data-baca-input="touch"] .bd-testi-card:not(.is-active){
+    display:none!important;
 }
 
-html[data-baca-input="touch"]
-.bd-index-header,
-html[data-baca-input="touch"]
-.bd-index-list{
-    display:none;
+html[data-baca-input="touch"] .bd-testi-card.is-active{
+    display:block!important;
 }
 
-html[data-baca-input="touch"]
-.bd-index-footer{
-    width:min(100%,680px);
-
-    margin:12px auto 0;
-
-    padding:12px 0 0;
-
-    border-top:1px solid rgba(36,27,82,.09);
+/* PHONE */
+html[data-baca-device="phone"] .bd-testi{
+    padding:56px 0 55px;
 }
 
-
-/* ================================================================
-   PHONE
-================================================================ */
-html[data-baca-device="phone"]
-.bd-editorial-books{
-    padding:58px 0 60px;
-}
-
-html[data-baca-device="phone"]
-.bd-editorial-container{
+html[data-baca-device="phone"] .bd-testi-container{
     width:100%;
-
     padding:0 16px;
 }
 
-html[data-baca-device="phone"]
-.bd-editorial-header{
+html[data-baca-device="phone"] .bd-testi-header{
+    width:100%;
     flex-direction:column;
     align-items:flex-start;
-
-    gap:15px;
-
-    margin-bottom:22px;
-    padding-bottom:18px;
+    gap:10px;
+    margin-bottom:19px;
+    padding-bottom:16px;
 }
 
-html[data-baca-device="phone"]
-.bd-editorial-heading h2{
-    font-size:33px;
+html[data-baca-device="phone"] .bd-testi-heading{
+    width:100%;
 }
 
-html[data-baca-device="phone"]
-.bd-editorial-heading p{
+html[data-baca-device="phone"] .bd-testi-heading h2{
+    max-width:350px;
+    font-size:31px;
+}
+
+html[data-baca-device="phone"] .bd-testi-heading p{
     max-width:100%;
-
-    font-size:10px;
+    font-size:9.5px;
 }
 
-html[data-baca-device="phone"]
-.bd-editorial-header-right{
-    width:100%;
+html[data-baca-device="phone"] .bd-testi-header-counter{
+    display:none;
+}
 
+html[data-baca-device="phone"] .bd-testi-card{
+    width:min(100%,285px);
+}
+
+html[data-baca-device="phone"] .bd-testi-controls{
+    width:min(100%,285px);
+    display:flex;
+    align-items:center;
     justify-content:space-between;
-}
-
-html[data-baca-device="phone"]
-.bd-feature-stage{
-    padding:19px 16px 22px;
-
-    border-radius:21px;
-}
-
-html[data-baca-device="phone"]
-.bd-feature-panel{
-    grid-template-columns:1fr;
-
-    gap:23px;
-
-    min-height:0;
-}
-
-html[data-baca-device="phone"]
-.bd-feature-cover-frame{
-    width:min(63vw,230px);
-
-    padding:12px;
-
-    border-radius:19px;
-}
-
-html[data-baca-device="phone"]
-.bd-feature-cover-link{
-    width:100%;
-    height:auto;
-
-    aspect-ratio:2/2.82;
-}
-
-html[data-baca-device="phone"]
-.bd-feature-cover-caption{
-    width:min(60vw,205px);
-}
-
-html[data-baca-device="phone"]
-.bd-feature-copy h3{
-    font-size:25px;
-}
-
-html[data-baca-device="phone"]
-.bd-feature-divider{
-    margin:18px 0 15px;
-}
-
-html[data-baca-device="phone"]
-.bd-price-item{
-    min-height:64px;
-}
-
-html[data-baca-device="phone"]
-.bd-feature-detail{
-    width:100%;
-
-    justify-content:space-between;
-
-    min-height:47px;
-}
-
-html[data-baca-device="phone"]
-.bd-index-footer{
-    width:100%;
-
+    gap:12px;
     margin-top:12px;
 }
 
-html[data-baca-device="phone"]
-.bd-index-nav button{
-    width:46px;
-    height:46px;
+html[data-baca-device="phone"] .bd-testi-dots{
+    display:none;
 }
 
+html[data-baca-device="phone"] .bd-testi-nav-group{
+    margin-left:auto;
+}
 
-/* SMALL PHONE */
+html[data-baca-device="phone"] .bd-testi-nav{
+    width:45px;
+    height:45px;
+}
+
+html[data-baca-device="phone"] .bd-testi-active-info{
+    width:100%;
+    grid-template-columns:1fr;
+    gap:9px;
+    margin-top:17px;
+    padding:13px;
+}
+
+html[data-baca-device="phone"] .bd-testi-active-number{
+    width:max-content;
+    min-width:65px;
+    min-height:38px;
+    flex-direction:row;
+    gap:5px;
+    padding:0 9px;
+}
+
+html[data-baca-device="phone"] .bd-testi-active-info>p{
+    padding:9px 0 0;
+    border-left:0;
+    border-top:1px solid rgba(36,27,82,.08);
+}
+
+/* DESKTOP HOVER */
+html[data-baca-device="desktop"][data-baca-input="fine"] .bd-testi-nav:hover{
+    border-color:rgba(239,88,67,.4);
+}
+
+html[data-baca-device="desktop"][data-baca-input="fine"] .bd-testi-nav-next:hover{
+    border-color:var(--orange);
+    background:var(--orange);
+}
+
+/* LIGHTBOX */
+.bd-testi-lightbox{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    background:rgba(13,9,35,.91);
+    backdrop-filter:blur(10px);
+    transition:opacity .2s ease,visibility .2s ease;
+}
+
+.bd-testi-lightbox.is-open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+
+.bd-testi-lightbox-inner{
+    width:min(100%,900px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.bd-testi-lightbox-inner img{
+    display:block;
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:calc(100dvh - 70px);
+    padding:7px;
+    object-fit:contain;
+    border-radius:15px;
+    background:#fff;
+}
+
+.bd-testi-lightbox-close{
+    position:absolute;
+    top:20px;
+    right:20px;
+    width:44px;
+    height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:50%;
+    background:rgba(255,255,255,.1);
+    color:#fff;
+    cursor:pointer;
+}
+
+.bd-testi-lightbox-close svg{
+    width:18px;
+    height:18px;
+}
+
+body.bd-testi-modal-open{
+    overflow:hidden;
+}
+
 @media(max-width:390px){
-
-    html[data-baca-device="phone"]
-    .bd-editorial-container{
+    html[data-baca-device="phone"] .bd-testi-container{
         padding:0 14px;
     }
 
-    html[data-baca-device="phone"]
-    .bd-editorial-heading h2{
-        font-size:30px;
+    html[data-baca-device="phone"] .bd-testi-heading h2{
+        font-size:29px;
     }
 
-    html[data-baca-device="phone"]
-    .bd-feature-copy h3{
-        font-size:23px;
-    }
-
-    html[data-baca-device="phone"]
-    .bd-price-item{
-        flex-direction:column;
-        align-items:flex-start;
-
-        gap:8px;
-    }
-
-    html[data-baca-device="phone"]
-    .bd-price-value{
-        min-width:0;
-        text-align:left;
-    }
-
-    html[data-baca-device="phone"]
-    .bd-current-price-row{
-        justify-content:flex-start;
+    html[data-baca-device="phone"] .bd-testi-card,
+    html[data-baca-device="phone"] .bd-testi-controls{
+        width:min(100%,265px);
     }
 }
 
-
 @media(prefers-reduced-motion:reduce){
-
-    .bd-editorial-books *{
+    .bd-testi-card,
+    .bd-testi-dot span,
+    .bd-testi-lightbox{
         transition:none!important;
     }
 }
 </style>
 
-
 <script>
 (function(){
+    function initBacaTestimoni(){
+        const section=document.getElementById('testimoni');
 
-    function initEditorialBooks(){
+        if(!section||section.dataset.testiReady==='1') return;
+        section.dataset.testiReady='1';
 
-        const section =
-            document.getElementById('katalog');
+        const cards=[...section.querySelectorAll('[data-testi-card]')];
+        const dots=[...section.querySelectorAll('[data-testi-dot]')];
+        const openButtons=[...section.querySelectorAll('[data-testi-open]')];
 
-        if(
-            !section ||
-            section.dataset.editorialReady === '1'
-        ){
-            return;
+        const stage=section.querySelector('#bdTestiStage');
+        const prev=section.querySelector('#bdTestiPrev');
+        const next=section.querySelector('#bdTestiNext');
+        const current=section.querySelector('#bdTestiCurrent');
+        const headerCurrent=section.querySelector('#bdTestiHeaderCurrent');
+        const infoNumber=section.querySelector('#bdTestiInfoNumber');
+        const infoLabel=section.querySelector('#bdTestiInfoLabel');
+        const infoName=section.querySelector('#bdTestiInfoName');
+
+        const lightbox=section.querySelector('#bdTestiLightbox');
+        const lightboxImage=section.querySelector('#bdTestiLightboxImage');
+        const lightboxClose=section.querySelector('#bdTestiLightboxClose');
+
+        if(!cards.length) return;
+
+        const items=@json($testimoniItems);
+        const gsap=window.bdGsap||null;
+
+        const reduceMotion=
+            window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+        let activeIndex=0;
+        let autoplay=null;
+        let startX=0;
+        let startY=0;
+
+        function getDevice(){
+            return window.BacaDevice||{
+                type:
+                    window.innerWidth<=767
+                        ? 'phone'
+                        : (
+                            window.innerWidth<=1023
+                                ? 'tablet'
+                                : 'desktop'
+                        ),
+                touch:navigator.maxTouchPoints>0
+            };
         }
-
-        section.dataset.editorialReady = '1';
-
-        const panels =
-            Array.from(
-                section.querySelectorAll(
-                    '[data-feature-panel]'
-                )
-            );
-
-        const indexButtons =
-            Array.from(
-                section.querySelectorAll(
-                    '[data-book-index]'
-                )
-            );
-
-        const prev =
-            section.querySelector(
-                '#bdEditorialPrev'
-            );
-
-        const next =
-            section.querySelector(
-                '#bdEditorialNext'
-            );
-
-        const current =
-            section.querySelector(
-                '#bdEditorialCurrent'
-            );
-
-        const mobileCurrent =
-            section.querySelector(
-                '#bdEditorialMobileCurrent'
-            );
-
-        const stage =
-            section.querySelector(
-                '#bdFeatureStage'
-            );
-
-        if(!panels.length){
-            return;
-        }
-
-        const gsap =
-            window.bdGsap || null;
-
-        const reduceMotion =
-            window.matchMedia(
-                '(prefers-reduced-motion:reduce)'
-            ).matches;
-
-        let activeIndex = 0;
-        let busy = false;
-
-        let startX = 0;
-        let startY = 0;
-
-
-        function device(){
-
-            return (
-                window.BacaDevice ||
-                {
-                    type:
-                        window.innerWidth <= 767
-                            ? 'phone'
-                            : (
-                                window.innerWidth <= 1023
-                                    ? 'tablet'
-                                    : 'desktop'
-                            ),
-
-                    touch:
-                        navigator.maxTouchPoints > 0
-                }
-            );
-        }
-
 
         function isTouch(){
+            const d=getDevice();
 
-            const d =
-                device();
-
-            return (
-                d.touch === true ||
-                d.type !== 'desktop'
-            );
+            return d.touch===true||
+                d.type!=='desktop';
         }
 
-
-        function updateUi(){
-
-            const number =
-                String(
-                    activeIndex + 1
-                ).padStart(
-                    2,
-                    '0'
-                );
+        function updateContent(){
+            const number=
+                String(activeIndex+1)
+                    .padStart(2,'0');
 
             if(current){
-                current.textContent =
-                    number;
+                current.textContent=number;
             }
 
-            if(mobileCurrent){
-                mobileCurrent.textContent =
-                    number;
+            if(headerCurrent){
+                headerCurrent.textContent=number;
             }
 
-            indexButtons.forEach(
-                function(button,index){
+            if(infoNumber){
+                infoNumber.textContent=number;
+            }
 
-                    button.classList.toggle(
-                        'is-active',
-                        index === activeIndex
-                    );
-                }
-            );
+            if(infoLabel&&items[activeIndex]){
+                infoLabel.textContent=
+                    items[activeIndex].label;
+            }
+
+            if(infoName&&items[activeIndex]){
+                infoName.textContent=
+                    items[activeIndex].name;
+            }
+
+            cards.forEach((card,index)=>{
+                card.classList.toggle(
+                    'is-active',
+                    index===activeIndex
+                );
+            });
+
+            dots.forEach((dot,index)=>{
+                dot.classList.toggle(
+                    'is-active',
+                    index===activeIndex
+                );
+            });
         }
 
-
-        function showBook(
-            targetIndex,
-            direction = 1
-        ){
-
-            if(!panels.length){
+        function animateTouchCard(card,direction){
+            if(!card||reduceMotion){
                 return;
             }
 
-            const nextIndex =
-                (
-                    targetIndex +
-                    panels.length
-                ) %
-                panels.length;
-
-            if(
-                nextIndex === activeIndex ||
-                busy
-            ){
-                return;
-            }
-
-            const oldPanel =
-                panels[activeIndex];
-
-            const newPanel =
-                panels[nextIndex];
-
-            if(
-                !oldPanel ||
-                !newPanel
-            ){
-                return;
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | TOUCH
-            |--------------------------------------------------------------------------
-            | Tidak ada horizontal document scroll.
-            | Hanya ganti panel.
-            */
-            if(
-                isTouch() ||
-                !gsap ||
-                reduceMotion
-            ){
-
-                oldPanel.style.display =
-                    'none';
-
-                oldPanel.classList.remove(
-                    'is-active'
-                );
-
-                newPanel.style.display =
-                    'grid';
-
-                newPanel.classList.add(
-                    'is-active'
-                );
-
-                activeIndex =
-                    nextIndex;
-
-                updateUi();
-
-                if(
-                    gsap &&
-                    !reduceMotion
-                ){
-
-                    gsap.fromTo(
-                        newPanel,
-                        {
-                            opacity:0,
-                            x:
-                                direction > 0
-                                    ? 14
-                                    : -14
-                        },
-                        {
-                            opacity:1,
-                            x:0,
-                            duration:.28,
-                            ease:'power2.out',
-                            clearProps:
-                                'transform,opacity'
-                        }
-                    );
-                }
-
-                return;
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | DESKTOP
-            |--------------------------------------------------------------------------
-            */
-
-            busy = true;
-
-            const oldCover =
-                oldPanel.querySelector(
-                    '.bd-feature-cover-wrap'
-                );
-
-            const oldCopy =
-                oldPanel.querySelector(
-                    '.bd-feature-copy'
-                );
-
-            const newCover =
-                newPanel.querySelector(
-                    '.bd-feature-cover-wrap'
-                );
-
-            const newCopy =
-                newPanel.querySelector(
-                    '.bd-feature-copy'
-                );
-
-            const tl =
-                gsap.timeline({
-                    onComplete:function(){
-
-                        activeIndex =
-                            nextIndex;
-
-                        updateUi();
-
-                        busy =
-                            false;
-                    }
-                });
-
-            tl.to(
-                [
-                    oldCover,
-                    oldCopy
-                ].filter(Boolean),
-                {
-                    opacity:0,
-                    x:
-                        direction > 0
-                            ? -15
-                            : 15,
-
-                    duration:.18,
-                    ease:'power2.in',
-                    stagger:.025
-                }
-            );
-
-            tl.set(
-                oldPanel,
-                {
-                    display:'none'
-                }
-            );
-
-            tl.set(
-                newPanel,
-                {
-                    display:'grid'
-                }
-            );
-
-            if(newCover){
-
-                tl.fromTo(
-                    newCover,
+            if(gsap){
+                gsap.fromTo(
+                    card,
                     {
                         opacity:0,
-                        x:
-                            direction > 0
-                                ? 17
-                                : -17
+                        x:direction>0?24:-24,
+                        scale:.985
                     },
                     {
                         opacity:1,
                         x:0,
-                        duration:.33,
-                        ease:'power3.out'
+                        scale:1,
+                        duration:.34,
+                        ease:'power3.out',
+                        clearProps:'transform,opacity'
                     }
                 );
+
+                return;
             }
 
-            if(newCopy){
-
-                tl.fromTo(
-                    newCopy,
+            card.animate(
+                [
                     {
                         opacity:0,
-                        y:9
+                        transform:
+                            direction>0
+                                ? 'translateX(24px) scale(.985)'
+                                : 'translateX(-24px) scale(.985)'
                     },
                     {
                         opacity:1,
-                        y:0,
-                        duration:.33,
-                        ease:'power3.out'
-                    },
-                    '-=.23'
-                );
-            }
-
-            tl.set(
-                [
-                    newCover,
-                    newCopy
-                ].filter(Boolean),
+                        transform:'translateX(0) scale(1)'
+                    }
+                ],
                 {
-                    clearProps:
-                        'transform,opacity'
+                    duration:340,
+                    easing:'cubic-bezier(.22,.8,.25,1)'
                 }
             );
         }
 
+        function renderTouch(direction=1,animate=false){
+            cards.forEach((card,index)=>{
+                card.style.display=
+                    index===activeIndex
+                        ? 'block'
+                        : 'none';
 
-        function goPrevious(){
+                card.style.transform='none';
+                card.style.opacity='1';
+                card.style.visibility='visible';
 
-            showBook(
-                activeIndex - 1,
+                card.style.pointerEvents=
+                    index===activeIndex
+                        ? 'auto'
+                        : 'none';
+            });
+
+            if(animate){
+                animateTouchCard(
+                    cards[activeIndex],
+                    direction
+                );
+            }
+        }
+
+        function renderDesktop(){
+            const total=cards.length;
+
+            const offset=
+                window.innerWidth<=1200
+                    ? 245
+                    : 270;
+
+            cards.forEach((card,index)=>{
+                card.style.display='block';
+
+                let relative=
+                    index-activeIndex;
+
+                if(relative>total/2){
+                    relative-=total;
+                }
+
+                if(relative<-(total/2)){
+                    relative+=total;
+                }
+
+                let x=0;
+                let scale=1;
+                let rotate=0;
+                let opacity=1;
+                let z=10;
+                let visibility='visible';
+                let pointer='auto';
+
+                if(relative===1){
+                    x=offset;
+                    scale=.82;
+                    rotate=-7;
+                    opacity=.58;
+                    z=7;
+                }
+                else if(relative===-1){
+                    x=-offset;
+                    scale=.82;
+                    rotate=7;
+                    opacity=.58;
+                    z=7;
+                }
+                else if(relative===2){
+                    x=offset*1.6;
+                    scale=.67;
+                    rotate=-10;
+                    opacity=.15;
+                    z=3;
+                }
+                else if(relative===-2){
+                    x=-(offset*1.6);
+                    scale=.67;
+                    rotate=10;
+                    opacity=.15;
+                    z=3;
+                }
+                else if(relative!==0){
+                    opacity=0;
+                    visibility='hidden';
+                    pointer='none';
+                    z=1;
+                }
+
+                card.style.setProperty(
+                    '--testi-x',
+                    x+'px'
+                );
+
+                card.style.setProperty(
+                    '--testi-scale',
+                    scale
+                );
+
+                card.style.setProperty(
+                    '--testi-rotate',
+                    rotate+'deg'
+                );
+
+                card.style.opacity=opacity;
+                card.style.visibility=visibility;
+                card.style.zIndex=z;
+                card.style.pointerEvents=pointer;
+            });
+        }
+
+        function render(
+            direction=1,
+            animate=false
+        ){
+            updateContent();
+
+            if(isTouch()){
+                renderTouch(
+                    direction,
+                    animate
+                );
+            }
+            else{
+                renderDesktop();
+            }
+        }
+
+        function goTo(
+            index,
+            direction=1
+        ){
+            activeIndex=
+                (
+                    index+
+                    cards.length
+                )%
+                cards.length;
+
+            render(
+                direction,
+                true
+            );
+        }
+
+        function previous(){
+            goTo(
+                activeIndex-1,
                 -1
             );
         }
 
-
-        function goNext(){
-
-            showBook(
-                activeIndex + 1,
+        function nextSlide(){
+            goTo(
+                activeIndex+1,
                 1
             );
         }
 
+        function stopAutoplay(){
+            if(autoplay){
+                clearInterval(autoplay);
+                autoplay=null;
+            }
+        }
 
-        indexButtons.forEach(
-            function(button,index){
+        function startAutoplay(){
+            stopAutoplay();
 
-                button.addEventListener(
+            if(
+                isTouch()||
+                reduceMotion||
+                cards.length<=1
+            ){
+                return;
+            }
+
+            autoplay=
+                setInterval(
+                    nextSlide,
+                    5200
+                );
+        }
+
+        prev?.addEventListener(
+            'click',
+            event=>{
+                event.preventDefault();
+
+                stopAutoplay();
+                previous();
+                startAutoplay();
+            }
+        );
+
+        next?.addEventListener(
+            'click',
+            event=>{
+                event.preventDefault();
+
+                stopAutoplay();
+                nextSlide();
+                startAutoplay();
+            }
+        );
+
+        dots.forEach(
+            (dot,index)=>{
+                dot.addEventListener(
                     'click',
-                    function(){
+                    ()=>{
+                        stopAutoplay();
 
-                        showBook(
+                        goTo(
                             index,
-                            index >= activeIndex
+                            index>=activeIndex
                                 ? 1
                                 : -1
                         );
+
+                        startAutoplay();
                     }
                 );
             }
         );
 
-
-        prev?.addEventListener(
-            'click',
-            function(event){
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                goPrevious();
-            }
-        );
-
-
-        next?.addEventListener(
-            'click',
-            function(event){
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                goNext();
-            }
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SWIPE
-        |--------------------------------------------------------------------------
-        | Swipe pada FEATURE, bukan scroll horizontal halaman.
-        */
         stage?.addEventListener(
             'touchstart',
-            function(event){
-
+            event=>{
                 if(!isTouch()){
                     return;
                 }
 
-                const touch =
+                const touch=
                     event.touches[0];
 
-                startX =
+                startX=
                     touch.clientX;
 
-                startY =
+                startY=
                     touch.clientY;
             },
             {
@@ -2228,97 +1277,210 @@ html[data-baca-device="phone"]
             }
         );
 
-
         stage?.addEventListener(
             'touchend',
-            function(event){
-
+            event=>{
                 if(!isTouch()){
                     return;
                 }
 
-                const touch =
+                const touch=
                     event.changedTouches[0];
 
-                const dx =
-                    touch.clientX -
-                    startX;
+                const dx=
+                    touch.clientX-startX;
 
-                const dy =
-                    touch.clientY -
-                    startY;
+                const dy=
+                    touch.clientY-startY;
 
                 if(
-                    Math.abs(dx) < 45 ||
-                    Math.abs(dx) <
-                    Math.abs(dy)
+                    Math.abs(dx)<42||
+                    Math.abs(dx)<Math.abs(dy)
                 ){
                     return;
                 }
 
-                if(dx < 0){
-                    goNext();
+                stopAutoplay();
+
+                if(dx<0){
+                    nextSlide();
                 }
                 else{
-                    goPrevious();
+                    previous();
                 }
+
+                startAutoplay();
             },
             {
                 passive:true
             }
         );
 
+        cards.forEach(
+            (card,index)=>{
+                card.addEventListener(
+                    'click',
+                    event=>{
+                        if(
+                            isTouch()||
+                            index===activeIndex
+                        ){
+                            return;
+                        }
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        stopAutoplay();
+
+                        goTo(
+                            index,
+                            index>activeIndex
+                                ? 1
+                                : -1
+                        );
+
+                        startAutoplay();
+                    }
+                );
+            }
+        );
+
+        function openLightbox(index){
+            if(
+                !lightbox||
+                !lightboxImage||
+                !items[index]
+            ){
+                return;
+            }
+
+            lightboxImage.src=
+                items[index].image;
+
+            lightboxImage.alt=
+                items[index].alt;
+
+            lightbox.classList.add(
+                'is-open'
+            );
+
+            lightbox.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+            document.body.classList.add(
+                'bd-testi-modal-open'
+            );
+
+            stopAutoplay();
+        }
+
+        function closeLightbox(){
+            if(!lightbox){
+                return;
+            }
+
+            lightbox.classList.remove(
+                'is-open'
+            );
+
+            lightbox.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            document.body.classList.remove(
+                'bd-testi-modal-open'
+            );
+
+            startAutoplay();
+        }
+
+        openButtons.forEach(
+            (button,index)=>{
+                button.addEventListener(
+                    'click',
+                    event=>{
+                        if(
+                            !isTouch()&&
+                            index!==activeIndex
+                        ){
+                            event.preventDefault();
+                            return;
+                        }
+
+                        openLightbox(index);
+                    }
+                );
+            }
+        );
+
+        lightboxClose?.addEventListener(
+            'click',
+            closeLightbox
+        );
+
+        lightbox?.addEventListener(
+            'click',
+            event=>{
+                if(event.target===lightbox){
+                    closeLightbox();
+                }
+            }
+        );
+
+        document.addEventListener(
+            'keydown',
+            event=>{
+                if(event.key==='Escape'){
+                    closeLightbox();
+                }
+            }
+        );
+
+        section.addEventListener(
+            'mouseenter',
+            ()=>{
+                if(!isTouch()){
+                    stopAutoplay();
+                }
+            }
+        );
+
+        section.addEventListener(
+            'mouseleave',
+            ()=>{
+                if(!isTouch()){
+                    startAutoplay();
+                }
+            }
+        );
 
         window.addEventListener(
             'baca:devicechange',
-            function(){
-
-                panels.forEach(
-                    function(panel,index){
-
-                        panel.style.display =
-                            index === activeIndex
-                                ? 'grid'
-                                : 'none';
-                    }
-                );
-
-                updateUi();
+            ()=>{
+                render(1,false);
+                startAutoplay();
             }
         );
 
-
-        panels.forEach(
-            function(panel,index){
-
-                panel.style.display =
-                    index === 0
-                        ? 'grid'
-                        : 'none';
-            }
-        );
-
-        activeIndex = 0;
-
-        updateUi();
+        render(1,false);
+        startAutoplay();
     }
 
-
-    if(
-        document.readyState ===
-        'loading'
-    ){
+    if(document.readyState==='loading'){
         document.addEventListener(
             'DOMContentLoaded',
-            initEditorialBooks,
+            initBacaTestimoni,
             {
                 once:true
             }
         );
     }
     else{
-        initEditorialBooks();
+        initBacaTestimoni();
     }
-
 })();
 </script>
