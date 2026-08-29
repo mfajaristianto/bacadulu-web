@@ -1,420 +1,601 @@
 @php
-    $testimoniItems = [
-        [
-            'image' => asset('img/Bentara.jpg'),
-            'name' => 'Bentara Campus',
-            'label' => 'Kolaborasi Pendidikan',
-            'alt' => 'Dokumentasi Bentara Campus',
-        ],
-        [
-            'image' => asset('img/Bina.jpg'),
-            'name' => 'Bina Cendikia',
-            'label' => 'Kolaborasi Penerbitan',
-            'alt' => 'Dokumentasi Bina Cendikia',
-        ],
-        [
-            'image' => asset('img/Fdi.jpg'),
-            'name' => 'FDI Partners',
-            'label' => 'Kolaborasi Profesional',
-            'alt' => 'Dokumentasi FDI Partners',
-        ],
-        [
-            'image' => asset('img/Kadin.jpg'),
-            'name' => 'KADIN',
-            'label' => 'Kolaborasi Institusi',
-            'alt' => 'Dokumentasi KADIN',
-        ],
-        [
-            'image' => asset('img/Fermartian.jpg'),
-            'name' => 'Fermartian',
-            'label' => 'Kolaborasi Mitra',
-            'alt' => 'Dokumentasi Fermartian',
-        ],
-    ];
+    $bukuTerbaru = \App\Models\Book::query()
+        ->latest()
+        ->take(5)
+        ->get();
+
+    $jumlahBukuTerbaru = $bukuTerbaru->count();
 @endphp
 
+<section id="katalog" class="bd-editorial-books">
 
-<section id="testimoni" class="bd-testi-section">
+    <div class="bd-editorial-grid-bg" aria-hidden="true"></div>
+    <div class="bd-orange-accent bd-orange-accent-left" aria-hidden="true"></div>
+    <div class="bd-orange-accent bd-orange-accent-right" aria-hidden="true"></div>
 
-    {{-- =========================================================
-         BACKGROUND DECORATION
-    ========================================================== --}}
-    <div class="bd-testi-grid" aria-hidden="true"></div>
+    <div class="bd-editorial-container">
 
-    <div class="bd-testi-glow bd-testi-glow-left" aria-hidden="true"></div>
+        {{-- HEADER --}}
+        <header class="bd-editorial-header">
 
-    <div class="bd-testi-glow bd-testi-glow-right" aria-hidden="true"></div>
+            <div class="bd-editorial-heading">
 
+                <div class="bd-editorial-kicker">
 
-    <div class="bd-testi-container">
-
-        {{-- =====================================================
-             HEADER
-        ====================================================== --}}
-        <header class="bd-testi-header" data-bd-reveal="up">
-
-            <div class="bd-testi-heading">
-
-                <div class="bd-testi-eyebrow">
-
-                    <span class="bd-testi-eyebrow-icon">
-
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
+                    <span class="bd-editorial-kicker-icon">
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8">
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M7 17h4l2-4V7H7v10z"
-                            />
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M14 17h4l2-4V7h-6v10z"
+                                d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"
                             />
                         </svg>
-
                     </span>
 
-                    <span>
-                        Cerita Mitra
-                    </span>
+                    <span>Baca Dulu Bookstore</span>
 
                 </div>
 
-
-                <h2>
-                    Kepercayaan yang
-                    <span>tumbuh bersama.</span>
-                </h2>
-
+                <h2>Terbitan Terbaru</h2>
 
                 <p>
-                    Dokumentasi, pengalaman, dan bentuk kepercayaan
-                    dari mitra yang telah berkolaborasi bersama Baca Dulu.
+                    Temukan buku terbaru pilihan Baca Dulu dalam format cetak
+                    maupun digital untuk menemani perjalanan membaca Anda.
                 </p>
 
             </div>
 
+            <div class="bd-editorial-header-right">
 
-            <div class="bd-testi-header-status">
+                @if(!$bukuTerbaru->isEmpty())
 
-                <div class="bd-testi-header-count">
+                    <div class="bd-editorial-counter">
+                        <strong id="bdEditorialCurrent">01</strong>
+                        <span>/</span>
+                        <span>
+                            {{ str_pad($jumlahBukuTerbaru, 2, '0', STR_PAD_LEFT) }}
+                        </span>
+                    </div>
 
-                    <strong id="bdTestiHeaderCurrent">
-                        01
-                    </strong>
+                @endif
 
-                    <span>/</span>
+                <a
+                    href="{{ route('portofolio.bookstore') }}"
+                    class="bd-editorial-all"
+                >
+                    <span>Seluruh Koleksi</span>
 
-                    <span>
-                        {{ str_pad(count($testimoniItems), 2, '0', STR_PAD_LEFT) }}
-                    </span>
-
-                </div>
-
-
-                <div class="bd-testi-header-progress">
-                    <span></span>
-                </div>
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.8">
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M5 12h14M13 6l6 6-6 6"
+                        />
+                    </svg>
+                </a>
 
             </div>
 
         </header>
 
 
-        {{-- =====================================================
-             CAROUSEL
-        ====================================================== --}}
-        <div class="bd-testi-showcase" data-bd-reveal="zoom">
+        @if($bukuTerbaru->isEmpty())
 
-            <div
-                class="bd-testi-stage"
-                id="bdTestiStage"
-            >
+            <div class="bd-editorial-empty">
 
-                @foreach($testimoniItems as $index => $item)
+                <span>Katalog</span>
 
-                    <article
-                        class="
-                            bd-testi-card
-                            {{ $index === 0 ? 'is-active' : '' }}
-                        "
-                        data-testi-card
-                        data-index="{{ $index }}"
-                    >
+                <h3>
+                    Belum ada terbitan terbaru.
+                </h3>
 
-                        <button
-                            type="button"
-                            class="bd-testi-card-button"
-                            data-testi-open="{{ $index }}"
-                            aria-label="Lihat dokumentasi {{ $item['name'] }}"
+                <p>
+                    Koleksi terbaru akan ditampilkan di bagian ini.
+                </p>
+
+            </div>
+
+        @else
+
+            <div class="bd-editorial-layout">
+
+                {{-- =====================================================
+                     FEATURE BOOK
+                ====================================================== --}}
+                <div
+                    class="bd-feature-stage"
+                    id="bdFeatureStage"
+                >
+
+                    @foreach($bukuTerbaru as $index => $b)
+
+                        @php
+                            $cover = $b->cover
+                                ? asset('storage/' . $b->cover)
+                                : null;
+
+                            $bookNumber = str_pad(
+                                $index + 1,
+                                2,
+                                '0',
+                                STR_PAD_LEFT
+                            );
+
+                            $category = $b->category ?? 'Buku';
+                        @endphp
+
+
+                        <article
+                            class="
+                                bd-feature-panel
+                                {{ $index === 0 ? 'is-active' : '' }}
+                            "
+                            data-feature-panel="{{ $index }}"
+                            style="{{ $index === 0 ? '' : 'display:none;' }}"
                         >
 
-                            <div class="bd-testi-media">
+                            {{-- COVER --}}
+                            <div class="bd-feature-cover-wrap">
 
-                                <img
-                                    src="{{ $item['image'] }}"
-                                    alt="{{ $item['alt'] }}"
-                                    loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                                    draggable="false"
-                                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                                >
+                                <div class="bd-feature-cover-frame">
 
+                                    <span class="bd-feature-cover-number">
+                                        {{ $bookNumber }}
+                                    </span>
 
-                                <div class="bd-testi-image-fallback">
+                                    <a
+                                        href="{{ route('portofolio.bookstore.show', ['book' => $b->slug]) }}"
+                                        class="bd-feature-cover-link"
+                                        aria-label="Lihat detail {{ $b->title }}"
+                                    >
 
-                                    <small>
-                                        Baca Dulu
-                                    </small>
+                                        @if($cover)
 
-                                    <strong>
-                                        {{ $item['name'] }}
-                                    </strong>
+                                            <img
+                                                src="{{ $cover }}"
+                                                alt="{{ $b->title }}"
+                                                class="bd-feature-cover"
+                                                loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                                            >
+
+                                            <div class="bd-feature-placeholder bd-cover-error-fallback">
+
+                                                <span class="bd-placeholder-brand">
+                                                    Baca Dulu
+                                                </span>
+
+                                                <div>
+                                                    <strong>
+                                                        {{ \Illuminate\Support\Str::limit($b->title, 60) }}
+                                                    </strong>
+
+                                                    <small>
+                                                        {{ $b->author }}
+                                                    </small>
+                                                </div>
+
+                                            </div>
+
+                                        @else
+
+                                            <div class="bd-feature-placeholder">
+
+                                                <span class="bd-placeholder-brand">
+                                                    Baca Dulu
+                                                </span>
+
+                                                <div>
+                                                    <strong>
+                                                        {{ \Illuminate\Support\Str::limit($b->title, 60) }}
+                                                    </strong>
+
+                                                    <small>
+                                                        {{ $b->author }}
+                                                    </small>
+                                                </div>
+
+                                            </div>
+
+                                        @endif
+
+                                    </a>
 
                                 </div>
 
 
-                                <div class="bd-testi-media-overlay"></div>
+                                <div class="bd-feature-cover-caption">
+                                    <span class="bd-caption-line"></span>
+                                    <span>Terbitan {{ $bookNumber }}</span>
+                                </div>
+
+                            </div>
 
 
-                                {{-- TOP --}}
-                                <div class="bd-testi-card-top">
+                            {{-- COPY --}}
+                            <div class="bd-feature-copy">
 
-                                    <span class="bd-testi-card-number">
-                                        {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
-                                    </span>
+                                <div class="bd-feature-category">
+                                    {{ $category }}
+                                </div>
+
+                                <h3>
+                                    {{ $b->title }}
+                                </h3>
+
+                                <p class="bd-feature-author">
+                                    <span>Oleh</span>
+                                    {{ $b->author }}
+                                </p>
 
 
-                                    <span class="bd-testi-expand">
+                                <div class="bd-feature-divider"></div>
 
-                                        <svg
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.8"
-                                        >
+
+                                <span class="bd-feature-format-label">
+                                    Pilihan Format
+                                </span>
+
+
+                                <div class="bd-feature-pricing">
+
+                                    {{-- CETAK --}}
+                                    <div class="bd-price-item">
+
+                                        <div class="bd-price-type">
+
+                                            <span class="bd-price-icon">
+                                                <svg viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="1.7">
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"
+                                                    />
+                                                </svg>
+                                            </span>
+
+                                            <div>
+                                                <span>Buku Cetak</span>
+                                                <small>Physical Edition</small>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="bd-price-value">
+
+                                            @if($b->has_print && $b->print_price !== null)
+
+                                                @if($b->has_active_print_discount)
+
+                                                    <div class="bd-old-price">
+                                                        IDR {{ number_format((float)$b->print_price, 2, ',', '.') }}
+                                                    </div>
+
+                                                @endif
+
+
+                                                <div class="bd-current-price-row">
+
+                                                    <strong>
+                                                        IDR {{ number_format((float)$b->effective_print_price, 2, ',', '.') }}
+                                                    </strong>
+
+                                                    @if($b->has_active_print_discount)
+
+                                                        <span class="bd-price-discount">
+                                                            -{{ number_format((float)$b->print_discount_percent, 0) }}%
+                                                        </span>
+
+                                                    @endif
+
+                                                </div>
+
+                                            @else
+
+                                                <span class="bd-not-available">
+                                                    Tidak tersedia
+                                                </span>
+
+                                            @endif
+
+                                        </div>
+
+                                    </div>
+
+
+                                    {{-- EBOOK --}}
+                                    <div class="bd-price-item">
+
+                                        <div class="bd-price-type">
+
+                                            <span class="bd-price-icon">
+                                                <svg viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="1.7">
+                                                    <rect
+                                                        x="5"
+                                                        y="3"
+                                                        width="14"
+                                                        height="18"
+                                                        rx="2"
+                                                    />
+
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        d="M9 7h6M9 11h6"
+                                                    />
+                                                </svg>
+                                            </span>
+
+                                            <div>
+                                                <span>E-book</span>
+                                                <small>Digital Edition</small>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="bd-price-value">
+
+                                            @if($b->has_ebook && $b->ebook_price !== null)
+
+                                                @if($b->has_active_ebook_discount)
+
+                                                    <div class="bd-old-price">
+                                                        IDR {{ number_format((float)$b->ebook_price, 2, ',', '.') }}
+                                                    </div>
+
+                                                @endif
+
+
+                                                <div class="bd-current-price-row">
+
+                                                    <strong>
+                                                        IDR {{ number_format((float)$b->effective_ebook_price, 2, ',', '.') }}
+                                                    </strong>
+
+                                                    @if($b->has_active_ebook_discount)
+
+                                                        <span class="bd-price-discount">
+                                                            -{{ number_format((float)$b->ebook_discount_percent, 0) }}%
+                                                        </span>
+
+                                                    @endif
+
+                                                </div>
+
+                                            @else
+
+                                                <span class="bd-not-available">
+                                                    Tidak tersedia
+                                                </span>
+
+                                            @endif
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="bd-feature-action-row">
+
+                                    <a
+                                        href="{{ route('portofolio.bookstore.show', ['book' => $b->slug]) }}"
+                                        class="bd-feature-detail"
+                                    >
+
+                                        <span>
+                                            Lihat Detail Buku
+                                        </span>
+
+                                        <svg viewBox="0 0 24 24"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="1.8">
                                             <path
                                                 stroke-linecap="round"
                                                 stroke-linejoin="round"
-                                                d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"
+                                                d="M5 12h14M13 6l6 6-6 6"
                                             />
                                         </svg>
 
-                                    </span>
-
-                                </div>
-
-
-                                {{-- CAPTION --}}
-                                <div class="bd-testi-caption">
-
-                                    <span>
-                                        {{ $item['label'] }}
-                                    </span>
-
-                                    <strong>
-                                        {{ $item['name'] }}
-                                    </strong>
+                                    </a>
 
                                 </div>
 
                             </div>
 
-                        </button>
-
-                    </article>
-
-                @endforeach
-
-            </div>
-
-
-            {{-- =================================================
-                 CONTROLS
-            ================================================== --}}
-            <div class="bd-testi-controls">
-
-                <button
-                    type="button"
-                    id="bdTestiPrev"
-                    class="bd-testi-nav"
-                    aria-label="Testimoni sebelumnya"
-                >
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M15 18l-6-6 6-6"
-                        />
-                    </svg>
-
-                </button>
-
-
-                <div class="bd-testi-dots">
-
-                    @foreach($testimoniItems as $index => $item)
-
-                        <button
-                            type="button"
-                            class="
-                                bd-testi-dot
-                                {{ $index === 0 ? 'is-active' : '' }}
-                            "
-                            data-testi-dot="{{ $index }}"
-                            aria-label="Testimoni {{ $index + 1 }}"
-                        >
-                            <span></span>
-                        </button>
+                        </article>
 
                     @endforeach
 
                 </div>
 
 
-                <div class="bd-testi-counter">
+                {{-- =====================================================
+                     INDEX DESKTOP
+                ====================================================== --}}
+                <aside class="bd-book-index">
 
-                    <strong id="bdTestiCurrent">
-                        01
-                    </strong>
-
-                    <span>
-                        /
-                        {{ str_pad(count($testimoniItems), 2, '0', STR_PAD_LEFT) }}
-                    </span>
-
-                </div>
+                    <div class="bd-index-header">
+                        <span>Terbitan</span>
+                        <strong>{{ $jumlahBukuTerbaru }} Buku</strong>
+                    </div>
 
 
-                <button
-                    type="button"
-                    id="bdTestiNext"
-                    class="
-                        bd-testi-nav
-                        bd-testi-nav-next
-                    "
-                    aria-label="Testimoni berikutnya"
-                >
+                    <div class="bd-index-list">
 
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M9 18l6-6-6-6"
-                        />
-                    </svg>
+                        @foreach($bukuTerbaru as $index => $b)
 
-                </button>
+                            @php
+                                $cover = $b->cover
+                                    ? asset('storage/' . $b->cover)
+                                    : null;
+
+                                $bookNumber = str_pad(
+                                    $index + 1,
+                                    2,
+                                    '0',
+                                    STR_PAD_LEFT
+                                );
+                            @endphp
+
+
+                            <button
+                                type="button"
+                                class="
+                                    bd-index-item
+                                    {{ $index === 0 ? 'is-active' : '' }}
+                                "
+                                data-book-index="{{ $index }}"
+                            >
+
+                                <span class="bd-index-number">
+                                    {{ $bookNumber }}
+                                </span>
+
+
+                                <div class="bd-index-thumb">
+
+                                    @if($cover)
+
+                                        <img
+                                            src="{{ $cover }}"
+                                            alt=""
+                                            loading="lazy"
+                                            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                                        >
+
+                                        <div class="bd-index-thumb-fallback bd-index-error-fallback">
+                                            BD
+                                        </div>
+
+                                    @else
+
+                                        <div class="bd-index-thumb-fallback">
+                                            BD
+                                        </div>
+
+                                    @endif
+
+                                </div>
+
+
+                                <div class="bd-index-copy">
+
+                                    <strong>
+                                        {{ \Illuminate\Support\Str::limit($b->title, 46) }}
+                                    </strong>
+
+                                    <span>
+                                        {{ $b->author }}
+                                    </span>
+
+                                </div>
+
+
+                                <span class="bd-index-arrow">
+
+                                    <svg viewBox="0 0 24 24"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         stroke-width="1.8">
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M9 5l7 7-7 7"
+                                        />
+                                    </svg>
+
+                                </span>
+
+                            </button>
+
+                        @endforeach
+
+                    </div>
+
+
+                    {{-- =================================================
+                         CONTROLS
+                    ================================================== --}}
+                    <div class="bd-index-footer">
+
+                        <div class="bd-index-mobile-label">
+
+                            <strong id="bdEditorialMobileCurrent">
+                                01
+                            </strong>
+
+                            <span>/</span>
+
+                            <span>
+                                {{ str_pad($jumlahBukuTerbaru, 2, '0', STR_PAD_LEFT) }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="bd-index-nav">
+
+                            <button
+                                type="button"
+                                id="bdEditorialPrev"
+                                aria-label="Buku sebelumnya"
+                            >
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.8">
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M15 18l-6-6 6-6"
+                                    />
+                                </svg>
+                            </button>
+
+
+                            <button
+                                type="button"
+                                id="bdEditorialNext"
+                                class="bd-index-nav-primary"
+                                aria-label="Buku berikutnya"
+                            >
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.8">
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M9 18l6-6-6-6"
+                                    />
+                                </svg>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </aside>
 
             </div>
 
-
-            {{-- =================================================
-                 ACTIVE INFO
-            ================================================== --}}
-            <div class="bd-testi-info">
-
-                <div class="bd-testi-info-number">
-
-                    <span>
-                        TESTIMONI
-                    </span>
-
-                    <strong id="bdTestiInfoNumber">
-                        01
-                    </strong>
-
-                </div>
-
-
-                <div class="bd-testi-info-copy">
-
-                    <span id="bdTestiInfoLabel">
-                        {{ $testimoniItems[0]['label'] }}
-                    </span>
-
-                    <h3 id="bdTestiInfoName">
-                        {{ $testimoniItems[0]['name'] }}
-                    </h3>
-
-                </div>
-
-
-                <div class="bd-testi-info-note">
-
-                    <span></span>
-
-                    <p>
-                        Dokumentasi kolaborasi dan kepercayaan
-                        bersama Baca Dulu.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         LIGHTBOX
-    ========================================================== --}}
-    <div
-        class="bd-testi-lightbox"
-        id="bdTestiLightbox"
-        aria-hidden="true"
-    >
-
-        <button
-            type="button"
-            id="bdTestiLightboxClose"
-            class="bd-testi-lightbox-close"
-            aria-label="Tutup gambar"
-        >
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                />
-            </svg>
-
-        </button>
-
-
-        <div class="bd-testi-lightbox-content">
-
-            <img
-                id="bdTestiLightboxImage"
-                src=""
-                alt=""
-            >
-
-        </div>
+        @endif
 
     </div>
 
@@ -422,101 +603,67 @@
 
 
 <style>
-/* ================================================================
-   ROOT
-================================================================ */
-.bd-testi-section{
+.bd-editorial-books{
     --navy:#241B52;
     --orange:#EF5843;
-    --gold:#F7AA35;
+    --orange-dark:#C84735;
+    --muted:#737580;
 
     position:relative;
-
     width:100%;
     max-width:100%;
+    overflow-x:clip;
 
-    padding:
-        72px 0 68px;
+    padding:86px 0 88px;
 
-    overflow:hidden;
-
-    background:
-        linear-gradient(
-            180deg,
-            #F5F2EC 0%,
-            #F4F1EB 100%
-        );
-
-    color:#25252D;
+    background:#fff;
+    color:#27272D;
 }
 
-
-.bd-testi-section *,
-.bd-testi-section *::before,
-.bd-testi-section *::after{
+.bd-editorial-books *{
     box-sizing:border-box;
 }
 
-
-/* ================================================================
-   FULL WIDTH BACKGROUND
-================================================================ */
-.bd-testi-grid{
+.bd-editorial-grid-bg{
     position:absolute;
-
     inset:0;
-
     pointer-events:none;
-
-    opacity:.34;
+    opacity:.58;
 
     background-image:
-        linear-gradient(
-            rgba(36,27,82,.025) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(36,27,82,.025) 1px,
-            transparent 1px
-        );
+        linear-gradient(rgba(36,27,82,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(36,27,82,.035) 1px,transparent 1px);
 
-    background-size:
-        52px 52px;
+    background-size:42px 42px;
 }
 
-
-.bd-testi-glow{
+.bd-orange-accent{
     position:absolute;
-
-    border-radius:50%;
-
     pointer-events:none;
+    border-radius:50%;
 }
 
+.bd-orange-accent-left{
+    width:470px;
+    height:470px;
 
-.bd-testi-glow-left{
-    width:430px;
-    height:430px;
-
-    left:-260px;
-    top:70px;
+    left:-220px;
+    top:-270px;
 
     background:
         radial-gradient(
             circle,
             rgba(239,88,67,.11),
-            transparent 68%
+            transparent 70%
         );
 }
 
+.bd-orange-accent-right{
+    width:520px;
+    height:520px;
 
-.bd-testi-glow-right{
-    width:480px;
-    height:480px;
-
-    right:-280px;
-    bottom:-260px;
+    right:-270px;
+    bottom:-290px;
 
     background:
         radial-gradient(
@@ -526,291 +673,626 @@
         );
 }
 
-
-/* ================================================================
-   CONTAINER
-   Lebih lebar dibanding sebelumnya.
-================================================================ */
-.bd-testi-container{
+.bd-editorial-container{
     position:relative;
-
     z-index:2;
 
-    width:
-        min(
-            calc(100% - 64px),
-            1440px
-        );
-
-    margin:
-        0 auto;
+    width:min(calc(100% - 56px),1380px);
+    margin:0 auto;
 }
 
 
-/* ================================================================
-   HEADER
-================================================================ */
-.bd-testi-header{
-    width:
-        min(
-            100%,
-            1180px
-        );
-
-    margin:
-        0 auto 26px;
-
+/* HEADER */
+.bd-editorial-header{
     display:flex;
-
     align-items:flex-end;
+    justify-content:space-between;
+    gap:40px;
 
-    justify-content:
-        space-between;
+    margin-bottom:32px;
+    padding-bottom:23px;
 
-    gap:35px;
-
-    padding-bottom:21px;
-
-    border-bottom:
-        1px solid
-        rgba(36,27,82,.10);
+    border-bottom:1px solid rgba(239,88,67,.15);
 }
 
-
-.bd-testi-heading{
-    max-width:670px;
+.bd-editorial-heading{
+    max-width:700px;
 }
 
-
-.bd-testi-eyebrow{
+.bd-editorial-kicker{
     display:flex;
-
     align-items:center;
-
     gap:8px;
 
-    margin-bottom:10px;
+    margin-bottom:11px;
 
-    color:
-        var(--orange);
+    color:var(--orange);
 
     font-size:8px;
-
     font-weight:850;
-
     letter-spacing:.15em;
-
     text-transform:uppercase;
 }
 
-
-.bd-testi-eyebrow-icon{
+.bd-editorial-kicker-icon{
     width:27px;
     height:27px;
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
 
     border-radius:8px;
 
-    background:
-        rgba(239,88,67,.09);
+    background:rgba(239,88,67,.08);
 }
 
+.bd-editorial-kicker-icon svg{
+    width:13px;
+    height:13px;
+}
 
-.bd-testi-eyebrow-icon svg{
+.bd-editorial-heading h2{
+    margin:0;
+
+    color:var(--navy);
+
+    font-size:clamp(34px,3.5vw,47px);
+    line-height:1.04;
+
+    font-weight:850;
+    letter-spacing:-.045em;
+}
+
+.bd-editorial-heading p{
+    max-width:590px;
+
+    margin:12px 0 0;
+
+    color:var(--muted);
+
+    font-size:11px;
+    line-height:1.72;
+}
+
+.bd-editorial-header-right{
+    display:flex;
+    align-items:center;
+    gap:21px;
+
+    flex:0 0 auto;
+}
+
+.bd-editorial-counter{
+    display:flex;
+    align-items:baseline;
+    gap:5px;
+
+    color:#A5A3AA;
+
+    font-size:8px;
+    font-weight:800;
+}
+
+.bd-editorial-counter strong{
+    color:var(--orange);
+    font-size:18px;
+}
+
+.bd-editorial-all{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding-bottom:5px;
+
+    border-bottom:1px solid rgba(239,88,67,.32);
+
+    color:var(--orange-dark)!important;
+
+    font-size:9px;
+    font-weight:850;
+
+    text-decoration:none;
+}
+
+.bd-editorial-all svg{
     width:13px;
     height:13px;
 }
 
 
-.bd-testi-heading h2{
-    margin:0;
+/* LAYOUT */
+.bd-editorial-layout{
+    display:grid;
 
-    color:
-        var(--navy);
+    grid-template-columns:
+        minmax(0,1fr)
+        320px;
 
-    font-size:
-        clamp(
-            31px,
-            3.3vw,
-            44px
-        );
-
-    line-height:1.04;
-
-    font-weight:850;
-
-    letter-spacing:-.048em;
+    gap:22px;
 }
 
 
-.bd-testi-heading h2 span{
-    color:
-        var(--orange);
+/* FEATURE */
+.bd-feature-stage{
+    position:relative;
+
+    min-width:0;
+    overflow:hidden;
+
+    padding:38px;
+
+    border:1px solid rgba(239,88,67,.13);
+    border-radius:28px;
+
+    background:#fff;
+
+    box-shadow:
+        0 16px 42px
+        rgba(36,27,82,.055);
 }
 
+.bd-feature-panel{
+    position:relative;
 
-.bd-testi-heading p{
-    max-width:570px;
+    display:grid;
 
-    margin:
-        11px 0 0;
+    grid-template-columns:
+        265px
+        minmax(0,1fr);
 
-    color:#777982;
-
-    font-size:10px;
-
-    line-height:1.7;
-}
-
-
-/* ================================================================
-   HEADER STATUS
-================================================================ */
-.bd-testi-header-status{
-    display:flex;
+    gap:48px;
 
     align-items:center;
 
-    gap:14px;
+    min-height:455px;
+}
 
-    flex:
-        0 0 auto;
+.bd-feature-cover-wrap{
+    min-width:0;
+}
+
+.bd-feature-cover-frame{
+    position:relative;
+
+    width:238px;
+
+    margin:0 auto;
+
+    padding:15px;
+
+    border:1px solid rgba(239,88,67,.12);
+    border-radius:23px;
+
+    background:#fff;
+
+    box-shadow:
+        0 13px 32px
+        rgba(36,27,82,.07);
+}
+
+.bd-feature-cover-number{
+    position:absolute;
+
+    z-index:5;
+
+    left:10px;
+    top:10px;
+
+    min-width:40px;
+    height:29px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0 9px;
+
+    border:1px solid rgba(239,88,67,.15);
+    border-radius:9px;
+
+    background:rgba(255,255,255,.96);
+
+    color:var(--orange);
+
+    font-size:9px;
+    font-weight:900;
+}
+
+.bd-feature-cover-link{
+    display:block;
+
+    width:208px;
+    height:294px;
+
+    margin:0 auto;
+}
+
+.bd-feature-cover{
+    display:block;
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    border-radius:14px;
+
+    box-shadow:
+        7px 12px 24px
+        rgba(31,27,55,.14);
+}
+
+.bd-feature-placeholder{
+    width:100%;
+    height:100%;
+
+    flex-direction:column;
+    justify-content:space-between;
+
+    padding:22px;
+
+    border-radius:14px;
+
+    color:#fff;
+
+    background:
+        linear-gradient(
+            145deg,
+            #EF5843,
+            #E97440
+        );
+}
+
+.bd-feature-cover-link >
+.bd-feature-placeholder:not(.bd-cover-error-fallback){
+    display:flex;
+}
+
+.bd-cover-error-fallback{
+    display:none;
+}
+
+.bd-placeholder-brand{
+    font-size:7px;
+    font-weight:850;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+}
+
+.bd-feature-placeholder strong{
+    display:block;
+
+    font-size:17px;
+    line-height:1.3;
+}
+
+.bd-feature-placeholder small{
+    display:block;
+    margin-top:8px;
+    font-size:8px;
+}
+
+.bd-feature-cover-caption{
+    width:208px;
+
+    display:flex;
+    align-items:center;
+    gap:7px;
+
+    margin:11px auto 0;
+
+    color:#94919A;
+
+    font-size:7px;
+    font-weight:800;
+
+    text-transform:uppercase;
+}
+
+.bd-caption-line{
+    width:18px;
+    height:1px;
+
+    background:var(--orange);
 }
 
 
-.bd-testi-header-count{
+/* FEATURE COPY */
+.bd-feature-copy{
+    min-width:0;
+}
+
+.bd-feature-category{
+    display:inline-flex;
+    align-items:center;
+
+    min-height:29px;
+
+    padding:0 11px;
+
+    border-radius:8px;
+
+    color:var(--orange);
+
+    background:rgba(239,88,67,.065);
+
+    font-size:7px;
+    font-weight:850;
+
+    letter-spacing:.14em;
+    text-transform:uppercase;
+}
+
+.bd-feature-copy h3{
+    max-width:590px;
+
+    margin:14px 0 0;
+
+    color:var(--navy);
+
+    font-size:clamp(26px,2.7vw,38px);
+    line-height:1.12;
+
+    font-weight:850;
+    letter-spacing:-.04em;
+
+    overflow-wrap:anywhere;
+}
+
+.bd-feature-author{
+    margin:12px 0 0;
+
+    color:#666873;
+
+    font-size:11px;
+    font-weight:650;
+}
+
+.bd-feature-author span{
+    margin-right:4px;
+
+    color:#AAAAAF;
+    font-weight:500;
+}
+
+.bd-feature-divider{
+    width:100%;
+    height:1px;
+
+    margin:23px 0 19px;
+
+    background:rgba(36,27,82,.09);
+}
+
+.bd-feature-format-label{
+    display:block;
+
+    margin-bottom:7px;
+
+    color:#9A98A0;
+
+    font-size:7px;
+    font-weight:800;
+
+    letter-spacing:.13em;
+    text-transform:uppercase;
+}
+
+.bd-feature-pricing{
+    border-top:1px solid rgba(36,27,82,.08);
+}
+
+.bd-price-item{
+    min-height:68px;
+
     display:flex;
+    align-items:center;
+    justify-content:space-between;
 
-    align-items:baseline;
+    gap:16px;
 
-    gap:4px;
+    padding:11px 0;
 
-    color:#AAA6AE;
+    border-bottom:1px solid rgba(36,27,82,.08);
+}
+
+.bd-price-type{
+    min-width:0;
+
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+}
+
+.bd-price-icon{
+    width:31px;
+    height:31px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    flex:0 0 31px;
+
+    border-radius:9px;
+
+    background:rgba(239,88,67,.07);
+    color:var(--orange);
+}
+
+.bd-price-icon svg{
+    width:15px;
+    height:15px;
+}
+
+.bd-price-type > div > span{
+    display:block;
+
+    color:var(--navy);
+
+    font-size:10px;
+    font-weight:800;
+}
+
+.bd-price-type small{
+    display:block;
+
+    margin-top:2px;
+
+    color:#A2A0A7;
+
+    font-size:7px;
+}
+
+.bd-price-value{
+    min-width:145px;
+    text-align:right;
+}
+
+.bd-old-price{
+    color:#AAA8AD;
 
     font-size:7px;
 
+    text-decoration:line-through;
+}
+
+.bd-current-price-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+
+    gap:6px;
+}
+
+.bd-price-value strong{
+    color:var(--navy);
+
+    font-size:12px;
     font-weight:850;
 }
 
+.bd-price-discount{
+    padding:4px 6px;
 
-.bd-testi-header-count strong{
-    color:
-        var(--orange);
+    border-radius:6px;
 
-    font-size:18px;
+    background:rgba(239,88,67,.08);
+
+    color:var(--orange);
+
+    font-size:6px;
+    font-weight:850;
+}
+
+.bd-not-available{
+    color:#A8A6AC;
+
+    font-size:8px;
+}
+
+.bd-feature-action-row{
+    margin-top:21px;
+}
+
+.bd-feature-detail{
+    min-height:43px;
+
+    display:inline-flex;
+    align-items:center;
+
+    gap:10px;
+
+    padding:0 16px;
+
+    border-radius:10px;
+
+    color:#fff!important;
+    background:var(--navy);
+
+    font-size:8px;
+    font-weight:850;
+
+    text-decoration:none;
+}
+
+.bd-feature-detail svg{
+    width:13px;
+    height:13px;
 }
 
 
-.bd-testi-header-progress{
-    width:70px;
-
-    height:1px;
+/* INDEX */
+.bd-book-index{
+    display:flex;
+    flex-direction:column;
 
     overflow:hidden;
 
-    background:
-        rgba(36,27,82,.12);
+    border:1px solid rgba(239,88,67,.12);
+    border-radius:24px;
+
+    background:#fff;
+
+    box-shadow:
+        0 14px 38px
+        rgba(36,27,82,.045);
 }
 
+.bd-index-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 
-.bd-testi-header-progress span{
-    display:block;
+    padding:17px 18px;
 
-    width:34%;
-
-    height:100%;
-
-    background:
-        var(--orange);
+    border-bottom:1px solid rgba(36,27,82,.08);
 }
 
+.bd-index-header span{
+    color:#9B99A0;
 
-/* ================================================================
-   SHOWCASE
-================================================================ */
-.bd-testi-showcase{
-    position:relative;
+    font-size:7px;
+    font-weight:850;
+
+    text-transform:uppercase;
 }
 
+.bd-index-header strong{
+    color:var(--navy);
 
-/* ================================================================
-   STAGE
-================================================================ */
-.bd-testi-stage{
+    font-size:8px;
+}
+
+.bd-index-list{
+    flex:1;
+}
+
+.bd-index-item{
     position:relative;
 
     width:100%;
+    min-height:88px;
 
-    height:370px;
+    display:grid;
 
-    overflow:hidden;
+    grid-template-columns:
+        24px
+        45px
+        minmax(0,1fr)
+        15px;
 
-    perspective:1300px;
-}
+    align-items:center;
 
+    gap:10px;
 
-/* ================================================================
-   CARD
-================================================================ */
-.bd-testi-card{
-    --testi-x:0px;
-    --testi-scale:1;
-    --testi-rotate:0deg;
-
-    position:absolute;
-
-    left:50%;
-    top:8px;
-
-    width:310px;
-    height:340px;
-
-    opacity:0;
-
-    visibility:hidden;
-
-    pointer-events:none;
-
-    transform:
-        translateX(-50%)
-        translateX(var(--testi-x))
-        scale(var(--testi-scale))
-        rotateY(var(--testi-rotate));
-
-    transform-origin:center;
-
-    transition:
-        transform .52s
-        cubic-bezier(.22,.8,.25,1),
-        opacity .42s ease;
-
-    will-change:
-        transform,
-        opacity;
-}
-
-
-.bd-testi-card.is-active{
-    pointer-events:auto;
-}
-
-
-.bd-testi-card-button{
-    width:100%;
-    height:100%;
-
-    display:block;
-
-    padding:0;
+    padding:12px 14px;
 
     border:0;
-
-    border-radius:22px;
+    border-bottom:1px solid rgba(36,27,82,.07);
 
     background:transparent;
 
@@ -819,1444 +1301,591 @@
     cursor:pointer;
 }
 
+.bd-index-item.is-active{
+    background:rgba(239,88,67,.055);
+}
 
-/* ================================================================
-   IMAGE
-================================================================ */
-.bd-testi-media{
-    position:relative;
+.bd-index-item.is-active::before{
+    content:"";
 
-    width:100%;
-    height:100%;
+    position:absolute;
+
+    left:0;
+    top:12px;
+    bottom:12px;
+
+    width:3px;
+
+    border-radius:0 999px 999px 0;
+
+    background:var(--orange);
+}
+
+.bd-index-number{
+    color:#AAA8AE;
+
+    font-size:7px;
+    font-weight:900;
+}
+
+.bd-index-item.is-active
+.bd-index-number{
+    color:var(--orange);
+}
+
+.bd-index-thumb{
+    width:42px;
+    height:57px;
 
     overflow:hidden;
 
-    border:
-        1px solid
-        rgba(36,27,82,.09);
+    border-radius:8px;
 
-    border-radius:22px;
-
-    background:#fff;
-
-    box-shadow:
-        0 17px 38px
-        rgba(36,27,82,.10);
-
-    transition:
-        border-color .25s ease,
-        box-shadow .25s ease;
+    background:#F2F1EE;
 }
 
-
-.bd-testi-card.is-active
-.bd-testi-media{
-    border-color:
-        rgba(239,88,67,.20);
-
-    box-shadow:
-        0 24px 48px
-        rgba(36,27,82,.14);
-}
-
-
-.bd-testi-media > img{
+.bd-index-thumb img{
     width:100%;
     height:100%;
 
     display:block;
 
-    padding:9px;
-
-    object-fit:contain;
-
-    object-position:center;
-
-    background:#fff;
-
-    border-radius:21px;
-
-    transition:
-        transform .45s ease;
+    object-fit:cover;
 }
 
+.bd-index-thumb-fallback{
+    width:100%;
+    height:100%;
 
-/* ================================================================
-   FALLBACK
-================================================================ */
-.bd-testi-image-fallback{
-    position:absolute;
-
-    inset:0;
-
-    display:none;
-
-    flex-direction:column;
-
+    display:flex;
     align-items:center;
-
     justify-content:center;
-
-    gap:8px;
-
-    padding:20px;
 
     color:#fff;
 
-    text-align:center;
+    background:var(--orange);
 
-    background:
-        linear-gradient(
-            145deg,
-            #241B52,
-            #332875
-        );
+    font-size:7px;
+    font-weight:900;
 }
 
+.bd-index-error-fallback{
+    display:none;
+}
 
-.bd-testi-image-fallback small{
-    color:
-        var(--gold);
+.bd-index-copy{
+    min-width:0;
+}
+
+.bd-index-copy strong{
+    display:-webkit-box;
+
+    overflow:hidden;
+
+    color:var(--navy);
+
+    font-size:9px;
+    line-height:1.4;
+
+    font-weight:750;
+
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+}
+
+.bd-index-copy span{
+    display:block;
+
+    margin-top:3px;
+
+    overflow:hidden;
+
+    color:#8D8C93;
 
     font-size:7px;
 
-    font-weight:850;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
 
-    letter-spacing:.15em;
+.bd-index-arrow{
+    color:#AAA8AE;
+}
 
-    text-transform:uppercase;
+.bd-index-arrow svg{
+    width:12px;
+    height:12px;
+}
+
+.bd-index-item.is-active
+.bd-index-arrow{
+    color:var(--orange);
 }
 
 
-.bd-testi-image-fallback strong{
-    font-size:20px;
-}
-
-
-/* ================================================================
-   OVERLAY
-================================================================ */
-.bd-testi-media-overlay{
-    position:absolute;
-
-    inset:0;
-
-    pointer-events:none;
-
-    background:
-        linear-gradient(
-            180deg,
-            transparent 55%,
-            rgba(17,12,49,.04) 68%,
-            rgba(17,12,49,.82) 100%
-        );
-}
-
-
-/* ================================================================
-   CARD TOP
-================================================================ */
-.bd-testi-card-top{
-    position:absolute;
-
-    z-index:5;
-
-    left:13px;
-    right:13px;
-    top:13px;
-
+/* CONTROLS */
+.bd-index-footer{
     display:flex;
-
     align-items:center;
-
-    justify-content:
-        space-between;
-}
-
-
-.bd-testi-card-number{
-    min-width:37px;
-    height:27px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:
-        0 8px;
-
-    border-radius:8px;
-
-    color:
-        var(--orange);
-
-    background:
-        rgba(255,255,255,.96);
-
-    font-size:8px;
-
-    font-weight:900;
-
-    box-shadow:
-        0 5px 14px
-        rgba(0,0,0,.07);
-}
-
-
-.bd-testi-expand{
-    width:30px;
-    height:30px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    border-radius:50%;
-
-    color:
-        var(--navy);
-
-    background:
-        rgba(255,255,255,.94);
-
-    opacity:.86;
-}
-
-
-.bd-testi-expand svg{
-    width:13px;
-    height:13px;
-}
-
-
-/* ================================================================
-   CAPTION
-================================================================ */
-.bd-testi-caption{
-    position:absolute;
-
-    z-index:5;
-
-    left:18px;
-    right:18px;
-    bottom:17px;
-}
-
-
-.bd-testi-caption span{
-    display:block;
-
-    margin-bottom:5px;
-
-    color:
-        rgba(255,255,255,.68);
-
-    font-size:6px;
-
-    font-weight:850;
-
-    letter-spacing:.14em;
-
-    text-transform:uppercase;
-}
-
-
-.bd-testi-caption strong{
-    display:block;
-
-    color:#fff;
-
-    font-size:17px;
-
-    line-height:1.2;
-
-    font-weight:850;
-
-    letter-spacing:-.025em;
-}
-
-
-/* ================================================================
-   CONTROLS
-================================================================ */
-.bd-testi-controls{
-    width:
-        min(
-            100%,
-            700px
-        );
-
-    margin:
-        3px auto 0;
-
-    display:grid;
-
-    grid-template-columns:
-        auto 1fr auto auto;
-
-    align-items:center;
+    justify-content:space-between;
 
     gap:12px;
+
+    padding:13px 14px;
+
+    border-top:1px solid rgba(36,27,82,.08);
 }
 
+.bd-index-mobile-label{
+    display:flex;
+    align-items:baseline;
 
-.bd-testi-nav{
+    gap:5px;
+
+    color:#A19FA6;
+
+    font-size:8px;
+    font-weight:800;
+}
+
+.bd-index-mobile-label strong{
+    color:var(--orange);
+
+    font-size:17px;
+}
+
+.bd-index-nav{
+    display:flex;
+    align-items:center;
+
+    gap:7px;
+
+    margin-left:auto;
+}
+
+.bd-index-nav button{
     width:42px;
     height:42px;
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
 
     padding:0;
 
-    border:
-        1px solid
-        rgba(36,27,82,.13);
-
-    border-radius:12px;
-
-    color:
-        var(--navy);
+    border:1px solid rgba(36,27,82,.12);
+    border-radius:11px;
 
     background:#fff;
+    color:var(--navy);
 
     cursor:pointer;
-
-    transition:
-        transform .2s ease,
-        background .2s ease,
-        color .2s ease,
-        border-color .2s ease;
 }
 
+.bd-index-nav .bd-index-nav-primary{
+    border-color:var(--navy);
 
-.bd-testi-nav-next{
+    background:var(--navy);
     color:#fff;
-
-    border-color:
-        var(--navy);
-
-    background:
-        var(--navy);
 }
 
-
-.bd-testi-nav svg{
+.bd-index-nav svg{
     width:14px;
     height:14px;
 }
 
 
-/* ================================================================
-   DOTS
-================================================================ */
-.bd-testi-dots{
-    display:flex;
+/* EMPTY */
+.bd-editorial-empty{
+    padding:60px 25px;
 
-    align-items:center;
+    border:1px solid rgba(239,88,67,.12);
+    border-radius:26px;
 
-    justify-content:center;
+    text-align:center;
+}
 
-    gap:4px;
+.bd-editorial-empty > span{
+    color:var(--orange);
+
+    font-size:8px;
+    font-weight:850;
+}
+
+.bd-editorial-empty h3{
+    margin:9px 0 0;
+
+    color:var(--navy);
+
+    font-size:20px;
+}
+
+.bd-editorial-empty p{
+    margin:7px 0 0;
+
+    color:var(--muted);
+
+    font-size:11px;
 }
 
 
-.bd-testi-dot{
-    width:22px;
-    height:15px;
+/* ================================================================
+   LAPTOP
+================================================================ */
+@media(max-width:1150px){
 
-    display:flex;
+    .bd-editorial-layout{
+        grid-template-columns:
+            minmax(0,1fr)
+            280px;
+    }
 
-    align-items:center;
+    .bd-feature-stage{
+        padding:30px;
+    }
 
-    justify-content:center;
+    .bd-feature-panel{
+        grid-template-columns:
+            220px
+            minmax(0,1fr);
 
-    padding:0;
+        gap:35px;
+    }
+
+    .bd-feature-cover-frame{
+        width:205px;
+    }
+
+    .bd-feature-cover-link{
+        width:175px;
+        height:248px;
+    }
+
+    .bd-feature-cover-caption{
+        width:175px;
+    }
+}
+
+
+/* ================================================================
+   TOUCH / TABLET
+   Tidak ada horizontal index carousel.
+================================================================ */
+html[data-baca-input="touch"]
+.bd-editorial-layout{
+    grid-template-columns:1fr;
+}
+
+html[data-baca-input="touch"]
+.bd-book-index{
+    overflow:visible;
 
     border:0;
 
+    border-radius:0;
+
     background:transparent;
 
-    cursor:pointer;
+    box-shadow:none;
 }
 
-
-.bd-testi-dot span{
-    width:13px;
-    height:2px;
-
-    display:block;
-
-    border-radius:999px;
-
-    background:
-        rgba(36,27,82,.18);
-
-    transition:
-        width .25s ease,
-        background .25s ease;
-}
-
-
-.bd-testi-dot.is-active span{
-    width:22px;
-
-    background:
-        var(--orange);
-}
-
-
-/* ================================================================
-   COUNTER
-================================================================ */
-.bd-testi-counter{
-    min-width:54px;
-
-    display:flex;
-
-    align-items:baseline;
-
-    justify-content:center;
-
-    gap:4px;
-
-    color:#AAA7AE;
-
-    font-size:7px;
-
-    font-weight:850;
-}
-
-
-.bd-testi-counter strong{
-    color:
-        var(--orange);
-
-    font-size:15px;
-}
-
-
-/* ================================================================
-   INFO
-================================================================ */
-.bd-testi-info{
-    width:
-        min(
-            100%,
-            820px
-        );
-
-    margin:
-        20px auto 0;
-
-    display:grid;
-
-    grid-template-columns:
-        74px
-        minmax(0,1fr)
-        minmax(200px,.72fr);
-
-    align-items:center;
-
-    gap:20px;
-
-    padding:
-        14px 17px;
-
-    border:
-        1px solid
-        rgba(36,27,82,.08);
-
-    border-radius:16px;
-
-    background:
-        rgba(255,255,255,.66);
-
-    box-shadow:
-        0 9px 25px
-        rgba(36,27,82,.035);
-}
-
-
-.bd-testi-info-number{
-    min-height:50px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:2px;
-
-    border:
-        1px solid
-        rgba(36,27,82,.07);
-
-    border-radius:11px;
-
-    background:#fff;
-}
-
-
-.bd-testi-info-number span{
-    color:#AAA6AE;
-
-    font-size:5px;
-
-    font-weight:850;
-
-    letter-spacing:.12em;
-}
-
-
-.bd-testi-info-number strong{
-    color:
-        var(--orange);
-
-    font-size:17px;
-}
-
-
-.bd-testi-info-copy{
-    min-width:0;
-}
-
-
-.bd-testi-info-copy > span{
-    display:block;
-
-    color:
-        var(--orange);
-
-    font-size:6px;
-
-    font-weight:850;
-
-    letter-spacing:.12em;
-
-    text-transform:uppercase;
-}
-
-
-.bd-testi-info-copy h3{
-    margin:
-        4px 0 0;
-
-    color:
-        var(--navy);
-
-    font-size:19px;
-
-    line-height:1.15;
-
-    font-weight:850;
-
-    letter-spacing:-.03em;
-
-    overflow-wrap:anywhere;
-}
-
-
-.bd-testi-info-note{
-    min-width:0;
-
-    display:flex;
-
-    align-items:flex-start;
-
-    gap:8px;
-
-    padding-left:18px;
-
-    border-left:
-        1px solid
-        rgba(36,27,82,.08);
-}
-
-
-.bd-testi-info-note > span{
-    width:5px;
-    height:5px;
-
-    flex:
-        0 0 auto;
-
-    margin-top:4px;
-
-    border-radius:50%;
-
-    background:
-        var(--orange);
-}
-
-
-.bd-testi-info-note p{
-    margin:0;
-
-    color:#89868F;
-
-    font-size:7px;
-
-    line-height:1.55;
-}
-
-
-/* ================================================================
-   DESKTOP HOVER
-================================================================ */
-html[data-baca-device="desktop"][data-baca-input="fine"]
-.bd-testi-card.is-active:hover
-.bd-testi-media > img{
-    transform:
-        scale(1.018);
-}
-
-
-html[data-baca-device="desktop"][data-baca-input="fine"]
-.bd-testi-nav:hover{
-    transform:
-        translateY(-2px);
-
-    border-color:
-        rgba(239,88,67,.4);
-}
-
-
-html[data-baca-device="desktop"][data-baca-input="fine"]
-.bd-testi-nav-next:hover{
-    color:#fff;
-
-    border-color:
-        var(--orange);
-
-    background:
-        var(--orange);
-}
-
-
-/* ================================================================
-   LARGE DESKTOP
-================================================================ */
-@media(min-width:1500px){
-
-    html[data-baca-device="desktop"]
-    .bd-testi-container{
-        width:
-            min(
-                calc(100% - 80px),
-                1440px
-            );
-    }
-
-}
-
-
-/* ================================================================
-   LAPTOP KECIL
-================================================================ */
-@media(
-    min-width:1024px
-)
-and
-(
-    max-width:1199px
-){
-
-    html[data-baca-device="desktop"]
-    .bd-testi-section{
-        padding:
-            65px 0 62px;
-    }
-
-
-    html[data-baca-device="desktop"]
-    .bd-testi-container{
-        width:
-            calc(100% - 42px);
-    }
-
-
-    html[data-baca-device="desktop"]
-    .bd-testi-stage{
-        height:350px;
-    }
-
-
-    html[data-baca-device="desktop"]
-    .bd-testi-card{
-        width:290px;
-
-        height:320px;
-    }
-
-}
-
-
-/* ================================================================
-   TABLET
-================================================================ */
-html[data-baca-device="tablet"]
-.bd-testi-section{
-    padding:
-        66px 0 62px;
-}
-
-
-html[data-baca-device="tablet"]
-.bd-testi-container{
-    width:100%;
-
-    padding:
-        0 24px;
-}
-
-
-html[data-baca-device="tablet"]
-.bd-testi-header{
-    width:100%;
-}
-
-
-html[data-baca-device="tablet"]
-.bd-testi-heading h2{
-    font-size:
-        clamp(
-            32px,
-            5vw,
-            40px
-        );
-}
-
-
-html[data-baca-device="tablet"]
-.bd-testi-stage{
-    height:340px;
-}
-
-
-html[data-baca-device="tablet"]
-.bd-testi-card{
-    width:275px;
-    height:310px;
-}
-
-
-html[data-baca-device="tablet"]
-.bd-testi-info{
-    grid-template-columns:
-        68px
-        minmax(0,1fr);
-}
-
-
-html[data-baca-device="tablet"]
-.bd-testi-info-note{
-    grid-column:2;
-
-    padding:
-        10px 0 0;
-
-    border-left:0;
-
-    border-top:
-        1px solid
-        rgba(36,27,82,.08);
-}
-
-
-/* ================================================================
-   PHONE / HP+
-================================================================ */
-html[data-baca-device="phone"]
-.bd-testi-section{
-    padding:
-        58px 0 56px;
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-container{
-    width:100%;
-
-    padding:
-        0 16px;
-}
-
-
-/* HEADER */
-html[data-baca-device="phone"]
-.bd-testi-header{
-    width:100%;
-
-    flex-direction:column;
-
-    align-items:flex-start;
-
-    gap:14px;
-
-    margin-bottom:20px;
-
-    padding-bottom:17px;
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-heading{
-    width:100%;
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-heading h2{
-    max-width:360px;
-
-    font-size:
-        clamp(
-            31px,
-            8.8vw,
-            39px
-        );
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-heading p{
-    max-width:370px;
-
-    font-size:9.5px;
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-header-status{
-    width:100%;
-
-    justify-content:
-        space-between;
-}
-
-
-/* ================================================================
-   PHONE STAGE = NATIVE SWIPE
-================================================================ */
-html[data-baca-device="phone"]
-.bd-testi-stage{
-    width:
-        calc(100% + 16px);
-
-    height:auto;
-
-    display:flex;
-
-    gap:12px;
-
-    margin-right:-16px;
-
-    padding:
-        3px 16px
-        15px 0;
-
-    overflow-x:auto;
-
-    overflow-y:hidden;
-
-    perspective:none;
-
-    scroll-snap-type:
-        x mandatory;
-
-    scrollbar-width:none;
-
-    -webkit-overflow-scrolling:
-        touch;
-
-    overscroll-behavior-x:
-        contain;
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-stage::-webkit-scrollbar{
+html[data-baca-input="touch"]
+.bd-index-header,
+html[data-baca-input="touch"]
+.bd-index-list{
     display:none;
 }
 
+html[data-baca-input="touch"]
+.bd-index-footer{
+    width:min(100%,680px);
 
-html[data-baca-device="phone"]
-.bd-testi-card{
-    position:relative!important;
+    margin:12px auto 0;
 
-    left:auto!important;
+    padding:12px 0 0;
 
-    top:auto!important;
-
-    flex:
-        0 0 min(
-            76vw,
-            285px
-        );
-
-    width:
-        min(
-            76vw,
-            285px
-        );
-
-    height:
-        min(
-            88vw,
-            330px
-        );
-
-    transform:none!important;
-
-    opacity:1!important;
-
-    visibility:visible!important;
-
-    pointer-events:auto!important;
-
-    scroll-snap-align:start;
-
-    scroll-snap-stop:always;
+    border-top:1px solid rgba(36,27,82,.09);
 }
 
 
+/* ================================================================
+   PHONE
+================================================================ */
 html[data-baca-device="phone"]
-.bd-testi-card-button,
+.bd-editorial-books{
+    padding:58px 0 60px;
+}
+
 html[data-baca-device="phone"]
-.bd-testi-media{
+.bd-editorial-container{
+    width:100%;
+
+    padding:0 16px;
+}
+
+html[data-baca-device="phone"]
+.bd-editorial-header{
+    flex-direction:column;
+    align-items:flex-start;
+
+    gap:15px;
+
+    margin-bottom:22px;
+    padding-bottom:18px;
+}
+
+html[data-baca-device="phone"]
+.bd-editorial-heading h2{
+    font-size:33px;
+}
+
+html[data-baca-device="phone"]
+.bd-editorial-heading p{
+    max-width:100%;
+
+    font-size:10px;
+}
+
+html[data-baca-device="phone"]
+.bd-editorial-header-right{
+    width:100%;
+
+    justify-content:space-between;
+}
+
+html[data-baca-device="phone"]
+.bd-feature-stage{
+    padding:19px 16px 22px;
+
+    border-radius:21px;
+}
+
+html[data-baca-device="phone"]
+.bd-feature-panel{
+    grid-template-columns:1fr;
+
+    gap:23px;
+
+    min-height:0;
+}
+
+html[data-baca-device="phone"]
+.bd-feature-cover-frame{
+    width:min(63vw,230px);
+
+    padding:12px;
+
     border-radius:19px;
 }
 
-
 html[data-baca-device="phone"]
-.bd-testi-media > img{
-    border-radius:18px;
+.bd-feature-cover-link{
+    width:100%;
+    height:auto;
+
+    aspect-ratio:2/2.82;
 }
 
-
 html[data-baca-device="phone"]
-.bd-testi-caption strong{
-    font-size:15px;
+.bd-feature-cover-caption{
+    width:min(60vw,205px);
 }
 
-
-/* CONTROLS */
 html[data-baca-device="phone"]
-.bd-testi-controls{
+.bd-feature-copy h3{
+    font-size:25px;
+}
+
+html[data-baca-device="phone"]
+.bd-feature-divider{
+    margin:18px 0 15px;
+}
+
+html[data-baca-device="phone"]
+.bd-price-item{
+    min-height:64px;
+}
+
+html[data-baca-device="phone"]
+.bd-feature-detail{
     width:100%;
 
-    grid-template-columns:
-        1fr auto auto;
+    justify-content:space-between;
 
-    gap:9px;
-
-    margin-top:3px;
+    min-height:47px;
 }
 
-
 html[data-baca-device="phone"]
-.bd-testi-dots{
-    display:none;
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-counter{
-    justify-content:flex-start;
-
-    margin-right:auto;
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-nav{
-    width:44px;
-    height:44px;
-}
-
-
-/* INFO */
-html[data-baca-device="phone"]
-.bd-testi-info{
+.bd-index-footer{
     width:100%;
 
-    grid-template-columns:1fr;
-
-    gap:10px;
-
-    margin-top:18px;
-
-    padding:14px;
+    margin-top:12px;
 }
-
 
 html[data-baca-device="phone"]
-.bd-testi-info-number{
-    width:max-content;
-
-    min-width:65px;
-
-    min-height:38px;
-
-    flex-direction:row;
-
-    gap:5px;
-
-    padding:
-        0 9px;
+.bd-index-nav button{
+    width:46px;
+    height:46px;
 }
 
 
-html[data-baca-device="phone"]
-.bd-testi-info-copy h3{
-    font-size:18px;
-}
-
-
-html[data-baca-device="phone"]
-.bd-testi-info-note{
-    grid-column:auto;
-
-    padding:
-        10px 0 0;
-
-    border-left:0;
-
-    border-top:
-        1px solid
-        rgba(36,27,82,.08);
-}
-
-
-/* ================================================================
-   SMALL PHONE
-================================================================ */
+/* SMALL PHONE */
 @media(max-width:390px){
 
     html[data-baca-device="phone"]
-    .bd-testi-container{
-        padding:
-            0 14px;
+    .bd-editorial-container{
+        padding:0 14px;
     }
-
 
     html[data-baca-device="phone"]
-    .bd-testi-stage{
-        width:
-            calc(100% + 14px);
-
-        margin-right:-14px;
-
-        padding-right:14px;
+    .bd-editorial-heading h2{
+        font-size:30px;
     }
-
 
     html[data-baca-device="phone"]
-    .bd-testi-card{
-        flex-basis:
-            min(
-                78vw,
-                270px
-            );
-
-        width:
-            min(
-                78vw,
-                270px
-            );
-
-        height:
-            min(
-                91vw,
-                315px
-            );
+    .bd-feature-copy h3{
+        font-size:23px;
     }
-
 
     html[data-baca-device="phone"]
-    .bd-testi-heading h2{
-        font-size:31px;
+    .bd-price-item{
+        flex-direction:column;
+        align-items:flex-start;
+
+        gap:8px;
     }
 
+    html[data-baca-device="phone"]
+    .bd-price-value{
+        min-width:0;
+        text-align:left;
+    }
+
+    html[data-baca-device="phone"]
+    .bd-current-price-row{
+        justify-content:flex-start;
+    }
 }
 
 
-/* ================================================================
-   LIGHTBOX
-================================================================ */
-.bd-testi-lightbox{
-    position:fixed;
-
-    inset:0;
-
-    z-index:99999;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:30px;
-
-    opacity:0;
-
-    visibility:hidden;
-
-    pointer-events:none;
-
-    background:
-        rgba(13,9,35,.90);
-
-    backdrop-filter:
-        blur(11px);
-
-    transition:
-        opacity .22s ease,
-        visibility .22s ease;
-}
-
-
-.bd-testi-lightbox.is-open{
-    opacity:1;
-
-    visibility:visible;
-
-    pointer-events:auto;
-}
-
-
-.bd-testi-lightbox-content{
-    width:
-        min(
-            100%,
-            920px
-        );
-
-    max-height:
-        calc(100dvh - 70px);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-}
-
-
-.bd-testi-lightbox-content img{
-    display:block;
-
-    max-width:100%;
-
-    max-height:
-        calc(100dvh - 70px);
-
-    width:auto;
-    height:auto;
-
-    padding:8px;
-
-    object-fit:contain;
-
-    border-radius:16px;
-
-    background:#fff;
-
-    box-shadow:
-        0 28px 75px
-        rgba(0,0,0,.4);
-}
-
-
-.bd-testi-lightbox-close{
-    position:absolute;
-
-    z-index:5;
-
-    right:22px;
-    top:22px;
-
-    width:44px;
-    height:44px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:0;
-
-    border:
-        1px solid
-        rgba(255,255,255,.18);
-
-    border-radius:50%;
-
-    color:#fff;
-
-    background:
-        rgba(255,255,255,.10);
-
-    cursor:pointer;
-}
-
-
-.bd-testi-lightbox-close svg{
-    width:18px;
-    height:18px;
-}
-
-
-/* ================================================================
-   MODAL
-================================================================ */
-body.bd-testi-modal-open{
-    overflow:hidden;
-}
-
-
-/* ================================================================
-   REDUCED MOTION
-================================================================ */
 @media(prefers-reduced-motion:reduce){
 
-    .bd-testi-card,
-    .bd-testi-media,
-    .bd-testi-media > img,
-    .bd-testi-nav,
-    .bd-testi-dot span{
+    .bd-editorial-books *{
         transition:none!important;
     }
-
 }
 </style>
 
 
 <script>
-(function () {
+(function(){
 
-    function initBacaTestimoni() {
+    function initEditorialBooks(){
 
         const section =
-            document.getElementById(
-                'testimoni'
-            );
+            document.getElementById('katalog');
 
-
-        if (
-            !section
-            ||
-            section.dataset.testiReady ===
-            '1'
-        ) {
+        if(
+            !section ||
+            section.dataset.editorialReady === '1'
+        ){
             return;
         }
 
+        section.dataset.editorialReady = '1';
 
-        section.dataset.testiReady =
-            '1';
-
-
-        const cards =
+        const panels =
             Array.from(
                 section.querySelectorAll(
-                    '[data-testi-card]'
+                    '[data-feature-panel]'
                 )
             );
 
-
-        const dots =
+        const indexButtons =
             Array.from(
                 section.querySelectorAll(
-                    '[data-testi-dot]'
+                    '[data-book-index]'
                 )
             );
-
-
-        const openButtons =
-            Array.from(
-                section.querySelectorAll(
-                    '[data-testi-open]'
-                )
-            );
-
-
-        const stage =
-            section.querySelector(
-                '#bdTestiStage'
-            );
-
 
         const prev =
             section.querySelector(
-                '#bdTestiPrev'
+                '#bdEditorialPrev'
             );
-
 
         const next =
             section.querySelector(
-                '#bdTestiNext'
+                '#bdEditorialNext'
             );
 
-
-        const counter =
+        const current =
             section.querySelector(
-                '#bdTestiCurrent'
+                '#bdEditorialCurrent'
             );
 
-
-        const headerCurrent =
+        const mobileCurrent =
             section.querySelector(
-                '#bdTestiHeaderCurrent'
+                '#bdEditorialMobileCurrent'
             );
 
-
-        const infoNumber =
+        const stage =
             section.querySelector(
-                '#bdTestiInfoNumber'
+                '#bdFeatureStage'
             );
 
-
-        const infoLabel =
-            section.querySelector(
-                '#bdTestiInfoLabel'
-            );
-
-
-        const infoName =
-            section.querySelector(
-                '#bdTestiInfoName'
-            );
-
-
-        const lightbox =
-            section.querySelector(
-                '#bdTestiLightbox'
-            );
-
-
-        const lightboxImage =
-            section.querySelector(
-                '#bdTestiLightboxImage'
-            );
-
-
-        const lightboxClose =
-            section.querySelector(
-                '#bdTestiLightboxClose'
-            );
-
-
-        if (
-            cards.length === 0
-        ) {
+        if(!panels.length){
             return;
         }
 
-
-        const items =
-            @json($testimoniItems);
-
-
-        let activeIndex =
-            0;
-
-
-        let autoplay =
-            null;
-
-
-        let scrollTimer =
-            null;
-
-
-        let resizeTimer =
-            null;
-
+        const gsap =
+            window.bdGsap || null;
 
         const reduceMotion =
             window.matchMedia(
                 '(prefers-reduced-motion:reduce)'
             ).matches;
 
+        let activeIndex = 0;
+        let busy = false;
 
-        /* =========================================================
-           DEVICE
-        ========================================================== */
-        function getDevice() {
-
-            if (
-                window.BacaDevice
-            ) {
-                return window.BacaDevice;
-            }
+        let startX = 0;
+        let startY = 0;
 
 
-            return {
-                type:
-                    window.innerWidth <= 767
-                        ? 'phone'
-                        : (
-                            window.innerWidth <= 1023
-                                ? 'tablet'
-                                : 'desktop'
-                        ),
-
-                phone:
-                    window.innerWidth <= 767,
-
-                tablet:
-                    window.innerWidth > 767
-                    &&
-                    window.innerWidth <= 1023,
-
-                desktop:
-                    window.innerWidth >= 1024,
-
-                touch:
-                    navigator.maxTouchPoints > 0,
-
-                input:
-                    navigator.maxTouchPoints > 0
-                        ? 'touch'
-                        : 'fine'
-            };
-
-        }
-
-
-        function isPhone() {
-
-            const device =
-                getDevice();
-
+        function device(){
 
             return (
-                device.type === 'phone'
-                ||
-                device.phone === true
-            );
+                window.BacaDevice ||
+                {
+                    type:
+                        window.innerWidth <= 767
+                            ? 'phone'
+                            : (
+                                window.innerWidth <= 1023
+                                    ? 'tablet'
+                                    : 'desktop'
+                            ),
 
+                    touch:
+                        navigator.maxTouchPoints > 0
+                }
+            );
         }
 
 
-        /* =========================================================
-           UPDATE TEXT
-        ========================================================== */
-        function updateInfo() {
+        function isTouch(){
+
+            const d =
+                device();
+
+            return (
+                d.touch === true ||
+                d.type !== 'desktop'
+            );
+        }
+
+
+        function updateUi(){
 
             const number =
                 String(
@@ -2266,632 +1895,333 @@ body.bd-testi-modal-open{
                     '0'
                 );
 
-
-            if (counter) {
-                counter.textContent =
+            if(current){
+                current.textContent =
                     number;
             }
 
-
-            if (headerCurrent) {
-                headerCurrent.textContent =
+            if(mobileCurrent){
+                mobileCurrent.textContent =
                     number;
             }
 
+            indexButtons.forEach(
+                function(button,index){
 
-            if (infoNumber) {
-                infoNumber.textContent =
-                    number;
-            }
-
-
-            if (
-                infoLabel
-                &&
-                items[activeIndex]
-            ) {
-                infoLabel.textContent =
-                    items[activeIndex].label;
-            }
-
-
-            if (
-                infoName
-                &&
-                items[activeIndex]
-            ) {
-                infoName.textContent =
-                    items[activeIndex].name;
-            }
-
-
-            dots.forEach(
-                function (
-                    dot,
-                    index
-                ) {
-
-                    dot.classList.toggle(
+                    button.classList.toggle(
                         'is-active',
                         index === activeIndex
                     );
-
                 }
             );
-
-
-            cards.forEach(
-                function (
-                    card,
-                    index
-                ) {
-
-                    card.classList.toggle(
-                        'is-active',
-                        index === activeIndex
-                    );
-
-                }
-            );
-
         }
 
 
-        /* =========================================================
-           DESKTOP / TABLET RENDER
-        ========================================================== */
-        function renderStage() {
+        function showBook(
+            targetIndex,
+            direction = 1
+        ){
 
-            if (
-                isPhone()
-            ) {
+            if(!panels.length){
+                return;
+            }
 
-                cards.forEach(
-                    function (
-                        card
-                    ) {
+            const nextIndex =
+                (
+                    targetIndex +
+                    panels.length
+                ) %
+                panels.length;
 
-                        card.style.removeProperty(
-                            '--testi-x'
-                        );
+            if(
+                nextIndex === activeIndex ||
+                busy
+            ){
+                return;
+            }
 
+            const oldPanel =
+                panels[activeIndex];
 
-                        card.style.removeProperty(
-                            '--testi-scale'
-                        );
+            const newPanel =
+                panels[nextIndex];
 
+            if(
+                !oldPanel ||
+                !newPanel
+            ){
+                return;
+            }
 
-                        card.style.removeProperty(
-                            '--testi-rotate'
-                        );
+            /*
+            |--------------------------------------------------------------------------
+            | TOUCH
+            |--------------------------------------------------------------------------
+            | Tidak ada horizontal document scroll.
+            | Hanya ganti panel.
+            */
+            if(
+                isTouch() ||
+                !gsap ||
+                reduceMotion
+            ){
 
+                oldPanel.style.display =
+                    'none';
 
-                        card.style.removeProperty(
-                            'opacity'
-                        );
-
-
-                        card.style.removeProperty(
-                            'visibility'
-                        );
-
-
-                        card.style.removeProperty(
-                            'z-index'
-                        );
-
-
-                        card.style.removeProperty(
-                            'pointer-events'
-                        );
-
-                    }
+                oldPanel.classList.remove(
+                    'is-active'
                 );
 
+                newPanel.style.display =
+                    'grid';
+
+                newPanel.classList.add(
+                    'is-active'
+                );
+
+                activeIndex =
+                    nextIndex;
+
+                updateUi();
+
+                if(
+                    gsap &&
+                    !reduceMotion
+                ){
+
+                    gsap.fromTo(
+                        newPanel,
+                        {
+                            opacity:0,
+                            x:
+                                direction > 0
+                                    ? 14
+                                    : -14
+                        },
+                        {
+                            opacity:1,
+                            x:0,
+                            duration:.28,
+                            ease:'power2.out',
+                            clearProps:
+                                'transform,opacity'
+                        }
+                    );
+                }
 
                 return;
             }
 
 
-            const device =
-                getDevice();
+            /*
+            |--------------------------------------------------------------------------
+            | DESKTOP
+            |--------------------------------------------------------------------------
+            */
 
+            busy = true;
 
-            const tablet =
-                device.type === 'tablet'
-                ||
-                device.tablet === true;
+            const oldCover =
+                oldPanel.querySelector(
+                    '.bd-feature-cover-wrap'
+                );
 
+            const oldCopy =
+                oldPanel.querySelector(
+                    '.bd-feature-copy'
+                );
 
-            const offset =
-                tablet
-                    ? 235
-                    : 270;
+            const newCover =
+                newPanel.querySelector(
+                    '.bd-feature-cover-wrap'
+                );
 
+            const newCopy =
+                newPanel.querySelector(
+                    '.bd-feature-copy'
+                );
 
-            const total =
-                cards.length;
+            const tl =
+                gsap.timeline({
+                    onComplete:function(){
 
+                        activeIndex =
+                            nextIndex;
 
-            cards.forEach(
-                function (
-                    card,
-                    index
-                ) {
+                        updateUi();
 
-                    let relative =
-                        index -
-                        activeIndex;
-
-
-                    if (
-                        relative >
-                        total / 2
-                    ) {
-                        relative -=
-                            total;
+                        busy =
+                            false;
                     }
-
-
-                    if (
-                        relative <
-                        -(total / 2)
-                    ) {
-                        relative +=
-                            total;
-                    }
-
-
-                    let x =
-                        0;
-
-
-                    let scale =
-                        1;
-
-
-                    let opacity =
-                        1;
-
-
-                    let rotate =
-                        0;
-
-
-                    let z =
-                        10;
-
-
-                    let visibility =
-                        'visible';
-
-
-                    let pointerEvents =
-                        'auto';
-
-
-                    if (
-                        relative === 0
-                    ) {
-
-                        x =
-                            0;
-
-                        scale =
-                            1;
-
-                        opacity =
-                            1;
-
-                        rotate =
-                            0;
-
-                        z =
-                            10;
-
-                    }
-
-                    else if (
-                        relative === 1
-                    ) {
-
-                        x =
-                            offset;
-
-                        scale =
-                            .82;
-
-                        opacity =
-                            .62;
-
-                        rotate =
-                            -7;
-
-                        z =
-                            7;
-
-                    }
-
-                    else if (
-                        relative === -1
-                    ) {
-
-                        x =
-                            -offset;
-
-                        scale =
-                            .82;
-
-                        opacity =
-                            .62;
-
-                        rotate =
-                            7;
-
-                        z =
-                            7;
-
-                    }
-
-                    else if (
-                        relative === 2
-                    ) {
-
-                        x =
-                            offset * 1.62;
-
-                        scale =
-                            .67;
-
-                        opacity =
-                            .16;
-
-                        rotate =
-                            -10;
-
-                        z =
-                            3;
-
-                    }
-
-                    else if (
-                        relative === -2
-                    ) {
-
-                        x =
-                            -(offset * 1.62);
-
-                        scale =
-                            .67;
-
-                        opacity =
-                            .16;
-
-                        rotate =
-                            10;
-
-                        z =
-                            3;
-
-                    }
-
-                    else {
-
-                        opacity =
-                            0;
-
-                        visibility =
-                            'hidden';
-
-                        pointerEvents =
-                            'none';
-
-                        z =
-                            1;
-                    }
-
-
-                    card.style.setProperty(
-                        '--testi-x',
-                        x + 'px'
-                    );
-
-
-                    card.style.setProperty(
-                        '--testi-scale',
-                        scale
-                    );
-
-
-                    card.style.setProperty(
-                        '--testi-rotate',
-                        rotate + 'deg'
-                    );
-
-
-                    card.style.opacity =
-                        opacity;
-
-
-                    card.style.visibility =
-                        visibility;
-
-
-                    card.style.zIndex =
-                        z;
-
-
-                    card.style.pointerEvents =
-                        pointerEvents;
-
+                });
+
+            tl.to(
+                [
+                    oldCover,
+                    oldCopy
+                ].filter(Boolean),
+                {
+                    opacity:0,
+                    x:
+                        direction > 0
+                            ? -15
+                            : 15,
+
+                    duration:.18,
+                    ease:'power2.in',
+                    stagger:.025
                 }
             );
 
-        }
+            tl.set(
+                oldPanel,
+                {
+                    display:'none'
+                }
+            );
 
+            tl.set(
+                newPanel,
+                {
+                    display:'grid'
+                }
+            );
 
-        /* =========================================================
-           SET ACTIVE
-        ========================================================== */
-        function setActive(
-            index,
-            scrollPhone = true
-        ) {
+            if(newCover){
 
-            activeIndex =
-                (
-                    index +
-                    cards.length
-                )
-                %
-                cards.length;
-
-
-            updateInfo();
-
-
-            renderStage();
-
-
-            if (
-                isPhone()
-                &&
-                scrollPhone
-                &&
-                cards[activeIndex]
-            ) {
-
-                cards[
-                    activeIndex
-                ].scrollIntoView(
+                tl.fromTo(
+                    newCover,
                     {
-                        behavior:
-                            reduceMotion
-                                ? 'auto'
-                                : 'smooth',
-
-                        block:
-                            'nearest',
-
-                        inline:
-                            'start'
+                        opacity:0,
+                        x:
+                            direction > 0
+                                ? 17
+                                : -17
+                    },
+                    {
+                        opacity:1,
+                        x:0,
+                        duration:.33,
+                        ease:'power3.out'
                     }
                 );
-
             }
 
+            if(newCopy){
+
+                tl.fromTo(
+                    newCopy,
+                    {
+                        opacity:0,
+                        y:9
+                    },
+                    {
+                        opacity:1,
+                        y:0,
+                        duration:.33,
+                        ease:'power3.out'
+                    },
+                    '-=.23'
+                );
+            }
+
+            tl.set(
+                [
+                    newCover,
+                    newCopy
+                ].filter(Boolean),
+                {
+                    clearProps:
+                        'transform,opacity'
+                }
+            );
         }
 
 
-        /* =========================================================
-           PREV NEXT
-        ========================================================== */
+        function goPrevious(){
+
+            showBook(
+                activeIndex - 1,
+                -1
+            );
+        }
+
+
+        function goNext(){
+
+            showBook(
+                activeIndex + 1,
+                1
+            );
+        }
+
+
+        indexButtons.forEach(
+            function(button,index){
+
+                button.addEventListener(
+                    'click',
+                    function(){
+
+                        showBook(
+                            index,
+                            index >= activeIndex
+                                ? 1
+                                : -1
+                        );
+                    }
+                );
+            }
+        );
+
+
         prev?.addEventListener(
             'click',
-            function () {
+            function(event){
 
-                stopAutoplay();
+                event.preventDefault();
+                event.stopPropagation();
 
-
-                setActive(
-                    activeIndex - 1
-                );
-
-
-                startAutoplay();
-
+                goPrevious();
             }
         );
 
 
         next?.addEventListener(
             'click',
-            function () {
+            function(event){
 
-                stopAutoplay();
+                event.preventDefault();
+                event.stopPropagation();
 
-
-                setActive(
-                    activeIndex + 1
-                );
-
-
-                startAutoplay();
-
+                goNext();
             }
         );
 
 
-        /* =========================================================
-           DOT
-        ========================================================== */
-        dots.forEach(
-            function (
-                dot,
-                index
-            ) {
-
-                dot.addEventListener(
-                    'click',
-                    function () {
-
-                        stopAutoplay();
-
-
-                        setActive(
-                            index
-                        );
-
-
-                        startAutoplay();
-
-                    }
-                );
-
-            }
-        );
-
-
-        /* =========================================================
-           CARD CLICK
-        ========================================================== */
-        cards.forEach(
-            function (
-                card,
-                index
-            ) {
-
-                card.addEventListener(
-                    'click',
-                    function (
-                        event
-                    ) {
-
-                        if (
-                            isPhone()
-                        ) {
-                            return;
-                        }
-
-
-                        if (
-                            index !==
-                            activeIndex
-                        ) {
-
-                            event.preventDefault();
-
-                            event.stopPropagation();
-
-
-                            stopAutoplay();
-
-
-                            setActive(
-                                index
-                            );
-
-
-                            startAutoplay();
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-
-        /* =========================================================
-           PHONE SCROLL DETECTION
-        ========================================================== */
+        /*
+        |--------------------------------------------------------------------------
+        | SWIPE
+        |--------------------------------------------------------------------------
+        | Swipe pada FEATURE, bukan scroll horizontal halaman.
+        */
         stage?.addEventListener(
-            'scroll',
-            function () {
+            'touchstart',
+            function(event){
 
-                if (
-                    !isPhone()
-                ) {
+                if(!isTouch()){
                     return;
                 }
 
+                const touch =
+                    event.touches[0];
 
-                clearTimeout(
-                    scrollTimer
-                );
+                startX =
+                    touch.clientX;
 
-
-                scrollTimer =
-                    window.setTimeout(
-                        function () {
-
-                            const stageRect =
-                                stage
-                                    .getBoundingClientRect();
-
-
-                            let nearest =
-                                activeIndex;
-
-
-                            let smallest =
-                                Infinity;
-
-
-                            cards.forEach(
-                                function (
-                                    card,
-                                    index
-                                ) {
-
-                                    const rect =
-                                        card
-                                            .getBoundingClientRect();
-
-
-                                    const distance =
-                                        Math.abs(
-                                            rect.left -
-                                            stageRect.left
-                                        );
-
-
-                                    if (
-                                        distance <
-                                        smallest
-                                    ) {
-
-                                        smallest =
-                                            distance;
-
-
-                                        nearest =
-                                            index;
-
-                                    }
-
-                                }
-                            );
-
-
-                            if (
-                                nearest !==
-                                activeIndex
-                            ) {
-
-                                activeIndex =
-                                    nearest;
-
-
-                                updateInfo();
-
-                            }
-
-                        },
-                        90
-                    );
-
+                startY =
+                    touch.clientY;
             },
             {
                 passive:true
@@ -2899,372 +2229,95 @@ body.bd-testi-modal-open{
         );
 
 
-        /* =========================================================
-           LIGHTBOX
-        ========================================================== */
-        function openLightbox(
-            index
-        ) {
+        stage?.addEventListener(
+            'touchend',
+            function(event){
 
-            if (
-                !lightbox
-                ||
-                !lightboxImage
-                ||
-                !items[index]
-            ) {
-                return;
-            }
-
-
-            lightboxImage.src =
-                items[index].image;
-
-
-            lightboxImage.alt =
-                items[index].alt;
-
-
-            lightbox.classList.add(
-                'is-open'
-            );
-
-
-            lightbox.setAttribute(
-                'aria-hidden',
-                'false'
-            );
-
-
-            document.body.classList.add(
-                'bd-testi-modal-open'
-            );
-
-
-            stopAutoplay();
-
-        }
-
-
-        function closeLightbox() {
-
-            if (
-                !lightbox
-            ) {
-                return;
-            }
-
-
-            lightbox.classList.remove(
-                'is-open'
-            );
-
-
-            lightbox.setAttribute(
-                'aria-hidden',
-                'true'
-            );
-
-
-            document.body.classList.remove(
-                'bd-testi-modal-open'
-            );
-
-
-            window.setTimeout(
-                function () {
-
-                    if (
-                        lightboxImage
-                        &&
-                        !lightbox.classList
-                            .contains(
-                                'is-open'
-                            )
-                    ) {
-
-                        lightboxImage.src =
-                            '';
-
-                    }
-
-                },
-                230
-            );
-
-
-            startAutoplay();
-
-        }
-
-
-        openButtons.forEach(
-            function (
-                button,
-                index
-            ) {
-
-                button.addEventListener(
-                    'click',
-                    function (
-                        event
-                    ) {
-
-                        if (
-                            !isPhone()
-                            &&
-                            index !==
-                            activeIndex
-                        ) {
-
-                            event.preventDefault();
-
-                            return;
-
-                        }
-
-
-                        openLightbox(
-                            index
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-        lightboxClose?.addEventListener(
-            'click',
-            closeLightbox
-        );
-
-
-        lightbox?.addEventListener(
-            'click',
-            function (
-                event
-            ) {
-
-                if (
-                    event.target ===
-                    lightbox
-                ) {
-
-                    closeLightbox();
-
+                if(!isTouch()){
+                    return;
                 }
 
-            }
-        );
+                const touch =
+                    event.changedTouches[0];
 
+                const dx =
+                    touch.clientX -
+                    startX;
 
-        document.addEventListener(
-            'keydown',
-            function (
-                event
-            ) {
+                const dy =
+                    touch.clientY -
+                    startY;
 
-                if (
-                    event.key ===
-                    'Escape'
-                ) {
-
-                    closeLightbox();
-
+                if(
+                    Math.abs(dx) < 45 ||
+                    Math.abs(dx) <
+                    Math.abs(dy)
+                ){
+                    return;
                 }
 
-            }
-        );
-
-
-        /* =========================================================
-           AUTOPLAY
-           Desktop / tablet saja.
-        ========================================================== */
-        function stopAutoplay() {
-
-            if (
-                autoplay
-            ) {
-
-                clearInterval(
-                    autoplay
-                );
-
-
-                autoplay =
-                    null;
-            }
-
-        }
-
-
-        function startAutoplay() {
-
-            stopAutoplay();
-
-
-            if (
-                isPhone()
-                ||
-                reduceMotion
-                ||
-                cards.length <= 1
-            ) {
-                return;
-            }
-
-
-            autoplay =
-                window.setInterval(
-                    function () {
-
-                        setActive(
-                            activeIndex + 1,
-                            false
-                        );
-
-                    },
-                    5200
-                );
-
-        }
-
-
-        /* =========================================================
-           HOVER PAUSE
-        ========================================================== */
-        section.addEventListener(
-            'mouseenter',
-            function () {
-
-                if (
-                    !isPhone()
-                ) {
-
-                    stopAutoplay();
-
+                if(dx < 0){
+                    goNext();
                 }
-
-            }
-        );
-
-
-        section.addEventListener(
-            'mouseleave',
-            function () {
-
-                if (
-                    !isPhone()
-                ) {
-
-                    startAutoplay();
-
+                else{
+                    goPrevious();
                 }
-
+            },
+            {
+                passive:true
             }
         );
-
-
-        /* =========================================================
-           DEVICE CHANGE
-        ========================================================== */
-        function refreshLayout() {
-
-            renderStage();
-
-
-            startAutoplay();
-
-        }
 
 
         window.addEventListener(
             'baca:devicechange',
-            refreshLayout
-        );
+            function(){
 
+                panels.forEach(
+                    function(panel,index){
 
-        window.addEventListener(
-            'resize',
-            function () {
-
-                clearTimeout(
-                    resizeTimer
+                        panel.style.display =
+                            index === activeIndex
+                                ? 'grid'
+                                : 'none';
+                    }
                 );
 
-
-                resizeTimer =
-                    window.setTimeout(
-                        refreshLayout,
-                        120
-                    );
-
-            },
-            {
-                passive:true
+                updateUi();
             }
         );
 
 
-        /* =========================================================
-           TAB VISIBILITY
-        ========================================================== */
-        document.addEventListener(
-            'visibilitychange',
-            function () {
+        panels.forEach(
+            function(panel,index){
 
-                if (
-                    document.hidden
-                ) {
-
-                    stopAutoplay();
-
-                }
-                else {
-
-                    startAutoplay();
-
-                }
-
+                panel.style.display =
+                    index === 0
+                        ? 'grid'
+                        : 'none';
             }
         );
 
+        activeIndex = 0;
 
-        /* =========================================================
-           INITIAL
-        ========================================================== */
-        updateInfo();
-
-
-        renderStage();
-
-
-        startAutoplay();
-
+        updateUi();
     }
 
 
-    if (
+    if(
         document.readyState ===
         'loading'
-    ) {
-
+    ){
         document.addEventListener(
             'DOMContentLoaded',
-            initBacaTestimoni,
+            initEditorialBooks,
             {
                 once:true
             }
         );
-
     }
-    else {
-
-        initBacaTestimoni();
-
+    else{
+        initEditorialBooks();
     }
 
 })();
