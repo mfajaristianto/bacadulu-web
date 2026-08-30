@@ -111,7 +111,7 @@
 
                                 {{-- Edit --}}
                                 <a
-                                    href="{{ route('admin.informations.edit', ['information' => $item->id]) }}"
+                                    href="{{ route('admin.informations.edit', ['information' => $item]) }}"
                                     class="text-blue-600 font-medium mr-4 hover:text-blue-800 hover:underline"
                                 >
                                     Edit
@@ -120,7 +120,8 @@
 
                                 {{-- Delete --}}
                                 <form
-                                    action="{{ route('admin.informations.destroy', ['information' => $item->id]) }}"
+                                    action="{{ route('admin.informations.destroy', ['information' => $item]) }}"
+                                    
                                     method="POST"
                                     class="inline"
                                 >
