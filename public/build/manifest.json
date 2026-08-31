@@ -1,0 +1,50 @@
+{
+  "node_modules/@barba/core/dist/barba.mjs": {
+    "file": "assets/barba-CqD84ExP.js",
+    "name": "barba",
+    "src": "node_modules/@barba/core/dist/barba.mjs",
+    "isDynamicEntry": true
+  },
+  "node_modules/animejs/dist/modules/index.js": {
+    "file": "assets/index-DEcqaEcM.js",
+    "name": "index",
+    "src": "node_modules/animejs/dist/modules/index.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/motion/dist/es/index.mjs": {
+    "file": "assets/index-eXAvlQ-a.js",
+    "name": "index",
+    "src": "node_modules/motion/dist/es/index.mjs",
+    "isDynamicEntry": true
+  },
+  "node_modules/three/build/three.module.js": {
+    "file": "assets/three.module-PDSP0dbZ.js",
+    "name": "three.module",
+    "src": "node_modules/three/build/three.module.js",
+    "isDynamicEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-DcTPOTZ7.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Btd9R3qN.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/motion/dist/es/index.mjs",
+      "node_modules/animejs/dist/modules/index.js",
+      "node_modules/three/build/three.module.js",
+      "node_modules/@barba/core/dist/barba.mjs"
+    ],
+    "css": [
+      "assets/app-BNWJ7Zcm.css"
+    ]
+  }
+}
