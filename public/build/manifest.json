@@ -1,4 +1,8 @@
 {
+  "_index-xgxdCp6f.js": {
+    "file": "assets/index-xgxdCp6f.js",
+    "name": "index"
+  },
   "node_modules/@barba/core/dist/barba.mjs": {
     "file": "assets/barba-CqD84ExP.js",
     "name": "barba",
@@ -24,7 +28,7 @@
     "isDynamicEntry": true
   },
   "resources/css/app.css": {
-    "file": "assets/app-_3BheirJ.css",
+    "file": "assets/app-DxIPCQdS.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -33,10 +37,13 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-Btd9R3qN.js",
+    "file": "assets/app-DlLi6XIi.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "_index-xgxdCp6f.js"
+    ],
     "dynamicImports": [
       "node_modules/motion/dist/es/index.mjs",
       "node_modules/animejs/dist/modules/index.js",
@@ -45,6 +52,15 @@
     ],
     "css": [
       "assets/app-BNWJ7Zcm.css"
+    ]
+  },
+  "resources/js/error-page.js": {
+    "file": "assets/error-page-BIvKz82Z.js",
+    "name": "error-page",
+    "src": "resources/js/error-page.js",
+    "isEntry": true,
+    "imports": [
+      "_index-xgxdCp6f.js"
     ]
   }
 }
