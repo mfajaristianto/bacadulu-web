@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminAccessPassword;
 use App\Models\TrustedDevice;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -13,132 +14,99 @@ use Illuminate\Support\Str;
 
 class AdminAuthController extends Controller
 {
-    /**
-     * Tampilkan form login.
-     */
     public function showLoginForm()
     {
-        return view(
-            'admin.auth.login'
-        );
+        return view('admin.auth.login');
     }
 
-    /**
-     * Login email + password.
-     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => [
-                'required',
-                'email',
-            ],
-
-            'password' => [
-                'required',
-                'string',
-            ],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | EMAIL ADMIN CONFIG
-        |--------------------------------------------------------------------------
-        */
-
         $adminEmail = strtolower(
-            trim(
-                (string) config(
-                    'services.admin_auth.email'
-                )
-            )
+            trim((string) config('services.admin_auth.email'))
         );
 
         if ($adminEmail === '') {
             return back()
                 ->withErrors([
-                    'email' =>
-                        'Konfigurasi email admin belum tersedia.',
+                    'email' => 'Konfigurasi email admin belum tersedia.',
                 ])
                 ->withInput();
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | CEK EMAIL LOGIN
-        |--------------------------------------------------------------------------
-        */
 
         $loginEmail = strtolower(
-            trim(
-                $credentials['email']
-            )
+            trim($credentials['email'])
         );
 
-        if (
-            $loginEmail !==
-            $adminEmail
-        ) {
+        if ($loginEmail !== $adminEmail) {
             return back()
                 ->withErrors([
-                    'email' =>
-                        'Akun ini tidak memiliki akses sebagai admin.',
+                    'email' => 'Akun ini tidak memiliki akses sebagai admin.',
                 ])
                 ->withInput();
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | CARI ADMIN
-        |--------------------------------------------------------------------------
-        */
 
         $user = User::whereRaw(
             'LOWER(email) = ?',
             [$adminEmail]
         )->first();
 
-        if (
-            !$user ||
-            !$user->is_admin
-        ) {
+        if (!$user || !$user->is_admin) {
             return back()
                 ->withErrors([
-                    'email' =>
-                        'Akun admin tidak ditemukan.',
+                    'email' => 'Akun admin tidak ditemukan.',
                 ])
                 ->withInput();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | CEK PASSWORD
-        |--------------------------------------------------------------------------
-        */
+        $credentialType = null;
+        $accessPassword = null;
 
         if (
-            !Hash::check(
+            Hash::check(
                 $credentials['password'],
                 $user->password
             )
         ) {
+            $credentialType = 'primary';
+        } else {
+            $accessPasswords = AdminAccessPassword::where('user_id', $user->id)
+                ->where('is_active', true)
+                ->whereNull('revoked_at')
+                ->get();
+
+            foreach ($accessPasswords as $candidate) {
+                if (
+                    Hash::check(
+                        $credentials['password'],
+                        $candidate->password_hash
+                    )
+                ) {
+                    $credentialType = 'access';
+                    $accessPassword = $candidate;
+                    break;
+                }
+            }
+        }
+
+        if (!$credentialType) {
             return back()
                 ->withErrors([
-                    'email' =>
-                        'Email atau password salah.',
+                    'email' => 'Email atau password salah.',
                 ])
                 ->withInput();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | CEK TRUSTED DEVICE
-        |--------------------------------------------------------------------------
-        */
-
-        $trustedToken = $request->cookie(
-            'admin_trusted_device'
+        $cookieName = $this->trustedCookieName(
+            $credentialType,
+            $accessPassword?->id
         );
+
+        $trustedToken = $request->cookie($cookieName);
 
         if ($trustedToken) {
             $tokenHash = hash(
@@ -146,56 +114,48 @@ class AdminAuthController extends Controller
                 $trustedToken
             );
 
-            $trustedDevice =
-                TrustedDevice::where(
-                    'user_id',
-                    $user->id
+            $trustedDevice = TrustedDevice::where('user_id', $user->id)
+                ->where('token_hash', $tokenHash)
+                ->where('credential_type', $credentialType)
+                ->when(
+                    $credentialType === 'access',
+                    function ($query) use ($accessPassword) {
+                        $query->where(
+                            'access_password_id',
+                            $accessPassword->id
+                        );
+                    },
+                    function ($query) {
+                        $query->whereNull('access_password_id');
+                    }
                 )
-                    ->where(
-                        'token_hash',
-                        $tokenHash
-                    )
-                    ->first();
+                ->first();
 
             if ($trustedDevice) {
                 if (
                     !$trustedDevice->expires_at ||
-                    $trustedDevice
-                        ->expires_at
-                        ->isFuture()
+                    $trustedDevice->expires_at->isFuture()
                 ) {
                     Auth::guard('admin')->login(
                         $user,
-                        $request->boolean(
-                            'remember'
-                        )
+                        $request->boolean('remember')
                     );
 
-                    $request
-                        ->session()
-                        ->regenerate();
+                    if ($accessPassword) {
+                        $accessPassword->update([
+                            'last_used_at' => now(),
+                        ]);
+                    }
+
+                    $request->session()->regenerate();
 
                     return redirect()
-                        ->route(
-                            'admin.dashboard'
-                        );
+                        ->route('admin.dashboard');
                 }
 
                 $trustedDevice->delete();
             }
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | DEVICE BARU
-        |--------------------------------------------------------------------------
-        |
-        | Password sudah benar.
-        |
-        | Belum kirim OTP.
-        | Sekarang minta identitas Google.
-        |
-        */
 
         $request->session()->forget([
             'admin_google_name',
@@ -204,6 +164,8 @@ class AdminAuthController extends Controller
             'admin_otp_code',
             'admin_otp_expires_at',
             'admin_otp_verified',
+            'admin_pending_credential_type',
+            'admin_pending_access_password_id',
         ]);
 
         $request->session()->put(
@@ -213,160 +175,99 @@ class AdminAuthController extends Controller
 
         $request->session()->put(
             'admin_remember',
-            $request->boolean(
-                'remember'
-            )
+            $request->boolean('remember')
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | VERIFIKASI GOOGLE
-        |--------------------------------------------------------------------------
-        */
+        $request->session()->put(
+            'admin_pending_credential_type',
+            $credentialType
+        );
+
+        $request->session()->put(
+            'admin_pending_access_password_id',
+            $accessPassword?->id
+        );
 
         return redirect()
-            ->route(
-                'admin.google.verify'
-            );
+            ->route('admin.google.verify');
     }
 
-    /**
-     * Form OTP.
-     */
-    public function showOtpForm(
-        Request $request
-    ) {
+    public function showOtpForm(Request $request)
+    {
         if (
-            !$request->session()->has(
-                'admin_pending_user_id'
-            ) ||
-            !$request->session()->has(
-                'admin_google_email'
-            ) ||
-            !$request->session()->has(
-                'admin_otp_code'
-            )
+            !$request->session()->has('admin_pending_user_id') ||
+            !$request->session()->has('admin_pending_credential_type') ||
+            !$request->session()->has('admin_google_email') ||
+            !$request->session()->has('admin_otp_code')
         ) {
             return redirect()
-                ->route(
-                    'admin.login'
-                );
+                ->route('admin.login');
         }
 
-        return view(
-            'admin.auth.otp'
-        );
+        return view('admin.auth.otp');
     }
 
-    /**
-     * Proses OTP.
-     */
-    public function processOtp(
-        Request $request
-    ) {
+    public function processOtp(Request $request)
+    {
         $request->validate([
-            'otp' => [
-                'required',
-                'digits:6',
-            ],
+            'otp' => ['required', 'digits:6'],
         ]);
 
-        $sessionOtp =
-            $request->session()->get(
-                'admin_otp_code'
-            );
+        $sessionOtp = $request->session()->get(
+            'admin_otp_code'
+        );
 
-        $expiresAt =
-            $request->session()->get(
-                'admin_otp_expires_at'
-            );
+        $expiresAt = $request->session()->get(
+            'admin_otp_expires_at'
+        );
 
-        $userId =
-            $request->session()->get(
-                'admin_pending_user_id'
-            );
+        $userId = $request->session()->get(
+            'admin_pending_user_id'
+        );
 
-        $googleEmail =
-            $request->session()->get(
-                'admin_google_email'
-            );
+        $credentialType = $request->session()->get(
+            'admin_pending_credential_type'
+        );
 
-        /*
-        |--------------------------------------------------------------------------
-        | SESSION TIDAK VALID
-        |--------------------------------------------------------------------------
-        */
+        $googleEmail = $request->session()->get(
+            'admin_google_email'
+        );
 
         if (
             !$sessionOtp ||
             !$userId ||
-            !$googleEmail
+            !$googleEmail ||
+            !in_array($credentialType, ['primary', 'access'], true)
         ) {
             return redirect()
-                ->route(
-                    'admin.login'
-                )
+                ->route('admin.login')
                 ->with(
                     'error',
                     'Sesi OTP tidak ditemukan, silakan login ulang.'
                 );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | OTP EXPIRED
-        |--------------------------------------------------------------------------
-        */
-
         if (
             !$expiresAt ||
-            now()->greaterThan(
-                $expiresAt
-            )
+            now()->greaterThan($expiresAt)
         ) {
-            $request->session()->forget([
-                'admin_otp_code',
-                'admin_otp_expires_at',
-                'admin_pending_user_id',
-                'admin_remember',
-                'admin_otp_verified',
-                'admin_google_name',
-                'admin_google_email',
-                'admin_google_id',
-            ]);
+            $this->clearPendingSession($request);
 
             return redirect()
-                ->route(
-                    'admin.login'
-                )
+                ->route('admin.login')
                 ->with(
                     'error',
                     'Kode OTP sudah kedaluwarsa, silakan login ulang.'
                 );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | OTP SALAH
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $request->otp !==
-            $sessionOtp
-        ) {
+        if ($request->otp !== $sessionOtp) {
             return back()
                 ->with(
                     'error',
                     'Kode OTP salah.'
                 );
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | OTP BENAR
-        |--------------------------------------------------------------------------
-        */
 
         $request->session()->put(
             'admin_otp_verified',
@@ -379,167 +280,116 @@ class AdminAuthController extends Controller
         ]);
 
         return redirect()
-            ->route(
-                'admin.confirm'
-            );
+            ->route('admin.confirm');
     }
 
-    /**
-     * Form konfirmasi terakhir.
-     */
-    public function showConfirmForm(
-        Request $request
-    ) {
+    public function showConfirmForm(Request $request)
+    {
+        $credentialType = $request->session()->get(
+            'admin_pending_credential_type'
+        );
+
         if (
-            !$request->session()->get(
-                'admin_otp_verified'
-            ) ||
-            !$request->session()->has(
-                'admin_pending_user_id'
-            ) ||
-            !$request->session()->has(
-                'admin_google_email'
-            )
+            !$request->session()->get('admin_otp_verified') ||
+            !$request->session()->has('admin_pending_user_id') ||
+            !$request->session()->has('admin_google_email') ||
+            !in_array($credentialType, ['primary', 'access'], true)
         ) {
             return redirect()
-                ->route(
-                    'admin.login'
-                );
+                ->route('admin.login');
         }
 
-        return view(
-            'admin.auth.confirm'
-        );
+        return view('admin.auth.confirm');
     }
 
-    /**
-     * Konfirmasi email + password.
-     */
-    public function processConfirm(
-        Request $request
-    ) {
+    public function processConfirm(Request $request)
+    {
         $request->validate([
-            'email' => [
-                'required',
-                'email',
-            ],
-
-            'password' => [
-                'required',
-                'string',
-            ],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
-        $userId =
-            $request->session()->get(
-                'admin_pending_user_id'
-            );
+        $userId = $request->session()->get(
+            'admin_pending_user_id'
+        );
 
-        $otpVerified =
-            $request->session()->get(
-                'admin_otp_verified'
-            );
+        $otpVerified = $request->session()->get(
+            'admin_otp_verified'
+        );
 
-        $googleEmail =
-            $request->session()->get(
-                'admin_google_email'
-            );
+        $googleEmail = $request->session()->get(
+            'admin_google_email'
+        );
 
-        /*
-        |--------------------------------------------------------------------------
-        | CEK SESSION
-        |--------------------------------------------------------------------------
-        */
+        $credentialType = $request->session()->get(
+            'admin_pending_credential_type'
+        );
+
+        $accessPasswordId = $request->session()->get(
+            'admin_pending_access_password_id'
+        );
 
         if (
             !$userId ||
             !$otpVerified ||
-            !$googleEmail
+            !$googleEmail ||
+            !in_array($credentialType, ['primary', 'access'], true)
         ) {
             return redirect()
-                ->route(
-                    'admin.login'
-                )
+                ->route('admin.login')
                 ->with(
                     'error',
                     'Sesi tidak valid, silakan login ulang.'
                 );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | USER
-        |--------------------------------------------------------------------------
-        */
-
-        $user = User::find(
-            $userId
-        );
-
         if (
-            !$user ||
-            !$user->is_admin
+            $credentialType === 'access' &&
+            !$accessPasswordId
         ) {
+            $this->clearPendingSession($request);
+
             return redirect()
-                ->route(
-                    'admin.login'
-                )
+                ->route('admin.login')
+                ->with(
+                    'error',
+                    'Sesi password akses tidak valid. Silakan login ulang.'
+                );
+        }
+
+        $user = User::find($userId);
+
+        if (!$user || !$user->is_admin) {
+            $this->clearPendingSession($request);
+
+            return redirect()
+                ->route('admin.login')
                 ->with(
                     'error',
                     'Akun admin tidak ditemukan.'
                 );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | EMAIL ADMIN CONFIG
-        |--------------------------------------------------------------------------
-        */
-
         $adminEmail = strtolower(
-            trim(
-                (string) config(
-                    'services.admin_auth.email'
-                )
-            )
+            trim((string) config('services.admin_auth.email'))
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | EMAIL DATABASE
-        |--------------------------------------------------------------------------
-        */
-
         if (
-            strtolower(
-                trim(
-                    $user->email
-                )
-            ) !==
+            strtolower(trim($user->email)) !==
             $adminEmail
         ) {
+            $this->clearPendingSession($request);
+
             return redirect()
-                ->route(
-                    'admin.login'
-                )
+                ->route('admin.login')
                 ->with(
                     'error',
                     'Email akun admin tidak sesuai konfigurasi.'
                 );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | EMAIL KONFIRMASI
-        |--------------------------------------------------------------------------
-        */
-
         if (
-            strtolower(
-                trim(
-                    $request->email
-                )
-            ) !==
+            strtolower(trim($request->email)) !==
             $adminEmail
         ) {
             return back()
@@ -549,18 +399,35 @@ class AdminAuthController extends Controller
                 );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | PASSWORD KONFIRMASI
-        |--------------------------------------------------------------------------
-        */
+        $accessPassword = null;
+        $passwordValid = false;
 
-        if (
-            !Hash::check(
+        if ($credentialType === 'primary') {
+            $passwordValid = Hash::check(
                 $request->password,
                 $user->password
+            );
+        }
+
+        if ($credentialType === 'access') {
+            $accessPassword = AdminAccessPassword::where(
+                'id',
+                $accessPasswordId
             )
-        ) {
+                ->where('user_id', $user->id)
+                ->where('is_active', true)
+                ->whereNull('revoked_at')
+                ->first();
+
+            if ($accessPassword) {
+                $passwordValid = Hash::check(
+                    $request->password,
+                    $accessPassword->password_hash
+                );
+            }
+        }
+
+        if (!$passwordValid) {
             return back()
                 ->with(
                     'error',
@@ -568,78 +435,47 @@ class AdminAuthController extends Controller
                 );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | TRUSTED DEVICE
-        |--------------------------------------------------------------------------
-        */
-
-        $trustedToken =
-            Str::random(64);
+        $trustedToken = Str::random(64);
 
         TrustedDevice::create([
-            'user_id' =>
-                $user->id,
-
-            'token_hash' =>
-                hash(
-                    'sha256',
-                    $trustedToken
-                ),
-
-            'user_agent' =>
-                $request->userAgent(),
-
-            'expires_at' =>
-                now()->addYear(),
+            'user_id' => $user->id,
+            'credential_type' => $credentialType,
+            'access_password_id' => $accessPassword?->id,
+            'token_hash' => hash(
+                'sha256',
+                $trustedToken
+            ),
+            'user_agent' => $request->userAgent(),
+            'expires_at' => now()->addYear(),
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | LOGIN ADMIN
-        |--------------------------------------------------------------------------
-        */
-
-        $remember =
-            $request->session()->get(
-                'admin_remember',
-                false
-            );
+        $remember = $request->session()->get(
+            'admin_remember',
+            false
+        );
 
         Auth::guard('admin')->login(
             $user,
             $remember
         );
 
-        $request
-            ->session()
-            ->regenerate();
+        if ($accessPassword) {
+            $accessPassword->update([
+                'last_used_at' => now(),
+            ]);
+        }
 
-        /*
-        |--------------------------------------------------------------------------
-        | BERSIHKAN SESSION
-        |--------------------------------------------------------------------------
-        */
+        $request->session()->regenerate();
 
-        $request->session()->forget([
-            'admin_pending_user_id',
-            'admin_otp_verified',
-            'admin_remember',
-            'admin_otp_code',
-            'admin_otp_expires_at',
-            'admin_google_name',
-            'admin_google_email',
-            'admin_google_id',
-        ]);
+        $this->clearPendingSession($request);
 
-        /*
-        |--------------------------------------------------------------------------
-        | COOKIE TRUSTED DEVICE
-        |--------------------------------------------------------------------------
-        */
+        $cookieName = $this->trustedCookieName(
+            $credentialType,
+            $accessPassword?->id
+        );
 
         $cookie = Cookie::make(
-            'admin_trusted_device',
+            $cookieName,
             $trustedToken,
             60 * 24 * 365,
             '/',
@@ -651,11 +487,37 @@ class AdminAuthController extends Controller
         );
 
         return redirect()
-            ->route(
-                'admin.dashboard'
-            )
-            ->withCookie(
-                $cookie
-            );
+            ->route('admin.dashboard')
+            ->withCookie($cookie);
+    }
+
+    private function trustedCookieName(
+        string $credentialType,
+        ?int $accessPasswordId = null
+    ): string {
+        if (
+            $credentialType === 'access' &&
+            $accessPasswordId
+        ) {
+            return 'admin_trusted_device_access_' . $accessPasswordId;
+        }
+
+        return 'admin_trusted_device';
+    }
+
+    private function clearPendingSession(Request $request): void
+    {
+        $request->session()->forget([
+            'admin_pending_user_id',
+            'admin_pending_credential_type',
+            'admin_pending_access_password_id',
+            'admin_otp_verified',
+            'admin_remember',
+            'admin_otp_code',
+            'admin_otp_expires_at',
+            'admin_google_name',
+            'admin_google_email',
+            'admin_google_id',
+        ]);
     }
 }

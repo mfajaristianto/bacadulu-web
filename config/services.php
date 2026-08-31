@@ -6,12 +6,6 @@ return [
     |--------------------------------------------------------------------------
     | Third Party Services
     |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
     */
 
     'postmark' => [
@@ -40,7 +34,7 @@ return [
     | Google OAuth
     |--------------------------------------------------------------------------
     |
-    | Digunakan untuk login menggunakan akun Google / Socialite.
+    | Digunakan untuk login user/penulis dan verifikasi Google admin.
     |
     */
 
@@ -55,14 +49,22 @@ return [
     | Admin Authentication
     |--------------------------------------------------------------------------
     |
-    | ADMIN_EMAIL     = Gmail yang diperbolehkan login sebagai admin.
-    | ADMIN_OTP_EMAIL = Gmail yang menerima kode OTP admin.
+    | ADMIN_EMAIL
+    | Email akun admin utama website.
+    |
+    | ADMIN_OTP_EMAIL
+    | Email keamanan yang menerima OTP login admin.
+    |
+    | ADMIN_RECOVERY_APPROVER_EMAIL
+    | Email pihak yang berhak menyetujui / menolak permohonan
+    | password akses tambahan.
     |
     */
 
     'admin_auth' => [
         'email' => env('ADMIN_EMAIL'),
         'otp_email' => env('ADMIN_OTP_EMAIL'),
+        'recovery_approver_email' => env('ADMIN_RECOVERY_APPROVER_EMAIL'),
     ],
 
 ];
