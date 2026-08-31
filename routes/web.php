@@ -633,4 +633,7 @@ Route::middleware(['auth:admin', 'admin'])
             AuthController::class,
             'logout',
         ])->name('logout');
+
     });
+
+    
