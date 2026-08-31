@@ -212,50 +212,48 @@
 
                     {{-- ================================================= --}}
                     {{-- TULIS ARTIKEL --}}
+                    {{-- SELALU TAMPIL --}}
+                    {{-- JIKA GUEST, MIDDLEWARE AUTH AKAN ARAHKAN KE LOGIN --}}
                     {{-- ================================================= --}}
 
-                    @auth
+                    <div class="border-t border-slate-100 mt-4 pt-4">
 
-                        <div class="border-t border-slate-100 mt-4 pt-4">
+                        <a
+                            href="{{ route('blog.create') }}"
+                            class="w-full
+                                   inline-flex
+                                   items-center
+                                   justify-center
+                                   gap-2
+                                   px-4 py-2.5
+                                   bg-orange-600
+                                   hover:bg-orange-700
+                                   text-white
+                                   text-sm
+                                   font-semibold
+                                   rounded-lg
+                                   transition"
+                        >
 
-                            <a
-                                href="{{ route('blog.create') }}"
-                                class="w-full
-                                       inline-flex
-                                       items-center
-                                       justify-center
-                                       gap-2
-                                       px-4 py-2.5
-                                       bg-orange-600
-                                       hover:bg-orange-700
-                                       text-white
-                                       text-sm
-                                       font-semibold
-                                       rounded-lg
-                                       transition"
+                            <svg
+                                class="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2"
                             >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 4v16m8-8H4"
+                                />
+                            </svg>
 
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="2"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M12 4v16m8-8H4"
-                                    />
-                                </svg>
+                            Tulis Artikel
 
-                                Tulis Artikel
+                        </a>
 
-                            </a>
-
-                        </div>
-
-                    @endauth
+                    </div>
 
                 </div>
 

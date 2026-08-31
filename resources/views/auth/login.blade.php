@@ -21,15 +21,13 @@
             {{-- Logo --}}
             <div class="text-center mb-8">
 
-                <div
-                    class="mx-auto mb-4 w-14 h-14 rounded-2xl
-                           bg-gradient-to-br from-orange-500 to-amber-400
-                           flex items-center justify-center
-                           text-white font-black text-xl shadow-lg"
-                >
-                    BD
-                </div>
-
+                <div class="flex justify-center mb-4">
+    <img
+        src="{{ asset('img/bacadulu-logo.jpg') }}"
+        alt="Baca Dulu"
+        class="h-16 w-auto object-contain"
+    >
+</div>
                 <h1 class="text-2xl font-bold text-slate-900">
                     Selamat Datang
                 </h1>
