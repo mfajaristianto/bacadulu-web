@@ -13,14 +13,11 @@ const STORE_PATH = '/portofolio/bookstore';
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const touchLike =
-    window.matchMedia('(pointer: coarse)').matches ||
-    window.matchMedia('(hover: none)').matches ||
-    navigator.maxTouchPoints > 0;
+    window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
 const finePointer =
-    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
-    !touchLike;
-
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    
 const phoneLayout = () =>
     window.matchMedia('(max-width: 767px)').matches;
 
