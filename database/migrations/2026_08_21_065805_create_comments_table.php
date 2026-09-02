@@ -6,34 +6,83 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Create Comments Table
+    |--------------------------------------------------------------------------
+    */
+
     public function up(): void
     {
-        /*
-        |--------------------------------------------------------------------------
-        | CEGAH ERROR TABLE SUDAH ADA
-        |--------------------------------------------------------------------------
-        |
-        | Database Anda ternyata sudah mempunyai tabel comments,
-        | sedangkan migration ini belum tercatat sebagai "Ran".
-        |
-        | Jadi apabila tabel sudah ada, migration dilewati tanpa
-        | menghapus data comments yang sudah tersimpan.
-        |
-        */
-
-        if (!Schema::hasTable('comments')) {
-
-            Schema::create('comments', function (Blueprint $table) {
-
-                $table->id();
-
-                $table->timestamps();
-
-            });
-
+        if (Schema::hasTable('comments')) {
+            return;
         }
+
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Post
+            |--------------------------------------------------------------------------
+            */
+
+            $table
+                ->foreignId('post_id')
+                ->constrained('posts')
+                ->cascadeOnDelete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | User
+            |--------------------------------------------------------------------------
+            */
+
+            $table
+                ->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Comment Body
+            |--------------------------------------------------------------------------
+            |
+            | Nama kolom utama kita adalah "body".
+            |
+            | Form boleh tetap menggunakan:
+            |
+            | content
+            |
+            | tetapi database menggunakan:
+            |
+            | body
+            |
+            */
+
+            $table->text('body');
+
+            $table->timestamps();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Index
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index([
+                'post_id',
+                'created_at',
+            ]);
+        });
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rollback
+    |--------------------------------------------------------------------------
+    */
 
     public function down(): void
     {

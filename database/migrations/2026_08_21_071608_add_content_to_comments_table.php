@@ -1,42 +1,43 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Tambahkan kolom content ke tabel comments.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy Migration
+    |--------------------------------------------------------------------------
+    |
+    | Migration ini sebelumnya membuat kolom "content".
+    |
+    | Struktur komentar terbaru menggunakan kolom:
+    |
+    | body
+    |
+    | sehingga migration lama ini sengaja dipertahankan sebagai migration
+    | kosong agar urutan migration historis Laravel tidak perlu dihapus atau
+    | diganti nama.
+    |
+    | Database lama akan diperbaiki oleh migration repair yang dibuat
+    | setelah migration ini.
+    |
+    */
+
     public function up(): void
     {
-        if (!Schema::hasColumn('comments', 'content')) {
-
-            Schema::table('comments', function (Blueprint $table) {
-
-                $table
-                    ->text('content')
-                    ->nullable()
-                    ->after('user_id');
-
-            });
-        }
+        //
     }
 
 
-    /**
-     * Rollback.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Rollback
+    |--------------------------------------------------------------------------
+    */
+
     public function down(): void
     {
-        if (Schema::hasColumn('comments', 'content')) {
-
-            Schema::table('comments', function (Blueprint $table) {
-
-                $table->dropColumn('content');
-
-            });
-        }
+        //
     }
 };
