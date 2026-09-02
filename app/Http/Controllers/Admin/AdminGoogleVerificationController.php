@@ -8,13 +8,17 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 use Throwable;
 
 class AdminGoogleVerificationController extends Controller
 {
-    /**
-     * Tampilkan halaman verifikasi Google.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Show Google Verification Page
+    |--------------------------------------------------------------------------
+    */
+
     public function show(Request $request)
     {
         if (
@@ -35,13 +39,12 @@ class AdminGoogleVerificationController extends Controller
         );
     }
 
-    /**
-     * Redirect ke Google.
-     *
-     * prompt=select_account:
-     * selalu minta orang memilih akun Google
-     * yang ingin digunakan.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect to Google
+    |--------------------------------------------------------------------------
+    */
+
     public function redirect(Request $request)
     {
         if (
@@ -72,21 +75,17 @@ class AdminGoogleVerificationController extends Controller
             ->redirect();
     }
 
-    /**
-     * Callback Google.
-     *
-     * Setelah Google berhasil:
-     * 1. Ambil nama Google
-     * 2. Ambil Gmail Google
-     * 3. Simpan ke session
-     * 4. Generate OTP
-     * 5. Kirim OTP ke Gmail Admin
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Google Callback
+    |--------------------------------------------------------------------------
+    */
+
     public function callback(Request $request)
     {
         /*
         |--------------------------------------------------------------------------
-        | CEK SESSION ADMIN
+        | Check Pending Admin Session
         |--------------------------------------------------------------------------
         */
 
@@ -105,11 +104,13 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | CEK ADMIN
+        | Find Admin
         |--------------------------------------------------------------------------
         */
 
-        $user = User::find($userId);
+        $user = User::find(
+            $userId
+        );
 
         if (
             !$user ||
@@ -129,7 +130,7 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | PASTIKAN EMAIL ADMIN SESUAI CONFIG
+        | Validate Admin Email Configuration
         |--------------------------------------------------------------------------
         */
 
@@ -143,8 +144,11 @@ class AdminGoogleVerificationController extends Controller
 
         if (
             $adminEmail === '' ||
-            strtolower(trim($user->email))
-                !== $adminEmail
+            strtolower(
+                trim(
+                    $user->email
+                )
+            ) !== $adminEmail
         ) {
             $this->clearAdminVerificationSession(
                 $request
@@ -160,7 +164,7 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | AMBIL IDENTITAS GOOGLE
+        | Get Google Identity
         |--------------------------------------------------------------------------
         */
 
@@ -170,8 +174,21 @@ class AdminGoogleVerificationController extends Controller
                     route('admin.google.callback')
                 )
                 ->user();
+        } catch (InvalidStateException $exception) {
+            report(
+                $exception
+            );
+
+            return redirect()
+                ->route('admin.google.verify')
+                ->with(
+                    'error',
+                    'Sesi verifikasi Google sudah berakhir atau tidak valid. Silakan pilih akun Google kembali.'
+                );
         } catch (Throwable $exception) {
-            report($exception);
+            report(
+                $exception
+            );
 
             return redirect()
                 ->route('admin.google.verify')
@@ -183,7 +200,7 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | GOOGLE EMAIL
+        | Google Email
         |--------------------------------------------------------------------------
         */
 
@@ -204,7 +221,7 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | GOOGLE NAME
+        | Google Name
         |--------------------------------------------------------------------------
         */
 
@@ -218,7 +235,7 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | GOOGLE ID
+        | Google ID
         |--------------------------------------------------------------------------
         */
 
@@ -228,7 +245,7 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | SIMPAN IDENTITAS GOOGLE KE SESSION
+        | Save Google Identity
         |--------------------------------------------------------------------------
         */
 
@@ -249,7 +266,22 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | BUAT OTP
+        | Remove Old OTP
+        |--------------------------------------------------------------------------
+        |
+        | Penting jika sebelumnya pernah ada OTP dari percobaan lain.
+        |
+        */
+
+        $request->session()->forget([
+            'admin_otp_code',
+            'admin_otp_expires_at',
+            'admin_otp_verified',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate OTP
         |--------------------------------------------------------------------------
         */
 
@@ -265,68 +297,60 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | SIMPAN OTP KE SESSION
+        | OTP Recipient
         |--------------------------------------------------------------------------
         */
 
-        $request->session()->put(
-            'admin_otp_code',
-            $otp
-        );
-
-        $request->session()->put(
-            'admin_otp_expires_at',
-            now()->addMinutes(5)
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | PENERIMA OTP
-        |--------------------------------------------------------------------------
-        */
-
-        $otpRecipient = trim(
-            (string) config(
-                'services.admin_auth.otp_email'
+        $otpRecipient = strtolower(
+            trim(
+                (string) config(
+                    'services.admin_auth.otp_email'
+                )
             )
         );
 
         if ($otpRecipient === '') {
-            $otpRecipient = $user->email;
+            $otpRecipient = strtolower(
+                trim(
+                    $user->email
+                )
+            );
         }
 
         /*
         |--------------------------------------------------------------------------
-        | INFORMASI DEVICE
+        | Validate OTP Recipient
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            !filter_var(
+                $otpRecipient,
+                FILTER_VALIDATE_EMAIL
+            )
+        ) {
+            return redirect()
+                ->route('admin.google.verify')
+                ->with(
+                    'error',
+                    'Email penerima OTP belum dikonfigurasi dengan benar.'
+                );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Device Information
         |--------------------------------------------------------------------------
         */
 
         $userAgent = (string) $request->userAgent();
 
         $loginInfo = [
-            /*
-            |--------------------------------------------------------------------------
-            | GOOGLE PEMOHON
-            |--------------------------------------------------------------------------
-            */
-
             'google_name' => $googleName,
             'google_email' => $googleEmail,
 
-            /*
-            |--------------------------------------------------------------------------
-            | ADMIN YANG DIAKSES
-            |--------------------------------------------------------------------------
-            */
-
             'account_name' => $user->name,
             'account_email' => $user->email,
-
-            /*
-            |--------------------------------------------------------------------------
-            | DEVICE
-            |--------------------------------------------------------------------------
-            */
 
             'device' => $this->detectDevice(
                 $userAgent
@@ -358,21 +382,71 @@ class AdminGoogleVerificationController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | KIRIM OTP
+        | Send OTP
         |--------------------------------------------------------------------------
+        |
+        | OTP BELUM dimasukkan ke session.
+        |
+        | Jadi apabila SMTP gagal, sistem tidak memiliki OTP aktif
+        | yang sebenarnya tidak pernah diterima oleh admin.
+        |
         */
 
-        Mail::to($otpRecipient)
-            ->send(
+        try {
+            Mail::to(
+                $otpRecipient
+            )->send(
                 new AdminOtpMail(
                     $otp,
                     $loginInfo
                 )
             );
+        } catch (Throwable $exception) {
+            report(
+                $exception
+            );
+
+            /*
+             * Pastikan tidak ada OTP lama yang masih dianggap valid.
+             */
+            $request->session()->forget([
+                'admin_otp_code',
+                'admin_otp_expires_at',
+                'admin_otp_verified',
+            ]);
+
+            return redirect()
+                ->route('admin.google.verify')
+                ->with(
+                    'error',
+                    'Kode OTP belum berhasil dikirim melalui email. Silakan periksa koneksi atau konfigurasi email, lalu coba kembali.'
+                );
+        }
 
         /*
         |--------------------------------------------------------------------------
-        | REDIRECT KE OTP
+        | Save OTP Only After Email Successfully Sent
+        |--------------------------------------------------------------------------
+        */
+
+        $request->session()->put(
+            'admin_otp_code',
+            $otp
+        );
+
+        $request->session()->put(
+            'admin_otp_expires_at',
+            now()->addMinutes(5)
+        );
+
+        $request->session()->put(
+            'admin_otp_verified',
+            false
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Redirect to OTP Page
         |--------------------------------------------------------------------------
         */
 
@@ -380,27 +454,35 @@ class AdminGoogleVerificationController extends Controller
             ->route('admin.otp');
     }
 
-    /**
-     * Hapus session verifikasi jika ada masalah.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Clear Admin Verification Session
+    |--------------------------------------------------------------------------
+    */
+
     private function clearAdminVerificationSession(
         Request $request
     ): void {
         $request->session()->forget([
             'admin_pending_user_id',
             'admin_remember',
+
             'admin_google_name',
             'admin_google_email',
             'admin_google_id',
+
             'admin_otp_code',
             'admin_otp_expires_at',
             'admin_otp_verified',
         ]);
     }
 
-    /**
-     * Deteksi jenis perangkat.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Detect Device
+    |--------------------------------------------------------------------------
+    */
+
     private function detectDevice(
         ?string $userAgent
     ): string {
@@ -409,16 +491,31 @@ class AdminGoogleVerificationController extends Controller
         );
 
         if (
-            str_contains($ua, 'ipad') ||
-            str_contains($ua, 'tablet')
+            str_contains(
+                $ua,
+                'ipad'
+            ) ||
+            str_contains(
+                $ua,
+                'tablet'
+            )
         ) {
             return 'Tablet';
         }
 
         if (
-            str_contains($ua, 'iphone') ||
-            str_contains($ua, 'android') ||
-            str_contains($ua, 'mobile')
+            str_contains(
+                $ua,
+                'iphone'
+            ) ||
+            str_contains(
+                $ua,
+                'android'
+            ) ||
+            str_contains(
+                $ua,
+                'mobile'
+            )
         ) {
             return 'Smartphone';
         }
@@ -426,9 +523,12 @@ class AdminGoogleVerificationController extends Controller
         return 'Desktop / Laptop';
     }
 
-    /**
-     * Deteksi model / platform.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Detect Device Model
+    |--------------------------------------------------------------------------
+    */
+
     private function detectDeviceModel(
         ?string $userAgent
     ): string {
@@ -451,12 +551,6 @@ class AdminGoogleVerificationController extends Controller
         ) {
             return 'Apple iPad';
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | ANDROID
-        |--------------------------------------------------------------------------
-        */
 
         if (
             stripos(
@@ -483,12 +577,6 @@ class AdminGoogleVerificationController extends Controller
             return 'Perangkat Android';
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | WINDOWS
-        |--------------------------------------------------------------------------
-        */
-
         if (
             stripos(
                 $ua,
@@ -498,12 +586,6 @@ class AdminGoogleVerificationController extends Controller
             return 'Windows PC / Laptop';
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | MAC
-        |--------------------------------------------------------------------------
-        */
-
         if (
             stripos(
                 $ua,
@@ -512,12 +594,6 @@ class AdminGoogleVerificationController extends Controller
         ) {
             return 'Mac';
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | LINUX
-        |--------------------------------------------------------------------------
-        */
 
         if (
             stripos(
@@ -531,9 +607,12 @@ class AdminGoogleVerificationController extends Controller
         return 'Model tidak dapat diketahui';
     }
 
-    /**
-     * Deteksi browser.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Detect Browser
+    |--------------------------------------------------------------------------
+    */
+
     private function detectBrowser(
         ?string $userAgent
     ): string {
@@ -610,21 +689,18 @@ class AdminGoogleVerificationController extends Controller
         return 'Browser tidak diketahui';
     }
 
-    /**
-     * Deteksi sistem operasi.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Detect Operating System
+    |--------------------------------------------------------------------------
+    */
+
     private function detectOperatingSystem(
         ?string $userAgent
     ): string {
         $ua = strtolower(
             $userAgent ?? ''
         );
-
-        /*
-        |--------------------------------------------------------------------------
-        | WINDOWS
-        |--------------------------------------------------------------------------
-        */
 
         if (
             str_contains(
@@ -671,12 +747,6 @@ class AdminGoogleVerificationController extends Controller
             return 'Windows';
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | ANDROID
-        |--------------------------------------------------------------------------
-        */
-
         if (
             preg_match(
                 '/Android\s([0-9.]+)/i',
@@ -687,12 +757,6 @@ class AdminGoogleVerificationController extends Controller
             return 'Android ' .
                 $matches[1];
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | IOS / IPADOS
-        |--------------------------------------------------------------------------
-        */
 
         if (
             preg_match(
@@ -719,12 +783,6 @@ class AdminGoogleVerificationController extends Controller
                 );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | MACOS
-        |--------------------------------------------------------------------------
-        */
-
         if (
             preg_match(
                 '/Mac OS X\s([0-9_]+)/i',
@@ -739,12 +797,6 @@ class AdminGoogleVerificationController extends Controller
                     $matches[1]
                 );
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | LINUX
-        |--------------------------------------------------------------------------
-        */
 
         if (
             str_contains(

@@ -708,9 +708,34 @@
     </div>
 
     @if($useBootstrap)
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    @endif
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@endif
 
-    @stack('scripts')
+@stack('scripts')
+
+{{-- SERVICE WORKER BACA DULU --}}
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker
+                .register('/sw.js', {
+                    scope: '/'
+                })
+                .then(function (registration) {
+                    console.log(
+                        'Service Worker Baca Dulu aktif:',
+                        registration.scope
+                    );
+                })
+                .catch(function (error) {
+                    console.error(
+                        'Service Worker Baca Dulu gagal:',
+                        error
+                    );
+                });
+        });
+    }
+</script>
+
 </body>
 </html>

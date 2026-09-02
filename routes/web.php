@@ -100,9 +100,11 @@ Route::prefix('panel-adminbaca')
         ])->name('login');
 
         Route::post('/login', [
-            AdminAuthController::class,
-            'login',
-        ])->name('login.submit');
+        AdminAuthController::class,
+        'login',
+])
+        ->middleware('throttle:5,1')
+         ->name('login.submit');
 
 
         // Forgot Password
@@ -182,9 +184,11 @@ Route::prefix('panel-adminbaca')
         ])->name('otp');
 
         Route::post('/verify-otp', [
-            AdminAuthController::class,
-            'processOtp',
-        ])->name('otp.submit');
+         AdminAuthController::class,
+         'processOtp',
+        ])
+         ->middleware('throttle:5,5')
+         ->name('otp.submit');
 
 
         // Confirm Access
@@ -194,9 +198,11 @@ Route::prefix('panel-adminbaca')
         ])->name('confirm');
 
         Route::post('/confirm-access', [
-            AdminAuthController::class,
-            'processConfirm',
-        ])->name('confirm.submit');
+         AdminAuthController::class,
+        'processConfirm',
+        ])
+          ->middleware('throttle:5,5')
+         ->name('confirm.submit');
     });
 
 

@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Information;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -12,55 +11,217 @@ class AdminCmsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_can_login_and_view_dashboard(): void
+    /*
+    |--------------------------------------------------------------------------
+    | Helper
+    |--------------------------------------------------------------------------
+    */
+
+    private function createAdmin(): User
     {
-        $admin = User::factory()->create([
-            'name' => 'Admin',
+        return User::factory()->create([
+            'name' => 'Admin Test',
             'email' => 'admin@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('PasswordAdmin123'),
             'is_admin' => true,
         ]);
-
-        $response = $this->post('/admin/login', [
-            'email' => 'admin@example.com',
-            'password' => 'password123',
-        ]);
-
-        $response->assertRedirect('/admin');
-        $this->assertAuthenticatedAs($admin);
     }
 
-    public function test_non_admin_cannot_access_dashboard(): void
+    /*
+    |--------------------------------------------------------------------------
+    | Guest tidak boleh masuk CMS
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_guest_cannot_access_admin_cms(): void
+    {
+        $response = $this->get(
+            route('admin.informations.index')
+        );
+
+        $response->assertRedirect(
+            route('admin.login')
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Login guard web tidak memberikan akses CMS
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_web_guard_does_not_grant_admin_access(): void
+    {
+        $admin = $this->createAdmin();
+
+        $this->actingAs(
+            $admin,
+            'web'
+        );
+
+        $response = $this->get(
+            route('admin.informations.index')
+        );
+
+        $response->assertRedirect(
+            route('admin.login')
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Non-admin pada guard admin tetap ditolak
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_non_admin_cannot_access_admin_cms(): void
     {
         $user = User::factory()->create([
             'is_admin' => false,
         ]);
 
-        $this->actingAs($user);
+        $this->actingAs(
+            $user,
+            'admin'
+        );
 
-        $response = $this->get('/admin');
+        $response = $this->get(
+            route('admin.informations.index')
+        );
 
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
-    public function test_admin_can_create_information(): void
+    /*
+    |--------------------------------------------------------------------------
+    | Admin dengan guard admin bisa masuk
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_admin_guard_can_access_admin_cms(): void
     {
-        $admin = User::factory()->create([
-            'is_admin' => true,
-        ]);
+        $admin = $this->createAdmin();
 
-        $this->actingAs($admin);
+        $this->actingAs(
+            $admin,
+            'admin'
+        );
 
-        $response = $this->post('/admin/informations', [
-            'title' => 'Test Informasi',
-            'content' => 'Isi konten test',
-            'image' => '',
-        ]);
+        $response = $this->get(
+            route('admin.informations.index')
+        );
 
-        $response->assertRedirect('/admin/informations');
-        $this->assertDatabaseHas('informations', [
-            'title' => 'Test Informasi',
-            'content' => 'Isi konten test',
-        ]);
+        $response->assertOk();
+
+        $this->assertAuthenticatedAs(
+            $admin,
+            'admin'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password utama tidak langsung login dashboard
+    |--------------------------------------------------------------------------
+    |
+    | Flow:
+    |
+    | password
+    | → Google Verification
+    | → OTP
+    | → Confirm Access
+    | → dashboard
+    |
+    */
+
+    public function test_primary_password_starts_google_verification(): void
+    {
+        $admin = $this->createAdmin();
+
+        $response = $this->post(
+            route('admin.login.submit'),
+            [
+                'email' => 'admin@example.com',
+                'password' => 'PasswordAdmin123',
+            ]
+        );
+
+        $response->assertRedirect(
+            route('admin.google.verify')
+        );
+
+        $response->assertSessionHas(
+            'admin_pending_user_id',
+            $admin->id
+        );
+
+        $response->assertSessionHas(
+            'admin_pending_credential_type',
+            'primary'
+        );
+
+        /*
+         * Belum login ke guard admin karena Google/OTP
+         * belum diselesaikan.
+         */
+        $this->assertGuest('admin');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password salah
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_wrong_admin_password_is_rejected(): void
+    {
+        $this->createAdmin();
+
+        $response = $this
+            ->from(route('admin.login'))
+            ->post(
+                route('admin.login.submit'),
+                [
+                    'email' => 'admin@example.com',
+                    'password' => 'PasswordSalah123',
+                ]
+            );
+
+        $response->assertRedirect(
+            route('admin.login')
+        );
+
+        $response->assertSessionHasErrors('email');
+
+        $this->assertGuest('admin');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Email admin salah
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_wrong_admin_email_is_rejected(): void
+    {
+        $this->createAdmin();
+
+        $response = $this
+            ->from(route('admin.login'))
+            ->post(
+                route('admin.login.submit'),
+                [
+                    'email' => 'bukanadmin@example.com',
+                    'password' => 'PasswordAdmin123',
+                ]
+            );
+
+        $response->assertRedirect(
+            route('admin.login')
+        );
+
+        $response->assertSessionHasErrors('email');
+
+        $this->assertGuest('admin');
     }
 }
