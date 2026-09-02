@@ -530,6 +530,16 @@ Route::middleware(['auth:admin', 'admin'])
 
 
         // Books
+        Route::post('books/{book:slug}/stock/add', [
+            AdminBookController::class,
+            'addStock',
+        ])->name('books.stock.add');
+
+        Route::post('books/{book:slug}/stock/sale', [
+            AdminBookController::class,
+            'recordSale',
+        ])->name('books.stock.sale');
+
         Route::resource('books', AdminBookController::class)
             ->scoped([
                 'book' => 'slug',

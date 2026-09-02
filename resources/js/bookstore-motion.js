@@ -2662,6 +2662,10 @@ const initStoreCart = root => {
                                 ${rupiah(item.price)} / item
                             </div>
 
+                            ${item.stock !== null && item.stock !== undefined
+                                ? `<div class="cart-unit-price">Stok tersedia: ${Number(item.stock)}</div>`
+                                : ''}
+
                             <div class="cart-product-bottom">
                                 <div class="qty-control">
                                     <button
@@ -2680,6 +2684,7 @@ const initStoreCart = root => {
                                         type="button"
                                         data-cart-action="plus"
                                         data-key="${escapeHtml(item.key)}"
+                                        ${item.stock !== null && item.stock !== undefined && Number(item.qty) >= Number(item.stock) ? 'disabled' : ''}
                                     >
                                         +
                                     </button>
@@ -2771,6 +2776,15 @@ const initStoreCart = root => {
                         button.dataset.price ?? 0
                     ),
 
+                stock:
+                    button.dataset.stock === undefined ||
+                    button.dataset.stock === ''
+                        ? null
+                        : Math.max(
+                            0,
+                            Number(button.dataset.stock)
+                        ),
+
                 qty: 1
             };
 
@@ -2787,6 +2801,18 @@ const initStoreCart = root => {
                 return;
             }
 
+            if (
+                product.stock !== null &&
+                product.stock < 1
+            ) {
+                showToast(
+                    'Stok Buku Cetak sudah habis.',
+                    true
+                );
+
+                return;
+            }
+
             const existing =
                 cart.find(
                     item =>
@@ -2795,6 +2821,20 @@ const initStoreCart = root => {
                 );
 
             if (existing) {
+                existing.stock = product.stock;
+
+                if (
+                    product.stock !== null &&
+                    Number(existing.qty) >= product.stock
+                ) {
+                    showToast(
+                        `Maksimal ${product.stock} buku sesuai stok yang tersedia.`,
+                        true
+                    );
+
+                    return;
+                }
+
                 existing.qty++;
             } else {
                 cart.push(product);
@@ -2857,6 +2897,24 @@ const initStoreCart = root => {
                 action === 'plus' &&
                 item
             ) {
+                const stock =
+                    item.stock === null ||
+                    item.stock === undefined
+                        ? null
+                        : Number(item.stock);
+
+                if (
+                    stock !== null &&
+                    Number(item.qty) >= stock
+                ) {
+                    showToast(
+                        `Jumlah maksimal sesuai stok: ${stock} buku.`,
+                        true
+                    );
+
+                    return;
+                }
+
                 item.qty++;
             }
 
@@ -3457,6 +3515,15 @@ const initDetailCart = root => {
                         button.dataset.price ?? 0
                     ),
 
+                stock:
+                    button.dataset.stock === undefined ||
+                    button.dataset.stock === ''
+                        ? null
+                        : Math.max(
+                            0,
+                            Number(button.dataset.stock)
+                        ),
+
                 qty: 1
             };
 
@@ -3478,7 +3545,35 @@ const initDetailCart = root => {
                         product.key
                 );
 
+            if (
+                product.stock !== null &&
+                product.stock < 1
+            ) {
+                if (feedback && feedbackText) {
+                    feedback.classList.add('show');
+                    feedbackText.textContent =
+                        'Stok Buku Cetak sudah habis.';
+                }
+
+                return;
+            }
+
             if (existing) {
+                existing.stock = product.stock;
+
+                if (
+                    product.stock !== null &&
+                    Number(existing.qty) >= product.stock
+                ) {
+                    if (feedback && feedbackText) {
+                        feedback.classList.add('show');
+                        feedbackText.textContent =
+                            `Jumlah di keranjang sudah mencapai stok (${product.stock} buku).`;
+                    }
+
+                    return;
+                }
+
                 existing.qty++;
             } else {
                 cart.push(product);

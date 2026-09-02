@@ -75,6 +75,22 @@
                 <p class="mt-1 text-[10px] text-slate-400">Contoh: IDR 200.000,00</p>
             </div>
 
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Stok Awal Buku Cetak</label>
+                <input
+                    type="number"
+                    name="print_stock"
+                    min="0"
+                    max="1000000"
+                    step="1"
+                    value="{{ old('print_stock', 0) }}"
+                    class="w-full rounded border border-slate-300 bg-white p-2.5 text-sm font-semibold text-slate-800"
+                >
+                <p class="mt-1 text-[10px] text-slate-500">
+                    Hanya untuk Buku Cetak. Nilai 0 akan otomatis tampil sebagai <strong>Stok Habis</strong> di Bookstore.
+                </p>
+            </div>
+
             <div class="border-t border-orange-200 pt-4">
                 <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
                     <input id="has_print_discount" type="checkbox" name="has_print_discount" value="1" {{ old('has_print_discount')?'checked':'' }} class="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500">

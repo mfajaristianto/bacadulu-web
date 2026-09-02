@@ -48,19 +48,13 @@
 
         <div class="book-format-list">
             @if($book->has_print && $book->print_price !== null)
-                <div class="format-box print-format">
+                <div class="format-box print-format {{ (int) $book->print_stock < 1 ? 'format-out-of-stock' : '' }}">
                     <div class="format-content">
                         <span class="format-label print-label">
-                            <svg class="format-icon"
-                                viewBox="0 0 24 24">
-
-                                <path class="motion-draw"
-                                    d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-
-                                <path class="motion-draw"
-                                    d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                            <svg class="format-icon" viewBox="0 0 24 24">
+                                <path class="motion-draw" d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                                <path class="motion-draw" d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
                             </svg>
-
                             Buku Cetak
                         </span>
 
@@ -69,72 +63,65 @@
                                 IDR {{ number_format((float)$book->print_price,2,',','.') }}
                             </div>
                         @else
-                            <div class="format-old-price"
-                                style="text-decoration:none">
-                                &nbsp;
-                            </div>
+                            <div class="format-old-price" style="text-decoration:none">&nbsp;</div>
                         @endif
 
                         <div class="format-price">
                             IDR {{ number_format((float)$book->effective_print_price,2,',','.') }}
                         </div>
 
-                        @if($book->has_active_print_discount)
-                            <span class="format-discount">
-                                -{{ number_format((float)$book->print_discount_percent,0) }}%
+                        @if((int) $book->print_stock > 0)
+                            <span class="format-stock available-stock">
+                                Stok: {{ (int) $book->print_stock }}
                             </span>
                         @else
-                            <span class="format-discount-placeholder">
-                                &nbsp;
+                            <span class="format-stock sold-out-stock">
+                                Stok Habis
                             </span>
                         @endif
                     </div>
 
-                    <button type="button"
-                        class="format-add print-add"
-                        data-cart-add="1"
-                        data-key="book-{{ $book->id }}-print"
-                        data-book-id="{{ $book->id }}"
-                        data-format="Buku Cetak"
-                        data-title="{{ $book->title }}"
-                        data-author="{{ $book->author }}"
-                        data-publisher="{{ $book->publisher }}"
-                        data-price="{{ (float)$book->effective_print_price }}"
-                        data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}">
-
-                        + Cetak
-                    </button>
+                    @if((int) $book->print_stock > 0)
+                        <button type="button"
+                            class="format-add print-add"
+                            data-cart-add="1"
+                            data-key="book-{{ $book->id }}-print"
+                            data-book-id="{{ $book->id }}"
+                            data-format="Buku Cetak"
+                            data-title="{{ $book->title }}"
+                            data-author="{{ $book->author }}"
+                            data-publisher="{{ $book->publisher }}"
+                            data-price="{{ (float)$book->effective_print_price }}"
+                            data-stock="{{ (int) $book->print_stock }}"
+                            data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}">
+                            + Cetak
+                        </button>
+                    @else
+                        <button type="button"
+                            class="format-add unavailable-add"
+                            data-unavailable-message="Stok Buku Cetak untuk {{ $book->title }} sudah habis.">
+                            Habis
+                        </button>
+                    @endif
                 </div>
             @else
                 <div class="format-box print-format format-unavailable">
                     <div class="format-content">
                         <span class="format-label print-label">
-                            <svg class="format-icon"
-                                viewBox="0 0 24 24">
-
-                                <path
-                                    d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-
-                                <path
-                                    d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                            <svg class="format-icon" viewBox="0 0 24 24">
+                                <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
                             </svg>
-
                             Buku Cetak
                         </span>
 
-                        <div class="format-unavailable-text">
-                            Tidak tersedia
-                        </div>
-
-                        <span class="format-discount-placeholder">
-                            &nbsp;
-                        </span>
+                        <div class="format-unavailable-text">Tidak tersedia</div>
+                        <span class="format-discount-placeholder">&nbsp;</span>
                     </div>
 
                     <button type="button"
                         class="format-add unavailable-add"
                         data-unavailable-message="Buku Cetak tidak tersedia untuk judul {{ $book->title }}.">
-
                         + Cetak
                     </button>
                 </div>
@@ -197,6 +184,7 @@
                         data-author="{{ $book->author }}"
                         data-publisher="{{ $book->publisher }}"
                         data-price="{{ (float)$book->effective_ebook_price }}"
+                        data-stock=""
                         data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}">
 
                         + E-book

@@ -849,6 +849,28 @@
     line-height: 12px;
 }
 
+.format-stock {
+    display: block;
+    height: 12px;
+    margin-top: 2px;
+    font-size: 8px;
+    line-height: 12px;
+    font-weight: 800;
+}
+
+.available-stock {
+    color: #15803D;
+}
+
+.sold-out-stock {
+    color: #DC2626;
+}
+
+.format-out-of-stock {
+    border-color: #FECACA;
+    background: #FFF7F7;
+}
+
 .format-unavailable {
     opacity: .72;
 }

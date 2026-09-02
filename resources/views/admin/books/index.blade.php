@@ -21,6 +21,7 @@
                     <th class="p-4">Judul & Penulis</th>
                     <th class="p-4">Penerbit</th>
                     <th class="p-4 min-w-[300px]">Format & Harga</th>
+                    <th class="p-4">Stok Cetak</th>
                     <th class="p-4">Kategori</th>
                     <th class="p-4 text-center">Aksi</th>
                 </tr>
@@ -111,6 +112,23 @@
                             </div>
                         </td>
 
+                        {{-- STOCK --}}
+                        <td class="p-4">
+                            @if($book->has_print)
+                                @if((int) $book->print_stock > 0)
+                                    <span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                                        {{ (int) $book->print_stock }} tersedia
+                                    </span>
+                                @else
+                                    <span class="inline-flex rounded-full bg-rose-100 px-2.5 py-1 text-xs font-bold text-rose-700">
+                                        Stok Habis
+                                    </span>
+                                @endif
+                            @else
+                                <span class="text-xs text-slate-400">Tidak ada cetak</span>
+                            @endif
+                        </td>
+
                         {{-- CATEGORY --}}
                         <td class="p-4 text-slate-600">
                             <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
@@ -133,7 +151,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="p-10 text-center text-slate-400">Belum ada data buku. Silakan tambah buku baru.</td>
+                        <td colspan="7" class="p-10 text-center text-slate-400">Belum ada data buku. Silakan tambah buku baru.</td>
                     </tr>
                 @endforelse
             </tbody>

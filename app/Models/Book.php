@@ -45,6 +45,8 @@ class Book extends Model
 
         'print_price',
 
+        'print_stock',
+
         'print_discount_percent',
 
         'print_discounted_price',
@@ -113,6 +115,9 @@ class Book extends Model
 
         'print_price' =>
             'decimal:2',
+
+        'print_stock' =>
+            'integer',
 
         'print_discount_percent' =>
             'decimal:2',
@@ -268,6 +273,27 @@ class Book extends Model
                 ? $this->ebook_discounted_price
 
                 : $this->ebook_price;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | STOK BUKU CETAK
+    |--------------------------------------------------------------------------
+    */
+
+    public function getPrintInStockAttribute(): bool
+    {
+        return
+            $this->has_print
+            && (int) $this->print_stock > 0;
+    }
+
+
+    public function stockMovements()
+    {
+        return $this->hasMany(BookStockMovement::class)
+            ->latest();
     }
 
 

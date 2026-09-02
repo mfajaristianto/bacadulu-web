@@ -393,6 +393,17 @@
     font-size:9px;
     font-weight:800
 }
+.detail-stock{
+    display:inline-flex;
+    width:max-content;
+    margin-top:10px;
+    padding:5px 9px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:800
+}
+.detail-stock.available{background:#DCFCE7;color:#15803D}
+.detail-stock.sold-out{background:#FEE2E2;color:#B91C1C}
 .add-format-button{
     display:flex;
     align-items:center;
@@ -656,25 +667,42 @@
                                         </span>
                                     @endif
 
-                                    <button
-                                        type="button"
-                                        class="add-format-button detail-add-cart"
-                                        data-key="book-{{ $book->id }}-print"
-                                        data-book-id="{{ $book->id }}"
-                                        data-format="Buku Cetak"
-                                        data-title="{{ $book->title }}"
-                                        data-author="{{ $book->author }}"
-                                        data-publisher="{{ $book->publisher }}"
-                                        data-price="{{ (float)$book->effective_print_price }}"
-                                        data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}"
-                                    >
-                                        <svg viewBox="0 0 24 24">
-                                            <circle cx="9" cy="20" r="1"/>
-                                            <circle cx="18" cy="20" r="1"/>
-                                            <path d="M3 4h2l2.4 10.2a2 2 0 002 1.5h7.8a2 2 0 002-1.5L21 7H6"/>
-                                        </svg>
-                                        <span>Tambah Buku Cetak</span>
-                                    </button>
+                                    @if((int) $book->print_stock > 0)
+                                        <span class="detail-stock available">
+                                            Stok tersedia: {{ (int) $book->print_stock }}
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            class="add-format-button detail-add-cart"
+                                            data-key="book-{{ $book->id }}-print"
+                                            data-book-id="{{ $book->id }}"
+                                            data-format="Buku Cetak"
+                                            data-title="{{ $book->title }}"
+                                            data-author="{{ $book->author }}"
+                                            data-publisher="{{ $book->publisher }}"
+                                            data-price="{{ (float)$book->effective_print_price }}"
+                                            data-stock="{{ (int) $book->print_stock }}"
+                                            data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <circle cx="9" cy="20" r="1"/>
+                                                <circle cx="18" cy="20" r="1"/>
+                                                <path d="M3 4h2l2.4 10.2a2 2 0 002 1.5h7.8a2 2 0 002-1.5L21 7H6"/>
+                                            </svg>
+                                            <span>Tambah Buku Cetak</span>
+                                        </button>
+                                    @else
+                                        <span class="detail-stock sold-out">Stok Habis</span>
+
+                                        <button
+                                            type="button"
+                                            class="add-format-button"
+                                            disabled
+                                        >
+                                            <span>Buku Sudah Habis</span>
+                                        </button>
+                                    @endif
                                 </div>
                             @endif
 
@@ -716,6 +744,7 @@
                                         data-author="{{ $book->author }}"
                                         data-publisher="{{ $book->publisher }}"
                                         data-price="{{ (float)$book->effective_ebook_price }}"
+                                        data-stock=""
                                         data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}"
                                     >
                                         <svg viewBox="0 0 24 24">

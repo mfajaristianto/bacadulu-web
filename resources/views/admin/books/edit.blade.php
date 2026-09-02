@@ -74,6 +74,22 @@
                 </div>
             </div>
 
+            <div>
+                <label class="block text-sm font-semibold mb-1">Stok Buku Cetak</label>
+                <input
+                    type="number"
+                    name="print_stock"
+                    min="0"
+                    max="1000000"
+                    step="1"
+                    value="{{ old('print_stock', $book->print_stock ?? 0) }}"
+                    class="w-full rounded border border-slate-300 bg-white p-2.5 font-semibold text-slate-800"
+                >
+                <p class="mt-1 text-[10px] text-slate-500">
+                    Perubahan angka di sini dicatat sebagai penyesuaian stok. Untuk transaksi harian, gunakan panel stok di bawah.
+                </p>
+            </div>
+
             <label class="inline-flex items-center gap-2">
                 <input id="has_print_discount" type="checkbox" name="has_print_discount" value="1" {{ old('has_print_discount',$book->print_discounted_price!==null?1:0)?'checked':'' }}>
                 <span class="font-semibold text-sm">Berikan diskon Buku Cetak</span>
@@ -178,6 +194,81 @@
             <button type="submit" class="rounded bg-orange-600 px-4 py-2 text-white font-semibold hover:bg-orange-700">Simpan Perubahan</button>
         </div>
     </form>
+
+    @if($book->has_print)
+        <div class="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
+            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
+                <div class="mb-4">
+                    <p class="text-xs font-bold uppercase tracking-wide text-emerald-700">Tambah Stok</p>
+                    <h2 class="mt-1 text-xl font-bold text-slate-900">Stok saat ini: {{ (int) $book->print_stock }} buku</h2>
+                    <p class="mt-1 text-xs text-slate-600">Gunakan saat ada cetak ulang atau stok baru masuk.</p>
+                </div>
+
+                <form action="{{ route('admin.books.stock.add', $book->slug) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <input type="number" name="quantity" min="1" max="1000000" required placeholder="Jumlah stok masuk" class="w-full rounded border border-emerald-200 bg-white p-2.5 text-sm">
+                    <input type="text" name="note" maxlength="500" placeholder="Catatan (opsional), mis. cetak ulang 50 eksemplar" class="w-full rounded border border-emerald-200 bg-white p-2.5 text-sm">
+                    <button type="submit" class="w-full rounded bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-700">+ Tambah Stok</button>
+                </form>
+            </div>
+
+            <div class="rounded-xl border border-rose-200 bg-rose-50 p-5 shadow-sm">
+                <div class="mb-4">
+                    <p class="text-xs font-bold uppercase tracking-wide text-rose-700">Catat Penjualan</p>
+                    <h2 class="mt-1 text-xl font-bold text-slate-900">Kurangi stok setelah CS mengonfirmasi</h2>
+                    <p class="mt-1 text-xs text-slate-600">Checkout WhatsApp tidak mengurangi stok. Catat di sini setelah pesanan benar-benar dikonfirmasi.</p>
+                </div>
+
+                <form action="{{ route('admin.books.stock.sale', $book->slug) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <input type="number" name="quantity" min="1" max="{{ max(1, (int) $book->print_stock) }}" required placeholder="Jumlah terjual" class="w-full rounded border border-rose-200 bg-white p-2.5 text-sm" {{ (int) $book->print_stock < 1 ? 'disabled' : '' }}>
+                    <input type="text" name="note" maxlength="500" placeholder="Catatan (opsional), mis. order via WhatsApp" class="w-full rounded border border-rose-200 bg-white p-2.5 text-sm" {{ (int) $book->print_stock < 1 ? 'disabled' : '' }}>
+                    <button type="submit" class="w-full rounded px-4 py-2.5 text-sm font-bold text-white {{ (int) $book->print_stock > 0 ? 'bg-rose-600 hover:bg-rose-700' : 'bg-slate-400 cursor-not-allowed' }}" {{ (int) $book->print_stock < 1 ? 'disabled' : '' }}>Catat Penjualan</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-6 rounded-xl border bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Riwayat Stok</p>
+                    <h2 class="mt-1 text-lg font-bold text-slate-900">Pergerakan stok Buku Cetak</h2>
+                </div>
+                <span class="rounded-full px-3 py-1 text-xs font-bold {{ (int) $book->print_stock > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700' }}">
+                    {{ (int) $book->print_stock > 0 ? 'Tersedia: '.$book->print_stock : 'Stok Habis' }}
+                </span>
+            </div>
+
+            <div class="mt-4 overflow-x-auto">
+                <table class="w-full min-w-[680px] text-left text-sm">
+                    <thead class="border-b bg-slate-50 text-xs uppercase text-slate-500">
+                        <tr>
+                            <th class="p-3">Waktu</th>
+                            <th class="p-3">Jenis</th>
+                            <th class="p-3">Perubahan</th>
+                            <th class="p-3">Sebelum → Sesudah</th>
+                            <th class="p-3">Admin</th>
+                            <th class="p-3">Catatan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        @forelse($book->stockMovements->take(30) as $movement)
+                            <tr>
+                                <td class="p-3 text-slate-500">{{ $movement->created_at?->timezone('Asia/Jakarta')->format('d M Y H:i') }}</td>
+                                <td class="p-3 font-semibold text-slate-700">{{ match($movement->type) { 'initial' => 'Stok Awal', 'restock' => 'Tambah Stok', 'sale' => 'Penjualan', default => 'Penyesuaian' } }}</td>
+                                <td class="p-3 font-bold {{ $movement->quantity_change >= 0 ? 'text-emerald-600' : 'text-rose-600' }}">{{ $movement->quantity_change >= 0 ? '+' : '' }}{{ $movement->quantity_change }}</td>
+                                <td class="p-3 text-slate-600">{{ $movement->stock_before }} → {{ $movement->stock_after }}</td>
+                                <td class="p-3 text-slate-600">{{ $movement->user?->name ?? 'Sistem' }}</td>
+                                <td class="p-3 text-slate-500">{{ $movement->note ?: '-' }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="6" class="p-6 text-center text-slate-400">Belum ada riwayat stok.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 </div>
 
 <script>

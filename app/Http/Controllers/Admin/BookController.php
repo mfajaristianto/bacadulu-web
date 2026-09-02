@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
@@ -135,6 +136,12 @@ class BookController extends Controller
             $hasPrint
                 ? (float) $request->print_price
                 : null;
+
+
+        $printStock =
+            $hasPrint
+                ? (int) $request->print_stock
+                : 0;
 
 
         $hasPrintDiscount =
@@ -288,7 +295,7 @@ class BookController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        Book::create([
+        $book = Book::create([
 
             /*
             |--------------------------------------------------------------------------
@@ -338,6 +345,9 @@ class BookController extends Controller
 
             'print_price' =>
                 $printPrice,
+
+            'print_stock' =>
+                $printStock,
 
             'print_discount_percent' =>
                 $printDiscountPercent,
@@ -405,6 +415,19 @@ class BookController extends Controller
         ]);
 
 
+        if ($hasPrint && $printStock > 0) {
+
+            $book->stockMovements()->create([
+                'user_id' => auth('admin')->id(),
+                'type' => 'initial',
+                'quantity_change' => $printStock,
+                'stock_before' => 0,
+                'stock_after' => $printStock,
+                'note' => 'Stok awal saat buku dibuat.',
+            ]);
+        }
+
+
         return redirect()
             ->route(
                 'admin.books.index'
@@ -425,6 +448,11 @@ class BookController extends Controller
     public function edit(
         Book $book
     ) {
+
+        $book->load([
+            'stockMovements.user',
+        ]);
+
 
         return view(
             'admin.books.edit',
@@ -491,6 +519,16 @@ class BookController extends Controller
             $hasPrint
                 ? (float) $request->print_price
                 : null;
+
+
+        $oldPrintStock =
+            (int) $book->print_stock;
+
+
+        $printStock =
+            $hasPrint
+                ? (int) $request->print_stock
+                : 0;
 
 
         $hasPrintDiscount =
@@ -691,6 +729,9 @@ class BookController extends Controller
             'print_price' =>
                 $printPrice,
 
+            'print_stock' =>
+                $printStock,
+
             'print_discount_percent' =>
                 $printDiscountPercent,
 
@@ -757,6 +798,19 @@ class BookController extends Controller
         ]);
 
 
+        if ($oldPrintStock !== $printStock) {
+
+            $book->stockMovements()->create([
+                'user_id' => auth('admin')->id(),
+                'type' => 'adjustment',
+                'quantity_change' => $printStock - $oldPrintStock,
+                'stock_before' => $oldPrintStock,
+                'stock_after' => $printStock,
+                'note' => 'Penyesuaian stok melalui form edit buku.',
+            ]);
+        }
+
+
         return redirect()
             ->route(
                 'admin.books.index'
@@ -765,6 +819,143 @@ class BookController extends Controller
                 'success',
                 'Buku berhasil diperbarui!'
             );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TAMBAH STOK BUKU CETAK
+    |--------------------------------------------------------------------------
+    */
+
+    public function addStock(
+        Request $request,
+        Book $book
+    ) {
+
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1|max:1000000',
+            'note' => 'nullable|string|max:500',
+        ]);
+
+
+        DB::transaction(function () use ($book, $validated) {
+
+            $lockedBook = Book::query()
+                ->whereKey($book->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+
+            if (!$lockedBook->has_print) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Buku ini tidak memiliki format Buku Cetak.',
+                ]);
+            }
+
+
+            $before =
+                (int) $lockedBook->print_stock;
+
+            $after =
+                $before + (int) $validated['quantity'];
+
+
+            $lockedBook->update([
+                'print_stock' => $after,
+            ]);
+
+
+            $lockedBook->stockMovements()->create([
+                'user_id' => auth('admin')->id(),
+                'type' => 'restock',
+                'quantity_change' => (int) $validated['quantity'],
+                'stock_before' => $before,
+                'stock_after' => $after,
+                'note' => $validated['note'] ?? 'Penambahan stok Buku Cetak.',
+            ]);
+        });
+
+
+        return redirect()
+            ->route('admin.books.edit', $book->slug)
+            ->with('success', 'Stok Buku Cetak berhasil ditambahkan.');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CATAT PENJUALAN BUKU CETAK
+    |--------------------------------------------------------------------------
+    |
+    | Dipakai setelah CS mengonfirmasi penjualan/pembayaran.
+    | Klik checkout WhatsApp TIDAK mengurangi stok.
+    |
+    */
+
+    public function recordSale(
+        Request $request,
+        Book $book
+    ) {
+
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1|max:1000000',
+            'note' => 'nullable|string|max:500',
+        ]);
+
+
+        DB::transaction(function () use ($book, $validated) {
+
+            $lockedBook = Book::query()
+                ->whereKey($book->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+
+            if (!$lockedBook->has_print) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Buku ini tidak memiliki format Buku Cetak.',
+                ]);
+            }
+
+
+            $before =
+                (int) $lockedBook->print_stock;
+
+            $quantity =
+                (int) $validated['quantity'];
+
+
+            if ($quantity > $before) {
+                throw ValidationException::withMessages([
+                    'quantity' => "Jumlah penjualan melebihi stok yang tersedia ({$before} buku).",
+                ]);
+            }
+
+
+            $after =
+                $before - $quantity;
+
+
+            $lockedBook->update([
+                'print_stock' => $after,
+            ]);
+
+
+            $lockedBook->stockMovements()->create([
+                'user_id' => auth('admin')->id(),
+                'type' => 'sale',
+                'quantity_change' => -$quantity,
+                'stock_before' => $before,
+                'stock_after' => $after,
+                'note' => $validated['note'] ?? 'Penjualan Buku Cetak dikonfirmasi CS.',
+            ]);
+        });
+
+
+        return redirect()
+            ->route('admin.books.edit', $book->slug)
+            ->with('success', 'Penjualan berhasil dicatat dan stok otomatis berkurang.');
     }
 
 
@@ -845,6 +1036,9 @@ class BookController extends Controller
 
             'print_price' =>
                 'nullable|required_if:has_print,1|numeric|min:0.01|max:999999999999.99',
+
+            'print_stock' =>
+                'nullable|required_if:has_print,1|integer|min:0|max:1000000',
 
             'has_print_discount' =>
                 'nullable|boolean',
