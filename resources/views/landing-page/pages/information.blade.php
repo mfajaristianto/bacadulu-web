@@ -1,844 +1,1497 @@
 @extends('layouts.app')
 
-@section('title', 'Informasi Terbaru - Baca Dulu')
+@section('title', 'Informasi - Baca Dulu')
 
 @section('content')
 
 <style>
-.information-page {
+/* =========================================================
+   BACA DULU — INFORMATION
+========================================================= */
+
+.bd-news {
     --navy: #241B52;
     --orange: #EF5843;
-    --orange-dark: #C6432F;
-    --gold: #F7AA35;
-    --text: #334155;
-    --muted: #6B7280;
-    --border: #E7E9EE;
-    --cream: #FBF9F5;
-    width: 100%;
+
+    --black: #171719;
+    --text: #555A65;
+    --muted: #898D97;
+    --line: #E8E9ED;
+
     min-height: 100vh;
-    overflow-x: hidden;
-    background:
-        radial-gradient(circle at 100% 0, rgba(239, 88, 67, .08), transparent 28%),
-        #F8FAFC;
-    color: var(--navy);
+
+    background: #FFFFFF;
+    color: var(--black);
+
     font-family: 'Inter', sans-serif;
+
+    overflow-x: hidden;
 }
 
-.information-page *,
-.information-page *::before,
-.information-page *::after {
+.bd-news *,
+.bd-news *::before,
+.bd-news *::after {
     box-sizing: border-box;
 }
 
-.information-container {
-    width: min(calc(100% - 64px), 1500px);
-    margin: 0 auto;
+.bd-news a {
+    text-decoration: none;
 }
 
-/* HERO */
-.information-hero {
-    position: relative;
-    padding: 70px 0 48px;
-    overflow: hidden;
-    border-top: 3px solid var(--orange);
-    background: #fff;
-}
-
-.information-hero::after {
-    content: "";
-    position: absolute;
-    width: 420px;
-    height: 420px;
-    right: -160px;
-    top: -230px;
-    border-radius: 50%;
-    background: radial-gradient(
-        circle,
-        rgba(247, 170, 53, .18),
-        rgba(239, 88, 67, .05) 48%,
-        transparent 70%
+.bd-news-shell {
+    width: min(
+        calc(100% - 72px),
+        1540px
     );
-    pointer-events: none;
+
+    margin-inline: auto;
 }
 
-.information-hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 760px;
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+.bd-news-intro {
+    padding: 40px 0 18px;
 }
 
-.information-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 30px;
-    padding: 6px 12px;
-    border: 1px solid #FED7AA;
-    border-radius: 999px;
-    background: #FFF7ED;
-    color: #C2410C;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-}
-
-.information-badge-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--orange);
-}
-
-.information-heading {
-    max-width: 720px;
-    margin: 17px 0 10px;
-    color: var(--navy);
-    font-family: 'Poppins', sans-serif;
-    font-size: clamp(36px, 4vw, 52px);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -1.3px;
-}
-
-.information-subtitle {
-    max-width: 650px;
-    margin: 0;
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.75;
-}
-
-/* SECTION */
-.information-section {
-    padding: 48px 0 70px;
-}
-
-.information-section-head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 26px;
-}
-
-.information-head-title {
-    min-width: 0;
-}
-
-.information-title-row {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
-
-.information-title-marker {
-    width: 9px;
-    height: 9px;
-    flex-shrink: 0;
-    border-radius: 3px;
-    background: linear-gradient(135deg, var(--orange), var(--gold));
-}
-
-.information-title-row h2 {
-    margin: 0;
-    color: var(--navy);
-    font-family: 'Poppins', sans-serif;
-    font-size: 24px;
-    font-weight: 750;
-}
-
-.information-head-title p {
-    margin: 6px 0 0 18px;
-    color: var(--muted);
-    font-size: 11px;
-}
-
-.information-page-info {
-    flex-shrink: 0;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: #fff;
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.information-page-info strong {
-    color: var(--navy);
-}
-
-/* GRID */
-.information-grid {
+.bd-news-intro-inner {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 18px;
-    align-items: stretch;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        360px;
+
+    align-items: end;
+
+    gap: 70px;
 }
 
-.information-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
+.bd-news-intro-copy {
     min-width: 0;
-    height: 100%;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    background: #fff;
-    box-shadow: 0 6px 20px rgba(36, 27, 82, .05);
-    transition:
-        transform .28s ease,
-        border-color .28s ease,
-        box-shadow .28s ease;
 }
 
-.information-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(239, 88, 67, .28);
-    box-shadow: 0 18px 38px rgba(36, 27, 82, .10);
-}
-
-/* IMAGE */
-.information-image-link {
-    position: relative;
-    display: block;
-    width: 100%;
-    height: 215px;
-    overflow: hidden;
-    background: linear-gradient(135deg, #F8FAFC, #EEF2F7);
-}
-
-.information-image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform .45s ease;
-}
-
-.information-card:hover .information-image {
-    transform: scale(1.035);
-}
-
-.information-placeholder {
-    position: absolute;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 9px;
-    padding: 20px;
-    color: var(--navy);
-    background:
-        radial-gradient(circle at 50% 45%, rgba(247, 170, 53, .15), transparent 35%),
-        var(--cream);
-}
-
-.information-placeholder.show {
-    display: flex;
-}
-
-.information-placeholder svg {
-    width: 36px;
-    height: 36px;
-    fill: none;
-    stroke: var(--orange);
-    stroke-width: 1.6;
-}
-
-.information-placeholder span {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-}
-
-.information-image-label {
-    position: absolute;
-    left: 12px;
-    bottom: 12px;
-    z-index: 3;
-    display: inline-flex;
-    align-items: center;
-    min-height: 27px;
-    padding: 5px 10px;
-    border-radius: 999px;
-    color: #C2410C;
-    background: rgba(255, 247, 237, .95);
-    backdrop-filter: blur(7px);
-    font-size: 8px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-}
-
-/* BODY */
-.information-body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    padding: 17px;
-}
-
-.information-meta {
+.bd-news-intro-index {
     display: flex;
     align-items: center;
-    gap: 7px;
-    min-height: 17px;
-    margin-bottom: 8px;
-    color: #94A3B8;
-    font-size: 9px;
-    font-weight: 600;
-}
 
-.information-meta-dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--orange);
-}
-
-.information-title {
-    min-height: 44px;
-    max-height: 44px;
-    margin: 0;
-    overflow: hidden;
-    color: var(--navy);
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.55;
-    overflow-wrap: anywhere;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
-.information-description {
-    min-height: 60px;
-    max-height: 60px;
-    margin: 9px 0 0;
-    overflow: hidden;
-    color: var(--muted);
-    font-size: 11px;
-    line-height: 1.75;
-    overflow-wrap: anywhere;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-}
-
-.information-action {
-    margin-top: auto;
-    padding-top: 17px;
-}
-
-.information-button {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     gap: 10px;
-    width: 100%;
-    min-height: 40px;
-    padding: 9px 13px;
-    border: 1px solid #FED7AA;
-    border-radius: 10px;
-    background: #FFF7ED;
-    color: var(--orange-dark) !important;
-    font-size: 10px;
-    font-weight: 800;
-    text-decoration: none !important;
-    transition:
-        background .2s ease,
-        color .2s ease,
-        border-color .2s ease;
+
+    margin-bottom: 13px;
+
+    color: #858993;
+
+    font-size: 9px;
+    font-weight: 750;
+
+    letter-spacing: .13em;
+
+    text-transform: uppercase;
 }
 
-.information-button svg {
-    width: 15px;
-    height: 15px;
+.bd-news-intro-index::before {
+    content: "";
+
+    width: 23px;
+    height: 2px;
+
     flex-shrink: 0;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    transition: transform .2s ease;
-}
 
-.information-button:hover {
-    border-color: var(--orange);
     background: var(--orange);
-    color: #fff !important;
 }
 
-.information-button:hover svg {
-    transform: translateX(3px);
+
+/* TITLE */
+
+.bd-news-title {
+    max-width: 780px;
+
+    margin: 0;
+
+    color: var(--navy);
+
+    font-family:  'Poppins', sans-serif;
+
+    font-size: clamp(
+        36px,
+        3.8vw,
+        55px
+    );
+
+    font-weight: 580;
+
+    line-height: 1.06;
+
+    letter-spacing: -.045em;
 }
 
-/* EMPTY */
-.information-empty {
-    grid-column: 1 / -1;
-    padding: 65px 25px;
-    border: 1px dashed #CBD5E1;
-    border-radius: 18px;
-    background: #fff;
-    text-align: center;
-}
-
-.information-empty-icon {
-    width: 58px;
-    height: 58px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 14px;
-    border-radius: 50%;
-    background: #FFF7ED;
+.bd-news-title span {
     color: var(--orange);
 }
 
-.information-empty-icon svg {
-    width: 26px;
-    height: 26px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.7;
+
+/* DESCRIPTION */
+
+.bd-news-description {
+    max-width: 350px;
+
+    margin: 0 0 4px;
+
+    color: #747985;
+
+    font-size: 12px;
+
+    line-height: 1.75;
 }
 
-.information-empty h3 {
-    margin: 0;
-    color: var(--navy);
-    font-size: 17px;
-    font-weight: 800;
+
+/* RULE */
+
+.bd-news-intro-rule {
+    width: 100%;
+    height: 1px;
+
+    margin-top: 30px;
+
+    background: var(--line);
 }
 
-.information-empty p {
-    margin: 7px 0 0;
-    color: var(--muted);
-    font-size: 11px;
+
+/* =========================================================
+   CAROUSEL
+========================================================= */
+
+.bd-news-carousel-section {
+    padding: 7px 0 65px;
 }
 
-/* PAGINATION */
-.information-pagination {
+
+/* HEADER */
+
+.bd-news-carousel-head {
     display: flex;
-    justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-top: 38px;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    margin-bottom: 19px;
 }
 
-.information-pagination a,
-.information-pagination span {
+.bd-news-head-left {
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+}
+
+.bd-news-head-title {
+    margin: 0;
+
+    color: #171719;
+
+    font-family: 'Poppins', sans-serif;
+
+    font-size: 21px;
+    font-weight: 500;
+
+    line-height: 1.2;
+
+    letter-spacing: -.025em;
+}
+
+
+/* VIEW ALL */
+
+.bd-news-view {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-width: 42px;
-    height: 42px;
-    padding: 0 11px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: #fff;
-    color: var(--navy) !important;
-    font-size: 11px;
+
+    gap: 8px;
+
+    color: #898D95 !important;
+
+    font-size: 9px;
     font-weight: 800;
-    text-decoration: none;
-    transition:
-        border-color .2s ease,
-        color .2s ease,
-        background .2s ease;
+
+    letter-spacing: .14em;
+
+    text-transform: uppercase;
+
+    transition: color .25s ease;
 }
 
-.information-pagination a:hover {
-    border-color: var(--orange);
+.bd-news-view svg {
+    width: 14px;
+    height: 14px;
+
+    fill: none;
+    stroke: currentColor;
+
+    stroke-width: 1.6;
+
+    transition:
+        transform .3s
+        cubic-bezier(.22,1,.36,1);
+}
+
+.bd-news-view:hover {
     color: var(--orange) !important;
 }
 
-.information-pagination .active {
-    border-color: var(--navy);
-    background: var(--navy);
-    color: #fff !important;
+.bd-news-view:hover svg {
+    transform: translateX(4px);
 }
 
-.information-pagination .disabled {
-    background: #F8FAFC;
-    color: #CBD5E1 !important;
+
+/* =========================================================
+   ARROWS
+========================================================= */
+
+.bd-news-arrows {
+    display: flex;
+    align-items: center;
+
+    gap: 2px;
 }
 
-/* RESPONSIVE */
-@media (max-width: 1199px) {
-    .information-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+.bd-news-arrow {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #222225;
+
+    cursor: pointer;
+
+    transition:
+        color .25s ease,
+        transform .2s ease;
 }
 
-@media (max-width: 767px) {
-    .information-container {
-        width: calc(100% - 34px);
-    }
-
-    .information-hero {
-        padding: 52px 0 40px;
-    }
-
-    .information-heading {
-        font-size: 35px;
-    }
-
-    .information-subtitle {
-        font-size: 12px;
-    }
-
-    .information-section {
-        padding: 38px 0 55px;
-    }
-
-    .information-section-head {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .information-title-row h2 {
-        font-size: 21px;
-    }
-
-    .information-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 13px;
-    }
-
-    .information-image-link {
-        height: 190px;
-    }
-
-    .information-pagination a,
-    .information-pagination span {
-        min-width: 44px;
-        height: 44px;
-    }
+.bd-news-arrow:hover {
+    color: var(--orange);
 }
 
-@media (max-width: 480px) {
-    .information-container {
+.bd-news-arrow:active {
+    transform: scale(.9);
+}
+
+.bd-news-arrow svg {
+    width: 25px;
+    height: 25px;
+
+    fill: none;
+    stroke: currentColor;
+
+    stroke-width: 1.55;
+}
+
+
+/* =========================================================
+   CAROUSEL TRACK
+========================================================= */
+
+.bd-news-carousel {
+    position: relative;
+
+    width: 100%;
+
+    display: flex;
+
+    gap: 18px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-bottom: 4px;
+
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+
+    scrollbar-width: none;
+
+    cursor: grab;
+}
+
+.bd-news-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.bd-news-carousel.is-dragging {
+    cursor: grabbing;
+
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+
+    user-select: none;
+}
+
+
+/* =========================================================
+   NEWS CARD
+========================================================= */
+
+.bd-news-card {
+    position: relative;
+
+    flex:
+        0 0
+        calc((100% - 36px) / 3);
+
+    min-width: 0;
+
+    height: clamp(
+        390px,
+        30vw,
+        520px
+    );
+
+    overflow: hidden;
+
+    border-radius: 17px;
+
+    background: #ECEEF1;
+
+    isolation: isolate;
+
+    scroll-snap-align: start;
+
+    color: #FFFFFF !important;
+}
+
+
+/* IMAGE */
+
+.bd-news-card-image {
+    position: absolute;
+
+    z-index: 1;
+
+    inset: 0;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transform: scale(1.01);
+
+    transition:
+        transform .85s
+        cubic-bezier(.22,1,.36,1);
+}
+
+.bd-news-card:hover
+.bd-news-card-image {
+    transform: scale(1.055);
+}
+
+
+/* =========================================================
+   FALLBACK
+========================================================= */
+
+.bd-news-fallback {
+    position: absolute;
+
+    z-index: 0;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            140deg,
+            #2B2258 0%,
+            #171329 100%
+        );
+}
+
+.bd-news-fallback-inner {
+    display: flex;
+    align-items: center;
+
+    flex-direction: column;
+
+    gap: 11px;
+
+    color: rgba(255,255,255,.9);
+}
+
+.bd-news-fallback-mark {
+    width: 9px;
+    height: 9px;
+
+    background: var(--orange);
+}
+
+.bd-news-fallback-text {
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: .14em;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.bd-news-card-overlay {
+    position: absolute;
+
+    z-index: 2;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5,7,12,.10) 0%,
+            rgba(5,7,12,.03) 38%,
+            rgba(5,7,12,.18) 55%,
+            rgba(5,7,12,.78) 100%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CARD TYPE
+========================================================= */
+
+.bd-news-card-type {
+    position: absolute;
+
+    z-index: 4;
+
+    top: 30px;
+    left: 30px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    color: rgba(255,255,255,.92);
+
+    font-size: 10px;
+    font-weight: 650;
+
+    letter-spacing: .1em;
+
+    text-transform: uppercase;
+}
+
+.bd-news-card-type::before {
+    content: "";
+
+    width: 6px;
+    height: 6px;
+
+    background: var(--orange);
+}
+
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.bd-news-card-content {
+    position: absolute;
+
+    z-index: 4;
+
+    left: 30px;
+    right: 30px;
+    bottom: 30px;
+}
+
+.bd-news-card-date {
+    margin-bottom: 10px;
+
+    color: rgba(255,255,255,.66);
+
+    font-size: 9px;
+    font-weight: 550;
+}
+
+.bd-news-card-title {
+    max-width: 95%;
+
+    margin: 0;
+
+    color: #FFFFFF;
+
+    font-family: 'Inter', sans-serif;
+
+    font-size: clamp(
+        19px,
+        1.6vw,
+        27px
+    );
+
+    font-weight: 500;
+
+    line-height: 1.18;
+
+    letter-spacing: -.025em;
+
+    overflow-wrap: anywhere;
+
+    transition:
+        transform .4s
+        cubic-bezier(.22,1,.36,1);
+}
+
+.bd-news-card:hover
+.bd-news-card-title {
+    transform: translateY(-4px);
+}
+
+
+/* READ MORE */
+
+.bd-news-card-more {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    max-height: 0;
+
+    margin-top: 0;
+
+    overflow: hidden;
+
+    color: rgba(255,255,255,.84);
+
+    font-size: 9px;
+    font-weight: 650;
+
+    opacity: 0;
+
+    transform: translateY(8px);
+
+    transition:
+        max-height .35s ease,
+        margin-top .35s ease,
+        opacity .35s ease,
+        transform .35s ease;
+}
+
+.bd-news-card-more svg {
+    width: 14px;
+    height: 14px;
+
+    fill: none;
+    stroke: currentColor;
+
+    stroke-width: 1.5;
+}
+
+.bd-news-card:hover
+.bd-news-card-more {
+    max-height: 28px;
+
+    margin-top: 13px;
+
+    opacity: 1;
+
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.bd-news-empty {
+    padding: 65px 20px;
+
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.bd-news-pagination {
+    margin-top: 30px;
+}
+
+.bd-news-pagination nav {
+    display: flex;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   MOTION
+========================================================= */
+
+.bd-news-reveal {
+    opacity: 0;
+
+    transform: translateY(16px);
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .bd-news-intro-inner {
+        grid-template-columns:
+            minmax(0,1fr)
+            300px;
+
+        gap: 45px;
+    }
+
+    .bd-news-card {
+        flex-basis:
+            calc((100% - 18px) / 2);
+
+        height: 470px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL TABLET
+========================================================= */
+
+@media (max-width: 820px) {
+
+    .bd-news-shell {
+        width: calc(100% - 40px);
+    }
+
+    .bd-news-intro-inner {
+        grid-template-columns: 1fr;
+
+        gap: 17px;
+    }
+
+    .bd-news-description {
+        max-width: 500px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+
+    .bd-news-shell {
         width: calc(100% - 30px);
     }
 
-    .information-heading {
-        font-size: 31px;
+
+    .bd-news-intro {
+        padding: 27px 0 12px;
     }
 
-    .information-grid {
-        grid-template-columns: 1fr;
+    .bd-news-intro-index {
+        margin-bottom: 10px;
+
+        font-size: 8px;
     }
 
-    .information-image-link {
-        height: 225px;
+    .bd-news-title {
+        font-size: 34px;
+        line-height: 1.08;
     }
+
+    .bd-news-description {
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .bd-news-intro-rule {
+        margin-top: 20px;
+    }
+
+
+    .bd-news-carousel-section {
+        padding:
+            5px 0
+            50px;
+    }
+
+    .bd-news-carousel-head {
+        margin-bottom: 15px;
+    }
+
+    .bd-news-head-left {
+        gap: 10px;
+    }
+
+    .bd-news-head-title {
+        font-size: 18px;
+    }
+
+    .bd-news-view {
+        display: none;
+    }
+
+    .bd-news-arrow {
+        width: 32px;
+        height: 32px;
+    }
+
+    .bd-news-arrow svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .bd-news-carousel {
+        gap: 12px;
+    }
+
+
+    .bd-news-card {
+        flex-basis: 86%;
+
+        height: 410px;
+
+        border-radius: 14px;
+    }
+
+    .bd-news-card-type {
+        top: 22px;
+        left: 22px;
+
+        font-size: 8px;
+    }
+
+    .bd-news-card-content {
+        left: 22px;
+        right: 22px;
+        bottom: 23px;
+    }
+
+    .bd-news-card-date {
+        margin-bottom: 8px;
+
+        font-size: 8px;
+    }
+
+    .bd-news-card-title {
+        font-size: 21px;
+
+        line-height: 1.2;
+    }
+
+    .bd-news-card-more {
+        display: none;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .bd-news-reveal {
+        opacity: 1 !important;
+
+        transform: none !important;
+    }
+
+    .bd-news-carousel {
+        scroll-behavior: auto;
+    }
+
+    .bd-news-card-image,
+    .bd-news-card-title,
+    .bd-news-card-more {
+        transition: none;
+    }
+
 }
 </style>
 
-<div class="information-page">
 
-    <section class="information-hero">
-        <div class="information-container">
-            <div class="information-hero-content">
+<div
+    class="bd-news"
+    id="bdNewsPage"
+>
 
-                <span class="information-badge">
-                    <span class="information-badge-dot"></span>
-                    Pusat Informasi
-                </span>
+    {{-- =====================================================
+         INTRO
+    ====================================================== --}}
 
-                <h1 class="information-heading">
-                    Informasi Terbaru
-                </h1>
+    <section class="bd-news-intro">
 
-                <p class="information-subtitle">
-                    Pengumuman, berita, dan informasi penting
-                    seputar layanan Baca Dulu.
+        <div class="bd-news-shell">
+
+            <div class="bd-news-intro-inner">
+
+
+                <div class="bd-news-intro-copy">
+
+                    <div
+                        class="
+                            bd-news-intro-index
+                            bd-news-reveal
+                        "
+                    >
+                        Informasi / Bacadulu
+                    </div>
+
+
+                    <h1
+                        class="
+                            bd-news-title
+                            bd-news-reveal
+                        "
+                    >
+                        Kabar terbaru dari
+                        <span>Bacadulu.</span>
+                    </h1>
+
+                </div>
+
+
+                <p
+                    class="
+                        bd-news-description
+                        bd-news-reveal
+                    "
+                >
+                    Temukan pengumuman, kabar kegiatan,
+                    agenda, serta pembaruan terbaru dari
+                    Bacadulu dalam satu tempat.
                 </p>
 
             </div>
+
+
+            <div
+                class="
+                    bd-news-intro-rule
+                    bd-news-reveal
+                "
+            ></div>
+
         </div>
+
     </section>
 
-    <section
-        class="information-section"
-        id="informasi-list"
-    >
-        <div class="information-container">
 
-            <div class="information-section-head">
 
-                <div class="information-head-title">
-                    <div class="information-title-row">
-                        <span class="information-title-marker"></span>
+    {{-- =====================================================
+         NEWS
+    ====================================================== --}}
 
-                        <h2>
-                            Informasi & Pengumuman
-                        </h2>
-                    </div>
+    <section class="bd-news-carousel-section">
 
-                    <p>
-                        Maksimal 5 informasi ditampilkan pada setiap halaman.
-                    </p>
+        <div class="bd-news-shell">
+
+
+            {{-- HEADER --}}
+
+            <div
+                class="
+                    bd-news-carousel-head
+                    bd-news-reveal
+                "
+            >
+
+                <div class="bd-news-head-left">
+
+                    <h2 class="bd-news-head-title">
+                        Latest news
+                    </h2>
+
+
+                    <a
+                        href="#bdNewsCarousel"
+                        class="bd-news-view"
+                    >
+                        View all
+
+                        <svg viewBox="0 0 24 24">
+
+                            <path d="M5 12h14"/>
+
+                            <path d="m14 7 5 5-5 5"/>
+
+                        </svg>
+
+                    </a>
+
                 </div>
 
-                @if($informations->total() > 0)
-                    <div class="information-page-info">
-                        Halaman
-                        <strong>
-                            {{ $informations->currentPage() }}
-                        </strong>
-                        dari
-                        <strong>
-                            {{ $informations->lastPage() }}
-                        </strong>
-                    </div>
-                @endif
+
+                <div class="bd-news-arrows">
+
+                    <button
+                        type="button"
+                        class="bd-news-arrow"
+                        id="bdNewsPrev"
+                        aria-label="Informasi sebelumnya"
+                    >
+
+                        <svg viewBox="0 0 24 24">
+
+                            <path d="M19 12H5"/>
+
+                            <path d="m10 7-5 5 5 5"/>
+
+                        </svg>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="bd-news-arrow"
+                        id="bdNewsNext"
+                        aria-label="Informasi berikutnya"
+                    >
+
+                        <svg viewBox="0 0 24 24">
+
+                            <path d="M5 12h14"/>
+
+                            <path d="m14 7 5 5-5 5"/>
+
+                        </svg>
+
+                    </button>
+
+                </div>
 
             </div>
 
-            <div class="information-grid">
 
-                @forelse($informations as $info)
 
-                    @php
-                        $description = \Illuminate\Support\Str::limit(
-                            trim(
-                                html_entity_decode(
-                                    strip_tags($info->content ?? '')
-                                )
-                            ),
-                            125
-                        );
+            {{-- =================================================
+                 CARDS
+            ================================================== --}}
 
-                        $date = $info->created_at
-                            ? $info->created_at
-                                ->timezone('Asia/Jakarta')
-                                ->translatedFormat('d M Y')
-                            : null;
-                    @endphp
+            @if($informations->count())
 
-                    <article class="information-card">
+                <div
+                    class="
+                        bd-news-carousel
+                        bd-news-reveal
+                    "
+                    id="bdNewsCarousel"
+                >
+
+                    @foreach($informations as $information)
 
                         <a
-                            href="{{ route('informasi.show', ['information' => $info->slug]) }}"
-                            class="information-image-link"
-                            aria-label="Baca {{ $info->title }}"
+                            href="{{ url('/information/' . $information->slug) }}"
+                            class="bd-news-card"
                         >
 
-                            @if($info->image)
+
+                            {{-- FALLBACK --}}
+
+                            <div class="bd-news-fallback">
+
+                                <div class="bd-news-fallback-inner">
+
+                                    <span
+                                        class="bd-news-fallback-mark"
+                                    ></span>
+
+                                    <span class="bd-news-fallback-text">
+                                        Bacadulu
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+
+                            {{-- IMAGE --}}
+
+                            @if(!empty($information->image))
 
                                 <img
-                                    src="{{ asset('storage/' . $info->image) }}"
-                                    alt="{{ $info->title }}"
-                                    class="information-image"
+                                    src="{{ asset('storage/' . $information->image) }}"
+                                    alt="{{ $information->title }}"
+                                    class="bd-news-card-image"
                                     loading="lazy"
+
                                     onerror="
                                         this.style.display='none';
-                                        this.nextElementSibling.classList.add('show');
                                     "
                                 >
 
-                                <div class="information-placeholder">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M5 4h14v16H5z"/>
-                                        <path d="M8 8h8M8 12h8M8 16h5"/>
-                                    </svg>
-
-                                    <span>Baca Dulu</span>
-                                </div>
-
-                            @else
-
-                                <div class="information-placeholder show">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M5 4h14v16H5z"/>
-                                        <path d="M8 8h8M8 12h8M8 16h5"/>
-                                    </svg>
-
-                                    <span>Baca Dulu</span>
-                                </div>
-
                             @endif
 
-                            <span class="information-image-label">
+
+
+                            {{-- OVERLAY --}}
+
+                            <div
+                                class="bd-news-card-overlay"
+                            ></div>
+
+
+
+                            {{-- CATEGORY --}}
+
+                            <div class="bd-news-card-type">
                                 Informasi
-                            </span>
-
-                        </a>
-
-                        <div class="information-body">
-
-                            @if($date)
-                                <div class="information-meta">
-                                    <span>Update</span>
-
-                                    <span class="information-meta-dot"></span>
-
-                                    <time>
-                                        {{ $date }}
-                                    </time>
-                                </div>
-                            @endif
-
-                            <h2 class="information-title">
-                                {{ $info->title }}
-                            </h2>
-
-                            <p class="information-description">
-                                {{ $description ?: 'Klik untuk membaca informasi selengkapnya.' }}
-                            </p>
-
-                            <div class="information-action">
-                                <a
-                                    href="{{ route('informasi.show', ['information' => $info->slug]) }}"
-                                    class="information-button"
-                                >
-                                    <span>
-                                        Baca Selengkapnya
-                                    </span>
-
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M9 5l7 7-7 7"/>
-                                    </svg>
-                                </a>
                             </div>
 
-                        </div>
 
-                    </article>
 
-                @empty
+                            {{-- CONTENT --}}
 
-                    <div class="information-empty">
+                            <div class="bd-news-card-content">
 
-                        <div class="information-empty-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M5 4h14v16H5z"/>
-                                <path d="M8 8h8M8 12h8M8 16h5"/>
-                            </svg>
-                        </div>
+                                <div class="bd-news-card-date">
 
-                        <h3>
-                            Belum Ada Informasi
-                        </h3>
+                                    @if($information->created_at)
 
-                        <p>
-                            Informasi terbaru Baca Dulu akan tampil di halaman ini.
-                        </p>
+                                        {{ $information->created_at
+                                            ->timezone('Asia/Jakarta')
+                                            ->translatedFormat('d M Y')
+                                        }}
 
-                    </div>
+                                    @endif
 
-                @endforelse
+                                </div>
 
-            </div>
 
-            @if($informations->hasPages())
+                                <h3 class="bd-news-card-title">
 
-                @php
-                    $startPage = max(
-                        1,
-                        $informations->currentPage() - 2
-                    );
+                                    {{ $information->title }}
 
-                    $endPage = min(
-                        $informations->lastPage(),
-                        $informations->currentPage() + 2
-                    );
-                @endphp
+                                </h3>
 
-                <nav
-                    class="information-pagination"
-                    aria-label="Navigasi halaman informasi"
-                >
 
-                    @if($informations->onFirstPage())
-                        <span class="disabled">
-                            ‹
-                        </span>
-                    @else
-                        <a
-                            href="{{ $informations->previousPageUrl() }}#informasi-list"
-                            aria-label="Halaman sebelumnya"
-                        >
-                            ‹
-                        </a>
-                    @endif
+                                <div class="bd-news-card-more">
 
-                    @if($startPage > 1)
+                                    Baca selengkapnya
 
-                        <a href="{{ $informations->url(1) }}#informasi-list">
-                            1
+                                    <svg viewBox="0 0 24 24">
+
+                                        <path d="M5 12h14"/>
+
+                                        <path d="m14 7 5 5-5 5"/>
+
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
                         </a>
 
-                        @if($startPage > 2)
-                            <span class="disabled">
-                                ...
-                            </span>
-                        @endif
+                    @endforeach
 
-                    @endif
+                </div>
 
-                    @for($page = $startPage; $page <= $endPage; $page++)
 
-                        @if($page === $informations->currentPage())
+            @else
 
-                            <span class="active">
-                                {{ $page }}
-                            </span>
+                <div class="bd-news-empty">
 
-                        @else
+                    Belum ada informasi tersedia.
 
-                            <a href="{{ $informations->url($page) }}#informasi-list">
-                                {{ $page }}
-                            </a>
+                </div>
 
-                        @endif
+            @endif
 
-                    @endfor
 
-                    @if($endPage < $informations->lastPage())
 
-                        @if($endPage < $informations->lastPage() - 1)
-                            <span class="disabled">
-                                ...
-                            </span>
-                        @endif
+            {{-- =================================================
+                 PAGINATION
+            ================================================== --}}
 
-                        <a href="{{ $informations->url($informations->lastPage()) }}#informasi-list">
-                            {{ $informations->lastPage() }}
-                        </a>
+            @if(
+                method_exists($informations, 'hasPages')
+                &&
+                $informations->hasPages()
+            )
 
-                    @endif
+                <div class="bd-news-pagination">
 
-                    @if($informations->hasMorePages())
+                    {{ $informations->links() }}
 
-                        <a
-                            href="{{ $informations->nextPageUrl() }}#informasi-list"
-                            aria-label="Halaman berikutnya"
-                        >
-                            ›
-                        </a>
-
-                    @else
-
-                        <span class="disabled">
-                            ›
-                        </span>
-
-                    @endif
-
-                </nav>
+                </div>
 
             @endif
 
         </div>
+
     </section>
 
 </div>
+
+
+<script>
+(() => {
+
+    const initBdNews = () => {
+
+        const page =
+            document.getElementById(
+                'bdNewsPage'
+            );
+
+
+        const carousel =
+            document.getElementById(
+                'bdNewsCarousel'
+            );
+
+
+        const previousButton =
+            document.getElementById(
+                'bdNewsPrev'
+            );
+
+
+        const nextButton =
+            document.getElementById(
+                'bdNewsNext'
+            );
+
+
+        if (!page) {
+            return;
+        }
+
+
+        /* =====================================================
+           ANIMATION
+        ====================================================== */
+
+        const gsap =
+            window.bdGsap || null;
+
+
+        const reducedMotion =
+            window.matchMedia(
+                '(prefers-reduced-motion: reduce)'
+            ).matches;
+
+
+        if (
+            gsap &&
+            !reducedMotion
+        ) {
+
+            gsap.to(
+                page.querySelectorAll(
+                    '.bd-news-reveal'
+                ),
+                {
+                    opacity: 1,
+
+                    y: 0,
+
+                    duration: .72,
+
+                    stagger: .055,
+
+                    ease: 'power3.out'
+                }
+            );
+
+        } else {
+
+            page
+                .querySelectorAll(
+                    '.bd-news-reveal'
+                )
+                .forEach(element => {
+
+                    element.style.opacity =
+                        '1';
+
+                    element.style.transform =
+                        'none';
+
+                });
+
+        }
+
+
+        if (!carousel) {
+            return;
+        }
+
+
+        /* =====================================================
+           SCROLL AMOUNT
+        ====================================================== */
+
+        const getScrollAmount = () => {
+
+            const card =
+                carousel.querySelector(
+                    '.bd-news-card'
+                );
+
+
+            if (!card) {
+                return 400;
+            }
+
+
+            const styles =
+                window.getComputedStyle(
+                    carousel
+                );
+
+
+            const gap =
+                parseFloat(
+                    styles.gap || 0
+                );
+
+
+            return (
+                card.getBoundingClientRect().width
+                +
+                gap
+            );
+
+        };
+
+
+        /* =====================================================
+           NEXT
+        ====================================================== */
+
+        if (nextButton) {
+
+            nextButton.addEventListener(
+                'click',
+                () => {
+
+                    carousel.scrollBy({
+
+                        left:
+                            getScrollAmount(),
+
+                        behavior:
+                            reducedMotion
+                                ? 'auto'
+                                : 'smooth'
+
+                    });
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           PREVIOUS
+        ====================================================== */
+
+        if (previousButton) {
+
+            previousButton.addEventListener(
+                'click',
+                () => {
+
+                    carousel.scrollBy({
+
+                        left:
+                            -getScrollAmount(),
+
+                        behavior:
+                            reducedMotion
+                                ? 'auto'
+                                : 'smooth'
+
+                    });
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           DESKTOP DRAG
+        ====================================================== */
+
+        const finePointer =
+            window.matchMedia(
+                '(hover: hover) and (pointer: fine)'
+            ).matches;
+
+
+        if (!finePointer) {
+            return;
+        }
+
+
+        let dragging = false;
+
+        let startX = 0;
+
+        let startScroll = 0;
+
+        let moved = false;
+
+
+        carousel.addEventListener(
+            'mousedown',
+            event => {
+
+                dragging = true;
+
+                moved = false;
+
+                startX =
+                    event.pageX;
+
+                startScroll =
+                    carousel.scrollLeft;
+
+                carousel.classList.add(
+                    'is-dragging'
+                );
+
+            }
+        );
+
+
+        window.addEventListener(
+            'mousemove',
+            event => {
+
+                if (!dragging) {
+                    return;
+                }
+
+
+                const distance =
+                    event.pageX -
+                    startX;
+
+
+                if (
+                    Math.abs(distance) > 5
+                ) {
+                    moved = true;
+                }
+
+
+                carousel.scrollLeft =
+                    startScroll -
+                    distance;
+
+            }
+        );
+
+
+        window.addEventListener(
+            'mouseup',
+            () => {
+
+                if (!dragging) {
+                    return;
+                }
+
+
+                dragging = false;
+
+
+                carousel.classList.remove(
+                    'is-dragging'
+                );
+
+            }
+        );
+
+
+        carousel.addEventListener(
+            'click',
+            event => {
+
+                if (!moved) {
+                    return;
+                }
+
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                moved = false;
+
+            },
+            true
+        );
+
+    };
+
+
+    if (
+        document.readyState ===
+        'loading'
+    ) {
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            initBdNews,
+            {
+                once: true
+            }
+        );
+
+    } else {
+
+        initBdNews();
+
+    }
+
+})();
+</script>
 
 @endsection
