@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f97316">
+
+    <title>Koneksi Terputus | Baca Dulu</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(249, 115, 22, 0.10),
+                    transparent 34%
+                ),
+                #f8fafc;
+
+            color: #0f172a;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 24px;
+        }
+
+        .offline-card {
+            width: min(100%, 560px);
+
+            background: #ffffff;
+
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+
+            padding: 42px 36px;
+
+            box-shadow:
+                0 24px 60px rgba(15, 23, 42, 0.08);
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 34px;
+
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .brand-dot {
+            width: 12px;
+            height: 12px;
+
+            border-radius: 999px;
+
+            background: #f97316;
+
+            box-shadow:
+                0 0 0 6px rgba(249, 115, 22, 0.12);
+        }
+
+        .icon-wrapper {
+            width: 72px;
+            height: 72px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 28px;
+
+            border-radius: 22px;
+
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .icon-wrapper svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        h1 {
+            font-size: clamp(28px, 5vw, 38px);
+            line-height: 1.15;
+
+            margin-bottom: 16px;
+
+            letter-spacing: -0.03em;
+        }
+
+        .description {
+            color: #64748b;
+
+            font-size: 16px;
+            line-height: 1.75;
+
+            margin-bottom: 30px;
+        }
+
+        .status-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+
+            padding: 16px;
+
+            margin-bottom: 26px;
+
+            border-radius: 16px;
+
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+
+            color: #475569;
+
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .status-indicator {
+            flex: 0 0 auto;
+
+            width: 9px;
+            height: 9px;
+
+            margin-top: 6px;
+
+            border-radius: 999px;
+
+            background: #ef4444;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            appearance: none;
+            border: 0;
+
+            min-height: 48px;
+
+            padding: 0 22px;
+
+            border-radius: 14px;
+
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                background 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+        .retry-button {
+            background: #f97316;
+            color: #ffffff;
+
+            box-shadow:
+                0 10px 24px rgba(249, 115, 22, 0.22);
+        }
+
+        .retry-button:hover {
+            background: #ea580c;
+            transform: translateY(-1px);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        .connection-text {
+            margin-top: 24px;
+
+            color: #94a3b8;
+
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 16px;
+            }
+
+            .offline-card {
+                padding: 32px 24px;
+                border-radius: 20px;
+            }
+
+            .brand {
+                margin-bottom: 28px;
+            }
+
+            .icon-wrapper {
+                width: 64px;
+                height: 64px;
+
+                border-radius: 18px;
+            }
+
+            .actions,
+            button {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="offline-card">
+        <div class="brand">
+            <span class="brand-dot"></span>
+            <span>Baca Dulu</span>
+        </div>
+
+        <div class="icon-wrapper" aria-hidden="true">
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+                <path d="M5 12.55a11 11 0 0 1 14.08-.02"/>
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+                <path d="M12 20h.01"/>
+                <path d="m3 3 18 18"/>
+            </svg>
+        </div>
+
+        <h1>Koneksi internet terputus</h1>
+
+        <p class="description">
+            Perangkat Anda belum dapat terhubung ke Baca Dulu.
+            Periksa koneksi internet lalu coba kembali.
+        </p>
+
+        <div class="status-box">
+            <span class="status-indicator"></span>
+
+            <div>
+                Halaman yang Anda buka belum dapat dimuat.
+                Data yang tersedia di server tidak mengalami perubahan
+                karena koneksi terputus sebelum permintaan dapat diproses.
+            </div>
+        </div>
+
+        <div class="actions">
+            <button
+                class="retry-button"
+                type="button"
+                onclick="retryConnection()"
+            >
+                Coba Lagi
+            </button>
+        </div>
+
+        <p class="connection-text" id="connection-status">
+            Menunggu koneksi internet kembali tersedia.
+        </p>
+    </main>
+
+  <script>
+    const connectionStatus =
+        document.getElementById('connection-status');
+
+    const retryButton =
+        document.querySelector('.retry-button');
+
+    let checkingConnection = false;
+
+    function sleep(ms) {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    function getRetryUrl() {
+        /*
+         * Kalau offline.html dibuka secara manual,
+         * setelah koneksi tersedia arahkan ke homepage.
+         */
+        if (
+            window.location.pathname === '/offline.html'
+            ||
+            window.location.pathname.startsWith('/offline.html/')
+        ) {
+            return '/';
+        }
+
+        /*
+         * Kalau offline.html sedang dipakai service worker
+         * sebagai fallback /information, /articles, dll,
+         * pertahankan URL aslinya.
+         */
+        return window.location.pathname +
+            window.location.search +
+            window.location.hash;
+    }
+
+    async function retryConnection() {
+        if (checkingConnection) {
+            return;
+        }
+
+        checkingConnection = true;
+
+        retryButton.disabled = true;
+        retryButton.textContent = 'Memeriksa...';
+
+        connectionStatus.textContent =
+            'Sedang memeriksa koneksi ke Baca Dulu...';
+
+        const retryUrl = getRetryUrl();
+
+        try {
+            /*
+             * Jalankan pengecekan server.
+             *
+             * Promise.all + sleep membuat tulisan
+             * "Memeriksa..." terlihat minimal 700ms,
+             * meskipun browser langsung tahu sedang offline.
+             */
+            const results = await Promise.all([
+                fetch(retryUrl, {
+                    method: 'HEAD',
+                    cache: 'no-store',
+                    credentials: 'same-origin'
+                }),
+                sleep(1800)
+            ]);
+
+            const response = results[0];
+
+            if (!response.ok) {
+                throw new Error(
+                    'Baca Dulu belum dapat dihubungi.'
+                );
+            }
+
+            connectionStatus.textContent =
+                'Koneksi kembali tersedia. Memuat halaman...';
+
+            retryButton.textContent = 'Terhubung';
+
+            await sleep(600);
+
+            window.location.replace(retryUrl);
+        } catch (error) {
+            /*
+             * Tetap beri sedikit waktu supaya perubahan
+             * tombol tidak terlihat seperti kedipan.
+             */
+            await sleep(300);
+
+            connectionStatus.textContent =
+                'Koneksi masih terputus. Periksa internet Anda lalu coba kembali.';
+
+            retryButton.disabled = false;
+            retryButton.textContent = 'Coba Lagi';
+
+            checkingConnection = false;
+        }
+    }
+
+    connectionStatus.textContent =
+        'Menunggu koneksi internet kembali tersedia.';
+</script>
+
+</body>
+</html>
