@@ -465,6 +465,47 @@
     overflow-wrap:anywhere
 }
 
+/* DETAIL CART */
+.cart-fab{position:fixed;right:24px;bottom:24px;z-index:1200;display:flex;align-items:center;justify-content:center;width:56px;height:56px;padding:0;border:0;border-radius:50%;color:#fff;background:var(--navy);cursor:pointer;box-shadow:0 12px 28px rgba(36,27,82,.32)}
+.cart-fab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8}
+.cart-count{position:absolute;top:-5px;right:-5px;display:flex;align-items:center;justify-content:center;min-width:21px;height:21px;padding:0 5px;border:2px solid #fff;border-radius:999px;color:#fff;background:var(--orange);font-size:9px;font-weight:800}
+.cart-count.hide{display:none}
+.cart-overlay{position:fixed;inset:0;z-index:1300;opacity:0;visibility:hidden;background:rgba(15,23,42,.48);backdrop-filter:blur(3px);transition:.25s ease}
+.cart-overlay.show{opacity:1;visibility:visible}
+.cart-drawer{position:fixed;top:0;right:0;z-index:1400;display:flex;flex-direction:column;width:460px;max-width:100vw;height:100dvh;background:#fff;transform:translateX(100%);transition:transform .35s var(--ease);box-shadow:-20px 0 50px rgba(15,23,42,.16)}
+.cart-drawer.open{transform:translateX(0)}
+.cart-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 20px;border-bottom:1px solid #E5E7EB}
+.cart-heading h3{margin:0;color:var(--navy);font-size:20px;font-weight:700}
+.cart-heading p{margin:2px 0 0;color:var(--muted);font-size:10px}
+.cart-header-actions{display:flex;align-items:center;gap:6px}
+.clear-cart{display:none;padding:7px 9px;border:1px solid #FECACA;border-radius:7px;color:#DC2626;background:#FEF2F2;font-size:9px;font-weight:700;cursor:pointer}
+.clear-cart.show{display:block}
+.cart-close{display:flex;align-items:center;justify-content:center;width:38px;height:38px;padding:0;border:0;border-radius:8px;color:#64748B;background:#F8FAFC;cursor:pointer}
+.cart-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+.cart-items{flex:1;overflow-y:auto;padding:12px;background:#F8FAFC}
+.cart-drawer-foot{padding:15px 18px 18px;border-top:1px solid #E5E7EB;background:#fff}
+.cart-summary-row,.cart-total-row{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.cart-summary-row{margin-bottom:5px}.cart-summary-row span{color:var(--muted);font-size:11px}
+.cart-total-row{margin:10px 0 13px;padding-top:10px;border-top:1px dashed #D1D5DB}.cart-total-row span{font-size:13px;font-weight:700}.cart-total-row strong{font-size:21px;font-weight:800}
+.checkout-btn{width:100%;min-height:48px;border:0;border-radius:9px;color:#fff;background:#22C55E;font-size:12px;font-weight:800;cursor:pointer}.checkout-btn:disabled{opacity:.45;cursor:not-allowed}
+.cart-note{margin:8px 0 0;color:#94A3B8;font-size:8.5px;line-height:1.5;text-align:center}
+.cart-toast{position:fixed;right:25px;bottom:90px;z-index:1500;max-width:320px;padding:11px 14px;opacity:0;visibility:hidden;transform:translateY(8px);border-radius:8px;color:#fff;background:var(--navy);font-size:10px;font-weight:700;transition:.2s ease}
+.cart-toast.show{opacity:1;visibility:visible;transform:none}.cart-toast.warning{background:#C2410C}
+.cart-empty{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 24px;color:#64748B}
+.cart-empty-icon{width:64px;height:64px;border-radius:18px;background:#FFF7ED;border:1px solid #FED7AA;display:flex;align-items:center;justify-content:center;margin-bottom:18px;color:#F97316}
+.cart-empty-icon svg,.cart-cover-placeholder svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cart-empty strong{display:block;font-size:15px;font-weight:700;color:#1E293B;margin-bottom:6px}.cart-empty span{display:block;max-width:260px;font-size:13px;line-height:1.6;color:#94A3B8}
+.cart-product{display:grid;grid-template-columns:90px minmax(0,1fr);gap:16px;padding:18px 0;border-bottom:1px solid #E2E8F0}
+.cart-product-cover{width:90px;height:125px;border-radius:10px;overflow:hidden;background:#F8FAFC;border:1px solid #E2E8F0;position:relative}.cart-product-cover img{width:100%;height:100%;display:block;object-fit:cover}
+.cart-cover-placeholder{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#FFF7ED;color:#F97316}.cart-cover-placeholder.show{display:flex}
+.cart-product-info{min-width:0}.cart-product-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.cart-format{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700}.cart-format.print{background:#FFF7ED;color:#EA580C}.cart-format.ebook{background:#EEF2FF;color:#4F46E5}
+.cart-remove{border:0;background:transparent;color:#94A3B8;cursor:pointer;font-size:16px;padding:2px 5px}
+.cart-product-title{margin:0;font-size:15px;line-height:1.4;font-weight:700;color:#1E293B}.cart-product-meta{margin:5px 0 0;font-size:12px;line-height:1.5;color:#94A3B8}.cart-unit-price{margin-top:10px;font-size:13px;font-weight:600;color:#475569}
+.cart-product-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:14px}.qty-control{display:inline-flex;align-items:center;border:1px solid #E2E8F0;border-radius:9px;overflow:hidden;background:#fff}.qty-control button{width:32px;height:32px;border:0;background:#fff;color:#334155;cursor:pointer;font-size:16px}.qty-control button:disabled{opacity:.4;cursor:not-allowed}.qty-control span{min-width:30px;text-align:center;font-size:13px;font-weight:700;color:#1E293B}
+.cart-subtotal-label{font-size:10px;color:#94A3B8;text-align:right}.cart-subtotal{margin-top:2px;font-size:14px;font-weight:800;color:#1E293B;text-align:right}
+.cart-feedback-open{border:0;padding:0;color:#15803D;background:transparent;font:inherit;font-weight:800;text-decoration:underline;cursor:pointer}
+
 @keyframes detailBookIdle{
     0%,100%{transform:rotateY(-18deg) translateY(0)}
     50%{transform:rotateY(-14deg) translateY(-4px)}
@@ -507,6 +548,12 @@
     .format-grid{grid-template-columns:1fr}
     .detail-info-grid{grid-template-columns:1fr 1fr}
     .description-text{font-size:13px}
+    .cart-fab{right:17px;bottom:17px;width:54px;height:54px}
+    .cart-drawer{width:100%}
+    .cart-toast{left:16px;right:16px;bottom:82px;max-width:none}
+    .cart-product{grid-template-columns:72px minmax(0,1fr);gap:12px}
+    .cart-product-cover{width:72px;height:100px}
+    .cart-product-bottom{align-items:center}
 }
 
 @media(max-width:480px){
@@ -766,7 +813,9 @@
 
                         <div id="cartFeedback" class="cart-feedback">
                             <span id="cartFeedbackText">Produk ditambahkan ke keranjang.</span>
-                            <a href="{{ route('portofolio.bookstore') }}">Buka Bookstore</a>
+                            <button type="button" class="cart-feedback-open" data-open-cart="1">
+                                Lihat Keranjang
+                            </button>
                         </div>
                     </div>
 
@@ -780,6 +829,49 @@
             </div>
         </div>
     </div>
+
+    <button
+        type="button"
+        class="cart-fab"
+        id="cartFab"
+        aria-label="Buka keranjang"
+    >
+        <svg viewBox="0 0 24 24">
+            <circle cx="9" cy="20" r="1"/>
+            <circle cx="18" cy="20" r="1"/>
+            <path d="M3 4h2l2.4 10.2a2 2 0 002 1.5h7.8a2 2 0 002-1.5L21 7H6"/>
+        </svg>
+        <span class="cart-count hide" id="cartCount">0</span>
+    </button>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <aside class="cart-drawer" id="cartDrawer" aria-label="Keranjang belanja">
+        <div class="cart-drawer-head">
+            <div class="cart-heading">
+                <h3>Keranjang Anda</h3>
+                <p id="cartHeaderCount">Belum ada produk</p>
+            </div>
+
+            <div class="cart-header-actions">
+                <button type="button" class="clear-cart" id="clearCartBtn">Kosongkan</button>
+                <button type="button" class="cart-close" id="cartClose" aria-label="Tutup keranjang">
+                    <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="cart-items" id="cartItems"></div>
+
+        <div class="cart-drawer-foot">
+            <div class="cart-summary-row"><span>Jumlah produk</span><strong id="cartItemCount">0 item</strong></div>
+            <div class="cart-total-row"><span>Total</span><strong id="cartTotal">IDR 0,00</strong></div>
+            <button type="button" class="checkout-btn" id="checkoutBtn" disabled>Checkout via WhatsApp</button>
+            <p class="cart-note">Stok, ongkir, file E-book, dan pembayaran akan dikonfirmasi oleh tim Baca Dulu.</p>
+        </div>
+    </aside>
+
+    <div class="cart-toast" id="cartToast"></div>
 </div>
 
 @endsection

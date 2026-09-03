@@ -102,7 +102,7 @@
                             rel="noopener noreferrer"
                             aria-label="YouTube Baca Dulu"
                         >
-                            <svg viewBox="0 0 24 24">
+                            <svg class="bd-social-icon bd-social-icon--fill" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.507a3.003 3.003 0 00-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 002.11 2.11c1.871.507 9.387.507 9.387.507s7.517 0 9.387-.507a3.003 3.003 0 002.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                             </svg>
                         </a>
@@ -113,10 +113,10 @@
                             rel="noopener noreferrer"
                             aria-label="Instagram Baca Dulu"
                         >
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <rect x="2" y="2" width="20" height="20" rx="5"/>
-                                <circle cx="12" cy="12" r="4"/>
-                                <circle cx="17.5" cy="6.5" r="1"/>
+                            <svg class="bd-social-icon bd-social-icon--instagram" viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/>
+                                <circle cx="12" cy="12" r="4.25"/>
+                                <circle class="bd-social-instagram-dot" cx="17.6" cy="6.45" r="1.15"/>
                             </svg>
                         </a>
 
@@ -126,7 +126,7 @@
                             rel="noopener noreferrer"
                             aria-label="TikTok"
                         >
-                            <svg viewBox="0 0 24 24">
+                            <svg class="bd-social-icon bd-social-icon--fill" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 11-2.88-2.89h.54V9.66h-.54a6.33 6.33 0 106.33 6.33V8.89a8.16 8.16 0 004.25 1.15V6.69z"/>
                             </svg>
                         </a>
@@ -356,12 +356,28 @@
         transform .2s ease;
 }
 
-.bd-footer-socials svg{
-    width:19px;
-    height:19px;
+.bd-footer-socials .bd-social-icon{
+    width:20px;
+    height:20px;
+    display:block;
+}
+
+.bd-footer-socials .bd-social-icon--fill{
     fill:currentColor;
+    stroke:none;
+}
+
+.bd-footer-socials .bd-social-icon--instagram{
+    fill:none;
     stroke:currentColor;
     stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.bd-footer-socials .bd-social-instagram-dot{
+    fill:currentColor;
+    stroke:none;
 }
 
 .bd-footer-bottom{

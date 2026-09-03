@@ -1057,6 +1057,15 @@
     color: #9CA3AF !important;
 }
 
+.catalog-section.catalog-is-loading .store-pagination {
+    pointer-events: none;
+    opacity: .55;
+}
+
+.catalog-section.catalog-is-loading #catalogGrid {
+    pointer-events: none;
+}
+
 .empty-state {
     grid-column: 1 / -1;
     width: 100%;

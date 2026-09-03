@@ -133,6 +133,15 @@ const normalizeCart = data => {
                 publisher: String(item.publisher ?? ''),
                 cover: String(item.cover ?? ''),
                 price: Number(item.price ?? 0),
+                stock:
+                    item.stock === undefined ||
+                    item.stock === null ||
+                    item.stock === ''
+                        ? null
+                        : Math.max(
+                            0,
+                            Number(item.stock)
+                        ),
                 qty: Math.max(1, Number(item.qty ?? 1))
             };
         })
@@ -155,6 +164,10 @@ const saveCart = cart => {
     localStorage.setItem(
         CART_KEY,
         JSON.stringify(cart)
+    );
+
+    window.dispatchEvent(
+        new CustomEvent('bacadulu:cart-updated')
     );
 };
 
@@ -1826,6 +1839,340 @@ const initLatestSlider = root => {
 };
 
 /* =====================================================
+   CATALOG AJAX PAGINATION
+   - bagian atas Bookstore tetap ada
+   - hanya grid katalog + pagination yang diganti
+   - setelah ganti halaman, viewport kembali ke judul katalog
+   - animasi tetap terlihat di HP/touch
+===================================================== */
+const initCatalogPagination = root => {
+    const catalog =
+        root.querySelector('#catalog');
+
+    if (!catalog) return;
+
+    let busy = false;
+
+    const scrollToCatalog = () => {
+        const navbar =
+            document.querySelector('#main-navbar');
+
+        const navbarHeight =
+            navbar?.getBoundingClientRect().height || 0;
+
+        const target =
+            Math.max(
+                0,
+                window.scrollY +
+                catalog.getBoundingClientRect().top -
+                navbarHeight -
+                14
+            );
+
+        if (reduceMotion) {
+            window.scrollTo(0, target);
+            return;
+        }
+
+        const state = {
+            y: window.scrollY
+        };
+
+        window.bdLenis?.stop?.();
+
+        gsap.to(
+            state,
+            {
+                y: target,
+                duration: .62,
+                ease: 'power3.inOut',
+                overwrite: true,
+
+                onUpdate: () => {
+                    window.scrollTo(
+                        0,
+                        state.y
+                    );
+                },
+
+                onComplete: () => {
+                    window.bdLenis?.start?.();
+                }
+            }
+        );
+    };
+
+    const animateOut = grid => {
+        if (reduceMotion) {
+            return Promise.resolve();
+        }
+
+        const items = [
+            ...grid.querySelectorAll(
+                '.catalog-item'
+            )
+        ];
+
+        if (!items.length) {
+            return Promise.resolve();
+        }
+
+        return new Promise(resolve => {
+            gsap.to(
+                items,
+                {
+                    autoAlpha: 0,
+                    x: -18,
+                    y: 8,
+                    scale: .985,
+                    duration: .2,
+                    stagger: .018,
+                    ease: 'power2.in',
+                    overwrite: true,
+                    onComplete: resolve
+                }
+            );
+        });
+    };
+
+    const animateIn = (grid, direction) => {
+        const items = [
+            ...grid.querySelectorAll(
+                '.catalog-item'
+            )
+        ];
+
+        if (
+            reduceMotion ||
+            !items.length
+        ) {
+            return;
+        }
+
+        gsap.fromTo(
+            items,
+            {
+                autoAlpha: 0,
+                x: direction >= 0 ? 26 : -26,
+                y: 14,
+                scale: .975
+            },
+            {
+                autoAlpha: 1,
+                x: 0,
+                y: 0,
+                scale: 1,
+                duration: .52,
+                stagger: .055,
+                ease: 'power4.out',
+                overwrite: true,
+                clearProps:
+                    'transform,opacity,visibility'
+            }
+        );
+    };
+
+    const loadPage = async (
+        href,
+        direction = 1
+    ) => {
+        if (busy) return;
+
+        const grid =
+            root.querySelector('#catalogGrid');
+
+        if (!grid) {
+            window.location.href = href;
+            return;
+        }
+
+        busy = true;
+        catalog.setAttribute(
+            'aria-busy',
+            'true'
+        );
+        catalog.classList.add(
+            'catalog-is-loading'
+        );
+
+        try {
+            const url =
+                new URL(
+                    href,
+                    window.location.origin
+                );
+
+            const responsePromise =
+                fetch(
+                    url.toString(),
+                    {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With':
+                                'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'
+                    }
+                );
+
+            await animateOut(grid);
+
+            const response =
+                await responsePromise;
+
+            if (!response.ok) {
+                throw new Error(
+                    `Catalog request failed: ${response.status}`
+                );
+            }
+
+            const html =
+                await response.text();
+
+            const doc =
+                new DOMParser()
+                    .parseFromString(
+                        html,
+                        'text/html'
+                    );
+
+            const newGrid =
+                doc.querySelector(
+                    '.bookstore-page #catalogGrid'
+                );
+
+            const newPagination =
+                doc.querySelector(
+                    '.bookstore-page .store-pagination'
+                );
+
+            if (!newGrid) {
+                throw new Error(
+                    'Catalog grid tidak ditemukan.'
+                );
+            }
+
+            grid.innerHTML =
+                newGrid.innerHTML;
+
+            const oldPagination =
+                root.querySelector(
+                    '.store-pagination'
+                );
+
+            if (
+                oldPagination &&
+                newPagination
+            ) {
+                oldPagination.replaceWith(
+                    newPagination
+                );
+            } else if (
+                oldPagination &&
+                !newPagination
+            ) {
+                oldPagination.remove();
+            } else if (
+                !oldPagination &&
+                newPagination
+            ) {
+                grid.insertAdjacentElement(
+                    'afterend',
+                    newPagination
+                );
+            }
+
+            url.hash = 'catalog';
+
+            history.replaceState(
+                history.state,
+                '',
+                url.toString()
+            );
+
+            initBookControllers(root);
+            initButtons(root);
+
+            animateIn(
+                grid,
+                direction
+            );
+
+            requestAnimationFrame(
+                scrollToCatalog
+            );
+        } catch (error) {
+            console.error(
+                'Baca Dulu catalog pagination gagal:',
+                error
+            );
+
+            window.location.href = href;
+        } finally {
+            busy = false;
+            catalog.removeAttribute(
+                'aria-busy'
+            );
+            catalog.classList.remove(
+                'catalog-is-loading'
+            );
+        }
+    };
+
+    root.addEventListener(
+        'click',
+        event => {
+            const link =
+                event.target.closest(
+                    '.store-pagination a'
+                );
+
+            if (
+                !link ||
+                !root.contains(link)
+            ) {
+                return;
+            }
+
+            if (
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const currentPage =
+                Number(
+                    new URL(
+                        window.location.href
+                    ).searchParams.get('page') || 1
+                );
+
+            const nextPage =
+                Number(
+                    new URL(
+                        link.href,
+                        window.location.origin
+                    ).searchParams.get('page') || 1
+                );
+
+            loadPage(
+                link.href,
+                nextPage >= currentPage
+                    ? 1
+                    : -1
+            );
+        },
+        true
+    );
+};
+
+/* =====================================================
    BUTTON INTERACTION
 ===================================================== */
 const initButtons = root => {
@@ -2038,18 +2385,10 @@ const animateAddToCart = (button, root) => {
     }
 
     /*
-     * TOUCH:
-     * tidak clone cover.
-     * Lebih ringan.
+     * Satu ghost ringan saja tetap aman untuk touch.
+     * Jadi HP juga mendapat feedback visual buku
+     * yang benar-benar bergerak menuju keranjang.
      */
-    if (touchLike) {
-        animateCartImpact(
-            button,
-            root
-        );
-
-        return;
-    }
 
     const fab =
         root.querySelector('#cartFab');
@@ -2068,8 +2407,14 @@ const animateAddToCart = (button, root) => {
     const card =
         button.closest('.book-card');
 
+    const detailCover =
+        root.querySelector(
+            '.detail-book-front'
+        );
+
     const cover =
         card?.querySelector('.book-front') ||
+        detailCover ||
         button;
 
     const sourceRect =
@@ -2114,7 +2459,9 @@ const animateAddToCart = (button, root) => {
             overflow: 'hidden',
             borderRadius: '3px 7px 7px 3px',
             backgroundImage:
-                coverStyle.backgroundImage,
+                button.dataset.cover
+                    ? `url("${button.dataset.cover}")`
+                    : coverStyle.backgroundImage,
             backgroundColor:
                 coverStyle.backgroundColor ||
                 '#EF5843',
@@ -2136,8 +2483,11 @@ const animateAddToCart = (button, root) => {
         /e-?book/i.test(format);
 
     if (
-        !coverStyle.backgroundImage ||
-        coverStyle.backgroundImage === 'none'
+        !button.dataset.cover &&
+        (
+            !coverStyle.backgroundImage ||
+            coverStyle.backgroundImage === 'none'
+        )
     ) {
         ghost.style.background =
             isEbook
@@ -2711,6 +3061,16 @@ const initStoreCart = root => {
         render();
     };
 
+    const syncFromStorage = () => {
+        cart = loadCart();
+        render();
+    };
+
+    window.addEventListener(
+        'bacadulu:cart-updated',
+        syncFromStorage
+    );
+
     /* =================================================
        ADD CART
     ================================================= */
@@ -3011,6 +3371,19 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
         }
     );
 
+    root.querySelectorAll(
+        '[data-open-cart="1"]'
+    ).forEach(button => {
+        button.addEventListener(
+            'click',
+            e => {
+                e.preventDefault();
+                e.stopPropagation();
+                openCart();
+            }
+        );
+    });
+
     close?.addEventListener(
         'click',
         closeCart
@@ -3036,6 +3409,11 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
         document.removeEventListener(
             'keydown',
             handleEscape
+        );
+
+        window.removeEventListener(
+            'bacadulu:cart-updated',
+            syncFromStorage
         );
 
         clearTimeout(
@@ -3581,26 +3959,31 @@ const initDetailCart = root => {
 
             saveCart(cart);
 
+            animateAddToCart(
+                button,
+                root
+            );
+
             if (feedback) {
                 feedback.classList.add(
                     'show'
                 );
 
-                if (
-                    !reduceMotion &&
-                    !touchLike
-                ) {
+                if (!reduceMotion) {
                     gsap.fromTo(
                         feedback,
                         {
                             autoAlpha: 0,
-                            y: 10
+                            y: 10,
+                            scale: .985
                         },
                         {
                             autoAlpha: 1,
                             y: 0,
-                            duration: .35,
-                            ease: 'power3.out'
+                            scale: 1,
+                            duration: .38,
+                            ease: 'power3.out',
+                            clearProps: 'transform'
                         }
                     );
                 }
@@ -3675,6 +4058,7 @@ const initStore = root => {
     initStoreSections(root);
 
     initLatestSlider(root);
+    initCatalogPagination(root);
 
     initButtons(root);
     initStoreCart(root);
@@ -3729,6 +4113,7 @@ const initDetail = root => {
     initDetailContent(root);
 
     initButtons(root);
+    initStoreCart(root);
     initDetailCart(root);
 
     if (touchLike) {
