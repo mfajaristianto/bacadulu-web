@@ -28,7 +28,11 @@
     "isDynamicEntry": true
   },
   "resources/css/app.css": {
+<<<<<<< HEAD
     "file": "assets/app-BEKwpThp.css",
+=======
+    "file": "assets/app-BUqO1rWK.css",
+>>>>>>> f4541bd5282e37b661f3e381d35a287ac86e1296
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",

@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Publisher;
+use App\Models\Book;
 
 class PublisherController extends Controller
 {
     public function index()
     {
-        $publishers = Publisher::query()
-            ->latest()
-            ->paginate(5)
-            ->withQueryString();
+        $books = Book::query()
+            ->orderByDesc('publish_year')
+            ->orderByDesc('id')
+            ->get();
 
         return view(
             'landing-page.pages.publisher',
-            compact('publishers')
+            compact('books')
         );
     }
 }

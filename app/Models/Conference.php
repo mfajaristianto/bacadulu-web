@@ -8,5 +8,16 @@ class Conference extends Model
 {
     protected $table = 'conferences';
 
-    protected $fillable = ['title', 'event_date', 'description', 'poster'];
+    protected $fillable = [
+        'title',
+        'event_date',
+        'event_time',
+        'location',
+        'description',
+        'poster',
+    ];
+
+    protected $casts = [
+        'event_date' => 'date',
+    ];
 }

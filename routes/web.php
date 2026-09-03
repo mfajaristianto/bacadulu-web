@@ -270,6 +270,11 @@ Route::get('/publisher', [
     'index',
 ])->name('publisher');
 
+Route::get('/publisher/books/{book}', [
+    PublisherController::class,
+    'show',
+])->name('publisher.books.show');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -651,5 +656,3 @@ Route::middleware(['auth:admin', 'admin'])
         ])->name('logout');
 
     });
-
-    
