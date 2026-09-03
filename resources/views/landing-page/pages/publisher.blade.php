@@ -5,2940 +5,1626 @@
 @section('content')
 
 @php
-    /*
-    |--------------------------------------------------------------------------
-    | TOTAL BOOKS
-    |--------------------------------------------------------------------------
-    */
+    $publisherBooks = collect($books ?? [])->values();
 
-    $totalBooks = method_exists($books, 'total')
-        ? $books->total() + ($featuredBook ? 1 : 0)
-        : $books->count() + ($featuredBook ? 1 : 0);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | STORAGE ASSET RESOLVER
-    |--------------------------------------------------------------------------
-    |
-    | Ini sengaja dibuat fleksibel supaya logo publisher tetap muncul
-    | walaupun path di database pernah tersimpan dalam format berbeda.
-    |
-    */
-
-    $resolveStorageAsset = function ($path) {
-
-        if (empty($path)) {
-            return null;
-        }
-
-        $path = trim(
-            str_replace(
-                '\\',
-                '/',
-                $path
-            )
-        );
-
-        if (
-            \Illuminate\Support\Str::startsWith(
-                $path,
-                [
-                    'http://',
-                    'https://',
-                    '//',
-                ]
-            )
-        ) {
-            return $path;
-        }
-
-        $path = ltrim(
-            $path,
-            '/'
-        );
-
-        if (
-            \Illuminate\Support\Str::startsWith(
-                $path,
-                'public/'
-            )
-        ) {
-            $path = substr(
-                $path,
-                strlen('public/')
-            );
-        }
-
-        if (
-            \Illuminate\Support\Str::startsWith(
-                $path,
-                'storage/'
-            )
-        ) {
-            $path = substr(
-                $path,
-                strlen('storage/')
-            );
-        }
-
-        return asset(
-            'storage/' . $path
-        );
-    };
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | HERO BOOKS
-    |--------------------------------------------------------------------------
-    */
-
-    $heroBooks = collect();
-
-    if ($featuredBook) {
-        $heroBooks->push(
-            $featuredBook
-        );
-    }
-
-    foreach ($books->take(2) as $heroBook) {
-
-        $heroBooks->push(
-            $heroBook
-        );
-
-    }
+    $publisherBookData = $publisherBooks->map(function ($book) {
+        return [
+            'id' => $book->id ?? null,
+            'title' => $book->title ?? 'Tanpa Judul',
+            'author' => $book->author ?? '-',
+            'year' => $book->publish_year ?? '-',
+            'isbn' => $book->isbn ?? '-',
+            'pages' => $book->pages ?? null,
+            'category' => !empty($book->category) ? $book->category : 'Umum',
+            'publisher' => !empty($book->publisher) ? $book->publisher : 'BacaDulu Publisher',
+            'cover' => !empty($book->cover) ? asset('storage/' . $book->cover) : null,
+            'synopsis' => !empty($book->description)
+                ? strip_tags($book->description, '<p><br><strong><b><em><i><ul><ol><li>')
+                : '',
+        ];
+    })->values();
 @endphp
 
-
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
 
+.bd-publisher{
+    --navy:#241B52;
+    --navy-deep:#17132E;
+    --orange:#EF5843;
+    --blue:#566B91;
+    --plum:#80586F;
+    --ink:#18161F;
+    --body:#5F5B69;
+    --muted:#96929C;
+    --line:#E8E7EC;
+    --line-strong:rgba(36,27,82,.15);
+    width:100%;
+    min-height:100vh;
+    overflow-x:hidden;
+    background:#fff;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+}
+.bd-publisher *,.bd-publisher *::before,.bd-publisher *::after{box-sizing:border-box}
+.bd-publisher button,.bd-publisher input{font-family:inherit}
+.bd-publisher a{color:inherit}
+.bd-publisher :focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.bd-publisher-shell{width:min(calc(100% - 72px),1260px);margin:auto}
+
+/* BRAND */
+.bd-publisher-brandbar{min-height:72px;display:flex;align-items:center;border-bottom:1px solid var(--line)}
+.bd-publisher-brand{display:inline-flex;align-items:center;gap:11px}
+.bd-publisher-brand-mark{width:7px;height:27px;background:var(--orange)}
+.bd-publisher-brand-name{color:var(--navy);font-family:'Fraunces',serif;font-size:21px;font-weight:600}
+.bd-publisher-brand-type{color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+
+/* TYPEWRITER */
+.bd-typewriter{display:inline-flex;align-items:center;min-height:1.3em}
+.bd-typewriter-text{display:inline-block}
+.bd-typewriter-cursor{width:1px;height:1em;margin-left:4px;background:currentColor;animation:bdBlink .7s steps(1) infinite}
+@keyframes bdBlink{0%,48%{opacity:1}49%,100%{opacity:0}}
+
+/* HERO */
+.bd-publisher-hero{
+    display:grid;
+    grid-template-columns:minmax(0,1.08fr) minmax(350px,.92fr);
+    gap:60px;
+    align-items:center;
+    min-height:520px;
+    padding:64px 0 62px;
+    border-bottom:1px solid var(--line);
+}
+.bd-publisher-hero-copy{max-width:760px}
+.bd-publisher-eyebrow,.bd-publisher-section-eyebrow{
+    color:var(--orange);
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+}
+.bd-publisher-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:17px}
+.bd-publisher-eyebrow::before{content:"";width:28px;height:2px;background:var(--orange)}
+.bd-publisher-hero h1{
+    max-width:710px;
+    margin:0 0 22px;
+    color:var(--navy);
+    font-family:'Fraunces',serif;
+    font-size:clamp(49px,5.2vw,76px);
+    font-weight:500;
+    line-height:.99;
+    letter-spacing:-.045em;
+}
+.bd-publisher-hero-description{max-width:590px;margin:0;color:var(--body);font-size:14px;line-height:1.8}
+.bd-word{display:inline-block;margin-right:.15em;will-change:transform,opacity}
+
+/* HERO MOTION */
+.bd-publisher-motion{position:relative;width:100%;height:390px;perspective:1000px;isolation:isolate}
+.bd-publisher-motion-orbit{
+    position:absolute;z-index:0;left:50%;top:50%;
+    width:325px;height:325px;margin:-162.5px 0 0 -162.5px;
+    border:1px solid rgba(36,27,82,.1);
+    border-radius:50%;
+    transform-origin:center;
+}
+.bd-publisher-motion-orbit::before{content:"";position:absolute;inset:42px;border:1px solid rgba(36,27,82,.055);border-radius:50%}
+.bd-publisher-orbit-dot{
+    position:absolute;left:50%;top:-5px;width:10px;height:10px;
+    border-radius:50%;background:var(--orange);transform:translateX(-50%);
+    box-shadow:0 0 0 7px rgba(239,88,67,.09);
+}
+.bd-axis-x,.bd-axis-y{position:absolute;left:50%;top:50%;pointer-events:none}
+.bd-axis-x{width:390px;height:1px;transform:translate(-50%,-50%);background:linear-gradient(90deg,transparent,rgba(36,27,82,.09),transparent)}
+.bd-axis-y{width:1px;height:360px;transform:translate(-50%,-50%);background:linear-gradient(180deg,transparent,rgba(36,27,82,.075),transparent)}
+
+.bd-publisher-float{position:absolute;z-index:3;will-change:transform}
+.bd-float-one{left:50%;top:49%;margin:-107px 0 0 -74px}
+.bd-float-two{left:27%;top:54%;margin:-84px 0 0 -57px;z-index:2}
+.bd-float-three{left:73%;top:55%;margin:-80px 0 0 -54px;z-index:2}
+.bd-float-four{left:66%;top:30%;margin:-64px 0 0 -45px;z-index:1}
+
+.bd-publisher-float-book{
+    position:relative;
+    overflow:hidden;
+    border-radius:4px;
+    box-shadow:0 25px 48px rgba(36,27,82,.15);
+    transform-style:preserve-3d;
+}
+.bd-float-one .bd-publisher-float-book{width:148px;height:214px;background:var(--navy);transform:rotate(-7deg)}
+.bd-float-two .bd-publisher-float-book{width:115px;height:168px;background:var(--orange);transform:rotate(-18deg)}
+.bd-float-three .bd-publisher-float-book{width:110px;height:160px;background:var(--blue);transform:rotate(14deg)}
+.bd-float-four .bd-publisher-float-book{width:90px;height:128px;background:var(--plum);transform:rotate(25deg)}
+.bd-publisher-float-book::before{content:"";position:absolute;top:0;bottom:0;left:15px;width:1px;background:rgba(255,255,255,.2)}
+.bd-publisher-float-book::after{content:"";position:absolute;left:28px;top:18px;width:34px;height:2px;background:rgba(255,255,255,.44)}
+.bd-publisher-float-label{
+    position:absolute;left:29px;right:18px;bottom:23px;
+    color:rgba(255,255,255,.92);
+    font-family:'Fraunces',serif;
+    font-size:14px;
+    line-height:1.12;
+}
+.bd-publisher-float-label small{
+    display:block;margin-bottom:7px;color:rgba(255,255,255,.54);
+    font-family:'Inter',sans-serif;font-size:6px;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;
+}
+.bd-publisher-motion-pulse{
+    position:absolute;z-index:6;right:7%;bottom:17%;
+    width:11px;height:11px;border-radius:50%;background:var(--orange);
+    box-shadow:0 0 0 7px rgba(239,88,67,.09);
+}
+
+/* ABOUT */
+.bd-publisher-about{
+    display:grid;
+    grid-template-columns:220px minmax(0,1fr);
+    gap:70px;
+    padding:54px 0;
+    border-bottom:1px solid var(--line);
+}
+.bd-publisher-section-label{
+    padding-top:5px;
+    color:var(--orange);
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+.bd-publisher-about-copy{max-width:800px}
+.bd-publisher-about-copy h2,.bd-publisher-section-title,.bd-publisher-catalog-title,.bd-publisher-submit h2{
+    color:var(--navy);
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    letter-spacing:-.035em;
+}
+.bd-publisher-about-copy h2{max-width:720px;margin:0 0 20px;font-size:clamp(31px,3.2vw,45px);line-height:1.08}
+.bd-publisher-about-copy p{max-width:700px;margin:0 0 12px;color:var(--body);font-size:13px;line-height:1.85}
+
+/* COMMON */
+.bd-publisher-section-head,.bd-publisher-catalog-head{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 340px;
+    gap:50px;
+    align-items:end;
+    margin-bottom:34px;
+}
+.bd-publisher-section-eyebrow{display:block;min-height:14px;margin-bottom:9px}
+.bd-publisher-section-title{max-width:680px;margin:0;font-size:clamp(34px,3.8vw,50px);line-height:1.04}
+.bd-publisher-section-description{margin:0;color:var(--body);font-size:11px;line-height:1.8}
+
+/* SERVICES */
+.bd-publisher-services{padding:58px 0 60px;border-bottom:1px solid var(--line)}
+.bd-publisher-service-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+}
+.bd-publisher-service{position:relative;min-height:225px;padding:27px;overflow:hidden}
+.bd-publisher-service+.bd-publisher-service{border-left:1px solid var(--line)}
+.bd-publisher-service-number{margin-bottom:35px;color:var(--orange);font-size:8px;font-weight:700;letter-spacing:.12em}
+.bd-publisher-service h3{max-width:190px;margin:0 0 11px;color:var(--navy);font-family:'Fraunces',serif;font-size:22px;font-weight:500;line-height:1.15}
+.bd-publisher-service p{max-width:210px;margin:0;color:var(--body);font-size:10px;line-height:1.7}
+.bd-publisher-service::after{
+    content:"";position:absolute;left:27px;bottom:0;width:34px;height:3px;
+    background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform .3s ease;
+}
+.bd-publisher-service:hover::after{transform:scaleX(1)}
+
+/* PROCESS */
+.bd-publisher-process{padding:64px 0 50px;border-bottom:1px solid var(--line)}
+.bd-process-layout{display:grid;grid-template-columns:285px minmax(0,1fr);gap:60px;align-items:start}
+.bd-process-side{position:sticky;top:100px;padding-top:8px}
+.bd-process-side .bd-publisher-section-eyebrow{margin-bottom:12px}
+.bd-process-side h2{
+    max-width:270px;margin:0 0 15px;color:var(--navy);
+    font-family:'Fraunces',serif;font-size:34px;font-weight:500;
+    line-height:1.05;letter-spacing:-.035em;
+}
+.bd-process-side p{max-width:250px;margin:0;color:var(--body);font-size:10px;line-height:1.75}
+
+.bd-process-flow{position:relative}
+.bd-process-track{
+    position:absolute;z-index:0;left:15px;top:150px;bottom:150px;
+    width:3px;border-radius:999px;background:#E5E3EA;
+}
+.bd-process-track-fill{
+    position:absolute;z-index:1;left:15px;top:150px;bottom:150px;
+    width:3px;border-radius:999px;background:var(--orange);
+    transform:scaleY(.001);transform-origin:top center;will-change:transform;
+}
+.bd-process-step-row{
+    position:relative;z-index:2;
+    display:grid;grid-template-columns:90px minmax(0,1fr);
+    gap:26px;align-items:center;min-height:300px;
+}
+.bd-process-step-row:not(:last-child) .bd-process-step{border-bottom:1px solid var(--line)}
+.bd-process-marker{display:flex;align-items:center;gap:14px;min-width:90px;color:var(--muted)}
+.bd-process-marker-dot{
+    width:32px;height:32px;flex:0 0 32px;
+    border:3px solid #DAD7E1;border-radius:50%;background:#fff;
+    box-shadow:0 0 0 7px #fff;
+    transition:background .3s ease,border-color .3s ease,transform .3s ease,box-shadow .3s ease;
+}
+.bd-process-marker-number{
+    color:inherit;font-family:'Fraunces',serif;font-size:18px;font-weight:500;line-height:1;
+    transition:transform .3s ease,color .3s ease;
+}
+.bd-process-marker.active{color:var(--navy)}
+.bd-process-marker.active .bd-process-marker-dot{
+    background:var(--orange);border-color:var(--orange);transform:scale(1.14);
+    box-shadow:0 0 0 7px #fff,0 0 0 10px rgba(239,88,67,.13);
+}
+.bd-process-marker.active .bd-process-marker-number{font-weight:600;transform:translateX(3px)}
+.bd-process-marker.done{color:var(--navy)}
+.bd-process-marker.done .bd-process-marker-dot{background:var(--navy);border-color:var(--navy)}
+
+.bd-process-step{display:flex;align-items:center;min-height:300px;padding:42px 0}
+.bd-process-step-inner{
+    width:100%;
+    display:grid;
+    grid-template-columns:120px minmax(0,1fr);
+    gap:38px;
+    align-items:center;
+}
+.bd-process-big-number{
+    color:rgba(36,27,82,.075);
+    font-family:'Fraunces',serif;
+    font-size:88px;
+    line-height:1;
+    letter-spacing:-.06em;
+}
+.bd-process-step-label{
+    display:inline-block;margin-bottom:10px;color:var(--orange);
+    font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+}
+.bd-process-step-copy h3{
+    max-width:600px;margin:0 0 13px;color:var(--navy);
+    font-family:'Fraunces',serif;font-size:clamp(31px,3.2vw,45px);
+    font-weight:500;line-height:1.04;letter-spacing:-.035em;
+}
+.bd-process-step-copy p{max-width:680px;margin:0;color:var(--body);font-size:12px;line-height:1.8}
 
 /* =========================================================
-   ROOT
+   CATALOG - COVER DIPERKECIL
 ========================================================= */
-
-.bd-publisher {
-    --navy: #241B52;
-    --navy-deep: #17132E;
-
-    --orange: #EF5843;
-    --orange-soft: #FFF1ED;
-
-    --ink: #17181C;
-    --body: #595F69;
-    --muted: #9197A1;
-
-    --line: #E7E8EC;
-    --soft: #F7F7F5;
-    --warm: #FAF8F4;
-
-    width: 100%;
-
-    min-height: 100vh;
-
-    overflow: hidden;
-
-    background: #FFFFFF;
-
-    color: var(--ink);
-
-    font-family: 'Inter', sans-serif;
-}
-
-.bd-publisher *,
-.bd-publisher *::before,
-.bd-publisher *::after {
-    box-sizing: border-box;
-}
-
-.bd-publisher-shell {
-    width: min(
-        calc(100% - 72px),
-        1360px
-    );
-
-    margin-inline: auto;
-}
-
-
-/* =========================================================
-   HERO
-========================================================= */
-
-.bd-publisher-hero {
-    position: relative;
-
-    min-height: 590px;
-
-    display: flex;
-    align-items: center;
-
-    padding:
-        55px 0;
-
-    overflow: hidden;
-
-    border-bottom: 1px solid var(--line);
-
-    background: #FFFFFF;
-}
-
-.bd-publisher-hero::before {
-    content: "";
-
-    position: absolute;
-
-    top: -220px;
-    right: -170px;
-
-    width: 510px;
-    height: 510px;
-
-    border: 1px solid rgba(36,27,82,.07);
-    border-radius: 50%;
-
-    pointer-events: none;
-}
-
-.bd-publisher-hero::after {
-    content: "";
-
-    position: absolute;
-
-    right: 11%;
-    bottom: -100px;
-
-    width: 230px;
-    height: 230px;
-
-    border: 1px solid rgba(239,88,67,.09);
-    border-radius: 50%;
-
-    pointer-events: none;
-}
-
-.bd-publisher-hero-grid {
-    position: relative;
-
-    z-index: 3;
-
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        560px;
-
-    gap: 65px;
-
-    align-items: center;
-}
-
-
-/* =========================================================
-   HERO COPY
-========================================================= */
-
-.bd-publisher-eyebrow {
-    display: flex;
-    align-items: center;
-
-    gap: 9px;
-
-    margin-bottom: 16px;
-
-    color: var(--orange);
-
-    font-size: 9px;
-    font-weight: 800;
-
-    letter-spacing: .15em;
-
-    text-transform: uppercase;
-}
-
-.bd-publisher-eyebrow::before {
-    content: "";
-
-    width: 27px;
-    height: 2px;
-
-    background: var(--orange);
-}
-
-.bd-publisher-hero-title {
-    max-width: 700px;
-
-    margin: 0;
-
-    color: var(--navy);
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: clamp(
-        45px,
-        5.4vw,
-        74px
-    );
-
-    font-weight: 600;
-
-    line-height: 1.02;
-
-    letter-spacing: -.055em;
-}
-
-.bd-publisher-hero-title span {
-    color: var(--orange);
-}
-
-.bd-publisher-hero-description {
-    max-width: 555px;
-
-    margin:
-        22px 0
-        0;
-
-    color: var(--body);
-
-    font-size: 13px;
-
-    line-height: 1.8;
-}
-
-.bd-publisher-hero-bottom {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-
-    gap: 24px;
-
-    margin-top: 27px;
-}
-
-.bd-publisher-scroll-link {
-    min-height: 44px;
-
-    display: inline-flex;
-    align-items: center;
-
-    gap: 8px;
-
-    padding:
-        0 17px;
-
-    border: 1px solid var(--navy);
-
-    background: var(--navy);
-
-    color: #FFFFFF !important;
-
-    font-size: 10px;
-    font-weight: 750;
-
-    text-decoration: none !important;
-
-    transition:
-        transform .25s ease,
-        background .25s ease;
-}
-
-.bd-publisher-scroll-link:hover {
-    transform: translateY(-2px);
-
-    background: var(--orange);
-
-    border-color: var(--orange);
-}
-
-.bd-publisher-scroll-link svg {
-    width: 14px;
-    height: 14px;
-
-    fill: none;
-    stroke: currentColor;
-
-    stroke-width: 1.7;
-}
-
-.bd-publisher-count {
-    display: flex;
-    align-items: baseline;
-
-    gap: 7px;
-}
-
-.bd-publisher-count strong {
-    color: var(--orange);
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: 24px;
-    font-weight: 600;
-}
-
-.bd-publisher-count span {
-    color: var(--muted);
-
-    font-size: 8px;
-    font-weight: 750;
-
-    letter-spacing: .07em;
-
-    text-transform: uppercase;
-}
-
-
-/* =========================================================
-   HERO BOOK COMPOSITION
-========================================================= */
-
-.bd-publisher-hero-books {
-    position: relative;
-
-    width: 560px;
-    height: 450px;
-
-    margin-left: auto;
-}
-
-.bd-publisher-hero-book {
-    position: absolute;
-
-    overflow: hidden;
-
-    background: var(--soft);
-
-    box-shadow:
-        0 18px 45px
-        rgba(36,27,82,.12);
-
-    transition:
-        transform .6s
-        cubic-bezier(.22,1,.36,1);
-}
-
-.bd-publisher-hero-book img {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-}
-
-.bd-publisher-hero-book:nth-child(1) {
-    z-index: 4;
-
-    width: 250px;
-    height: 360px;
-
-    left: 156px;
-    top: 35px;
-
-    transform: rotate(-1deg);
-}
-
-.bd-publisher-hero-book:nth-child(2) {
-    z-index: 2;
-
-    width: 190px;
-    height: 285px;
-
-    left: 20px;
-    top: 104px;
-
-    transform: rotate(-7deg);
-}
-
-.bd-publisher-hero-book:nth-child(3) {
-    z-index: 1;
-
-    width: 190px;
-    height: 285px;
-
-    right: 9px;
-    top: 91px;
-
-    transform: rotate(7deg);
-}
-
-.bd-publisher-hero-books:hover
-.bd-publisher-hero-book:nth-child(1) {
-    transform:
-        translateY(-8px)
-        rotate(0);
-}
-
-.bd-publisher-hero-books:hover
-.bd-publisher-hero-book:nth-child(2) {
-    transform:
-        translate(-8px, 3px)
-        rotate(-9deg);
-}
-
-.bd-publisher-hero-books:hover
-.bd-publisher-hero-book:nth-child(3) {
-    transform:
-        translate(8px, 3px)
-        rotate(9deg);
-}
-
-.bd-publisher-cover-fallback {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-direction: column;
-
-    gap: 11px;
-
-    padding: 20px;
-
-    background:
-        linear-gradient(
-            145deg,
-            var(--navy),
-            var(--navy-deep)
-        );
-
-    color: #FFFFFF;
-
-    text-align: center;
-}
-
-.bd-publisher-cover-fallback::before {
-    content: "";
-
-    width: 9px;
-    height: 9px;
-
-    background: var(--orange);
-}
-
-.bd-publisher-cover-fallback span {
-    max-width: 130px;
-
-    font-size: 9px;
-    font-weight: 700;
-
-    line-height: 1.5;
-}
-
-
-/* =========================================================
-   SECTION COMMON
-========================================================= */
-
-.bd-publisher-section {
-    padding:
-        49px 0;
-}
-
-.bd-publisher-section + .bd-publisher-section {
-    border-top: 1px solid var(--line);
-}
-
-.bd-publisher-section-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-
-    gap: 30px;
-
-    margin-bottom: 27px;
-}
-
-.bd-publisher-section-label {
-    margin-bottom: 7px;
-
-    color: var(--orange);
-
-    font-size: 8px;
-    font-weight: 800;
-
-    letter-spacing: .14em;
-
-    text-transform: uppercase;
-}
-
-.bd-publisher-section-title {
-    margin: 0;
-
-    color: var(--navy);
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: clamp(
-        28px,
-        3vw,
-        42px
-    );
-
-    font-weight: 600;
-
-    line-height: 1.15;
-
-    letter-spacing: -.04em;
-}
-
-.bd-publisher-section-description {
-    max-width: 430px;
-
-    margin: 0;
-
-    color: var(--body);
-
-    font-size: 11px;
-
-    line-height: 1.7;
-}
-
-
-/* =========================================================
-   FEATURED PUBLICATION
-========================================================= */
-
-.bd-publisher-featured {
-    display: grid;
-
-    grid-template-columns:
-        390px
-        minmax(0, 1fr);
-
-    gap: 65px;
-
-    align-items: center;
-
-    padding:
-        28px 0
-        12px;
-}
-
-.bd-publisher-featured-cover-wrap {
-    display: flex;
-    justify-content: center;
-}
-
-.bd-publisher-featured-cover {
-    position: relative;
-
-    width: 320px;
-
-    aspect-ratio: 3 / 4.2;
-
-    overflow: hidden;
-
-    background: var(--soft);
-
-    box-shadow:
-        0 22px 50px
-        rgba(36,27,82,.11);
-}
-
-.bd-publisher-featured-cover img {
-    position: relative;
-
-    z-index: 2;
-
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    transition:
-        transform .75s
-        cubic-bezier(.22,1,.36,1);
-}
-
-.bd-publisher-featured:hover
-.bd-publisher-featured-cover img {
-    transform: scale(1.035);
-}
-
-.bd-publisher-featured-content {
-    max-width: 730px;
-}
-
-.bd-publisher-publication-kicker {
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    margin-bottom: 12px;
-
-    color: var(--orange);
-
-    font-size: 8px;
-    font-weight: 800;
-
-    letter-spacing: .13em;
-
-    text-transform: uppercase;
-}
-
-.bd-publisher-publication-kicker::before {
-    content: "";
-
-    width: 20px;
-    height: 2px;
-
-    background: var(--orange);
-}
-
-.bd-publisher-featured-title {
-    margin: 0;
-
-    color: var(--navy);
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: clamp(
-        31px,
-        4vw,
-        53px
-    );
-
-    font-weight: 600;
-
-    line-height: 1.08;
-
-    letter-spacing: -.05em;
-
-    overflow-wrap: anywhere;
-}
-
-.bd-publisher-featured-author {
-    margin-top: 13px;
-
-    color: #464C56;
-
-    font-size: 12px;
-    font-weight: 650;
-}
-
-
-/* =========================================================
-   FEATURED META
-========================================================= */
-
-.bd-publisher-featured-meta {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    margin-top: 23px;
-
-    border-top: 1px solid var(--line);
-}
-
-.bd-publisher-featured-meta-item {
-    min-height: 67px;
-
-    padding:
-        13px 17px
-        12px 0;
-
-    border-bottom: 1px solid var(--line);
-}
-
-.bd-publisher-featured-meta-item:not(:nth-child(3n)) {
-    margin-right: 17px;
-
-    border-right: 1px solid var(--line);
-}
-
-.bd-publisher-meta-label {
-    color: var(--muted);
-
-    font-size: 7px;
-    font-weight: 750;
-
-    letter-spacing: .08em;
-
-    text-transform: uppercase;
-}
-
-.bd-publisher-meta-value {
-    margin-top: 6px;
-
-    color: var(--navy);
-
-    font-size: 10px;
-    font-weight: 650;
-
-    line-height: 1.45;
-
-    overflow-wrap: anywhere;
-}
-
-.bd-publisher-status {
-    color: #338258;
-}
-
-.bd-publisher-featured-description {
-    max-width: 700px;
-
-    margin-top: 19px;
-
-    color: var(--body);
-
-    font-size: 12px;
-
-    line-height: 1.8;
-}
-
-.bd-publisher-detail {
-    min-height: 41px;
-
-    display: inline-flex;
-    align-items: center;
-
-    gap: 8px;
-
-    margin-top: 17px;
-
-    color: var(--navy) !important;
-
-    font-size: 10px;
-    font-weight: 750;
-
-    text-decoration: none !important;
-
-    transition:
-        gap .25s ease,
-        color .25s ease;
-}
-
-.bd-publisher-detail:hover {
-    gap: 12px;
-
-    color: var(--orange) !important;
-}
-
-.bd-publisher-detail svg {
-    width: 14px;
-    height: 14px;
-
-    fill: none;
-    stroke: currentColor;
-
-    stroke-width: 1.7;
-}
-
-
-/* =========================================================
-   BOOK CATALOG
-========================================================= */
-
-.bd-publisher-book-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
-    border-top: 1px solid var(--line);
-}
-
-.bd-publisher-book {
-    min-width: 0;
-
-    padding:
-        26px 20px
-        27px 0;
-
-    border-bottom: 1px solid var(--line);
-}
-
-.bd-publisher-book:not(:nth-child(4n)) {
-    margin-right: 20px;
-
-    border-right: 1px solid var(--line);
-}
-
-.bd-publisher-book-cover {
-    position: relative;
-
-    width: 100%;
-
-    aspect-ratio: 3 / 4.15;
-
-    overflow: hidden;
-
-    background: var(--soft);
-}
-
-.bd-publisher-book-cover img {
-    position: relative;
-
-    z-index: 2;
-
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    transition:
-        transform .7s
-        cubic-bezier(.22,1,.36,1);
-}
-
-.bd-publisher-book:hover
-.bd-publisher-book-cover img {
-    transform: scale(1.045);
-}
-
-.bd-publisher-book-content {
-    padding-top: 15px;
-}
-
-.bd-publisher-book-category {
-    color: var(--orange);
-
-    font-size: 7px;
-    font-weight: 800;
-
-    letter-spacing: .08em;
-
-    text-transform: uppercase;
-}
-
-.bd-publisher-book-title {
-    margin:
-        7px 0
-        0;
-
-    color: var(--navy);
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: 15px;
-    font-weight: 600;
-
-    line-height: 1.35;
-
-    letter-spacing: -.025em;
-}
-
-.bd-publisher-book-author {
-    margin-top: 6px;
-
-    color: var(--body);
-
-    font-size: 9px;
-
-    line-height: 1.5;
-}
-
-.bd-publisher-book-meta {
-    margin-top: 12px;
-
-    padding-top: 10px;
-
-    border-top: 1px solid var(--line);
-}
-
-.bd-publisher-book-meta-row {
-    display: flex;
-    justify-content: space-between;
-
-    gap: 11px;
-
-    padding:
-        3px 0;
-
-    font-size: 8px;
-
-    line-height: 1.45;
-}
-
-.bd-publisher-book-meta-label {
-    color: var(--muted);
-}
-
-.bd-publisher-book-meta-value {
-    max-width: 68%;
-
-    color: #555B65;
-
-    font-weight: 650;
-
-    text-align: right;
-
-    overflow-wrap: anywhere;
-}
-
-.bd-publisher-book-detail {
-    display: inline-flex;
-    align-items: center;
-
-    gap: 7px;
-
-    margin-top: 12px;
-
-    color: var(--navy) !important;
-
-    font-size: 9px;
-    font-weight: 750;
-
-    text-decoration: none !important;
-
-    transition:
-        color .25s ease,
-        gap .25s ease;
-}
-
-.bd-publisher-book-detail:hover {
-    gap: 10px;
-
-    color: var(--orange) !important;
-}
-
-.bd-publisher-book-detail svg {
-    width: 12px;
-    height: 12px;
-
-    fill: none;
-    stroke: currentColor;
-
-    stroke-width: 1.7;
-}
-
-
-/* =========================================================
-   PUBLISHER PARTNERS
-========================================================= */
-
-.bd-publisher-partner-section {
-    background: var(--warm);
-}
-
-.bd-publisher-partner-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    border-top:
-        1px solid
-        rgba(36,27,82,.10);
-}
-
-.bd-publisher-partner {
-    min-width: 0;
-
-    display: grid;
-
-    grid-template-columns:
-        95px
-        minmax(0, 1fr);
-
-    gap: 17px;
-
-    align-items: center;
-
-    min-height: 135px;
-
-    padding:
-        20px 20px
-        20px 0;
-
-    border-bottom:
-        1px solid
-        rgba(36,27,82,.10);
-}
-
-.bd-publisher-partner:not(:nth-child(3n)) {
-    margin-right: 20px;
-
-    border-right:
-        1px solid
-        rgba(36,27,82,.10);
-}
-
-
-/* =========================================================
-   LOGO FIX
-========================================================= */
-
-.bd-publisher-partner-logo {
-    position: relative;
-
-    width: 95px;
-    height: 80px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-
-    padding: 12px;
-
-    background: #FFFFFF;
-
-    border: 1px solid rgba(36,27,82,.08);
-
-    isolation: isolate;
-}
-
-.bd-publisher-partner-logo-fallback {
-    position: absolute;
-
-    z-index: 1;
-
-    inset: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #FFFFFF;
-}
-
-.bd-publisher-partner-logo-fallback::before {
-    content: "";
-
-    width: 7px;
-    height: 7px;
-
-    background: var(--orange);
-}
-
-.bd-publisher-partner-logo img {
-    position: relative;
-
-    z-index: 2;
-
-    display: block;
-
-    max-width: 100%;
-    max-height: 100%;
-
-    width: auto;
-    height: auto;
-
-    object-fit: contain;
-}
-
-.bd-publisher-partner-name {
-    margin: 0;
-
-    color: var(--navy);
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    line-height: 1.4;
-}
-
-.bd-publisher-partner-description {
-    margin-top: 5px;
-
-    color: #727780;
-
-    font-size: 9px;
-
-    line-height: 1.55;
-
-    display: -webkit-box;
-
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-
-    overflow: hidden;
-}
-
-
-/* =========================================================
-   PROCESS — SMALL
-========================================================= */
-
-.bd-publisher-process {
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
-    border-top: 1px solid var(--line);
-}
-
-.bd-publisher-process-item {
-    position: relative;
-
-    min-height: 145px;
-
-    padding:
-        20px 20px
-        19px 0;
-
-    border-bottom: 1px solid var(--line);
-}
-
-.bd-publisher-process-item:not(:last-child) {
-    margin-right: 20px;
-
-    border-right: 1px solid var(--line);
-}
-
-.bd-publisher-process-number {
-    margin-bottom: 22px;
-
-    color: #BEC2C8;
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: 9px;
-    font-weight: 600;
-}
-
-.bd-publisher-process-title {
-    margin: 0;
-
-    color: var(--navy);
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.bd-publisher-process-text {
-    max-width: 220px;
-
-    margin-top: 6px;
-
-    color: var(--body);
-
-    font-size: 9px;
-
-    line-height: 1.6;
-}
-
-
-/* =========================================================
-   CTA
-========================================================= */
-
-.bd-publisher-cta {
-    padding:
-        48px 0;
-
-    background: var(--navy);
-}
-
-.bd-publisher-cta-grid {
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        auto;
-
-    gap: 40px;
-
-    align-items: center;
-}
-
-.bd-publisher-cta-label {
-    margin-bottom: 8px;
-
-    color: #F1A291;
-
-    font-size: 8px;
-    font-weight: 800;
-
-    letter-spacing: .13em;
-
-    text-transform: uppercase;
-}
-
-.bd-publisher-cta-title {
-    max-width: 750px;
-
-    margin: 0;
-
-    color: #FFFFFF;
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: clamp(
-        29px,
-        3.6vw,
-        48px
-    );
-
-    font-weight: 600;
-
-    line-height: 1.1;
-
-    letter-spacing: -.045em;
-}
-
-.bd-publisher-cta-link {
-    min-height: 47px;
-
-    display: inline-flex;
-    align-items: center;
-
-    gap: 8px;
-
-    padding:
-        0 19px;
-
-    background: var(--orange);
-
-    color: #FFFFFF !important;
-
-    font-size: 10px;
-    font-weight: 750;
-
-    text-decoration: none !important;
-}
-
-
-/* =========================================================
-   EMPTY
-========================================================= */
-
-.bd-publisher-empty {
-    padding:
-        65px 20px;
-
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-
-    text-align: center;
-}
-
-.bd-publisher-empty::before {
-    content: "";
-
-    display: block;
-
-    width: 9px;
-    height: 9px;
-
-    margin:
-        0 auto
-        13px;
-
-    background: var(--orange);
-}
-
-.bd-publisher-empty h3 {
-    margin: 0;
-
-    color: var(--navy);
-
-    font-family: 'Poppins', sans-serif;
-
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.bd-publisher-empty p {
-    margin:
-        6px 0
-        0;
-
-    color: var(--muted);
-
-    font-size: 10px;
-}
-
-
-/* =========================================================
-   PAGINATION
-========================================================= */
-
-.bd-publisher-pagination {
-    display: flex;
-    justify-content: center;
-
-    margin-top: 34px;
-}
-
-.bd-publisher-pagination .pagination {
-    display: flex;
-    flex-wrap: wrap;
-
-    gap: 7px;
-
-    margin: 0;
-}
-
-.bd-publisher-pagination .page-link {
-    min-width: 38px;
-    height: 38px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding:
-        0 10px;
-
-    border: 1px solid var(--line);
-    border-radius: 50% !important;
-
-    background: #FFFFFF;
-
-    color: #555B65;
-
-    font-size: 10px;
-
-    box-shadow: none !important;
-}
-
-.bd-publisher-pagination
-.page-item.active
-.page-link {
-    border-color: var(--navy);
-
-    background: var(--navy);
-
-    color: #FFFFFF;
-}
-
-
-/* =========================================================
-   REVEAL
-========================================================= */
-
-.bd-publisher-reveal {
-    opacity: 0;
-
-    transform: translateY(15px);
-}
-
-
-/* =========================================================
-   TABLET
-========================================================= */
-
-@media (max-width: 1080px) {
-
-    .bd-publisher-hero-grid {
-        grid-template-columns:
-            minmax(0, 1fr)
-            440px;
-
-        gap: 40px;
+.bd-publisher-catalog{padding:60px 0 8px}
+.bd-publisher-catalog-title{margin:0;font-size:clamp(37px,4vw,54px);line-height:1}
+
+.bd-publisher-filterbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    padding:17px 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+}
+.bd-publisher-chips{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.bd-publisher-chip{
+    min-height:36px;
+    padding:0 14px;
+    border:1px solid transparent;
+    border-radius:3px;
+    background:transparent;
+    color:var(--body);
+    font-size:11px;
+    cursor:pointer;
+}
+.bd-publisher-chip:hover{border-color:var(--line-strong);color:var(--navy)}
+.bd-publisher-chip[aria-pressed="true"]{border-color:var(--navy);background:var(--navy);color:#fff}
+
+.bd-publisher-search{width:280px;flex-shrink:0}
+.bd-publisher-search input{
+    width:100%;
+    height:40px;
+    padding:0 14px;
+    border:1px solid var(--line);
+    border-radius:3px;
+    background:#fff;
+    color:var(--ink);
+    font-size:11px;
+    outline:none;
+}
+.bd-publisher-search input:focus{border-color:var(--orange)}
+
+.bd-publisher-result{
+    min-height:58px;
+    display:flex;
+    align-items:center;
+    color:var(--muted);
+    font-size:10px;
+}
+
+/* 4 KOLOM, TAPI CARD TIDAK MELEBAR */
+.bd-publisher-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,235px));
+    justify-content:space-between;
+    align-items:start;
+    gap:46px 28px;
+    padding:0 0 78px;
+}
+
+/* CARD DIJAGA MAKSIMAL 235PX */
+.bd-publisher-card{
+    width:100%;
+    max-width:235px;
+    min-width:0;
+    perspective:900px;
+}
+
+/* FRAME COVER */
+.bd-publisher-cover-card{
+    width:100%;
+    padding:9px;
+    border:1px solid rgba(var(--book-rgb),.11);
+    border-radius:6px;
+    background:rgba(var(--book-rgb),.04);
+    transform-style:preserve-3d;
+    will-change:transform;
+    transition:background .25s ease,border-color .25s ease;
+}
+.bd-publisher-cover-card:hover{
+    background:rgba(var(--book-rgb),.07);
+    border-color:rgba(var(--book-rgb),.18);
+}
+
+/* COVER LEBIH KECIL DAN EDITORIAL */
+.bd-publisher-cover{
+    position:relative;
+    display:block;
+    width:100%;
+    aspect-ratio:3/4;
+    overflow:hidden;
+    padding:0;
+    border:0;
+    border-radius:3px;
+    background:var(--navy);
+    cursor:pointer;
+    text-align:left;
+    transform-style:preserve-3d;
+    will-change:transform;
+    box-shadow:0 13px 26px rgba(36,27,82,.10);
+}
+.bd-publisher-cover-image{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+.bd-publisher-cover-fallback{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:20px 18px;
+    color:#fff;
+}
+.bd-publisher-cover-category{
+    color:rgba(255,255,255,.65);
+    font-size:8px;
+    font-weight:600;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+.bd-publisher-cover-title{
+    display:block;
+    color:#fff;
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    line-height:1.13;
+}
+.bd-publisher-cover-author{
+    display:block;
+    margin-top:8px;
+    color:rgba(255,255,255,.64);
+    font-size:9px;
+}
+
+/* META BUKU */
+.bd-publisher-card-meta{padding:14px 2px 0}
+.bd-publisher-card-category{
+    margin-bottom:6px;
+    color:var(--orange);
+    font-size:7px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+.bd-publisher-card-title{
+    margin:0 0 5px;
+    color:var(--navy);
+    font-family:'Fraunces',serif;
+    font-size:18px;
+    font-weight:500;
+    line-height:1.23;
+}
+.bd-publisher-card-sub{margin:0 0 10px;color:var(--body);font-size:9px}
+.bd-publisher-card-link{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    min-height:28px;
+    padding:0;
+    border:0;
+    background:transparent;
+    color:var(--navy);
+    font-size:9px;
+    font-weight:600;
+    cursor:pointer;
+}
+.bd-publisher-card-link::after{content:"→";color:var(--orange);font-size:13px;transition:transform .2s ease}
+.bd-publisher-card-link:hover::after{transform:translateX(4px)}
+
+/* CTA */
+.bd-publisher-submit{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 250px;
+    gap:50px;
+    align-items:end;
+    margin-bottom:76px;
+    padding:48px 0;
+    border-top:1px solid var(--navy);
+    border-bottom:1px solid var(--line);
+}
+.bd-publisher-submit h2{max-width:700px;margin:0 0 13px;font-size:clamp(34px,4vw,53px);line-height:1.02}
+.bd-publisher-submit p{max-width:620px;margin:0;color:var(--body);font-size:11px;line-height:1.8}
+.bd-publisher-submit-button{
+    min-height:46px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:25px;
+    padding:0 18px;
+    border:1px solid var(--navy);
+    background:var(--navy);
+    color:#fff;
+    text-decoration:none;
+    font-size:10px;
+    font-weight:600;
+}
+.bd-publisher-submit-button::after{content:"→";color:var(--orange);font-size:16px}
+
+/* DRAWER */
+.bd-publisher-overlay{
+    position:fixed;
+    z-index:9998;
+    inset:0;
+    background:rgba(22,17,48,.44);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .28s ease;
+}
+.bd-publisher-overlay.open{opacity:1;pointer-events:auto}
+
+.bd-publisher-drawer{
+    position:fixed;
+    z-index:9999;
+    top:0;
+    right:0;
+    width:470px;
+    max-width:94vw;
+    height:100%;
+    overflow-y:auto;
+    transform:translateX(100%);
+    border-left:1px solid var(--line);
+    background:#fff;
+    box-shadow:-30px 0 70px rgba(36,27,82,.14);
+    transition:transform .35s ease;
+}
+.bd-publisher-drawer.open{transform:translateX(0)}
+.bd-publisher-drawer-top{
+    position:sticky;
+    z-index:4;
+    top:0;
+    min-height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    border-bottom:1px solid var(--line);
+    background:#fff;
+}
+.bd-publisher-drawer-label{color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.bd-publisher-close{
+    width:34px;height:34px;
+    border:1px solid var(--line);
+    border-radius:50%;
+    background:#fff;
+    color:var(--navy);
+    cursor:pointer;
+}
+.bd-publisher-drawer-body{padding:31px 34px 48px}
+.bd-publisher-drawer-book{
+    display:grid;
+    grid-template-columns:126px minmax(0,1fr);
+    gap:24px;
+    align-items:end;
+    margin-bottom:32px;
+}
+.bd-publisher-drawer-cover-card{
+    padding:8px;
+    border:1px solid rgba(var(--book-rgb),.13);
+    border-radius:6px;
+    background:rgba(var(--book-rgb),.055);
+}
+.bd-publisher-drawer-cover{
+    position:relative;
+    width:108px;
+    aspect-ratio:3/4;
+    overflow:hidden;
+    border-radius:2px;
+    background:var(--navy);
+}
+.bd-publisher-drawer-cover img{width:100%;height:100%;object-fit:cover}
+.bd-publisher-drawer-cover-fallback{
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:14px;
+    color:#fff;
+}
+.bd-publisher-drawer-cover-category{font-size:7px;text-transform:uppercase}
+.bd-publisher-drawer-cover-title{font-family:'Fraunces',serif;font-size:13px}
+.bd-publisher-drawer-status{margin-bottom:9px;color:var(--orange);font-size:8px;font-weight:700;text-transform:uppercase}
+.bd-publisher-drawer-title{margin:0 0 8px;color:var(--navy);font-family:'Fraunces',serif;font-size:27px}
+.bd-publisher-drawer-author{color:var(--body);font-size:11px}
+.bd-publisher-meta{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    margin-bottom:31px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+}
+.bd-publisher-meta-item{padding:17px 12px}
+.bd-publisher-meta-label{display:block;margin-bottom:6px;color:var(--muted);font-size:8px;text-transform:uppercase}
+.bd-publisher-meta-value{color:var(--ink);font-size:11px}
+.bd-publisher-synopsis-label{margin-bottom:12px;color:var(--orange);font-size:8px;font-weight:700;text-transform:uppercase}
+.bd-publisher-synopsis{color:var(--body);font-size:12px;line-height:1.8}
+.bd-publisher-empty{display:none;padding:70px 20px;color:var(--muted);text-align:center;font-size:12px}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+    .bd-publisher-grid{
+        grid-template-columns:repeat(3,minmax(0,220px));
+        justify-content:space-between;
+    }
+    .bd-publisher-card{max-width:220px}
+}
+
+@media(max-width:1000px){
+    .bd-publisher-service-grid{grid-template-columns:repeat(2,1fr)}
+    .bd-process-layout{grid-template-columns:230px minmax(0,1fr);gap:35px}
+    .bd-process-step-inner{grid-template-columns:90px minmax(0,1fr);gap:25px}
+}
+
+@media(max-width:800px){
+    .bd-publisher-shell{width:calc(100% - 40px)}
+    .bd-publisher-hero{grid-template-columns:1fr}
+    .bd-publisher-about,.bd-publisher-section-head,.bd-publisher-catalog-head,.bd-publisher-submit{grid-template-columns:1fr}
+
+    .bd-process-layout{grid-template-columns:1fr;gap:35px}
+    .bd-process-side{position:relative;top:auto}
+    .bd-process-side h2,.bd-process-side p{max-width:520px}
+    .bd-process-step-row{grid-template-columns:75px minmax(0,1fr);gap:20px;min-height:280px}
+    .bd-process-step{min-height:280px}
+    .bd-process-track,.bd-process-track-fill{left:13px;top:140px;bottom:140px}
+    .bd-process-marker-dot{width:28px;height:28px;flex-basis:28px}
+    .bd-process-marker-number{font-size:16px}
+
+    .bd-publisher-grid{
+        grid-template-columns:repeat(2,minmax(0,210px));
+        justify-content:start;
+        gap:42px 28px;
+    }
+    .bd-publisher-card{max-width:210px}
+}
+
+@media(max-width:600px){
+    .bd-publisher-shell{width:calc(100% - 30px)}
+    .bd-publisher-brand-type{display:none}
+    .bd-publisher-hero{min-height:0;padding:45px 0 25px}
+    .bd-publisher-hero h1{font-size:40px}
+    .bd-publisher-motion{height:265px;transform:scale(.78)}
+    .bd-publisher-service-grid{grid-template-columns:1fr}
+    .bd-publisher-filterbar{flex-direction:column;align-items:flex-start}
+    .bd-publisher-search{width:100%}
+    .bd-publisher-drawer{width:100%;max-width:100%}
+
+    .bd-process-step-row{grid-template-columns:62px minmax(0,1fr);gap:13px;min-height:250px}
+    .bd-process-step{min-height:250px;padding:30px 0}
+    .bd-process-track,.bd-process-track-fill{left:11px;top:125px;bottom:125px;width:2px}
+    .bd-process-marker{gap:8px}
+    .bd-process-marker-dot{width:24px;height:24px;flex-basis:24px;border-width:2px;box-shadow:0 0 0 4px #fff}
+    .bd-process-marker.active .bd-process-marker-dot{box-shadow:0 0 0 4px #fff,0 0 0 7px rgba(239,88,67,.13)}
+    .bd-process-marker-number{font-size:13px}
+    .bd-process-step-inner{grid-template-columns:1fr;gap:8px}
+    .bd-process-big-number{font-size:48px}
+    .bd-process-step-copy h3{font-size:27px}
+    .bd-process-step-copy p{font-size:10px}
+
+    .bd-publisher-grid{
+        grid-template-columns:1fr;
+        justify-items:start;
+        gap:38px;
     }
 
-    .bd-publisher-hero-books {
-        width: 440px;
+    /* HP TETAP JANGAN SELEBAR LAYAR */
+    .bd-publisher-card{
+        width:min(72vw,215px);
+        max-width:215px;
     }
-
-    .bd-publisher-hero-book:nth-child(1) {
-        left: 115px;
-    }
-
-    .bd-publisher-hero-book:nth-child(2) {
-        left: 0;
-    }
-
-    .bd-publisher-book-grid {
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
-    }
-
-    .bd-publisher-book:not(:nth-child(4n)) {
-        margin-right: 0;
-
-        border-right: 0;
-    }
-
-    .bd-publisher-book:not(:nth-child(3n)) {
-        margin-right: 20px;
-
-        border-right: 1px solid var(--line);
-    }
-
 }
 
-
-/* =========================================================
-   TABLET PORTRAIT
-========================================================= */
-
-@media (max-width: 850px) {
-
-    .bd-publisher-shell {
-        width:
-            calc(100% - 40px);
-    }
-
-    .bd-publisher-hero {
-        min-height: auto;
-    }
-
-    .bd-publisher-hero-grid {
-        grid-template-columns: 1fr;
-
-        gap: 35px;
-    }
-
-    .bd-publisher-hero-books {
-        width: min(
-            100%,
-            540px
-        );
-
-        margin-inline: auto;
-    }
-
-    .bd-publisher-featured {
-        grid-template-columns:
-            270px
-            minmax(0, 1fr);
-
-        gap: 35px;
-    }
-
-    .bd-publisher-featured-cover {
-        width: 250px;
-    }
-
-    .bd-publisher-featured-meta {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .bd-publisher-featured-meta-item:not(:nth-child(3n)) {
-        margin-right: 0;
-
-        border-right: 0;
-    }
-
-    .bd-publisher-featured-meta-item:nth-child(odd) {
-        margin-right: 15px;
-
-        border-right: 1px solid var(--line);
-    }
-
-    .bd-publisher-book-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .bd-publisher-book:not(:nth-child(3n)) {
-        margin-right: 0;
-
-        border-right: 0;
-    }
-
-    .bd-publisher-book:nth-child(odd) {
-        margin-right: 20px;
-
-        border-right: 1px solid var(--line);
-    }
-
-    .bd-publisher-partner-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .bd-publisher-partner:not(:nth-child(3n)) {
-        margin-right: 0;
-
-        border-right: 0;
-    }
-
-    .bd-publisher-partner:nth-child(odd) {
-        margin-right: 20px;
-
-        border-right:
-            1px solid
-            rgba(36,27,82,.10);
-    }
-
-    .bd-publisher-process {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 640px) {
-
-    .bd-publisher-shell {
-        width:
-            calc(100% - 30px);
-    }
-
-
-    /* HERO */
-
-    .bd-publisher-hero {
-        padding:
-            31px 0
-            36px;
-    }
-
-    .bd-publisher-hero-title {
-        font-size: 39px;
-    }
-
-    .bd-publisher-hero-description {
-        font-size: 11px;
-    }
-
-    .bd-publisher-hero-books {
-        width: 100%;
-        height: 310px;
-    }
-
-    .bd-publisher-hero-book:nth-child(1) {
-        width: 165px;
-        height: 240px;
-
-        left: 50%;
-        top: 18px;
-
-        transform:
-            translateX(-50%)
-            rotate(-1deg);
-    }
-
-    .bd-publisher-hero-book:nth-child(2) {
-        width: 125px;
-        height: 185px;
-
-        left: 3px;
-        top: 67px;
-    }
-
-    .bd-publisher-hero-book:nth-child(3) {
-        width: 125px;
-        height: 185px;
-
-        right: 3px;
-        top: 62px;
-    }
-
-    .bd-publisher-hero-books:hover
-    .bd-publisher-hero-book:nth-child(1) {
-        transform:
-            translateX(-50%)
-            translateY(-4px)
-            rotate(0);
-    }
-
-
-    /* SECTION */
-
-    .bd-publisher-section {
-        padding:
-            36px 0;
-    }
-
-    .bd-publisher-section-head {
-        align-items: flex-start;
-        flex-direction: column;
-
-        gap: 9px;
-    }
-
-    .bd-publisher-section-title {
-        font-size: 28px;
-    }
-
-
-    /* FEATURED */
-
-    .bd-publisher-featured {
-        grid-template-columns: 1fr;
-
-        gap: 25px;
-
-        padding-top: 10px;
-    }
-
-    .bd-publisher-featured-cover {
-        width: min(
-            72%,
-            275px
-        );
-    }
-
-    .bd-publisher-featured-title {
-        font-size: 29px;
-    }
-
-    .bd-publisher-featured-description {
-        font-size: 10px;
-    }
-
-
-    /* BOOK GRID */
-
-    .bd-publisher-book-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .bd-publisher-book,
-    .bd-publisher-book:nth-child(odd) {
-        margin: 0;
-
-        padding:
-            18px 8px
-            20px 0;
-
-        border-right: 0;
-    }
-
-    .bd-publisher-book:nth-child(odd) {
-        margin-right: 10px;
-
-        border-right: 1px solid var(--line);
-    }
-
-    .bd-publisher-book-title {
-        font-size: 12px;
-    }
-
-    .bd-publisher-book-meta {
-        display: none;
-    }
-
-
-    /* PARTNER */
-
-    .bd-publisher-partner-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .bd-publisher-partner,
-    .bd-publisher-partner:nth-child(odd) {
-        min-height: 115px;
-
-        margin: 0;
-
-        border-right: 0;
-    }
-
-
-    /* PROCESS */
-
-    .bd-publisher-process {
-        grid-template-columns: 1fr;
-    }
-
-    .bd-publisher-process-item,
-    .bd-publisher-process-item:not(:last-child) {
-        min-height: 0;
-
-        margin: 0;
-
-        padding:
-            18px 0;
-
-        border-right: 0;
-    }
-
-    .bd-publisher-process-number {
-        margin-bottom: 10px;
-    }
-
-
-    /* CTA */
-
-    .bd-publisher-cta-grid {
-        grid-template-columns: 1fr;
-
-        gap: 20px;
-    }
-
-    .bd-publisher-cta-title {
-        font-size: 29px;
-    }
-
-    .bd-publisher-cta-link {
-        width: 100%;
-
-        justify-content: center;
-    }
-
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    .bd-publisher-reveal {
-        opacity: 1 !important;
-
-        transform: none !important;
-    }
-
+@media(prefers-reduced-motion:reduce){
+    .bd-publisher *{animation-duration:.001ms!important;animation-iteration-count:1!important}
 }
 </style>
 
+<section class="bd-publisher" id="bdPublisherPage">
+    <div class="bd-publisher-shell">
 
-
-<div
-    class="bd-publisher"
-    id="bdPublisherPage"
->
-
-
-    {{-- =====================================================
-         HERO
-    ====================================================== --}}
-
-    <section class="bd-publisher-hero">
-
-        <div class="bd-publisher-shell">
-
-            <div class="bd-publisher-hero-grid">
-
-
-                {{-- COPY --}}
-
-                <div class="bd-publisher-reveal">
-
-                    <div class="bd-publisher-eyebrow">
-
-                        BacaDulu Publisher
-
-                    </div>
-
-
-                    <h1 class="bd-publisher-hero-title">
-
-                        Buku yang telah
-                        kami <span>terbitkan.</span>
-
-                    </h1>
-
-
-                    <p class="bd-publisher-hero-description">
-
-                        Jelajahi karya yang telah diterbitkan
-                        melalui BacaDulu Publisher, mulai dari
-                        buku ajar, referensi, monograf,
-                        hingga berbagai karya akademik
-                        dan umum.
-
-                    </p>
-
-
-                    <div class="bd-publisher-hero-bottom">
-
-                        <a
-                            href="#koleksiTerbitan"
-                            class="bd-publisher-scroll-link"
-                        >
-
-                            Jelajahi Terbitan
-
-                            <svg viewBox="0 0 24 24">
-
-                                <path d="M12 5v14"/>
-
-                                <path d="m7 14 5 5 5-5"/>
-
-                            </svg>
-
-                        </a>
-
-
-                        <div class="bd-publisher-count">
-
-                            <strong>
-                                {{ $totalBooks }}
-                            </strong>
-
-                            <span>
-                                Karya diterbitkan
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                {{-- BOOK VISUAL --}}
-
-                @if($heroBooks->count())
-
-                    <div
-                        class="
-                            bd-publisher-hero-books
-                            bd-publisher-reveal
-                        "
-                    >
-
-                        @foreach($heroBooks as $heroBook)
-
-                            <div class="bd-publisher-hero-book">
-
-                                @if(!empty($heroBook->cover))
-
-                                    <img
-                                        src="{{ $resolveStorageAsset($heroBook->cover) }}"
-                                        alt="{{ $heroBook->title }}"
-                                        onerror="this.style.display='none';"
-                                    >
-
-                                @endif
-
-
-                                <div class="bd-publisher-cover-fallback">
-
-                                    <span>
-                                        {{ $heroBook->title }}
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                        @endforeach
-
-                    </div>
-
-                @endif
-
+        <div class="bd-publisher-brandbar">
+            <div class="bd-publisher-brand">
+                <span class="bd-publisher-brand-mark"></span>
+                <span class="bd-publisher-brand-name">BacaDulu</span>
+                <span class="bd-publisher-brand-type">Publisher</span>
             </div>
-
         </div>
 
-    </section>
+        <section class="bd-publisher-hero" id="bdPublisherHero">
+            <div class="bd-publisher-hero-copy">
+                <div class="bd-publisher-eyebrow js-typewriter" data-text="Baca Publisher">Baca Publisher</div>
 
+                <h1 class="js-word-reveal">
+                    Karya yang layak diterbitkan dan dibaca lebih luas.
+                </h1>
 
-
-    {{-- =====================================================
-         FEATURED PUBLICATION
-    ====================================================== --}}
-
-    <section
-        class="bd-publisher-section"
-        id="koleksiTerbitan"
-    >
-
-        <div class="bd-publisher-shell">
-
-
-            <div
-                class="
-                    bd-publisher-section-head
-                    bd-publisher-reveal
-                "
-            >
-
-                <div>
-
-                    <div class="bd-publisher-section-label">
-                        Terbitan terbaru
-                    </div>
-
-
-                    <h2 class="bd-publisher-section-title">
-
-                        Karya pilihan
-                        Baca Publisher
-
-                    </h2>
-
-                </div>
-
-
-                <p class="bd-publisher-section-description">
-
-                    Portfolio buku yang telah melalui
-                    proses penerbitan dan menjadi bagian
-                    dari koleksi BacaDulu Publisher.
-
+                <p class="bd-publisher-hero-description">
+                    BacaDulu Publisher menerbitkan buku, monograf, referensi, dan bahan ajar melalui proses editorial yang terarah agar setiap karya memiliki kualitas, identitas, dan nilai baca yang kuat.
                 </p>
-
             </div>
 
+            <div class="bd-publisher-motion" id="bdPublisherMotion" aria-hidden="true">
+                <div class="bd-publisher-motion-orbit" id="bdPublisherOrbit">
+                    <span class="bd-publisher-orbit-dot"></span>
+                </div>
 
+                <span class="bd-axis-x"></span>
+                <span class="bd-axis-y"></span>
 
-            @if($featuredBook)
-
-                <article
-                    class="
-                        bd-publisher-featured
-                        bd-publisher-reveal
-                    "
-                >
-
-
-                    {{-- COVER --}}
-
-                    <div class="bd-publisher-featured-cover-wrap">
-
-                        <div class="bd-publisher-featured-cover">
-
-
-                            <div class="bd-publisher-cover-fallback">
-
-                                <span>
-                                    {{ $featuredBook->title }}
-                                </span>
-
-                            </div>
-
-
-                            @if(!empty($featuredBook->cover))
-
-                                <img
-                                    src="{{ $resolveStorageAsset($featuredBook->cover) }}"
-                                    alt="{{ $featuredBook->title }}"
-                                    onerror="this.style.display='none';"
-                                >
-
-                            @endif
-
+                <div class="bd-publisher-float bd-float-two js-bd-float">
+                    <div class="bd-publisher-float-book">
+                        <div class="bd-publisher-float-label">
+                            <small>BacaDulu</small>
+                            Buku
                         </div>
-
                     </div>
+                </div>
 
-
-
-                    {{-- CONTENT --}}
-
-                    <div class="bd-publisher-featured-content">
-
-
-                        <div class="bd-publisher-publication-kicker">
-                            Terbitan terbaru
+                <div class="bd-publisher-float bd-float-three js-bd-float">
+                    <div class="bd-publisher-float-book">
+                        <div class="bd-publisher-float-label">
+                            <small>BacaDulu</small>
+                            Referensi
                         </div>
-
-
-                        <h3 class="bd-publisher-featured-title">
-
-                            {{ $featuredBook->title }}
-
-                        </h3>
-
-
-                        @if(!empty($featuredBook->author))
-
-                            <div class="bd-publisher-featured-author">
-
-                                {{ $featuredBook->author }}
-
-                            </div>
-
-                        @endif
-
-
-
-                        <div class="bd-publisher-featured-meta">
-
-
-                            <div class="bd-publisher-featured-meta-item">
-
-                                <div class="bd-publisher-meta-label">
-                                    Tahun Terbit
-                                </div>
-
-                                <div class="bd-publisher-meta-value">
-
-                                    {{ $featuredBook->publish_year ?: '-' }}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="bd-publisher-featured-meta-item">
-
-                                <div class="bd-publisher-meta-label">
-                                    ISBN
-                                </div>
-
-                                <div class="bd-publisher-meta-value">
-
-                                    {{ $featuredBook->isbn ?: '-' }}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="bd-publisher-featured-meta-item">
-
-                                <div class="bd-publisher-meta-label">
-                                    Jenis Buku
-                                </div>
-
-                                <div class="bd-publisher-meta-value">
-
-                                    {{ $featuredBook->category ?: '-' }}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="bd-publisher-featured-meta-item">
-
-                                <div class="bd-publisher-meta-label">
-                                    Penulis
-                                </div>
-
-                                <div class="bd-publisher-meta-value">
-
-                                    {{ $featuredBook->author ?: '-' }}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="bd-publisher-featured-meta-item">
-
-                                <div class="bd-publisher-meta-label">
-                                    Penerbit
-                                </div>
-
-                                <div class="bd-publisher-meta-value">
-
-                                    {{
-                                        $featuredBook->publisher
-                                        ?:
-                                        'BacaDulu Publisher'
-                                    }}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="bd-publisher-featured-meta-item">
-
-                                <div class="bd-publisher-meta-label">
-                                    Status
-                                </div>
-
-                                <div
-                                    class="
-                                        bd-publisher-meta-value
-                                        bd-publisher-status
-                                    "
-                                >
-
-                                    Sudah Terbit
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-
-                        @if(!empty($featuredBook->description))
-
-                            <div class="bd-publisher-featured-description">
-
-                                {{
-                                    \Illuminate\Support\Str::limit(
-                                        trim(
-                                            preg_replace(
-                                                '/\s+/u',
-                                                ' ',
-                                                strip_tags(
-                                                    $featuredBook->description
-                                                )
-                                            )
-                                        ),
-                                        380
-                                    )
-                                }}
-
-                            </div>
-
-                        @endif
-
-
-
-                        <a
-                            href="{{ route('publisher.books.show', $featuredBook) }}"
-                            class="bd-publisher-detail"
-                        >
-
-                            Lihat Detail Buku
-
-                            <svg viewBox="0 0 24 24">
-
-                                <path d="M5 12h14"/>
-
-                                <path d="m14 7 5 5-5 5"/>
-
-                            </svg>
-
-                        </a>
-
                     </div>
+                </div>
 
+                <div class="bd-publisher-float bd-float-four js-bd-float">
+                    <div class="bd-publisher-float-book"></div>
+                </div>
+
+                <div class="bd-publisher-float bd-float-one js-bd-float">
+                    <div class="bd-publisher-float-book">
+                        <div class="bd-publisher-float-label">
+                            <small>BacaDulu Publisher</small>
+                            Ideas become books.
+                        </div>
+                    </div>
+                </div>
+
+                <span class="bd-publisher-motion-pulse" id="bdPublisherPulse"></span>
+            </div>
+        </section>
+
+        <section class="bd-publisher-about js-scroll-section">
+            <div class="bd-publisher-section-label js-typewriter" data-text="Tentang Publisher">
+                Tentang Publisher
+            </div>
+
+            <div class="bd-publisher-about-copy">
+                <h2 class="js-section-title">
+                    Menjaga kualitas isi, identitas karya, dan pengalaman membaca.
+                </h2>
+
+                <p class="js-section-copy">
+                    BacaDulu Publisher menjadi ruang penerbitan bagi karya akademik dan nonakademik, mulai dari monograf, buku ajar, referensi, hingga buku untuk pembaca umum.
+                </p>
+
+                <p class="js-section-copy">
+                    Setiap naskah dipersiapkan melalui proses editorial dan penerbitan agar tidak hanya selesai dicetak, tetapi memiliki struktur, identitas, dan penyajian yang layak untuk dibaca lebih luas.
+                </p>
+            </div>
+        </section>
+
+        <section class="bd-publisher-services js-scroll-section" data-mode="services">
+            <div class="bd-publisher-section-head">
+                <div>
+                    <span class="bd-publisher-section-eyebrow js-typewriter" data-text="Layanan Penerbitan">
+                        Layanan Penerbitan
+                    </span>
+
+                    <h2 class="bd-publisher-section-title js-section-title">
+                        Dari naskah menjadi buku yang siap terbit.
+                    </h2>
+                </div>
+
+                <p class="bd-publisher-section-description js-section-copy">
+                    Proses penerbitan disiapkan secara menyeluruh agar naskah memiliki kualitas editorial, visual, dan identitas penerbitan yang baik.
+                </p>
+            </div>
+
+            <div class="bd-publisher-service-grid">
+                <article class="bd-publisher-service js-service">
+                    <div class="bd-publisher-service-number">01</div>
+                    <h3>Editorial & Penyuntingan</h3>
+                    <p>Penyiapan struktur naskah, penyuntingan bahasa, proofreading, dan finalisasi sebelum produksi.</p>
                 </article>
 
+                <article class="bd-publisher-service js-service">
+                    <div class="bd-publisher-service-number">02</div>
+                    <h3>Desain & Tata Letak</h3>
+                    <p>Penataan isi dan desain sampul agar buku memiliki karakter visual yang sesuai dengan isi dan pembacanya.</p>
+                </article>
 
-            @else
+                <article class="bd-publisher-service js-service">
+                    <div class="bd-publisher-service-number">03</div>
+                    <h3>ISBN & Penerbitan</h3>
+                    <p>Persiapan administrasi penerbitan untuk buku cetak maupun format digital sesuai kebutuhan karya.</p>
+                </article>
 
-                <div class="bd-publisher-empty">
+                <article class="bd-publisher-service js-service">
+                    <div class="bd-publisher-service-number">04</div>
+                    <h3>Cetak & Publikasi</h3>
+                    <p>Persiapan produksi buku sekaligus dukungan agar karya dapat hadir dan dikenal oleh pembacanya.</p>
+                </article>
+            </div>
+        </section>
 
-                    <h3>
-                        Belum ada buku diterbitkan
-                    </h3>
+        <section class="bd-publisher-process" id="bdPublisherProcess">
+            <div class="bd-process-layout">
+
+                <aside class="bd-process-side">
+                    <span class="bd-publisher-section-eyebrow js-process-typewriter" data-text="Alur Penerbitan">
+                        Alur Penerbitan
+                    </span>
+
+                    <h2>
+                        Satu proses yang jelas dari awal sampai terbit.
+                    </h2>
 
                     <p>
-                        Portfolio buku akan tampil di sini.
+                        Scroll ke bawah untuk mengikuti setiap tahap penerbitan dari pengajuan naskah hingga karya resmi terbit.
                     </p>
+                </aside>
 
-                </div>
+                <div class="bd-process-flow">
+                    <div class="bd-process-track"></div>
+                    <div class="bd-process-track-fill" id="bdProcessTrackFill"></div>
 
-            @endif
+                    @php
+                        $steps = [
+                            ['01','Tahap Pertama','Pengajuan Naskah','Penulis mengirimkan naskah dan informasi dasar mengenai karya yang ingin diterbitkan melalui BacaDulu Publisher.'],
+                            ['02','Tahap Kedua','Review Naskah','Tim melakukan pemeriksaan awal untuk memahami karakter naskah, kelayakan penerbitan, serta kebutuhan pengerjaan sebelum masuk tahap editorial.'],
+                            ['03','Tahap Ketiga','Editorial & Penyuntingan','Naskah memasuki proses penyuntingan, proofreading, penyempurnaan struktur, dan penyesuaian penyajian agar lebih siap dibaca.'],
+                            ['04','Tahap Keempat','Desain & Finalisasi','Isi buku ditata, desain sampul disiapkan, metadata dilengkapi, dan keseluruhan materi difinalisasi sebelum memasuki proses penerbitan.'],
+                            ['05','Tahap Kelima','Buku Resmi Terbit','Karya memasuki proses penerbitan dan produksi hingga akhirnya siap hadir sebagai buku yang dapat dibaca dan dikenali oleh pembacanya.'],
+                        ];
+                    @endphp
 
-        </div>
+                    @foreach($steps as $index => $step)
+                        <div class="bd-process-step-row" data-process-step="{{ $index }}">
+                            <div class="bd-process-marker {{ $index === 0 ? 'active' : '' }}" data-process-marker="{{ $index }}">
+                                <span class="bd-process-marker-dot"></span>
+                                <span class="bd-process-marker-number">{{ $step[0] }}</span>
+                            </div>
 
-    </section>
+                            <article class="bd-process-step">
+                                <div class="bd-process-step-inner">
+                                    <div class="bd-process-big-number">{{ $step[0] }}</div>
 
-
-
-    {{-- =====================================================
-         ALL BOOKS
-    ====================================================== --}}
-
-    @if($books->count())
-
-        <section class="bd-publisher-section">
-
-            <div class="bd-publisher-shell">
-
-
-                <div
-                    class="
-                        bd-publisher-section-head
-                        bd-publisher-reveal
-                    "
-                >
-
-                    <div>
-
-                        <div class="bd-publisher-section-label">
-                            Portfolio
+                                    <div class="bd-process-step-copy">
+                                        <span class="bd-process-step-label">{{ $step[1] }}</span>
+                                        <h3>{{ $step[2] }}</h3>
+                                        <p>{{ $step[3] }}</p>
+                                    </div>
+                                </div>
+                            </article>
                         </div>
-
-
-                        <h2 class="bd-publisher-section-title">
-                            Semua terbitan
-                        </h2>
-
-                    </div>
-
-
-                    <p class="bd-publisher-section-description">
-
-                        Lihat informasi judul, penulis,
-                        tahun penerbitan, ISBN,
-                        dan kategori setiap buku.
-
-                    </p>
-
-                </div>
-
-
-
-                <div class="bd-publisher-book-grid">
-
-                    @foreach($books as $book)
-
-                        <article
-                            class="
-                                bd-publisher-book
-                                bd-publisher-reveal
-                            "
-                        >
-
-
-                            {{-- COVER --}}
-
-                            <div class="bd-publisher-book-cover">
-
-
-                                <div class="bd-publisher-cover-fallback">
-
-                                    <span>
-                                        {{ $book->title }}
-                                    </span>
-
-                                </div>
-
-
-                                @if(!empty($book->cover))
-
-                                    <img
-                                        src="{{ $resolveStorageAsset($book->cover) }}"
-                                        alt="{{ $book->title }}"
-                                        loading="lazy"
-                                        onerror="this.style.display='none';"
-                                    >
-
-                                @endif
-
-                            </div>
-
-
-
-                            {{-- CONTENT --}}
-
-                            <div class="bd-publisher-book-content">
-
-
-                                @if(!empty($book->category))
-
-                                    <div class="bd-publisher-book-category">
-
-                                        {{ $book->category }}
-
-                                    </div>
-
-                                @endif
-
-
-                                <h3 class="bd-publisher-book-title">
-
-                                    {{ $book->title }}
-
-                                </h3>
-
-
-                                @if(!empty($book->author))
-
-                                    <div class="bd-publisher-book-author">
-
-                                        {{ $book->author }}
-
-                                    </div>
-
-                                @endif
-
-
-
-                                <div class="bd-publisher-book-meta">
-
-
-                                    <div class="bd-publisher-book-meta-row">
-
-                                        <span class="bd-publisher-book-meta-label">
-                                            Tahun
-                                        </span>
-
-                                        <span class="bd-publisher-book-meta-value">
-
-                                            {{ $book->publish_year ?: '-' }}
-
-                                        </span>
-
-                                    </div>
-
-
-                                    <div class="bd-publisher-book-meta-row">
-
-                                        <span class="bd-publisher-book-meta-label">
-                                            ISBN
-                                        </span>
-
-                                        <span class="bd-publisher-book-meta-value">
-
-                                            {{ $book->isbn ?: '-' }}
-
-                                        </span>
-
-                                    </div>
-
-
-                                    <div class="bd-publisher-book-meta-row">
-
-                                        <span class="bd-publisher-book-meta-label">
-                                            Status
-                                        </span>
-
-                                        <span class="bd-publisher-book-meta-value">
-
-                                            Sudah Terbit
-
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                <a
-                                    href="{{ route('publisher.books.show', $book) }}"
-                                    class="bd-publisher-book-detail"
-                                >
-
-                                    Lihat Detail
-
-                                    <svg viewBox="0 0 24 24">
-
-                                        <path d="M5 12h14"/>
-
-                                        <path d="m14 7 5 5-5 5"/>
-
-                                    </svg>
-
-                                </a>
-
-                            </div>
-
-                        </article>
-
                     @endforeach
-
                 </div>
-
-
-
-                @if($books->hasPages())
-
-                    <div class="bd-publisher-pagination">
-
-                        {{
-                            $books
-                                ->onEachSide(1)
-                                ->links('pagination::bootstrap-5')
-                        }}
-
-                    </div>
-
-                @endif
-
             </div>
-
         </section>
 
-    @endif
-
-
-
-    {{-- =====================================================
-         PUBLISHER PARTNERS
-    ====================================================== --}}
-
-    @if($publishers->count())
-
-        <section
-            class="
-                bd-publisher-section
-                bd-publisher-partner-section
-            "
-        >
-
-            <div class="bd-publisher-shell">
-
-
-                <div
-                    class="
-                        bd-publisher-section-head
-                        bd-publisher-reveal
-                    "
-                >
-
-                    <div>
-
-                        <div class="bd-publisher-section-label">
-                            Kolaborasi
-                        </div>
-
-
-                        <h2 class="bd-publisher-section-title">
-
-                            Mitra penerbitan
-
-                        </h2>
-
-                    </div>
-
-
-                    <p class="bd-publisher-section-description">
-
-                        Penerbit dan mitra yang menjadi
-                        bagian dari jaringan penerbitan
-                        Baca Dulu.
-
-                    </p>
-
-                </div>
-
-
-
-                <div class="bd-publisher-partner-grid">
-
-                    @foreach($publishers as $publisher)
-
-                        @php
-                            $publisherName =
-                                $publisher->name
-                                ??
-                                $publisher->title
-                                ??
-                                'Publisher';
-
-                            $publisherLogoPath =
-                                $publisher->logo
-                                ??
-                                $publisher->image
-                                ??
-                                null;
-
-                            $publisherLogo =
-                                $resolveStorageAsset(
-                                    $publisherLogoPath
-                                );
-                        @endphp
-
-
-                        <article
-                            class="
-                                bd-publisher-partner
-                                bd-publisher-reveal
-                            "
-                        >
-
-
-                            {{-- LOGO --}}
-
-                            <div class="bd-publisher-partner-logo">
-
-
-                                <div class="bd-publisher-partner-logo-fallback"></div>
-
-
-                                @if($publisherLogo)
-
-                                    <img
-                                        src="{{ $publisherLogo }}"
-                                        alt="{{ $publisherName }}"
-                                        loading="lazy"
-                                        onerror="this.style.display='none';"
-                                    >
-
-                                @endif
-
-                            </div>
-
-
-
-                            {{-- INFO --}}
-
-                            <div>
-
-                                <h3 class="bd-publisher-partner-name">
-
-                                    {{ $publisherName }}
-
-                                </h3>
-
-
-                                @if(!empty($publisher->description))
-
-                                    <div class="bd-publisher-partner-description">
-
-                                        {{
-                                            \Illuminate\Support\Str::limit(
-                                                trim(
-                                                    preg_replace(
-                                                        '/\s+/u',
-                                                        ' ',
-                                                        strip_tags(
-                                                            $publisher->description
-                                                        )
-                                                    )
-                                                ),
-                                                120
-                                            )
-                                        }}
-
-                                    </div>
-
-                                @endif
-
-                            </div>
-
-                        </article>
-
-                    @endforeach
-
-                </div>
-
-            </div>
-
-        </section>
-
-    @endif
-
-
-
-    {{-- =====================================================
-         PROCESS
-    ====================================================== --}}
-
-    <section class="bd-publisher-section">
-
-        <div class="bd-publisher-shell">
-
-
-            <div
-                class="
-                    bd-publisher-section-head
-                    bd-publisher-reveal
-                "
-            >
-
+        <section class="bd-publisher-catalog js-scroll-section" data-mode="catalog">
+            <div class="bd-publisher-catalog-head">
                 <div>
+                    <span class="bd-publisher-section-eyebrow js-typewriter" data-text="Katalog BacaDulu">
+                        Katalog BacaDulu
+                    </span>
 
-                    <div class="bd-publisher-section-label">
-                        Menerbitkan bersama kami
-                    </div>
-
-
-                    <h2 class="bd-publisher-section-title">
-
-                        Dari naskah
-                        menjadi buku.
-
+                    <h2 class="bd-publisher-catalog-title js-section-title">
+                        Terbitan kami.
                     </h2>
-
                 </div>
 
-
-                <p class="bd-publisher-section-description">
-
-                    Proses penerbitan disusun secara
-                    bertahap agar setiap karya siap
-                    memasuki portfolio penerbitan.
-
+                <p class="bd-publisher-section-description js-section-copy">
+                    Jelajahi karya yang telah diterbitkan berdasarkan kategori, judul, atau nama penulis.
                 </p>
-
             </div>
 
+            <div class="bd-publisher-filterbar js-catalog-filter">
+                <div class="bd-publisher-chips" id="bdPublisherChips"></div>
 
-
-            <div class="bd-publisher-process">
-
-
-                <article class="bd-publisher-process-item bd-publisher-reveal">
-
-                    <div class="bd-publisher-process-number">
-                        01
-                    </div>
-
-                    <h3 class="bd-publisher-process-title">
-                        Kirim Naskah
-                    </h3>
-
-                    <div class="bd-publisher-process-text">
-
-                        Penulis mengajukan naskah
-                        untuk ditinjau.
-
-                    </div>
-
-                </article>
-
-
-
-                <article class="bd-publisher-process-item bd-publisher-reveal">
-
-                    <div class="bd-publisher-process-number">
-                        02
-                    </div>
-
-                    <h3 class="bd-publisher-process-title">
-                        Editorial
-                    </h3>
-
-                    <div class="bd-publisher-process-text">
-
-                        Naskah memasuki tahap
-                        penyuntingan dan review.
-
-                    </div>
-
-                </article>
-
-
-
-                <article class="bd-publisher-process-item bd-publisher-reveal">
-
-                    <div class="bd-publisher-process-number">
-                        03
-                    </div>
-
-                    <h3 class="bd-publisher-process-title">
-                        Produksi
-                    </h3>
-
-                    <div class="bd-publisher-process-text">
-
-                        Layout, sampul dan kelengkapan
-                        penerbitan dipersiapkan.
-
-                    </div>
-
-                </article>
-
-
-
-                <article class="bd-publisher-process-item bd-publisher-reveal">
-
-                    <div class="bd-publisher-process-number">
-                        04
-                    </div>
-
-                    <h3 class="bd-publisher-process-title">
-                        Terbit
-                    </h3>
-
-                    <div class="bd-publisher-process-text">
-
-                        Buku diterbitkan dan masuk
-                        ke portfolio Baca Publisher.
-
-                    </div>
-
-                </article>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    {{-- =====================================================
-         CTA
-    ====================================================== --}}
-
-    <section class="bd-publisher-cta">
-
-        <div class="bd-publisher-shell">
-
-            <div class="bd-publisher-cta-grid">
-
-
-                <div class="bd-publisher-reveal">
-
-                    <div class="bd-publisher-cta-label">
-                        Punya naskah?
-                    </div>
-
-
-                    <h2 class="bd-publisher-cta-title">
-
-                        Jadikan gagasan Anda
-                        bagian dari terbitan berikutnya.
-
-                    </h2>
-
+                <div class="bd-publisher-search">
+                    <input type="text" id="bdPublisherSearch" placeholder="Cari judul atau penulis" autocomplete="off">
                 </div>
-
-
-                <a
-                    href="{{ url('/konsultasi') }}"
-                    class="
-                        bd-publisher-cta-link
-                        bd-publisher-reveal
-                    "
-                >
-
-                    Konsultasi Penerbitan →
-
-                </a>
-
             </div>
 
-        </div>
+            <div class="bd-publisher-result">
+                <span id="bdPublisherResultCount"></span>
+            </div>
 
-    </section>
+            <div class="bd-publisher-grid" id="bdPublisherGrid"></div>
 
-</div>
+            <div class="bd-publisher-empty" id="bdPublisherEmpty">
+                Tidak ada buku yang sesuai dengan pencarian.
+            </div>
+        </section>
 
+        <section class="bd-publisher-submit js-scroll-section" data-mode="cta">
+            <div>
+                <span class="bd-publisher-section-eyebrow js-typewriter" data-text="Punya Naskah?">
+                    Punya Naskah?
+                </span>
 
+                <h2 class="js-section-title">
+                    Mulai perjalanan penerbitan karya Anda.
+                </h2>
+
+                <p class="js-section-copy">
+                    Konsultasikan naskah dan kebutuhan penerbitan untuk mengetahui proses yang sesuai dengan karya Anda.
+                </p>
+            </div>
+
+            <a href="#" class="bd-publisher-submit-button js-submit-button">
+                Ajukan Naskah
+            </a>
+        </section>
+
+    </div>
+</section>
+
+<div class="bd-publisher-overlay" id="bdPublisherOverlay"></div>
+
+<aside class="bd-publisher-drawer" id="bdPublisherDrawer" aria-hidden="true">
+    <div class="bd-publisher-drawer-top">
+        <div class="bd-publisher-drawer-label">Detail Terbitan</div>
+        <button type="button" class="bd-publisher-close" id="bdPublisherClose">×</button>
+    </div>
+
+    <div class="bd-publisher-drawer-body" id="bdPublisherDrawerBody"></div>
+</aside>
 
 <script>
 (() => {
+    const BOOKS = @json($publisherBookData);
 
-    const initPublisherPage = () => {
+    const COLORS = {
+        'Monograf':{hex:'#241B52',rgb:'36,27,82'},
+        'Referensi':{hex:'#EF5843',rgb:'239,88,67'},
+        'Buku Ajar':{hex:'#566B91',rgb:'86,107,145'},
+        'Umum':{hex:'#80586F',rgb:'128,88,111'}
+    };
 
-        const page =
-            document.getElementById(
-                'bdPublisherPage'
+    const FALLBACK = [
+        {hex:'#241B52',rgb:'36,27,82'},
+        {hex:'#EF5843',rgb:'239,88,67'},
+        {hex:'#566B91',rgb:'86,107,145'},
+        {hex:'#80586F',rgb:'128,88,111'}
+    ];
+
+    let gsapInstance = null;
+    let activeCategory = 'Semua';
+    let searchTerm = '';
+    let lastFocusedElement = null;
+
+    const escapeHtml = value => String(value ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+
+    const categories = [...new Set(
+        BOOKS.map(book => book.category || 'Umum').filter(Boolean)
+    )];
+
+    const getColor = category => {
+        if (COLORS[category]) return COLORS[category];
+        let index = categories.indexOf(category);
+        if (index < 0) index = 0;
+        return FALLBACK[index % FALLBACK.length];
+    };
+
+    const resolveGsap = () => {
+        const candidates = [
+            window.bdGsap,
+            window.bdGsap?.gsap,
+            window.gsap,
+            window.GSAP
+        ];
+
+        return candidates.find(item =>
+            item &&
+            typeof item.to === 'function' &&
+            typeof item.fromTo === 'function' &&
+            typeof item.timeline === 'function'
+        ) || null;
+    };
+
+    /* TYPEWRITER */
+    const typeText = (element,gsap) => {
+        if (!element || element.dataset.typed === '1') return;
+
+        const text = element.dataset.text || element.textContent.trim();
+
+        element.dataset.typed = '1';
+        element.setAttribute('aria-label',text);
+
+        element.innerHTML = `
+            <span class="bd-typewriter" aria-hidden="true">
+                <span class="bd-typewriter-text"></span>
+                <span class="bd-typewriter-cursor"></span>
+            </span>
+        `;
+
+        const output = element.querySelector('.bd-typewriter-text');
+        const cursor = element.querySelector('.bd-typewriter-cursor');
+        const state = {value:0};
+
+        gsap.to(state,{
+            value:text.length,
+            duration:Math.max(.42,text.length * .032),
+            ease:'none',
+            onUpdate:() => {
+                output.textContent = text.slice(0,Math.round(state.value));
+            },
+            onComplete:() => {
+                output.textContent = text;
+
+                if (cursor) {
+                    gsap.to(cursor,{
+                        opacity:0,
+                        duration:.1,
+                        onComplete:() => cursor.remove()
+                    });
+                }
+            }
+        });
+    };
+
+    /* HERO */
+    const splitWords = element => {
+        if (!element || element.dataset.split === '1') return [];
+
+        const text = element.textContent.trim().replace(/\s+/g,' ');
+        element.dataset.split = '1';
+        element.setAttribute('aria-label',text);
+        element.innerHTML = text.split(' ').map(word =>
+            `<span class="bd-word" aria-hidden="true">${escapeHtml(word)}</span>`
+        ).join(' ');
+
+        return [...element.querySelectorAll('.bd-word')];
+    };
+
+    const animateHero = gsap => {
+        const hero = document.getElementById('bdPublisherHero');
+        const motion = document.getElementById('bdPublisherMotion');
+
+        if (!hero || !motion) return;
+
+        const words = splitWords(hero.querySelector('.js-word-reveal'));
+        const description = hero.querySelector('.bd-publisher-hero-description');
+        const floats = [...motion.querySelectorAll('.js-bd-float')];
+        const orbit = document.getElementById('bdPublisherOrbit');
+        const pulse = document.getElementById('bdPublisherPulse');
+
+        const tl = gsap.timeline({delay:.08});
+
+        tl.fromTo(words,
+            {opacity:0,y:38,rotationX:-22},
+            {opacity:1,y:0,rotationX:0,duration:.7,stagger:.045,ease:'power3.out'}
+        );
+
+        tl.fromTo(description,
+            {opacity:0,y:22},
+            {opacity:1,y:0,duration:.55,ease:'power3.out'},
+            '-=.35'
+        );
+
+        tl.call(() => typeText(hero.querySelector('.js-typewriter'),gsap),null,'-=.28');
+
+        gsap.fromTo(floats,
+            {opacity:0,scale:.75,y:35},
+            {opacity:1,scale:1,y:0,duration:.85,stagger:.1,ease:'back.out(1.4)',delay:.18}
+        );
+
+        floats.forEach((item,index) => {
+            gsap.to(item,{
+                y:index % 2 === 0 ? -13 : 11,
+                x:index % 3 === 0 ? 4 : -4,
+                duration:2.6 + index * .38,
+                repeat:-1,
+                yoyo:true,
+                ease:'sine.inOut'
+            });
+        });
+
+        if (orbit) {
+            gsap.to(orbit,{rotation:360,duration:20,repeat:-1,ease:'none'});
+        }
+
+        if (pulse) {
+            gsap.to(pulse,{scale:1.55,opacity:.45,duration:1.3,repeat:-1,yoyo:true,ease:'sine.inOut'});
+        }
+    };
+
+    /* NORMAL SECTION */
+    const initSectionAnimations = gsap => {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+
+                const section = entry.target;
+                if (section.dataset.animated === '1') return;
+
+                section.dataset.animated = '1';
+
+                const typewriter = section.querySelector('.js-typewriter');
+                const title = section.querySelector('.js-section-title');
+                const copies = section.querySelectorAll('.js-section-copy');
+
+                if (typewriter) typeText(typewriter,gsap);
+
+                if (title) {
+                    gsap.fromTo(title,
+                        {opacity:0,y:38},
+                        {opacity:1,y:0,duration:.7,ease:'power3.out'}
+                    );
+                }
+
+                if (copies.length) {
+                    gsap.fromTo(copies,
+                        {opacity:0,y:22},
+                        {opacity:1,y:0,duration:.58,stagger:.1,delay:.1,ease:'power3.out'}
+                    );
+                }
+
+                if (section.dataset.mode === 'services') {
+                    gsap.fromTo(section.querySelectorAll('.js-service'),
+                        {opacity:0,y:52,scale:.95},
+                        {opacity:1,y:0,scale:1,duration:.68,stagger:.11,delay:.15,ease:'back.out(1.2)'}
+                    );
+                }
+
+                if (section.dataset.mode === 'catalog') {
+                    const filter = section.querySelector('.js-catalog-filter');
+
+                    if (filter) {
+                        gsap.fromTo(filter,
+                            {opacity:0,y:24},
+                            {opacity:1,y:0,duration:.55,delay:.15,ease:'power3.out'}
+                        );
+                    }
+
+                    requestAnimationFrame(() => animateBookCards(gsap));
+                }
+
+                if (section.dataset.mode === 'cta') {
+                    const button = section.querySelector('.js-submit-button');
+
+                    if (button) {
+                        gsap.fromTo(button,
+                            {opacity:0,x:45},
+                            {opacity:1,x:0,duration:.65,delay:.15,ease:'power3.out'}
+                        );
+                    }
+                }
+
+                observer.unobserve(section);
+            });
+        },{
+            threshold:.12,
+            rootMargin:'0px 0px -5% 0px'
+        });
+
+        document.querySelectorAll('.js-scroll-section').forEach(section => observer.observe(section));
+    };
+
+    /* PROCESS */
+    const initProcessAnimations = gsap => {
+        const process = document.getElementById('bdPublisherProcess');
+        if (!process) return;
+
+        const rows = [...process.querySelectorAll('[data-process-step]')];
+        const markers = [...process.querySelectorAll('[data-process-marker]')];
+        const fill = document.getElementById('bdProcessTrackFill');
+        const typewriter = process.querySelector('.js-process-typewriter');
+
+        const setActive = index => {
+            markers.forEach((marker,i) => {
+                marker.classList.toggle('active',i === index);
+                marker.classList.toggle('done',i < index);
+            });
+
+            if (fill) {
+                const progress = rows.length <= 1 ? 1 : index / (rows.length - 1);
+
+                gsap.to(fill,{
+                    scaleY:Math.max(.001,progress),
+                    duration:.55,
+                    ease:'power2.out'
+                });
+            }
+        };
+
+        const headerObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+
+                if (typewriter) typeText(typewriter,gsap);
+
+                gsap.fromTo(
+                    process.querySelectorAll('.bd-process-side h2,.bd-process-side p'),
+                    {opacity:0,y:24},
+                    {opacity:1,y:0,duration:.6,stagger:.09,ease:'power3.out'}
+                );
+
+                headerObserver.disconnect();
+            });
+        },{threshold:.12});
+
+        headerObserver.observe(process);
+
+        const rowObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+
+                const row = entry.target;
+                const index = Number(row.dataset.processStep);
+
+                setActive(index);
+
+                if (row.dataset.animated === '1') return;
+                row.dataset.animated = '1';
+
+                const marker = row.querySelector('.bd-process-marker');
+                const number = row.querySelector('.bd-process-big-number');
+                const label = row.querySelector('.bd-process-step-label');
+                const title = row.querySelector('h3');
+                const copy = row.querySelector('p');
+                const direction = index % 2 === 0 ? 38 : -38;
+
+                gsap.fromTo(marker,
+                    {opacity:0,scale:.65},
+                    {opacity:1,scale:1,duration:.5,ease:'back.out(1.7)'}
+                );
+
+                gsap.fromTo(number,
+                    {opacity:0,scale:.72,rotation:index % 2 === 0 ? -7 : 7},
+                    {opacity:1,scale:1,rotation:0,duration:.55,ease:'back.out(1.5)'}
+                );
+
+                gsap.fromTo(label,
+                    {opacity:0,y:12},
+                    {opacity:1,y:0,duration:.4,delay:.07,ease:'power3.out'}
+                );
+
+                gsap.fromTo(title,
+                    {opacity:0,x:direction},
+                    {opacity:1,x:0,duration:.58,delay:.1,ease:'power3.out'}
+                );
+
+                gsap.fromTo(copy,
+                    {opacity:0,y:20},
+                    {opacity:1,y:0,duration:.52,delay:.18,ease:'power3.out'}
+                );
+            });
+        },{
+            threshold:.4,
+            rootMargin:'-5% 0px -20% 0px'
+        });
+
+        rows.forEach(row => rowObserver.observe(row));
+        setActive(0);
+    };
+
+    /* BOOK COVER */
+    const coverMarkup = book => {
+        const color = getColor(book.category || 'Umum');
+
+        if (book.cover) {
+            return `
+                <div class="bd-publisher-cover-card" style="--book-rgb:${color.rgb}">
+                    <button type="button" class="bd-publisher-cover" data-id="${book.id}">
+                        <img src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}" class="bd-publisher-cover-image" loading="lazy">
+                    </button>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="bd-publisher-cover-card" style="--book-rgb:${color.rgb}">
+                <button type="button" class="bd-publisher-cover" data-id="${book.id}" style="background:${color.hex}">
+                    <span class="bd-publisher-cover-fallback" style="background:${color.hex}">
+                        <span class="bd-publisher-cover-category">${escapeHtml(book.category || 'Umum')}</span>
+
+                        <span>
+                            <span class="bd-publisher-cover-title">${escapeHtml(book.title)}</span>
+                            <span class="bd-publisher-cover-author">${escapeHtml(book.author || '-')}</span>
+                        </span>
+                    </span>
+                </button>
+            </div>
+        `;
+    };
+
+    /* FILTER */
+    const renderChips = () => {
+        const container = document.getElementById('bdPublisherChips');
+        if (!container) return;
+
+        container.innerHTML = ['Semua',...categories].map(category => `
+            <button
+                type="button"
+                class="bd-publisher-chip"
+                data-category="${escapeHtml(category)}"
+                aria-pressed="${category === activeCategory}"
+            >
+                ${escapeHtml(category)}
+            </button>
+        `).join('');
+
+        container.querySelectorAll('.bd-publisher-chip').forEach(button => {
+            button.addEventListener('click',() => {
+                activeCategory = button.dataset.category;
+                renderChips();
+                renderGrid();
+            });
+        });
+    };
+
+    /* GRID */
+    const renderGrid = () => {
+        const grid = document.getElementById('bdPublisherGrid');
+        const result = document.getElementById('bdPublisherResultCount');
+        const empty = document.getElementById('bdPublisherEmpty');
+
+        if (!grid || !result || !empty) return;
+
+        const query = searchTerm.trim().toLocaleLowerCase('id-ID');
+
+        const filtered = BOOKS.filter(book => {
+            const category = book.category || 'Umum';
+            const title = String(book.title || '').toLocaleLowerCase('id-ID');
+            const author = String(book.author || '').toLocaleLowerCase('id-ID');
+
+            return (
+                (activeCategory === 'Semua' || category === activeCategory) &&
+                (!query || title.includes(query) || author.includes(query))
             );
+        });
 
+        result.textContent = `${filtered.length} judul ditemukan`;
 
-        if (!page) {
+        if (!filtered.length) {
+            grid.style.display = 'none';
+            empty.style.display = 'block';
             return;
         }
 
+        grid.style.display = 'grid';
+        empty.style.display = 'none';
 
+        grid.innerHTML = filtered.map(book => `
+            <article class="bd-publisher-card">
+                ${coverMarkup(book)}
 
-        /*
-        |--------------------------------------------------------------------------
-        | GSAP
-        |--------------------------------------------------------------------------
-        */
+                <div class="bd-publisher-card-meta">
+                    <div class="bd-publisher-card-category">${escapeHtml(book.category || 'Umum')}</div>
 
-        const gsap =
-            window.bdGsap || null;
+                    <h3 class="bd-publisher-card-title">
+                        ${escapeHtml(book.title)}
+                    </h3>
 
+                    <p class="bd-publisher-card-sub">
+                        ${escapeHtml(book.author || '-')} · ${escapeHtml(book.year || '-')}
+                    </p>
 
-        const reducedMotion =
-            window.matchMedia(
-                '(prefers-reduced-motion: reduce)'
-            ).matches;
+                    <button type="button" class="bd-publisher-card-link" data-id="${book.id}">
+                        Lihat detail
+                    </button>
+                </div>
+            </article>
+        `).join('');
 
+        bindBookEvents();
 
-        if (
-            gsap &&
-            !reducedMotion
-        ) {
+        const catalog = document.querySelector('.bd-publisher-catalog');
 
-            gsap.to(
-                page.querySelectorAll(
-                    '.bd-publisher-reveal'
-                ),
-                {
-                    opacity: 1,
-
-                    y: 0,
-
-                    duration: .62,
-
-                    stagger: .025,
-
-                    ease: 'power3.out'
-                }
-            );
-
-        } else {
-
-            page
-                .querySelectorAll(
-                    '.bd-publisher-reveal'
-                )
-                .forEach(element => {
-
-                    element.style.opacity =
-                        '1';
-
-                    element.style.transform =
-                        'none';
-
-                });
-
+        if (gsapInstance && catalog?.dataset.animated === '1') {
+            requestAnimationFrame(() => animateBookCards(gsapInstance));
         }
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | INTERNAL SCROLL
-        |--------------------------------------------------------------------------
-        */
-
-        const link =
-            page.querySelector(
-                'a[href="#koleksiTerbitan"]'
-            );
-
-
-        const section =
-            document.getElementById(
-                'koleksiTerbitan'
-            );
-
-
-        if (
-            link &&
-            section
-        ) {
-
-            link.addEventListener(
-                'click',
-                event => {
-
-                    event.preventDefault();
-
-
-                    section.scrollIntoView({
-                        behavior:
-                            reducedMotion
-                                ? 'auto'
-                                : 'smooth',
-
-                        block: 'start'
-                    });
-
-                }
-            );
-
-        }
-
     };
 
+    /* =====================================================
+       GSAP BOOK REVEAL
+       MODEL "BUKU MASUK KE RAK"
+    ====================================================== */
+    const animateBookCards = gsap => {
+        const cards = [...document.querySelectorAll('#bdPublisherGrid .bd-publisher-card')];
+        if (!cards.length) return;
 
-    if (
-        document.readyState ===
-        'loading'
-    ) {
+        gsap.killTweensOf(cards);
 
-        document.addEventListener(
-            'DOMContentLoaded',
-            initPublisherPage,
+        gsap.fromTo(cards,
             {
-                once: true
+                opacity:0,
+                y:52,
+                scale:.9,
+                rotationY:-12,
+                rotationZ:-2,
+                transformOrigin:'50% 100%'
+            },
+            {
+                opacity:1,
+                y:0,
+                scale:1,
+                rotationY:0,
+                rotationZ:0,
+                duration:.72,
+                stagger:.085,
+                ease:'back.out(1.15)',
+                clearProps:'transform'
             }
         );
+    };
 
+    /* =====================================================
+       3D HOVER BUKU
+    ====================================================== */
+    const bindBookTilt = () => {
+        if (!gsapInstance) return;
+        if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+
+        document.querySelectorAll('.bd-publisher-cover-card').forEach(card => {
+            if (card.dataset.tiltBound === '1') return;
+            card.dataset.tiltBound = '1';
+
+            const cover = card.querySelector('.bd-publisher-cover');
+            if (!cover) return;
+
+            card.addEventListener('pointermove',event => {
+                const rect = card.getBoundingClientRect();
+                const x = (event.clientX - rect.left) / rect.width - .5;
+                const y = (event.clientY - rect.top) / rect.height - .5;
+
+                gsapInstance.to(card,{
+                    y:-7,
+                    rotationY:x * 8,
+                    rotationX:-y * 6,
+                    duration:.35,
+                    ease:'power2.out',
+                    overwrite:'auto'
+                });
+
+                gsapInstance.to(cover,{
+                    scale:1.025,
+                    duration:.35,
+                    ease:'power2.out',
+                    overwrite:'auto'
+                });
+            });
+
+            card.addEventListener('pointerleave',() => {
+                gsapInstance.to(card,{
+                    y:0,
+                    rotationX:0,
+                    rotationY:0,
+                    duration:.55,
+                    ease:'power3.out',
+                    overwrite:'auto'
+                });
+
+                gsapInstance.to(cover,{
+                    scale:1,
+                    duration:.55,
+                    ease:'power3.out',
+                    overwrite:'auto'
+                });
+            });
+        });
+    };
+
+    const bindBookEvents = () => {
+        document.querySelectorAll('#bdPublisherGrid .bd-publisher-cover,#bdPublisherGrid .bd-publisher-card-link').forEach(element => {
+            element.addEventListener('click',event => {
+                openDrawer(element.dataset.id,event.currentTarget);
+            });
+        });
+
+        bindBookTilt();
+    };
+
+    /* DRAWER */
+    const openDrawer = (id,trigger) => {
+        const book = BOOKS.find(item => String(item.id) === String(id));
+        if (!book) return;
+
+        lastFocusedElement = trigger;
+
+        const drawer = document.getElementById('bdPublisherDrawer');
+        const overlay = document.getElementById('bdPublisherOverlay');
+        const body = document.getElementById('bdPublisherDrawerBody');
+        const color = getColor(book.category || 'Umum');
+
+        if (!drawer || !overlay || !body) return;
+
+        const cover = book.cover
+            ? `<img src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}">`
+            : `
+                <div class="bd-publisher-drawer-cover-fallback" style="background:${color.hex}">
+                    <span class="bd-publisher-drawer-cover-category">${escapeHtml(book.category || 'Umum')}</span>
+                    <span class="bd-publisher-drawer-cover-title">${escapeHtml(book.title)}</span>
+                </div>
+            `;
+
+        body.innerHTML = `
+            <div class="bd-publisher-drawer-book">
+                <div class="bd-publisher-drawer-cover-card" style="--book-rgb:${color.rgb}">
+                    <div class="bd-publisher-drawer-cover" style="background:${color.hex}">
+                        ${cover}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="bd-publisher-drawer-status">Sudah terbit</div>
+                    <h2 class="bd-publisher-drawer-title">${escapeHtml(book.title)}</h2>
+                    <p class="bd-publisher-drawer-author">${escapeHtml(book.author || '-')}</p>
+                </div>
+            </div>
+
+            <div class="bd-publisher-meta">
+                <div class="bd-publisher-meta-item">
+                    <span class="bd-publisher-meta-label">ISBN</span>
+                    <span class="bd-publisher-meta-value">${escapeHtml(book.isbn || '-')}</span>
+                </div>
+
+                <div class="bd-publisher-meta-item">
+                    <span class="bd-publisher-meta-label">Tahun Terbit</span>
+                    <span class="bd-publisher-meta-value">${escapeHtml(book.year || '-')}</span>
+                </div>
+
+                <div class="bd-publisher-meta-item">
+                    <span class="bd-publisher-meta-label">Halaman</span>
+                    <span class="bd-publisher-meta-value">${book.pages ? escapeHtml(book.pages) + ' halaman' : '-'}</span>
+                </div>
+
+                <div class="bd-publisher-meta-item">
+                    <span class="bd-publisher-meta-label">Jenis Buku</span>
+                    <span class="bd-publisher-meta-value">${escapeHtml(book.category || 'Umum')}</span>
+                </div>
+
+                <div class="bd-publisher-meta-item">
+                    <span class="bd-publisher-meta-label">Penerbit</span>
+                    <span class="bd-publisher-meta-value">${escapeHtml(book.publisher || 'BacaDulu Publisher')}</span>
+                </div>
+            </div>
+
+            <div class="bd-publisher-synopsis-label">Sinopsis</div>
+
+            <div class="bd-publisher-synopsis">
+                ${book.synopsis || '<p>Sinopsis belum tersedia.</p>'}
+            </div>
+        `;
+
+        overlay.classList.add('open');
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+
+        if (gsapInstance) {
+            gsapInstance.fromTo(
+                body.children,
+                {opacity:0,y:22},
+                {opacity:1,y:0,duration:.45,stagger:.07,ease:'power3.out'}
+            );
+        }
+    };
+
+    const closeDrawer = () => {
+        document.getElementById('bdPublisherDrawer')?.classList.remove('open');
+        document.getElementById('bdPublisherOverlay')?.classList.remove('open');
+        document.getElementById('bdPublisherDrawer')?.setAttribute('aria-hidden','true');
+        document.body.style.overflow = '';
+        lastFocusedElement?.focus();
+    };
+
+    /* START GSAP */
+    const startAnimations = () => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        let attempts = 0;
+
+        const timer = setInterval(() => {
+            const gsap = resolveGsap();
+
+            if (gsap) {
+                clearInterval(timer);
+
+                gsapInstance = gsap;
+
+                animateHero(gsap);
+                initSectionAnimations(gsap);
+                initProcessAnimations(gsap);
+                bindBookTilt();
+
+                console.log('[Baca Publisher] GSAP aktif.');
+                return;
+            }
+
+            attempts++;
+
+            if (attempts >= 80) {
+                clearInterval(timer);
+                console.warn('[Baca Publisher] GSAP tidak ditemukan.');
+            }
+        },50);
+    };
+
+    /* EVENTS */
+    document.getElementById('bdPublisherSearch')?.addEventListener('input',event => {
+        searchTerm = event.target.value;
+        renderGrid();
+    });
+
+    document.getElementById('bdPublisherClose')?.addEventListener('click',closeDrawer);
+    document.getElementById('bdPublisherOverlay')?.addEventListener('click',closeDrawer);
+
+    document.addEventListener('keydown',event => {
+        if (event.key === 'Escape') closeDrawer();
+    });
+
+    /* BOOT */
+    const boot = () => {
+        renderChips();
+        renderGrid();
+        startAnimations();
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded',boot,{once:true});
     } else {
-
-        initPublisherPage();
-
+        boot();
     }
-
 })();
 </script>
 
