@@ -2738,6 +2738,9 @@ const animateAddToCart = (button, root) => {
 /* =====================================================
    STORE CART
 ===================================================== */
+/* =====================================================
+   STORE CART
+===================================================== */
 const initStoreCart = root => {
     let cart =
         loadCart();
@@ -2811,7 +2814,9 @@ const initStoreCart = root => {
             warning
         );
 
-        toast.classList.add('show');
+        toast.classList.add(
+            'show'
+        );
 
         clearTimeout(
             toastTimer
@@ -2830,8 +2835,13 @@ const initStoreCart = root => {
     };
 
     const openCart = () => {
-        drawer?.classList.add('open');
-        overlay?.classList.add('show');
+        drawer?.classList.add(
+            'open'
+        );
+
+        overlay?.classList.add(
+            'show'
+        );
 
         document.body.style.overflow =
             'hidden';
@@ -2859,8 +2869,13 @@ const initStoreCart = root => {
     };
 
     const closeCart = () => {
-        drawer?.classList.remove('open');
-        overlay?.classList.remove('show');
+        drawer?.classList.remove(
+            'open'
+        );
+
+        overlay?.classList.remove(
+            'show'
+        );
 
         document.body.style.overflow =
             '';
@@ -2927,7 +2942,9 @@ const initStoreCart = root => {
                         </svg>
                     </div>
 
-                    <strong>Keranjang masih kosong</strong>
+                    <strong>
+                        Keranjang masih kosong
+                    </strong>
 
                     <span>
                         Pilih Buku Cetak atau E-book dari katalog.
@@ -2945,7 +2962,9 @@ const initStoreCart = root => {
                     Number(item.qty);
 
                 const formatClass =
-                    /e-?book/i.test(item.format)
+                    /e-?book/i.test(
+                        item.format
+                    )
                         ? 'ebook'
                         : 'print';
 
@@ -2963,6 +2982,7 @@ const initStoreCart = root => {
                                 loading="lazy"
                                 onerror="this.style.display='none';this.nextElementSibling?.classList.add('show');"
                             >
+
                             <div class="cart-cover-placeholder cart-cover-fallback">
                                 <svg viewBox="0 0 24 24">
                                     <path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path>
@@ -2980,13 +3000,39 @@ const initStoreCart = root => {
                         `;
 
                 return `
-                    <article class="cart-product">
+                    <article
+                        class="cart-product"
+                        style="
+                            width: 100%;
+                            min-width: 0;
+                            max-width: 100%;
+                            box-sizing: border-box;
+                            overflow: hidden;
+                        "
+                    >
                         <div class="cart-product-cover">
                             ${cover}
                         </div>
 
-                        <div class="cart-product-info">
-                            <div class="cart-product-top">
+                        <div
+                            class="cart-product-info"
+                            style="
+                                width: 100%;
+                                min-width: 0;
+                                max-width: 100%;
+                                box-sizing: border-box;
+                                overflow: hidden;
+                            "
+                        >
+                            <div
+                                class="cart-product-top"
+                                style="
+                                    width: 100%;
+                                    min-width: 0;
+                                    max-width: 100%;
+                                    box-sizing: border-box;
+                                "
+                            >
                                 <span class="cart-format ${formatClass}">
                                     ${escapeHtml(item.format)}
                                 </span>
@@ -2996,16 +3042,37 @@ const initStoreCart = root => {
                                     class="cart-remove"
                                     data-cart-action="remove"
                                     data-key="${escapeHtml(item.key)}"
+                                    aria-label="Hapus buku"
                                 >
                                     ✕
                                 </button>
                             </div>
 
-                            <h4 class="cart-product-title">
+                            <h4
+                                class="cart-product-title"
+                                style="
+                                    width: 100%;
+                                    min-width: 0;
+                                    max-width: 100%;
+                                    overflow-wrap: anywhere;
+                                    word-break: break-word;
+                                    white-space: normal;
+                                "
+                            >
                                 ${escapeHtml(item.title)}
                             </h4>
 
-                            <p class="cart-product-meta">
+                            <p
+                                class="cart-product-meta"
+                                style="
+                                    width: 100%;
+                                    min-width: 0;
+                                    max-width: 100%;
+                                    overflow-wrap: anywhere;
+                                    word-break: break-word;
+                                    white-space: normal;
+                                "
+                            >
                                 ${escapeHtml(item.author)}
                                 ${publisher}
                             </p>
@@ -3014,11 +3081,29 @@ const initStoreCart = root => {
                                 ${rupiah(item.price)} / item
                             </div>
 
-                            ${item.stock !== null && item.stock !== undefined
-                                ? `<div class="cart-unit-price">Stok tersedia: ${Number(item.stock)}</div>`
-                                : ''}
+                            ${
+                                item.stock !== null &&
+                                item.stock !== undefined
+                                    ? `
+                                        <div class="cart-unit-price">
+                                            Stok tersedia:
+                                            ${Number(item.stock)}
+                                        </div>
+                                    `
+                                    : ''
+                            }
 
-                            <div class="cart-book-actions">
+                            <div
+                                class="cart-book-actions"
+                                style="
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    width: 100%;
+                                    min-width: 0;
+                                    max-width: 100%;
+                                    box-sizing: border-box;
+                                "
+                            >
                                 <button
                                     type="button"
                                     class="cart-synopsis-toggle"
@@ -3029,22 +3114,105 @@ const initStoreCart = root => {
                                     Baca Sinopsis
                                 </button>
 
-                                ${item.detailUrl
-                                    ? `<a class="cart-detail-link" href="${escapeHtml(item.detailUrl)}">Lihat Detail Buku</a>`
-                                    : ''}
+                                ${
+                                    item.detailUrl
+                                        ? `
+                                            <a
+                                                class="cart-detail-link"
+                                                href="${escapeHtml(item.detailUrl)}"
+                                            >
+                                                Lihat Detail Buku
+                                            </a>
+                                        `
+                                        : ''
+                                }
                             </div>
 
                             <div
                                 class="cart-synopsis"
                                 data-cart-synopsis="${escapeHtml(item.key)}"
+                                style="
+                                    width: 100%;
+                                    min-width: 0;
+                                    max-width: 100%;
+                                    box-sizing: border-box;
+                                    overflow: hidden;
+                                    overflow-wrap: anywhere;
+                                    word-wrap: break-word;
+                                    word-break: break-word;
+                                    white-space: normal;
+                                "
                             >
-                                <strong>Sinopsis</strong>
-                                ${item.description
-                                    ? escapeHtml(item.description)
-                                    : `<span class="cart-synopsis-empty">Sinopsis belum tersimpan pada item ini. Gunakan “Lihat Detail Buku” untuk membacanya.</span>`}
+                                <strong
+                                    style="
+                                        display: block;
+                                        width: 100%;
+                                        min-width: 0;
+                                        max-width: 100%;
+                                        box-sizing: border-box;
+                                        margin-bottom: 6px;
+                                        overflow-wrap: anywhere;
+                                        word-wrap: break-word;
+                                        word-break: break-word;
+                                        white-space: normal;
+                                    "
+                                >
+                                    Sinopsis
+                                </strong>
+
+                                <div
+                                    class="cart-synopsis-text"
+                                    style="
+                                        display: block;
+                                        width: 100%;
+                                        min-width: 0;
+                                        max-width: 100%;
+                                        box-sizing: border-box;
+                                        overflow: hidden;
+                                        overflow-wrap: anywhere;
+                                        word-wrap: break-word;
+                                        word-break: break-word;
+                                        white-space: normal;
+                                    "
+                                >
+                                    ${
+                                        item.description
+                                            ? escapeHtml(
+                                                item.description
+                                            )
+                                            : `
+                                                <span
+                                                    class="cart-synopsis-empty"
+                                                    style="
+                                                        display: block;
+                                                        width: 100%;
+                                                        min-width: 0;
+                                                        max-width: 100%;
+                                                        box-sizing: border-box;
+                                                        overflow: hidden;
+                                                        overflow-wrap: anywhere;
+                                                        word-wrap: break-word;
+                                                        word-break: break-word;
+                                                        white-space: normal;
+                                                    "
+                                                >
+                                                    Sinopsis belum tersimpan pada item ini.
+                                                    Gunakan “Lihat Detail Buku” untuk membacanya.
+                                                </span>
+                                            `
+                                    }
+                                </div>
                             </div>
 
-                            <div class="cart-product-bottom">
+                            <div
+                                class="cart-product-bottom"
+                                style="
+                                    width: 100%;
+                                    min-width: 0;
+                                    max-width: 100%;
+                                    box-sizing: border-box;
+                                "
+                            >
                                 <div class="qty-control">
                                     <button
                                         type="button"
@@ -3062,18 +3230,37 @@ const initStoreCart = root => {
                                         type="button"
                                         data-cart-action="plus"
                                         data-key="${escapeHtml(item.key)}"
-                                        ${item.stock !== null && item.stock !== undefined && Number(item.qty) >= Number(item.stock) ? 'disabled' : ''}
+                                        ${
+                                            item.stock !== null &&
+                                            item.stock !== undefined &&
+                                            Number(item.qty) >=
+                                                Number(item.stock)
+                                                ? 'disabled'
+                                                : ''
+                                        }
                                     >
                                         +
                                     </button>
                                 </div>
 
-                                <div>
+                                <div
+                                    style="
+                                        min-width: 0;
+                                        max-width: 100%;
+                                    "
+                                >
                                     <div class="cart-subtotal-label">
                                         Subtotal
                                     </div>
 
-                                    <div class="cart-subtotal">
+                                    <div
+                                        class="cart-subtotal"
+                                        style="
+                                            max-width: 100%;
+                                            overflow-wrap: anywhere;
+                                            word-break: break-word;
+                                        "
+                                    >
                                         ${rupiah(subtotal)}
                                     </div>
                                 </div>
@@ -3090,7 +3277,9 @@ const initStoreCart = root => {
     };
 
     const syncFromStorage = () => {
-        cart = loadCart();
+        cart =
+            loadCart();
+
         render();
     };
 
@@ -3148,7 +3337,8 @@ const initStoreCart = root => {
                     button.dataset.title ?? '',
 
                 format:
-                    button.dataset.format ?? 'Buku',
+                    button.dataset.format ??
+                    'Buku',
 
                 author:
                     button.dataset.author ?? '',
@@ -3176,7 +3366,9 @@ const initStoreCart = root => {
                         ? null
                         : Math.max(
                             0,
-                            Number(button.dataset.stock)
+                            Number(
+                                button.dataset.stock
+                            )
                         ),
 
                 qty: 1
@@ -3215,15 +3407,23 @@ const initStoreCart = root => {
                 );
 
             if (existing) {
-                existing.stock = product.stock;
+                existing.stock =
+                    product.stock;
+
                 existing.description =
-                    product.description || existing.description || '';
+                    product.description ||
+                    existing.description ||
+                    '';
+
                 existing.detailUrl =
-                    product.detailUrl || existing.detailUrl || '';
+                    product.detailUrl ||
+                    existing.detailUrl ||
+                    '';
 
                 if (
                     product.stock !== null &&
-                    Number(existing.qty) >= product.stock
+                    Number(existing.qty) >=
+                        product.stock
                 ) {
                     showToast(
                         `Maksimal ${product.stock} buku sesuai stok yang tersedia.`,
@@ -3235,7 +3435,9 @@ const initStoreCart = root => {
 
                 existing.qty++;
             } else {
-                cart.push(product);
+                cart.push(
+                    product
+                );
             }
 
             persist();
@@ -3266,7 +3468,7 @@ const initStoreCart = root => {
     );
 
     /* =================================================
-       CART +/- REMOVE
+       CART + / - / REMOVE / SINOPSIS
     ================================================= */
     items?.addEventListener(
         'click',
@@ -3284,7 +3486,12 @@ const initStoreCart = root => {
             const action =
                 button.dataset.cartAction;
 
-            if (action === 'synopsis') {
+            /* =========================================
+               BACA / TUTUP SINOPSIS
+            ========================================= */
+            if (
+                action === 'synopsis'
+            ) {
                 const key =
                     button.dataset.key || '';
 
@@ -3293,14 +3500,20 @@ const initStoreCart = root => {
                         `[data-cart-synopsis="${CSS.escape(key)}"]`
                     );
 
-                if (!synopsis) return;
+                if (!synopsis) {
+                    return;
+                }
 
                 const isOpen =
-                    synopsis.classList.toggle('show');
+                    synopsis.classList.toggle(
+                        'show'
+                    );
 
                 button.setAttribute(
                     'aria-expanded',
-                    isOpen ? 'true' : 'false'
+                    isOpen
+                        ? 'true'
+                        : 'false'
                 );
 
                 button.textContent =
@@ -3308,10 +3521,16 @@ const initStoreCart = root => {
                         ? 'Tutup Sinopsis'
                         : 'Baca Sinopsis';
 
-                if (isOpen && !reduceMotion) {
+                if (
+                    isOpen &&
+                    !reduceMotion
+                ) {
                     gsap.fromTo(
                         synopsis,
-                        {autoAlpha: 0, y: -5},
+                        {
+                            autoAlpha: 0,
+                            y: -5
+                        },
                         {
                             autoAlpha: 1,
                             y: 0,
@@ -3331,6 +3550,9 @@ const initStoreCart = root => {
                         button.dataset.key
                 );
 
+            /* =========================================
+               PLUS
+            ========================================= */
             if (
                 action === 'plus' &&
                 item
@@ -3339,11 +3561,14 @@ const initStoreCart = root => {
                     item.stock === null ||
                     item.stock === undefined
                         ? null
-                        : Number(item.stock);
+                        : Number(
+                            item.stock
+                        );
 
                 if (
                     stock !== null &&
-                    Number(item.qty) >= stock
+                    Number(item.qty) >=
+                        stock
                 ) {
                     showToast(
                         `Jumlah maksimal sesuai stok: ${stock} buku.`,
@@ -3356,6 +3581,9 @@ const initStoreCart = root => {
                 item.qty++;
             }
 
+            /* =========================================
+               MINUS
+            ========================================= */
             if (
                 action === 'minus' &&
                 item
@@ -3363,6 +3591,9 @@ const initStoreCart = root => {
                 item.qty--;
             }
 
+            /* =========================================
+               REMOVE
+            ========================================= */
             if (
                 action === 'remove' ||
                 (
@@ -3378,15 +3609,23 @@ const initStoreCart = root => {
                     );
             }
 
-            animeFlash(button);
+            animeFlash(
+                button
+            );
+
             persist();
         }
     );
 
+    /* =================================================
+       CLEAR CART
+    ================================================= */
     clear?.addEventListener(
         'click',
         () => {
-            if (!cart.length) return;
+            if (!cart.length) {
+                return;
+            }
 
             if (
                 !confirm(
@@ -3397,18 +3636,27 @@ const initStoreCart = root => {
             }
 
             cart = [];
+
             persist();
         }
     );
 
+    /* =================================================
+       CHECKOUT WHATSAPP
+    ================================================= */
     checkout?.addEventListener(
         'click',
         () => {
-            if (!cart.length) return;
+            if (!cart.length) {
+                return;
+            }
 
             const lines =
                 cart.map(
-                    (item, index) => {
+                    (
+                        item,
+                        index
+                    ) => {
                         const subtotal =
                             Number(item.price) *
                             Number(item.qty);
@@ -3421,7 +3669,9 @@ Harga: ${rupiah(item.price)}
 Jumlah: ${item.qty}
 Subtotal: ${rupiah(subtotal)}`;
                     }
-                ).join('\n\n');
+                ).join(
+                    '\n\n'
+                );
 
             const message =
 `Halo Baca Dulu, saya ingin melakukan pemesanan:
@@ -3440,11 +3690,15 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
         }
     );
 
+    /* =================================================
+       OPEN CART
+    ================================================= */
     fab?.addEventListener(
         'click',
         e => {
             e.preventDefault();
             e.stopPropagation();
+
             openCart();
         }
     );
@@ -3457,11 +3711,15 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
             e => {
                 e.preventDefault();
                 e.stopPropagation();
+
                 openCart();
             }
         );
     });
 
+    /* =================================================
+       CLOSE CART
+    ================================================= */
     close?.addEventListener(
         'click',
         closeCart
@@ -3473,7 +3731,9 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
     );
 
     const handleEscape = e => {
-        if (e.key === 'Escape') {
+        if (
+            e.key === 'Escape'
+        ) {
             closeCart();
         }
     };
@@ -3483,6 +3743,9 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
         handleEscape
     );
 
+    /* =================================================
+       CLEANUP
+    ================================================= */
     root.__bdCartCleanup = () => {
         document.removeEventListener(
             'keydown',
