@@ -35,7 +35,6 @@ use App\Http\Controllers\Admin\JurnalAdminController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PublisherAdminController;
 
-
 /*
 |--------------------------------------------------------------------------
 | HOME
@@ -49,7 +48,6 @@ Route::get('/', function () {
 
     return view('landing-page.index');
 })->name('home');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -82,7 +80,6 @@ Route::post('/logout', function () {
     ->middleware('auth')
     ->name('logout');
 
-
 /*
 |--------------------------------------------------------------------------
 | ADMIN AUTH & RECOVERY
@@ -93,21 +90,30 @@ Route::prefix('panel-adminbaca')
     ->name('admin.')
     ->group(function () {
 
-        // Login
+        /*
+        |--------------------------------------------------------------------------
+        | Login
+        |--------------------------------------------------------------------------
+        */
+
         Route::get('/login', [
             AdminAuthController::class,
             'showLoginForm',
         ])->name('login');
 
         Route::post('/login', [
-        AdminAuthController::class,
-        'login',
-])
-        ->middleware('throttle:5,1')
-         ->name('login.submit');
+            AdminAuthController::class,
+            'login',
+        ])
+            ->middleware('throttle:5,1')
+            ->name('login.submit');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Forgot Password
+        |--------------------------------------------------------------------------
+        */
 
-        // Forgot Password
         Route::get('/forgot-password', [
             AdminRecoveryController::class,
             'showForm',
@@ -125,8 +131,12 @@ Route::prefix('panel-adminbaca')
             'waiting',
         ])->name('recovery.waiting');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Recovery Approval
+        |--------------------------------------------------------------------------
+        */
 
-        // Recovery Approval
         Route::get('/forgot-password/review/{publicId}/{decision}', [
             AdminRecoveryController::class,
             'review',
@@ -143,8 +153,12 @@ Route::prefix('panel-adminbaca')
             ->whereIn('decision', ['approve', 'reject'])
             ->name('recovery.decision');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Create Access Password
+        |--------------------------------------------------------------------------
+        */
 
-        // Create Access Password
         Route::get('/forgot-password/create-password/{publicId}', [
             AdminRecoveryController::class,
             'showPasswordForm',
@@ -159,8 +173,12 @@ Route::prefix('panel-adminbaca')
             ->middleware(['signed', 'throttle:10,1'])
             ->name('recovery.password.store');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Google Verification
+        |--------------------------------------------------------------------------
+        */
 
-        // Google Verification
         Route::get('/google-verification', [
             AdminGoogleVerificationController::class,
             'show',
@@ -176,35 +194,42 @@ Route::prefix('panel-adminbaca')
             'callback',
         ])->name('google.callback');
 
+        /*
+        |--------------------------------------------------------------------------
+        | OTP
+        |--------------------------------------------------------------------------
+        */
 
-        // OTP
         Route::get('/verify-otp', [
             AdminAuthController::class,
             'showOtpForm',
         ])->name('otp');
 
         Route::post('/verify-otp', [
-         AdminAuthController::class,
-         'processOtp',
+            AdminAuthController::class,
+            'processOtp',
         ])
-         ->middleware('throttle:5,5')
-         ->name('otp.submit');
+            ->middleware('throttle:5,5')
+            ->name('otp.submit');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Confirm Access
+        |--------------------------------------------------------------------------
+        */
 
-        // Confirm Access
         Route::get('/confirm-access', [
             AdminAuthController::class,
             'showConfirmForm',
         ])->name('confirm');
 
         Route::post('/confirm-access', [
-         AdminAuthController::class,
-        'processConfirm',
+            AdminAuthController::class,
+            'processConfirm',
         ])
-          ->middleware('throttle:5,5')
-         ->name('confirm.submit');
+            ->middleware('throttle:5,5')
+            ->name('confirm.submit');
     });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -222,7 +247,6 @@ Route::get('/information/{information:slug}', [
     'show',
 ])->name('informasi.show');
 
-
 /*
 |--------------------------------------------------------------------------
 | ARTICLES
@@ -233,7 +257,6 @@ Route::get('/articles', [
     DataArticleController::class,
     'index',
 ])->name('articles');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -246,7 +269,6 @@ Route::get('/jurnal', [
     'index',
 ])->name('jurnal');
 
-
 /*
 |--------------------------------------------------------------------------
 | CONFERENCE
@@ -257,7 +279,6 @@ Route::get('/conference', [
     ConferenceController::class,
     'index',
 ])->name('conference');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -275,7 +296,6 @@ Route::get('/publisher/books/{book}', [
     'show',
 ])->name('publisher.books.show');
 
-
 /*
 |--------------------------------------------------------------------------
 | KONSULTASI
@@ -285,7 +305,6 @@ Route::get('/publisher/books/{book}', [
 Route::get('/konsultasi', function () {
     return view('landing-page.pages.konsultasi');
 })->name('konsultasi');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -303,7 +322,6 @@ Route::get('/haki/daftar/{jenis}', function ($jenis) {
         'jenis' => $jenis,
     ]);
 })->name('haki.daftar');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -323,7 +341,6 @@ Route::get('/tentang/kontak', function () {
     return view('landing-page.pages.kontak');
 })->name('tentang.kontak');
 
-
 /*
 |--------------------------------------------------------------------------
 | PORTOFOLIO
@@ -333,7 +350,6 @@ Route::get('/tentang/kontak', function () {
 Route::get('/portofolio/katalog', function () {
     return view('landing-page.pages.katalog-lengkap');
 })->name('portofolio.katalog');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -351,10 +367,15 @@ Route::get('/portofolio/bookstore/{book:slug}', [
     'show',
 ])->name('portofolio.bookstore.show');
 
-
 /*
 |--------------------------------------------------------------------------
 | BLOG
+|--------------------------------------------------------------------------
+*/
+
+/*
+|--------------------------------------------------------------------------
+| Blog Public
 |--------------------------------------------------------------------------
 */
 
@@ -363,7 +384,20 @@ Route::get('/blog', [
     'index',
 ])->name('blog.index');
 
+/*
+|--------------------------------------------------------------------------
+| Blog Authenticated
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware('auth')->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Create Article
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/blog/create', [
         BlogController::class,
         'create',
@@ -374,10 +408,22 @@ Route::middleware('auth')->group(function () {
         'store',
     ])->name('blog.store');
 
+    /*
+    |--------------------------------------------------------------------------
+    | My Articles
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/blog/saya', [
         BlogController::class,
         'myPosts',
     ])->name('blog.myPosts');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Edit Article
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/blog/{post:slug}/edit', [
         BlogController::class,
@@ -394,22 +440,53 @@ Route::middleware('auth')->group(function () {
         'destroy',
     ])->name('blog.destroy');
 
-    Route::post('/blog/{post}/like', [
+    /*
+    |--------------------------------------------------------------------------
+    | Like Article
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post('/blog/{post:slug}/like', [
         BlogController::class,
         'toggleLike',
     ])->name('blog.like');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Comments
+    |--------------------------------------------------------------------------
+    */
 
     Route::post('/blog/{post:slug}/comments', [
         CommentController::class,
         'store',
     ])->name('post.comment.store');
+
+    Route::put('/blog/comments/{comment}', [
+        CommentController::class,
+        'update',
+    ])->name('post.comment.update');
+
+    Route::delete('/blog/comments/{comment}', [
+        CommentController::class,
+        'destroy',
+    ])->name('post.comment.destroy');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Show Article
+|--------------------------------------------------------------------------
+|
+| WAJIB di bawah /blog/create dan /blog/saya supaya slug
+| tidak menangkap URL statis tersebut.
+|
+*/
 
 Route::get('/blog/{post:slug}', [
     BlogController::class,
     'show',
 ])->name('blog.show');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -423,6 +500,7 @@ Route::get('/komunitas', [
 ])->name('community.index');
 
 Route::middleware('auth')->group(function () {
+
     Route::get('/komunitas/buat', [
         CommunityController::class,
         'create',
@@ -459,7 +537,6 @@ Route::get('/komunitas/{community}', [
     'show',
 ])->name('community.show');
 
-
 /*
 |--------------------------------------------------------------------------
 | EVENT
@@ -476,7 +553,6 @@ Route::get('/event/{slug}', [
     'show',
 ])->name('event.show');
 
-
 /*
 |--------------------------------------------------------------------------
 | TEAM
@@ -488,7 +564,6 @@ Route::get('/team/{slug}', [
     'show',
 ])->name('team.show');
 
-
 /*
 |--------------------------------------------------------------------------
 | SEARCH
@@ -499,7 +574,6 @@ Route::get('/search', [
     SearchController::class,
     'index',
 ])->name('search');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -516,7 +590,6 @@ Route::get('/lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('language');
 
-
 /*
 |--------------------------------------------------------------------------
 | ADMIN CMS
@@ -528,65 +601,101 @@ Route::middleware(['auth:admin', 'admin'])
     ->name('admin.')
     ->group(function () {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
+
         Route::get('/', [
             DashboardController::class,
             'index',
         ])->name('dashboard');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Books
+        |--------------------------------------------------------------------------
+        */
 
         // Books
-        Route::post('books/{book:slug}/stock/add', [
-            AdminBookController::class,
-            'addStock',
-        ])->name('books.stock.add');
+Route::post('books/{book:slug}/stock/add', [
+    AdminBookController::class,
+    'addStock',
+])->name('books.stock.add');
 
-        Route::post('books/{book:slug}/stock/sale', [
-            AdminBookController::class,
-            'recordSale',
-        ])->name('books.stock.sale');
+Route::post('books/{book:slug}/stock/sale', [
+    AdminBookController::class,
+    'recordSale',
+])->name('books.stock.sale');
 
-        Route::resource('books', AdminBookController::class)
-            ->scoped([
-                'book' => 'slug',
-            ]);
+Route::resource('books', AdminBookController::class)
+    ->scoped([
+        'book' => 'slug',
+    ]);
+        
 
+        /*
+        |--------------------------------------------------------------------------
+        | Informations
+        |--------------------------------------------------------------------------
+        */
 
-        // Informations
         Route::resource(
             'informations',
             InformationAdminController::class
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Journals
+        |--------------------------------------------------------------------------
+        */
 
-        // Journals
         Route::resource(
             'journals',
             JurnalAdminController::class
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Conferences
+        |--------------------------------------------------------------------------
+        */
 
-        // Conferences
         Route::resource(
             'conferences',
             ConferenceAdminController::class
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Publishers
+        |--------------------------------------------------------------------------
+        */
 
-        // Publishers
         Route::resource(
             'publishers',
             PublisherAdminController::class
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Data Articles
+        |--------------------------------------------------------------------------
+        */
 
-        // Data Articles
         Route::resource(
             'data-articles',
             DataArticleAdminController::class
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Posts
+        |--------------------------------------------------------------------------
+        */
 
-        // Posts
         Route::get('/posts', [
             PostController::class,
             'index',
@@ -617,15 +726,23 @@ Route::middleware(['auth:admin', 'admin'])
             'reject',
         ])->name('posts.reject');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Events
+        |--------------------------------------------------------------------------
+        */
 
-        // Events
         Route::resource(
             'events',
             EventAdminController::class
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Communities
+        |--------------------------------------------------------------------------
+        */
 
-        // Communities
         Route::resource(
             'communities',
             AdminCommunityController::class
@@ -641,18 +758,25 @@ Route::middleware(['auth:admin', 'admin'])
             'reject',
         ])->name('communities.reject');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Detail
+        |--------------------------------------------------------------------------
+        */
 
-        // Detail
         Route::get('/detail/{type}/{id}', [
             DetailController::class,
             'show',
         ])->name('detail.show');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Logout
+        |--------------------------------------------------------------------------
+        */
 
-        // Logout
         Route::post('/logout', [
             AuthController::class,
             'logout',
         ])->name('logout');
-
     });

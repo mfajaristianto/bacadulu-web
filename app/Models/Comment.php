@@ -2,76 +2,67 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Comment extends Model
 {
-    use HasFactory;
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FILLABLE
-    |--------------------------------------------------------------------------
-    */
+    protected $table = 'comments';
 
     protected $fillable = [
         'post_id',
         'user_id',
         'body',
+        'content',
     ];
 
-
     /*
     |--------------------------------------------------------------------------
-    | RELASI POST
+    | RELATIONSHIPS
     |--------------------------------------------------------------------------
     */
 
-    public function post()
+    public function post(): BelongsTo
     {
-        return $this->belongsTo(
-            Post::class
-        );
+        return $this->belongsTo(Post::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /*
     |--------------------------------------------------------------------------
-    | RELASI USER
-    |--------------------------------------------------------------------------
-    */
-
-    public function user()
-    {
-        return $this->belongsTo(
-            User::class
-        );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | COMPATIBILITY ACCESSOR
+    | CONTENT COMPATIBILITY
     |--------------------------------------------------------------------------
     |
-    | Database menggunakan:
+    | Database lama menggunakan kolom "body".
+    | UI / controller baru menggunakan nama "content".
     |
-    | $comment->body
-    |
-    | Tetapi Blade yang sudah Anda dan teman Anda buat menggunakan:
+    | Dengan accessor + mutator ini:
     |
     | $comment->content
     |
-    | Accessor ini membuat keduanya tetap bekerja tanpa perlu mengubah
-    | seluruh Blade.
+    | otomatis membaca:
     |
-    |--------------------------------------------------------------------------
+    | comments.body
+    |
+    | Dan ketika controller menjalankan:
+    |
+    | Comment::create(['content' => '...'])
+    |
+    | nilainya otomatis disimpan ke kolom "body".
+    |
     */
 
-    public function getContentAttribute()
+    public function getContentAttribute(): string
     {
-        return $this->body;
+        return $this->attributes['body'] ?? '';
+    }
+
+    public function setContentAttribute($value): void
+    {
+        $this->attributes['body'] = $value;
     }
 }
