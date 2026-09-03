@@ -93,7 +93,9 @@
                             data-publisher="{{ $book->publisher }}"
                             data-price="{{ (float)$book->effective_print_price }}"
                             data-stock="{{ (int) $book->print_stock }}"
-                            data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}">
+                            data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}"
+                            data-description="{{ \Illuminate\Support\Str::limit(strip_tags($book->description ?? ''), 2500) }}"
+                            data-detail-url="{{ route('portofolio.bookstore.show',['book'=>$book->slug]) }}">
                             + Cetak
                         </button>
                     @else
@@ -185,7 +187,9 @@
                         data-publisher="{{ $book->publisher }}"
                         data-price="{{ (float)$book->effective_ebook_price }}"
                         data-stock=""
-                        data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}">
+                        data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}"
+                        data-description="{{ \Illuminate\Support\Str::limit(strip_tags($book->description ?? ''), 2500) }}"
+                        data-detail-url="{{ route('portofolio.bookstore.show',['book'=>$book->slug]) }}">
 
                         + E-book
                     </button>

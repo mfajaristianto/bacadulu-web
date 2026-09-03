@@ -13,6 +13,7 @@
     --muted:#64748B;
     --border:#E2E8F0;
     --cream:#FBF9F5;
+    --ease:cubic-bezier(.22,1,.36,1);
     width:100%;
     min-height:100vh;
     overflow-x:hidden;
@@ -502,6 +503,17 @@
 .cart-format{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700}.cart-format.print{background:#FFF7ED;color:#EA580C}.cart-format.ebook{background:#EEF2FF;color:#4F46E5}
 .cart-remove{border:0;background:transparent;color:#94A3B8;cursor:pointer;font-size:16px;padding:2px 5px}
 .cart-product-title{margin:0;font-size:15px;line-height:1.4;font-weight:700;color:#1E293B}.cart-product-meta{margin:5px 0 0;font-size:12px;line-height:1.5;color:#94A3B8}.cart-unit-price{margin-top:10px;font-size:13px;font-weight:600;color:#475569}
+
+.cart-book-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:11px}
+.cart-synopsis-toggle,.cart-detail-link{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:31px;padding:6px 9px;border-radius:8px;font-size:10.5px;font-weight:750;line-height:1;text-decoration:none;cursor:pointer;transition:.18s ease}
+.cart-synopsis-toggle{border:1px solid #FED7AA;color:#C2410C;background:#FFF7ED}
+.cart-synopsis-toggle:hover{border-color:#FB923C;background:#FFEDD5}
+.cart-detail-link{border:1px solid #E2E8F0;color:#475569!important;background:#fff}
+.cart-detail-link:hover{border-color:#CBD5E1;background:#F8FAFC;color:#1E293B!important}
+.cart-synopsis{display:none;margin-top:10px;padding:11px 12px;border:1px solid #E2E8F0;border-radius:10px;background:#fff;color:#64748B;font-size:11px;line-height:1.65}
+.cart-synopsis.show{display:block}
+.cart-synopsis strong{display:block;margin-bottom:5px;color:#334155;font-size:10.5px}
+.cart-synopsis-empty{font-style:italic;color:#94A3B8}
 .cart-product-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:14px}.qty-control{display:inline-flex;align-items:center;border:1px solid #E2E8F0;border-radius:9px;overflow:hidden;background:#fff}.qty-control button{width:32px;height:32px;border:0;background:#fff;color:#334155;cursor:pointer;font-size:16px}.qty-control button:disabled{opacity:.4;cursor:not-allowed}.qty-control span{min-width:30px;text-align:center;font-size:13px;font-weight:700;color:#1E293B}
 .cart-subtotal-label{font-size:10px;color:#94A3B8;text-align:right}.cart-subtotal{margin-top:2px;font-size:14px;font-weight:800;color:#1E293B;text-align:right}
 .cart-feedback-open{border:0;padding:0;color:#15803D;background:transparent;font:inherit;font-weight:800;text-decoration:underline;cursor:pointer}
@@ -731,6 +743,8 @@
                                             data-price="{{ (float)$book->effective_print_price }}"
                                             data-stock="{{ (int) $book->print_stock }}"
                                             data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}"
+                                            data-description="{{ \Illuminate\Support\Str::limit(strip_tags($book->description ?? ''), 2500) }}"
+                                            data-detail-url="{{ route('portofolio.bookstore.show',['book'=>$book->slug]) }}"
                                         >
                                             <svg viewBox="0 0 24 24">
                                                 <circle cx="9" cy="20" r="1"/>
@@ -793,6 +807,8 @@
                                         data-price="{{ (float)$book->effective_ebook_price }}"
                                         data-stock=""
                                         data-cover="{{ $book->cover ? asset('storage/'.$book->cover) : '' }}"
+                                        data-description="{{ \Illuminate\Support\Str::limit(strip_tags($book->description ?? ''), 2500) }}"
+                                        data-detail-url="{{ route('portofolio.bookstore.show',['book'=>$book->slug]) }}"
                                     >
                                         <svg viewBox="0 0 24 24">
                                             <circle cx="9" cy="20" r="1"/>

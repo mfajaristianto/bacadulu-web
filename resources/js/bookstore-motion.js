@@ -132,6 +132,8 @@ const normalizeCart = data => {
                 author: String(item.author ?? ''),
                 publisher: String(item.publisher ?? ''),
                 cover: String(item.cover ?? ''),
+                description: String(item.description ?? ''),
+                detailUrl: String(item.detailUrl ?? ''),
                 price: Number(item.price ?? 0),
                 stock:
                     item.stock === undefined ||
@@ -3016,6 +3018,32 @@ const initStoreCart = root => {
                                 ? `<div class="cart-unit-price">Stok tersedia: ${Number(item.stock)}</div>`
                                 : ''}
 
+                            <div class="cart-book-actions">
+                                <button
+                                    type="button"
+                                    class="cart-synopsis-toggle"
+                                    data-cart-action="synopsis"
+                                    data-key="${escapeHtml(item.key)}"
+                                    aria-expanded="false"
+                                >
+                                    Baca Sinopsis
+                                </button>
+
+                                ${item.detailUrl
+                                    ? `<a class="cart-detail-link" href="${escapeHtml(item.detailUrl)}">Lihat Detail Buku</a>`
+                                    : ''}
+                            </div>
+
+                            <div
+                                class="cart-synopsis"
+                                data-cart-synopsis="${escapeHtml(item.key)}"
+                            >
+                                <strong>Sinopsis</strong>
+                                ${item.description
+                                    ? escapeHtml(item.description)
+                                    : `<span class="cart-synopsis-empty">Sinopsis belum tersimpan pada item ini. Gunakan “Lihat Detail Buku” untuk membacanya.</span>`}
+                            </div>
+
                             <div class="cart-product-bottom">
                                 <div class="qty-control">
                                     <button
@@ -3131,6 +3159,12 @@ const initStoreCart = root => {
                 cover:
                     button.dataset.cover ?? '',
 
+                description:
+                    button.dataset.description ?? '',
+
+                detailUrl:
+                    button.dataset.detailUrl ?? '',
+
                 price:
                     Number(
                         button.dataset.price ?? 0
@@ -3182,6 +3216,10 @@ const initStoreCart = root => {
 
             if (existing) {
                 existing.stock = product.stock;
+                existing.description =
+                    product.description || existing.description || '';
+                existing.detailUrl =
+                    product.detailUrl || existing.detailUrl || '';
 
                 if (
                     product.stock !== null &&
@@ -3243,15 +3281,55 @@ const initStoreCart = root => {
             e.preventDefault();
             e.stopPropagation();
 
+            const action =
+                button.dataset.cartAction;
+
+            if (action === 'synopsis') {
+                const key =
+                    button.dataset.key || '';
+
+                const synopsis =
+                    items.querySelector(
+                        `[data-cart-synopsis="${CSS.escape(key)}"]`
+                    );
+
+                if (!synopsis) return;
+
+                const isOpen =
+                    synopsis.classList.toggle('show');
+
+                button.setAttribute(
+                    'aria-expanded',
+                    isOpen ? 'true' : 'false'
+                );
+
+                button.textContent =
+                    isOpen
+                        ? 'Tutup Sinopsis'
+                        : 'Baca Sinopsis';
+
+                if (isOpen && !reduceMotion) {
+                    gsap.fromTo(
+                        synopsis,
+                        {autoAlpha: 0, y: -5},
+                        {
+                            autoAlpha: 1,
+                            y: 0,
+                            duration: .22,
+                            ease: 'power2.out'
+                        }
+                    );
+                }
+
+                return;
+            }
+
             const item =
                 cart.find(
                     row =>
                         row.key ===
                         button.dataset.key
                 );
-
-            const action =
-                button.dataset.cartAction;
 
             if (
                 action === 'plus' &&
@@ -3888,6 +3966,12 @@ const initDetailCart = root => {
                 cover:
                     button.dataset.cover ?? '',
 
+                description:
+                    button.dataset.description ?? '',
+
+                detailUrl:
+                    button.dataset.detailUrl ?? '',
+
                 price:
                     Number(
                         button.dataset.price ?? 0
@@ -3938,6 +4022,10 @@ const initDetailCart = root => {
 
             if (existing) {
                 existing.stock = product.stock;
+                existing.description =
+                    product.description || existing.description || '';
+                existing.detailUrl =
+                    product.detailUrl || existing.detailUrl || '';
 
                 if (
                     product.stock !== null &&
