@@ -12,36 +12,43 @@
         : null;
 
     $hasImage = !empty($information->image);
+    $isPinned = (bool) ($information->is_pinned ?? false);
+
+    $titleLength = mb_strlen(trim($information->title));
+
+    $titleSizeClass = match (true) {
+        $titleLength >= 120 => 'is-extreme',
+        $titleLength >= 75 => 'is-long',
+        $titleLength >= 45 => 'is-medium',
+        default => '',
+    };
 @endphp
 
-
 <style>
-/* =========================================================
-   BACA DULU
-   INFORMATION DETAIL
-========================================================= */
-
 .bd-detail {
     --navy: #241B52;
-    --orange: #EF5843;
-    --gold: #F7AA35;
+    --orange-dark: #C94F35;
+    --orange: #D96A2B;
+    --amber: #E58A2B;
+    --gold: #F0A52E;
+    --yellow: #F2C94C;
 
-    --ink: #19191D;
-    --body: #505661;
-    --muted: #8B9099;
-    --line: #E7E8EC;
-    --soft: #F7F8FA;
+    --ink: #29292F;
+    --body: #555A63;
+    --muted: #858A93;
+    --soft-text: #A0A3AA;
 
-    position: relative;
+    --white: #FFFFFF;
+    --warm: #FFFCF8;
+    --cream: #FFF7ED;
+    --soft: #F7F7F7;
+    --border: #E9E3DD;
 
     min-height: 100vh;
-
     overflow-x: hidden;
-
-    background: #FFFFFF;
     color: var(--ink);
-
-    font-family: 'Poppins', sans-serif;
+    background: var(--white);
+    font-family: 'Inter', sans-serif;
 }
 
 .bd-detail *,
@@ -54,12 +61,12 @@
     text-decoration: none;
 }
 
-.bd-detail-container {
-    width: min(
-        calc(100% - 64px),
-        1200px
-    );
+.bd-detail button {
+    font-family: inherit;
+}
 
+.bd-detail-container {
+    width: min(calc(100% - 40px), 980px);
     margin-inline: auto;
 }
 
@@ -70,25 +77,23 @@
 
 .bd-detail-progress {
     position: fixed;
-
-    z-index: 999;
-
+    z-index: 9999;
     top: 0;
     left: 0;
-
     width: 100%;
     height: 3px;
-
     pointer-events: none;
 }
 
 .bd-detail-progress-bar {
     width: 0;
     height: 100%;
-
-    background: var(--orange);
-
-    transform-origin: left center;
+    background: linear-gradient(
+        90deg,
+        var(--orange-dark),
+        var(--orange),
+        var(--gold)
+    );
 }
 
 
@@ -98,55 +103,93 @@
 
 .bd-detail-nav {
     position: relative;
-
-    z-index: 10;
-
-    border-bottom: 1px solid var(--line);
-
+    z-index: 20;
+    border-bottom: 1px solid #EFEAE5;
     background: rgba(255,255,255,.96);
+    backdrop-filter: blur(12px);
 }
 
 .bd-detail-nav-inner {
-    min-height: 58px;
-
+    min-height: 62px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 16px;
 }
 
 .bd-detail-back {
     display: inline-flex;
     align-items: center;
+    gap: 7px;
 
-    gap: 9px;
+    min-height: 36px;
+    padding: 0 12px;
 
-    color: #747983 !important;
+    border: 1px solid #E5DFD9;
+    border-radius: 9px;
 
-    font-size: 11px;
-    font-weight: 600;
+    color: var(--navy) !important;
+    background: #FFFFFF;
+
+    font-size: 10px;
+    font-weight: 750;
+
+    box-shadow: 0 3px 10px rgba(36,27,82,.035);
 
     transition:
-        color .25s ease;
+        transform .25s ease,
+        color .25s ease,
+        border-color .25s ease,
+        background .25s ease;
 }
 
 .bd-detail-back svg {
-    width: 17px;
-    height: 17px;
-
+    width: 13px;
+    height: 13px;
     fill: none;
     stroke: currentColor;
-
-    stroke-width: 1.7;
-
-    transition:
-        transform .3s cubic-bezier(.22,1,.36,1);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform .25s ease;
 }
 
 .bd-detail-back:hover {
     color: var(--orange) !important;
+    border-color: rgba(217,106,43,.32);
+    background: #FFF9F3;
+    transform: translateY(-1px);
 }
 
 .bd-detail-back:hover svg {
-    transform: translateX(-4px);
+    transform: translateX(-3px);
+}
+
+.bd-detail-nav-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    color: var(--soft-text);
+
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+}
+
+.bd-detail-nav-status::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        var(--orange),
+        var(--gold)
+    );
 }
 
 
@@ -156,105 +199,49 @@
 
 .bd-detail-hero {
     position: relative;
-
-    padding:
-        46px 0
-        43px;
-
     overflow: hidden;
+    padding: 38px 0 36px;
+
+    background:
+        radial-gradient(
+            circle at 96% 7%,
+            rgba(240,165,46,.10),
+            transparent 24%
+        ),
+        radial-gradient(
+            circle at 2% 100%,
+            rgba(217,106,43,.045),
+            transparent 24%
+        ),
+        #FFFFFF;
+}
+
+.bd-detail-hero::after {
+    content: "";
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    right: -125px;
+    top: -125px;
+
+    border: 1px solid rgba(36,27,82,.05);
+    border-radius: 50%;
+
+    pointer-events: none;
 }
 
 .bd-detail-hero-grid {
     position: relative;
-
-    z-index: 3;
+    z-index: 2;
 
     display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        370px;
-
-    gap: 62px;
-
+    grid-template-columns: minmax(0,1fr) 300px;
     align-items: center;
+    gap: 42px;
 }
 
 .bd-detail-hero-grid.no-image {
-    grid-template-columns: minmax(0, 820px);
-}
-
-
-/* =========================================================
-   DECORATION
-========================================================= */
-
-.bd-detail-decoration {
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 0;
-
-    pointer-events: none;
-
-    overflow: hidden;
-}
-
-.bd-detail-ring {
-    position: absolute;
-
-    width: 240px;
-    height: 240px;
-
-    right: -80px;
-    top: -115px;
-
-    border: 1px solid rgba(36,27,82,.08);
-    border-radius: 50%;
-}
-
-.bd-detail-ring::before {
-    content: "";
-
-    position: absolute;
-
-    width: 150px;
-    height: 150px;
-
-    left: 44px;
-    top: 44px;
-
-    border: 1px solid rgba(239,88,67,.11);
-    border-radius: 50%;
-}
-
-.bd-detail-ring::after {
-    content: "";
-
-    position: absolute;
-
-    width: 7px;
-    height: 7px;
-
-    left: 29px;
-    bottom: 38px;
-
-    border-radius: 50%;
-
-    background: var(--orange);
-}
-
-.bd-detail-decor-line {
-    position: absolute;
-
-    width: 110px;
-    height: 2px;
-
-    left: -45px;
-    bottom: 39px;
-
-    background: rgba(239,88,67,.18);
+    grid-template-columns: minmax(0,720px);
 }
 
 
@@ -264,130 +251,214 @@
 
 .bd-detail-copy {
     position: relative;
-
     min-width: 0;
-
-    padding-left: 22px;
+    padding-left: 17px;
 }
 
 .bd-detail-copy::before {
     content: "";
-
     position: absolute;
-
-    top: 4px;
-    bottom: 4px;
+    top: 3px;
+    bottom: 3px;
     left: 0;
-
     width: 3px;
 
     border-radius: 999px;
 
-    background:
-        linear-gradient(
-            180deg,
-            var(--orange) 0%,
-            var(--orange) 52%,
-            rgba(239,88,67,.10) 52%,
-            rgba(239,88,67,.10) 100%
-        );
+    background: linear-gradient(
+        180deg,
+        var(--orange-dark),
+        var(--orange),
+        var(--gold)
+    );
 }
 
-.bd-detail-title-mask {
-    overflow: hidden;
+
+/* META */
+
+.bd-detail-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
 }
+
+.bd-detail-category,
+.bd-detail-pinned {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    min-height: 25px;
+    padding: 0 9px;
+
+    border-radius: 999px;
+
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+.bd-detail-category {
+    border: 1px solid rgba(217,106,43,.16);
+    color: var(--orange);
+    background: #FFF7EF;
+}
+
+.bd-detail-pinned {
+    border: 1px solid rgba(240,165,46,.20);
+    color: #A76613;
+    background: #FFF7DF;
+}
+
+.bd-detail-pinned svg {
+    width: 10px;
+    height: 10px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.bd-detail-meta-dot {
+    width: 4px;
+    height: 4px;
+    flex: 0 0 4px;
+    border-radius: 50%;
+    background: var(--gold);
+}
+
+.bd-detail-date {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
 
 .bd-detail-title {
-    max-width: 760px;
-
+    width: 100%;
+    max-width: 620px;
     margin: 0;
 
     color: var(--navy);
 
     font-family: 'Poppins', sans-serif;
-
-    font-size: clamp(
-        38px,
-        4.2vw,
-        58px
-    );
-
-    font-weight: 600;
-
-    line-height: 1.07;
-
-    letter-spacing: -.045em;
+    font-size: clamp(31px,3.4vw,42px);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -.038em;
 
     overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.bd-detail-title.is-medium {
+    font-size: clamp(28px,3vw,37px);
+    line-height: 1.14;
+}
+
+.bd-detail-title.is-long {
+    font-size: clamp(24px,2.6vw,32px);
+    line-height: 1.17;
+    letter-spacing: -.025em;
+}
+
+.bd-detail-title.is-extreme {
+    font-size: clamp(21px,2.2vw,27px);
+    line-height: 1.2;
+    letter-spacing: -.015em;
 }
 
 
 /* =========================================================
-   DATE + SHARE
+   HERO SHARE
 ========================================================= */
 
-.bd-detail-meta {
+.bd-detail-hero-actions {
     display: flex;
     align-items: center;
-
-    gap: 16px;
-
-    margin-top: 22px;
-}
-
-.bd-detail-date {
-    color: var(--muted);
-
-    font-size: 11px;
-    font-weight: 500;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
 }
 
 .bd-detail-share {
-    width: 38px;
-    height: 38px;
-
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 7px;
 
-    margin-left: auto;
+    min-height: 37px;
+    padding: 0 11px;
 
-    padding: 0;
+    border: 1px solid #E5DFDA;
+    border-radius: 9px;
 
-    border: 1px solid var(--line);
-    border-radius: 50%;
-
+    color: var(--navy);
     background: #FFFFFF;
 
-    color: #70757E;
+    font-size: 9px;
+    font-weight: 750;
 
     cursor: pointer;
 
     transition:
+        transform .25s ease,
         color .25s ease,
         border-color .25s ease,
         background .25s ease,
-        transform .3s cubic-bezier(.22,1,.36,1);
+        box-shadow .25s ease;
+}
+
+.bd-detail-share-icon {
+    width: 23px;
+    height: 23px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 6px;
+
+    color: var(--orange);
+    background: #FFF3E9;
 }
 
 .bd-detail-share svg {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
 
     fill: none;
     stroke: currentColor;
-
-    stroke-width: 1.6;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .bd-detail-share:hover {
-    transform: translateY(-2px);
-
+    color: #FFFFFF;
     border-color: var(--orange);
 
-    background: var(--orange);
+    background: linear-gradient(
+        105deg,
+        var(--orange-dark),
+        var(--orange)
+    );
 
+    box-shadow: 0 8px 18px rgba(217,106,43,.16);
+    transform: translateY(-2px);
+}
+
+.bd-detail-share:hover .bd-detail-share-icon {
     color: #FFFFFF;
+    background: rgba(255,255,255,.16);
 }
 
 
@@ -397,266 +468,205 @@
 
 .bd-detail-media-wrap {
     position: relative;
-
-    padding:
-        10px
-        10px
-        0
-        0;
+    width: 100%;
+    max-width: 300px;
+    justify-self: end;
+    padding: 8px 8px 0 0;
 }
 
 .bd-detail-media-wrap::before {
     content: "";
-
     position: absolute;
-
-    z-index: 0;
-
     top: 0;
     right: 0;
 
-    width: 68px;
-    height: 68px;
+    width: 52px;
+    height: 52px;
 
     border-top: 2px solid var(--orange);
-    border-right: 2px solid var(--orange);
+    border-right: 2px solid var(--gold);
+    border-radius: 0 13px 0 0;
 
-    border-radius: 0 15px 0 0;
-
-    opacity: .72;
+    opacity: .75;
 }
 
 .bd-detail-media-wrap::after {
     content: "";
-
     position: absolute;
+    right: -5px;
+    bottom: -5px;
 
-    z-index: 0;
-
-    right: -7px;
-    bottom: -7px;
-
-    width: 72px;
-    height: 72px;
+    width: 56px;
+    height: 56px;
 
     background:
         radial-gradient(
             circle,
-            rgba(36,27,82,.14) 1px,
-            transparent 1.6px
+            rgba(36,27,82,.13) 1px,
+            transparent 1.5px
         );
 
-    background-size: 10px 10px;
-
-    opacity: .7;
+    background-size: 9px 9px;
+    opacity: .62;
 }
 
 .bd-detail-media {
     position: relative;
-
     z-index: 2;
 
     width: 100%;
-    height: 285px;
+    aspect-ratio: 4 / 3;
 
     overflow: hidden;
 
-    border-radius: 15px;
+    border: 1px solid #EEE8E2;
+    border-radius: 13px;
 
     background: var(--soft);
-
-    box-shadow:
-        0 14px 38px
-        rgba(36,27,82,.07);
-
-    isolation: isolate;
+    box-shadow: 0 13px 30px rgba(36,27,82,.065);
 }
 
 .bd-detail-image {
     position: absolute;
-
-    z-index: 1;
-
+    z-index: 2;
     inset: 0;
-
-    display: block;
 
     width: 100%;
     height: 100%;
+    display: block;
 
     object-fit: cover;
 
-    transform: scale(1.01);
-
     transition:
-        transform .8s cubic-bezier(.22,1,.36,1);
+        transform .7s
+        cubic-bezier(.22,1,.36,1);
 }
 
-.bd-detail-media:hover
-.bd-detail-image {
-    transform: scale(1.04);
+.bd-detail-media:hover .bd-detail-image {
+    transform: scale(1.035);
 }
-
-
-/* =========================================================
-   IMAGE FALLBACK
-========================================================= */
 
 .bd-detail-fallback {
     position: absolute;
-
     inset: 0;
 
+    display: grid;
+    place-items: center;
+
+    background: linear-gradient(
+        135deg,
+        var(--navy),
+        #17132F
+    );
+}
+
+.bd-detail-fallback-inner {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
 
-    background:
-        linear-gradient(
-            135deg,
-            #2B225A,
-            #17132E
-        );
+    color: #FFFFFF;
+
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: .13em;
+    text-transform: uppercase;
 }
 
 .bd-detail-fallback-mark {
-    width: 10px;
-    height: 10px;
-
-    background: var(--orange);
+    width: 8px;
+    height: 8px;
+    transform: rotate(45deg);
+    background: var(--gold);
 }
 
 
 /* =========================================================
-   ARTICLE SEPARATOR
+   SEPARATOR
 ========================================================= */
 
 .bd-detail-separator {
     position: relative;
-
     height: 1px;
-
-    background: var(--line);
+    background: #EFEAE5;
 }
 
 .bd-detail-separator::before {
     content: "";
-
     position: absolute;
-
+    top: -1px;
     left: 50%;
 
     width: 46px;
     height: 3px;
 
+    border-radius: 999px;
+
     transform: translateX(-50%);
 
-    background: var(--orange);
+    background: linear-gradient(
+        90deg,
+        var(--orange),
+        var(--gold)
+    );
 }
 
 
 /* =========================================================
-   READING AREA
+   ARTICLE
 ========================================================= */
 
 .bd-detail-reading {
-    position: relative;
-
-    padding:
-        48px 0
-        72px;
-}
-
-.bd-detail-reading::before {
-    content: "";
-
-    position: absolute;
-
-    width: 210px;
-    height: 210px;
-
-    left: -140px;
-    top: 95px;
-
-    border: 1px solid rgba(36,27,82,.045);
-    border-radius: 50%;
-
-    pointer-events: none;
+    padding: 42px 0 58px;
 }
 
 .bd-detail-reading-inner {
-    width: min(
-        calc(100% - 64px),
-        760px
-    );
-
+    width: min(calc(100% - 32px),700px);
     margin-inline: auto;
 }
 
-
-/* =========================================================
-   CONTENT
-========================================================= */
-
 .bd-detail-content {
-    display: flow-root;
-
     width: 100%;
+    min-width: 0;
     max-width: 100%;
 
     color: var(--body);
 
-    font-size: 16px;
-
-    line-height: 1.9;
+    font-size: 15px;
+    line-height: 1.86;
 
     overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
-.bd-detail-content::after {
-    content: "";
-
-    display: block;
-
-    clear: both;
-}
-
+.bd-detail-content *,
 .bd-detail-content > * {
+    min-width: 0 !important;
     max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
 }
-
-
-/* =========================================================
-   RESET BAD HTML WIDTHS/FLOATS FROM EDITOR
-========================================================= */
 
 .bd-detail-content p,
 .bd-detail-content div,
+.bd-detail-content span,
 .bd-detail-content section,
 .bd-detail-content article {
-    max-width: 100% !important;
+    white-space: normal !important;
 }
 
 .bd-detail-content p {
-    margin:
-        0 0
-        24px;
+    margin: 0 0 21px;
 }
 
 .bd-detail-content > p:first-child {
-    margin-top: 0;
-
-    color: #292D35;
-
-    font-size: 18px;
-
-    line-height: 1.78;
+    color: #363940;
+    font-size: 16px;
+    line-height: 1.82;
 }
 
 
-/* =========================================================
-   HEADINGS
-========================================================= */
+/* HEADINGS */
 
 .bd-detail-content h1,
 .bd-detail-content h2,
@@ -664,69 +674,44 @@
 .bd-detail-content h4,
 .bd-detail-content h5,
 .bd-detail-content h6 {
-    max-width: 100% !important;
+    clear: both;
 
     color: var(--navy);
 
     font-family: 'Poppins', sans-serif;
-
-    font-weight: 600;
-
-    line-height: 1.3;
+    font-weight: 700;
+    line-height: 1.32;
 
     letter-spacing: -.025em;
-
-    overflow-wrap: anywhere;
-
-    clear: both;
 }
 
 .bd-detail-content h1 {
-    margin:
-        48px 0
-        17px;
-
-    font-size: 31px;
+    margin: 42px 0 14px;
+    font-size: 28px;
 }
 
 .bd-detail-content h2 {
-    margin:
-        43px 0
-        16px;
-
-    font-size: 27px;
+    margin: 37px 0 14px;
+    font-size: 24px;
 }
 
 .bd-detail-content h3 {
-    margin:
-        36px 0
-        14px;
-
-    font-size: 22px;
+    margin: 31px 0 12px;
+    font-size: 20px;
 }
 
 .bd-detail-content h4 {
-    margin:
-        30px 0
-        12px;
-
-    font-size: 18px;
+    margin: 27px 0 10px;
+    font-size: 17px;
 }
 
 
-/* =========================================================
-   LISTS
-========================================================= */
+/* LIST */
 
 .bd-detail-content ul,
 .bd-detail-content ol {
-    max-width: 100% !important;
-
-    margin:
-        0 0
-        25px;
-
-    padding-left: 24px;
+    margin: 0 0 22px;
+    padding-left: 22px;
 }
 
 .bd-detail-content ul {
@@ -738,51 +723,36 @@
 }
 
 .bd-detail-content li {
-    margin-bottom: 8px;
+    margin-bottom: 7px;
 }
 
 
-/* =========================================================
-   LINK
-========================================================= */
+/* LINK */
 
 .bd-detail-content a {
     color: var(--orange) !important;
-
     text-decoration: underline;
-
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
 }
 
 
-/* =========================================================
-   BLOCKQUOTE
-========================================================= */
+/* BLOCKQUOTE */
 
 .bd-detail-content blockquote {
     clear: both;
 
-    margin:
-        36px 0;
-
-    padding:
-        4px 0
-        4px 21px;
+    margin: 29px 0;
+    padding: 4px 0 4px 17px;
 
     border-left: 3px solid var(--orange);
 
     color: var(--navy);
 
     font-family: 'Poppins', sans-serif;
-
-    font-size: 20px;
-
+    font-size: 17px;
     font-weight: 500;
-
-    line-height: 1.55;
-
-    letter-spacing: -.02em;
+    line-height: 1.58;
 }
 
 .bd-detail-content blockquote p {
@@ -790,97 +760,75 @@
 }
 
 
-/* =========================================================
-   CONTENT IMAGES
-========================================================= */
+/* IMAGE */
 
 .bd-detail-content img {
     display: block !important;
-
     float: none !important;
 
     width: auto !important;
     max-width: 100% !important;
 
     height: auto !important;
-    max-height: 520px;
+    max-height: 500px;
 
-    margin:
-        31px auto !important;
+    margin: 27px auto !important;
 
-    border-radius: 13px;
-
+    border-radius: 12px;
     object-fit: contain;
 }
 
 
-/* =========================================================
-   FIGURE
-========================================================= */
+/* FIGURE */
 
 .bd-detail-content figure {
     float: none !important;
-
     clear: both;
 
     width: 100% !important;
     max-width: 100% !important;
 
-    margin:
-        32px 0 !important;
+    margin: 28px 0 !important;
 }
 
 .bd-detail-content figure img {
-    margin:
-        0 auto !important;
+    margin: 0 auto !important;
 }
 
 .bd-detail-content figcaption {
-    margin-top: 9px;
+    margin-top: 8px;
 
-    color: #969AA3;
+    color: #969AA2;
 
-    font-size: 10px;
-
+    font-size: 9px;
     line-height: 1.6;
-
     text-align: center;
 }
 
 
-/* =========================================================
-   VIDEO
-========================================================= */
+/* VIDEO */
 
 .bd-detail-content iframe,
 .bd-detail-content video {
     display: block;
-
     float: none !important;
-
     clear: both;
 
     width: 100% !important;
     max-width: 100% !important;
+    min-height: 340px;
 
-    min-height: 380px;
-
-    margin:
-        32px 0;
+    margin: 28px 0;
 
     border: 0;
-
-    border-radius: 13px;
+    border-radius: 12px;
 }
 
 
-/* =========================================================
-   TABLE
-========================================================= */
+/* TABLE */
 
 .bd-detail-content table {
     display: block;
-
     clear: both;
 
     width: 100% !important;
@@ -888,8 +836,7 @@
 
     overflow-x: auto;
 
-    margin:
-        32px 0;
+    margin: 28px 0;
 
     border-collapse: collapse;
 
@@ -898,144 +845,245 @@
 
 .bd-detail-content th,
 .bd-detail-content td {
-    padding:
-        12px 11px;
-
-    border-bottom: 1px solid var(--line);
-
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
     text-align: left;
-
     vertical-align: top;
 }
 
 .bd-detail-content th {
     color: var(--navy);
-
     font-weight: 800;
 }
 
 
-/* =========================================================
-   CODE
-========================================================= */
+/* CODE */
 
 .bd-detail-content pre {
     clear: both;
 
     max-width: 100%;
-
     overflow-x: auto;
 
-    margin:
-        30px 0;
+    margin: 27px 0;
+    padding: 15px;
 
-    padding: 18px;
-
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: 10px;
 
     background: var(--soft);
+
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 
 /* =========================================================
-   BOTTOM NAV
+   END ARTICLE CTA
 ========================================================= */
 
-.bd-detail-bottom {
+.bd-detail-after {
     position: relative;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    margin-top: 40px;
+    padding: 18px;
 
-    clear: both;
+    overflow: hidden;
 
-    width: 100%;
+    border: 1px solid #EBE1D6;
+    border-radius: 13px;
 
-    margin-top: 52px;
-
-    padding-top: 21px;
-
-    border-top: 1px solid var(--line);
+    background:
+        radial-gradient(
+            circle at 100% 0,
+            rgba(240,165,46,.12),
+            transparent 32%
+        ),
+        linear-gradient(
+            135deg,
+            #FFFDF9,
+            #FFF7ED
+        );
 }
 
-.bd-detail-bottom::before {
+.bd-detail-after::before {
     content: "";
 
     position: absolute;
-
-    top: -1px;
+    top: 0;
     left: 0;
 
-    width: 35px;
-    height: 2px;
+    width: 100%;
+    height: 3px;
 
-    background: var(--orange);
+    background: linear-gradient(
+        90deg,
+        var(--orange-dark),
+        var(--orange),
+        var(--gold)
+    );
 }
 
-.bd-detail-more {
+.bd-detail-after-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.bd-detail-after-copy {
+    min-width: 0;
+}
+
+.bd-detail-after-label {
+    display: block;
+    margin-bottom: 3px;
+
+    color: var(--orange);
+
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.bd-detail-after h3 {
+    margin: 0;
+
+    color: var(--navy);
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.bd-detail-after p {
+    max-width: 350px;
+
+    margin: 4px 0 0;
+
+    color: var(--muted);
+
+    font-size: 8px;
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   BOTTOM ACTIONS
+========================================================= */
+
+.bd-detail-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 7px;
+}
+
+.bd-detail-more,
+.bd-detail-top {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    gap: 7px;
 
-    gap: 9px;
+    min-height: 38px;
+    padding: 0 12px;
 
-    color: var(--navy) !important;
+    border-radius: 9px;
 
-    font-size: 11px;
-    font-weight: 650;
+    font-size: 8px;
+    font-weight: 800;
+
+    cursor: pointer;
 
     transition:
-        color .25s ease;
+        transform .25s ease,
+        box-shadow .25s ease,
+        color .25s ease,
+        border-color .25s ease,
+        background .25s ease;
 }
 
-.bd-detail-more svg {
-    width: 17px;
-    height: 17px;
 
-    fill: none;
-    stroke: currentColor;
+/* PRIMARY */
 
-    stroke-width: 1.7;
+.bd-detail-more {
+    border: 0;
 
-    transition:
-        transform .3s cubic-bezier(.22,1,.36,1);
+    color: #FFFFFF !important;
+
+    background: linear-gradient(
+        105deg,
+        var(--orange-dark),
+        var(--orange),
+        var(--gold)
+    );
+
+    background-size: 170% 100%;
+
+    box-shadow:
+        0 8px 18px
+        rgba(217,106,43,.17);
 }
 
 .bd-detail-more:hover {
-    color: var(--orange) !important;
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 11px 22px
+        rgba(217,106,43,.22);
+}
+
+.bd-detail-more svg {
+    transition: transform .25s ease;
 }
 
 .bd-detail-more:hover svg {
-    transform: translateX(-4px);
+    transform: translateX(2px);
 }
 
-.bd-detail-bottom-mark {
-    display: flex;
-    align-items: center;
 
-    gap: 5px;
+/* SECONDARY */
+
+.bd-detail-top {
+    border: 1px solid #E2DCD5;
+
+    color: var(--navy);
+
+    background: rgba(255,255,255,.76);
 }
 
-.bd-detail-bottom-mark span {
-    display: block;
+.bd-detail-top:hover {
+    color: var(--orange);
 
-    width: 5px;
-    height: 5px;
+    border-color:
+        rgba(217,106,43,.30);
 
-    border-radius: 50%;
+    background: #FFFFFF;
+
+    transform: translateY(-2px);
 }
 
-.bd-detail-bottom-mark span:nth-child(1) {
-    background: var(--navy);
+.bd-detail-more svg,
+.bd-detail-top svg {
+    width: 11px;
+    height: 11px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
-.bd-detail-bottom-mark span:nth-child(2) {
-    background: var(--orange);
+.bd-detail-top svg {
+    transition: transform .25s ease;
 }
 
-.bd-detail-bottom-mark span:nth-child(3) {
-    background: var(--gold);
+.bd-detail-top:hover svg {
+    transform: translateY(-2px);
 }
 
 
@@ -1045,39 +1093,52 @@
 
 .bd-detail-toast {
     position: fixed;
-
     z-index: 9999;
 
-    right: 20px;
-    bottom: 20px;
+    right: 18px;
+    bottom: 18px;
 
-    padding:
-        10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 9px 12px;
 
     border-radius: 8px;
 
+    color: #FFFFFF;
     background: var(--navy);
 
-    color: #FFFFFF;
-
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 650;
 
-    opacity: 0;
+    box-shadow:
+        0 12px 28px
+        rgba(36,27,82,.18);
 
+    opacity: 0;
     transform: translateY(12px);
 
     pointer-events: none;
 }
 
+.bd-detail-toast-dot {
+    width: 5px;
+    height: 5px;
+    flex: 0 0 5px;
+
+    border-radius: 50%;
+
+    background: var(--gold);
+}
+
 
 /* =========================================================
-   ANIMATION
+   MOTION
 ========================================================= */
 
 .bd-detail-reveal {
     opacity: 0;
-
     transform: translateY(14px);
 }
 
@@ -1086,20 +1147,31 @@
    TABLET
 ========================================================= */
 
-@media (max-width: 940px) {
-
+@media (max-width: 860px) {
     .bd-detail-hero-grid {
-        grid-template-columns:
-            minmax(0, 1fr)
-            320px;
-
-        gap: 38px;
+        grid-template-columns: minmax(0,1fr) 260px;
+        gap: 28px;
     }
 
-    .bd-detail-media {
-        height: 255px;
+    .bd-detail-media-wrap {
+        max-width: 260px;
     }
 
+    .bd-detail-title {
+        font-size: clamp(29px,4vw,37px);
+    }
+
+    .bd-detail-title.is-medium {
+        font-size: clamp(27px,3.6vw,33px);
+    }
+
+    .bd-detail-title.is-long {
+        font-size: clamp(23px,3.1vw,28px);
+    }
+
+    .bd-detail-title.is-extreme {
+        font-size: clamp(20px,2.7vw,25px);
+    }
 }
 
 
@@ -1107,35 +1179,31 @@
    SMALL TABLET
 ========================================================= */
 
-@media (max-width: 720px) {
-
-    .bd-detail-container,
-    .bd-detail-reading-inner {
-        width:
-            calc(100% - 40px);
+@media (max-width: 700px) {
+    .bd-detail-container {
+        width: calc(100% - 32px);
     }
 
     .bd-detail-hero-grid {
         grid-template-columns: 1fr;
-
-        gap: 27px;
-    }
-
-    .bd-detail-copy {
-        padding-left: 18px;
+        gap: 25px;
     }
 
     .bd-detail-media-wrap {
-        width: min(
-            100%,
-            520px
-        );
+        width: min(100%,460px);
+        max-width: none;
+        justify-self: start;
     }
 
     .bd-detail-media {
-        height: 260px;
+        aspect-ratio: 16 / 9;
     }
 
+    .bd-detail-after-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 13px;
+    }
 }
 
 
@@ -1144,134 +1212,143 @@
 ========================================================= */
 
 @media (max-width: 640px) {
-
     .bd-detail-container,
     .bd-detail-reading-inner {
-        width:
-            calc(100% - 30px);
+        width: calc(100% - 28px);
     }
-
-
-    /* NAV */
 
     .bd-detail-nav-inner {
-        min-height: 52px;
+        min-height: 58px;
     }
 
+    .bd-detail-nav-status {
+        display: none;
+    }
 
-    /* HERO */
+    .bd-detail-back {
+        min-height: 35px;
+        padding: 0 10px;
+        font-size: 9px;
+    }
 
     .bd-detail-hero {
-        padding:
-            28px 0
-            30px;
+        padding: 27px 0 28px;
     }
 
     .bd-detail-copy {
-        padding-left: 15px;
+        padding-left: 13px;
     }
 
     .bd-detail-copy::before {
         width: 2px;
     }
 
-    .bd-detail-title {
-        font-size: 33px;
-
-        line-height: 1.08;
-
-        letter-spacing: -.035em;
+    .bd-detail-category,
+    .bd-detail-pinned {
+        min-height: 24px;
+        font-size: 6.5px;
     }
 
-    .bd-detail-meta {
-        margin-top: 17px;
+    .bd-detail-date {
+        font-size: 8px;
+    }
+
+    .bd-detail-title {
+        font-size: clamp(27px,8vw,33px);
+        line-height: 1.13;
+    }
+
+    .bd-detail-title.is-medium {
+        font-size: clamp(25px,7vw,30px);
+    }
+
+    .bd-detail-title.is-long {
+        font-size: clamp(22px,6vw,26px);
+        line-height: 1.17;
+    }
+
+    .bd-detail-title.is-extreme {
+        font-size: clamp(19px,5.3vw,23px);
+        line-height: 1.2;
+    }
+
+    .bd-detail-hero-actions {
+        margin-top: 15px;
+    }
+
+    .bd-detail-share {
+        min-height: 36px;
+        font-size: 8px;
     }
 
     .bd-detail-media-wrap {
         width: 100%;
-
-        padding:
-            7px
-            7px
-            0
-            0;
     }
 
     .bd-detail-media {
-        height: 220px;
-
-        border-radius: 12px;
+        aspect-ratio: 16 / 9;
+        border-radius: 11px;
     }
-
-    .bd-detail-media-wrap::before {
-        width: 50px;
-        height: 50px;
-    }
-
-    .bd-detail-media-wrap::after {
-        width: 55px;
-        height: 55px;
-    }
-
-
-    /* DECORATION */
-
-    .bd-detail-ring {
-        width: 170px;
-        height: 170px;
-
-        right: -90px;
-        top: -80px;
-    }
-
-
-    /* ARTICLE */
 
     .bd-detail-reading {
-        padding:
-            33px 0
-            50px;
+        padding: 32px 0 46px;
     }
 
     .bd-detail-content {
         font-size: 14px;
-
-        line-height: 1.85;
+        line-height: 1.83;
     }
 
     .bd-detail-content > p:first-child {
-        font-size: 16px;
+        font-size: 15px;
     }
 
     .bd-detail-content h1 {
-        font-size: 26px;
+        font-size: 24px;
     }
 
     .bd-detail-content h2 {
-        margin-top: 36px;
-
-        font-size: 23px;
+        margin-top: 33px;
+        font-size: 22px;
     }
 
     .bd-detail-content h3 {
-        font-size: 19px;
+        font-size: 18px;
     }
 
     .bd-detail-content blockquote {
-        padding-left: 17px;
-
-        font-size: 17px;
+        font-size: 16px;
     }
 
     .bd-detail-content iframe,
     .bd-detail-content video {
-        min-height: 220px;
+        min-height: 205px;
     }
 
-    .bd-detail-bottom {
-        margin-top: 42px;
+    .bd-detail-after {
+        margin-top: 34px;
+        padding: 15px;
     }
 
+    .bd-detail-after h3 {
+        font-size: 14px;
+    }
+
+    .bd-detail-after p {
+        font-size: 8px;
+    }
+
+    .bd-detail-actions {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .bd-detail-more,
+    .bd-detail-top {
+        width: 100%;
+        min-height: 42px;
+    }
 }
 
 
@@ -1280,186 +1357,134 @@
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-
     .bd-detail-reveal {
         opacity: 1 !important;
-
         transform: none !important;
     }
 
-    .bd-detail-image {
-        transition: none;
+    .bd-detail-image,
+    .bd-detail-back,
+    .bd-detail-share,
+    .bd-detail-more,
+    .bd-detail-top {
+        transition: none !important;
     }
-
 }
 </style>
 
 
+<div class="bd-detail" id="bdInformationDetail">
 
-<div
-    class="bd-detail"
-    id="bdInformationDetail"
->
-
-
-    {{-- =====================================================
-         READING PROGRESS
-    ====================================================== --}}
-
+    {{-- Reading Progress --}}
     <div class="bd-detail-progress">
-
         <div
             class="bd-detail-progress-bar"
             id="bdDetailProgress"
         ></div>
-
     </div>
 
 
-
     {{-- =====================================================
-         NAVIGATION
+         TOP NAV
     ====================================================== --}}
-
     <nav class="bd-detail-nav">
-
         <div class="bd-detail-container">
 
             <div class="bd-detail-nav-inner">
 
                 <a
                     href="{{ route('informasi') }}"
-                    class="
-                        bd-detail-back
-                        bd-detail-reveal
-                    "
+                    class="bd-detail-back bd-detail-reveal"
                 >
-
                     <svg viewBox="0 0 24 24">
-
                         <path d="M19 12H5"/>
-
                         <path d="m10 7-5 5 5 5"/>
-
                     </svg>
 
-                    Kembali
-
+                    Kembali ke Informasi
                 </a>
+
+
+                <span class="bd-detail-nav-status bd-detail-reveal">
+                    Detail Informasi
+                </span>
 
             </div>
 
         </div>
-
     </nav>
-
 
 
     {{-- =====================================================
          HERO
     ====================================================== --}}
-
     <header class="bd-detail-hero">
-
-
-        {{-- DECORATION --}}
-
-        <div class="bd-detail-decoration">
-
-            <div class="bd-detail-ring"></div>
-
-            <div class="bd-detail-decor-line"></div>
-
-        </div>
-
-
 
         <div class="bd-detail-container">
 
-            <div
-                class="
-                    bd-detail-hero-grid
-                    {{ !$hasImage ? 'no-image' : '' }}
-                "
-            >
+            <div class="bd-detail-hero-grid {{ !$hasImage ? 'no-image' : '' }}">
 
-
-                {{-- =================================================
-                     COPY
-                ================================================== --}}
-
+                {{-- Copy --}}
                 <div class="bd-detail-copy">
 
+                    <div class="bd-detail-meta bd-detail-reveal">
 
-                    <div class="bd-detail-title-mask">
+                        @if($isPinned)
+                            <span class="bd-detail-pinned">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M14 4l6 6-3 1-4 4-1 5-3-3-4 4-2-2 4-4-3-3 5-1 4-4z"/>
+                                </svg>
 
-                        <h1
-                            class="bd-detail-title"
-                            id="bdDetailTitle"
-                        >
+                                Informasi Pilihan
+                            </span>
+                        @else
+                            <span class="bd-detail-category">
+                                Informasi
+                            </span>
+                        @endif
 
-                            {{ $information->title }}
 
-                        </h1>
+                        @if($publishedDate)
+                            <span class="bd-detail-meta-dot"></span>
+
+                            <time
+                                class="bd-detail-date"
+                                datetime="{{ $information->created_at->toDateString() }}"
+                            >
+                                {{ $publishedDate }}
+                            </time>
+                        @endif
 
                     </div>
 
 
-
-                    <div
-                        class="
-                            bd-detail-meta
-                            bd-detail-reveal
-                        "
+                    <h1
+                        class="bd-detail-title {{ $titleSizeClass }}"
+                        id="bdDetailTitle"
                     >
+                        {{ $information->title }}
+                    </h1>
 
 
-                        @if($publishedDate)
-
-                            <time class="bd-detail-date">
-
-                                {{ $publishedDate }}
-
-                            </time>
-
-                        @endif
-
-
+                    {{-- SHARE HANYA SATU --}}
+                    <div class="bd-detail-hero-actions bd-detail-reveal">
 
                         <button
                             type="button"
                             class="bd-detail-share"
                             id="bdDetailShare"
-                            aria-label="Bagikan informasi"
-                            title="Bagikan"
                         >
+                            <span class="bd-detail-share-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="18" cy="5" r="2"/>
+                                    <circle cx="6" cy="12" r="2"/>
+                                    <circle cx="18" cy="19" r="2"/>
+                                    <path d="M8 11l8-5"/>
+                                    <path d="M8 13l8 5"/>
+                                </svg>
+                            </span>
 
-                            <svg viewBox="0 0 24 24">
-
-                                <circle
-                                    cx="18"
-                                    cy="5"
-                                    r="2"
-                                />
-
-                                <circle
-                                    cx="6"
-                                    cy="12"
-                                    r="2"
-                                />
-
-                                <circle
-                                    cx="18"
-                                    cy="19"
-                                    r="2"
-                                />
-
-                                <path d="M8 11l8-5"/>
-
-                                <path d="M8 13l8 5"/>
-
-                            </svg>
-
+                            Bagikan Informasi
                         </button>
 
                     </div>
@@ -1467,32 +1492,18 @@
                 </div>
 
 
-
-                {{-- =================================================
-                     IMAGE
-                ================================================== --}}
-
+                {{-- Hero Image --}}
                 @if($hasImage)
-
-                    <div
-                        class="
-                            bd-detail-media-wrap
-                            bd-detail-reveal
-                        "
-                    >
+                    <div class="bd-detail-media-wrap bd-detail-reveal">
 
                         <div class="bd-detail-media">
 
-
                             <div class="bd-detail-fallback">
-
-                                <span
-                                    class="bd-detail-fallback-mark"
-                                ></span>
-
+                                <div class="bd-detail-fallback-inner">
+                                    <span class="bd-detail-fallback-mark"></span>
+                                    <span>Baca Dulu</span>
+                                </div>
                             </div>
-
-
 
                             <img
                                 src="{{ asset('storage/' . $information->image) }}"
@@ -1500,16 +1511,12 @@
                                 class="bd-detail-image"
                                 loading="eager"
                                 fetchpriority="high"
-
-                                onerror="
-                                    this.style.display='none';
-                                "
+                                onerror="this.style.display='none';"
                             >
 
                         </div>
 
                     </div>
-
                 @endif
 
             </div>
@@ -1519,434 +1526,325 @@
     </header>
 
 
-
-    {{-- =====================================================
-         SEPARATOR
-    ====================================================== --}}
-
     <div class="bd-detail-separator"></div>
-
 
 
     {{-- =====================================================
          ARTICLE
     ====================================================== --}}
-
     <main class="bd-detail-reading">
 
         <div class="bd-detail-reading-inner">
 
-
-            {{-- =================================================
-                 RAW ARTICLE CONTENT
-                 IMPORTANT:
-                 ONLY USER CONTENT INSIDE THIS ELEMENT
-            ================================================== --}}
-
-            <article
-                class="
-                    bd-detail-content
-                    bd-detail-reveal
-                "
-            >
-
+            <article class="bd-detail-content bd-detail-reveal">
                 {!! $information->content !!}
-
             </article>
 
 
-
             {{-- =================================================
-                 BOTTOM NAVIGATION
-                 OUTSIDE RAW CONTENT
-                 SO FLOAT/EDITOR HTML CANNOT AFFECT IT
+                 BOTTOM ACTION
             ================================================== --}}
+            <section class="bd-detail-after bd-detail-reveal">
 
-            <div
-                class="
-                    bd-detail-bottom
-                    bd-detail-reveal
-                "
-            >
+                <div class="bd-detail-after-inner">
 
-                <a
-                    href="{{ route('informasi') }}"
-                    class="bd-detail-more"
-                >
+                    <div class="bd-detail-after-copy">
 
-                    <svg viewBox="0 0 24 24">
+                        <span class="bd-detail-after-label">
+                            Selesai Membaca
+                        </span>
 
-                        <path d="M19 12H5"/>
+                        <h3>
+                            Mau lihat informasi lainnya?
+                        </h3>
 
-                        <path d="m10 7-5 5 5 5"/>
+                        <p>
+                            Jelajahi kabar, agenda, kegiatan, dan
+                            pembaruan lain yang diterbitkan Baca Dulu.
+                        </p>
 
-                    </svg>
-
-                    Informasi lainnya
-
-                </a>
+                    </div>
 
 
-                <div
-                    class="bd-detail-bottom-mark"
-                    aria-hidden="true"
-                >
+                    <div class="bd-detail-actions">
 
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                        {{-- PRIMARY --}}
+                        <a
+                            href="{{ route('informasi') }}#semua-informasi"
+                            class="bd-detail-more"
+                        >
+                            Informasi Lainnya
+
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 12h14"/>
+                                <path d="m14 7 5 5-5 5"/>
+                            </svg>
+                        </a>
+
+
+                        {{-- BUKAN SHARE LAGI --}}
+                        <button
+                            type="button"
+                            class="bd-detail-top"
+                            id="bdDetailTop"
+                        >
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 19V5"/>
+                                <path d="m7 10 5-5 5 5"/>
+                            </svg>
+
+                            Kembali ke Atas
+                        </button>
+
+                    </div>
 
                 </div>
 
-            </div>
+            </section>
 
         </div>
 
     </main>
 
 
-
-    {{-- =====================================================
-         TOAST
-    ====================================================== --}}
-
-    <div
-        class="bd-detail-toast"
-        id="bdDetailToast"
-    >
-
+    {{-- SHARE TOAST --}}
+    <div class="bd-detail-toast" id="bdDetailToast">
+        <span class="bd-detail-toast-dot"></span>
         Link berhasil disalin
-
     </div>
 
 </div>
 
 
-
 <script>
 (() => {
-
     const initInformationDetail = () => {
+        const page = document.getElementById('bdInformationDetail');
 
-        const page =
-            document.getElementById(
-                'bdInformationDetail'
-            );
-
-
-        if (!page) {
+        if (!page || page.dataset.detailReady === '1') {
             return;
         }
 
+        page.dataset.detailReady = '1';
 
-        const gsap =
-            window.bdGsap || null;
-
-
-        const reducedMotion =
-            window.matchMedia(
-                '(prefers-reduced-motion: reduce)'
-            ).matches;
-
+        const gsap = window.bdGsap || window.gsap || null;
+        const reducedMotion = window.matchMedia(
+            '(prefers-reduced-motion: reduce)'
+        ).matches;
 
 
         /* =====================================================
            INTRO
         ====================================================== */
 
-        const title =
-            document.getElementById(
-                'bdDetailTitle'
-            );
+        const title = document.getElementById('bdDetailTitle');
+        const revealItems = page.querySelectorAll('.bd-detail-reveal');
 
-
-        if (
-            gsap &&
-            !reducedMotion
-        ) {
-
-            gsap.set(
-                title,
-                {
-                    yPercent: 105
-                }
-            );
-
-
-            const timeline =
-                gsap.timeline({
-                    defaults: {
-                        ease: 'power3.out'
-                    }
-                });
-
-
-            timeline
-                .to(
+        if (gsap && !reducedMotion) {
+            if (title) {
+                gsap.fromTo(
                     title,
                     {
-                        yPercent: 0,
-
-                        duration: .78
-                    }
-                )
-
-                .to(
-                    page.querySelectorAll(
-                        '.bd-detail-reveal'
-                    ),
+                        opacity: 0,
+                        y: 20
+                    },
                     {
                         opacity: 1,
-
                         y: 0,
-
-                        duration: .56,
-
-                        stagger: .04
-                    },
-                    '-=.46'
+                        duration: .65,
+                        ease: 'power3.out'
+                    }
                 );
+            }
 
+            gsap.to(revealItems, {
+                opacity: 1,
+                y: 0,
+                duration: .50,
+                stagger: .04,
+                delay: .08,
+                ease: 'power3.out'
+            });
         } else {
+            revealItems.forEach(element => {
+                element.style.opacity = '1';
+                element.style.transform = 'none';
+            });
 
-            page
-                .querySelectorAll(
-                    '.bd-detail-reveal'
-                )
-                .forEach(element => {
-
-                    element.style.opacity = '1';
-
-                    element.style.transform = 'none';
-
-                });
-
+            if (title) {
+                title.style.opacity = '1';
+                title.style.transform = 'none';
+            }
         }
-
 
 
         /* =====================================================
            READING PROGRESS
         ====================================================== */
 
-        const progress =
-            document.getElementById(
-                'bdDetailProgress'
-            );
-
+        const progress = document.getElementById('bdDetailProgress');
 
         const updateProgress = () => {
-
             if (!progress) {
                 return;
             }
-
 
             const scrollTop =
                 window.scrollY ||
                 document.documentElement.scrollTop;
 
-
             const scrollHeight =
                 document.documentElement.scrollHeight -
                 window.innerHeight;
 
-
-            const percentage =
-                scrollHeight > 0
-                    ? Math.min(
-                        100,
-                        Math.max(
-                            0,
-                            (
-                                scrollTop /
-                                scrollHeight
-                            ) * 100
-                        )
+            const percentage = scrollHeight > 0
+                ? Math.min(
+                    100,
+                    Math.max(
+                        0,
+                        (scrollTop / scrollHeight) * 100
                     )
-                    : 0;
+                )
+                : 0;
 
-
-            progress.style.width =
-                `${percentage}%`;
-
+            progress.style.width = `${percentage}%`;
         };
-
 
         window.addEventListener(
             'scroll',
             updateProgress,
-            {
-                passive: true
-            }
+            { passive: true }
         );
 
-
         updateProgress();
-
 
 
         /* =====================================================
            SHARE
         ====================================================== */
 
-        const shareButton =
-            document.getElementById(
-                'bdDetailShare'
-            );
-
-
-        const toast =
-            document.getElementById(
-                'bdDetailToast'
-            );
-
+        const shareButton = document.getElementById('bdDetailShare');
+        const toast = document.getElementById('bdDetailToast');
 
         const showToast = () => {
-
             if (!toast) {
                 return;
             }
 
+            if (gsap && !reducedMotion) {
+                gsap.killTweensOf(toast);
 
-            if (
-                gsap &&
-                !reducedMotion
-            ) {
+                gsap.timeline()
+                    .to(toast, {
+                        opacity: 1,
+                        y: 0,
+                        duration: .2
+                    })
+                    .to(toast, {
+                        opacity: 0,
+                        y: 12,
+                        duration: .2,
+                        delay: 1.3
+                    });
 
-                gsap
-                    .timeline()
-
-                    .to(
-                        toast,
-                        {
-                            opacity: 1,
-
-                            y: 0,
-
-                            duration: .22
-                        }
-                    )
-
-                    .to(
-                        toast,
-                        {
-                            opacity: 0,
-
-                            y: 12,
-
-                            duration: .22,
-
-                            delay: 1.3
-                        }
-                    );
-
-            } else {
-
-                toast.style.opacity = '1';
-
-
-                setTimeout(
-                    () => {
-
-                        toast.style.opacity = '0';
-
-                    },
-                    1500
-                );
-
+                return;
             }
 
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 1500);
         };
 
 
         const copyLink = async () => {
-
             try {
-
-                await navigator
-                    .clipboard
-                    .writeText(
+                if (
+                    navigator.clipboard &&
+                    window.isSecureContext
+                ) {
+                    await navigator.clipboard.writeText(
                         window.location.href
                     );
 
+                    showToast();
+                    return;
+                }
 
-                showToast();
-
+                throw new Error('Clipboard unavailable');
             } catch (error) {
-
                 window.prompt(
                     'Salin link:',
                     window.location.href
                 );
-
             }
-
         };
 
 
-        if (shareButton) {
+        const shareInformation = async () => {
+            if (typeof navigator.share === 'function') {
+                try {
+                    await navigator.share({
+                        title: @json($information->title),
+                        url: window.location.href
+                    });
 
-            shareButton.addEventListener(
-                'click',
-                async () => {
-
-                    if (navigator.share) {
-
-                        try {
-
-                            await navigator.share({
-
-                                title:
-                                    @json(
-                                        $information->title
-                                    ),
-
-                                url:
-                                    window.location.href
-
-                            });
-
-                        } catch (error) {
-
-                            // User membatalkan share.
-
-                        }
-
-
+                    return;
+                } catch (error) {
+                    if (error?.name === 'AbortError') {
                         return;
                     }
-
-
-                    copyLink();
-
                 }
-            );
+            }
 
-        }
+            await copyLink();
+        };
 
+        shareButton?.addEventListener(
+            'click',
+            shareInformation
+        );
+
+
+        /* =====================================================
+           BACK TO TOP
+        ====================================================== */
+
+        const topButton = document.getElementById('bdDetailTop');
+
+        topButton?.addEventListener('click', () => {
+            if (reducedMotion) {
+                window.scrollTo(0, 0);
+                return;
+            }
+
+            if (window.bdLenis) {
+                window.bdLenis.scrollTo(0, {
+                    duration: 1
+                });
+
+                return;
+            }
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
     };
 
 
-    if (
-        document.readyState ===
-        'loading'
-    ) {
-
+    if (document.readyState === 'loading') {
         document.addEventListener(
             'DOMContentLoaded',
             initInformationDetail,
-            {
-                once: true
-            }
+            { once: true }
         );
-
     } else {
-
         initInformationDetail();
-
     }
-
 })();
 </script>
 

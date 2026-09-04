@@ -633,18 +633,27 @@ Route::resource('books', AdminBookController::class)
     ->scoped([
         'book' => 'slug',
     ]);
-        
 
         /*
-        |--------------------------------------------------------------------------
-        | Informations
-        |--------------------------------------------------------------------------
-        */
+|--------------------------------------------------------------------------
+| Informations
+|--------------------------------------------------------------------------
+*/
 
-        Route::resource(
-            'informations',
-            InformationAdminController::class
-        );
+Route::patch(
+    'informations/{information}/pin',
+    [
+        InformationAdminController::class,
+        'togglePin',
+    ]
+)->name('informations.pin');
+
+Route::resource(
+    'informations',
+    InformationAdminController::class
+);
+        
+
 
         /*
         |--------------------------------------------------------------------------
