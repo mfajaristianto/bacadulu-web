@@ -1,510 +1,399 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Conference')
-
 @section('content')
 
-<style>
-.bd-conf-edit {
-    --navy:#241B52;
-    --orange:#EF5843;
-    --line:#E5E7EB;
-    --muted:#7A808A;
+<div class="min-h-screen bg-slate-50">
+    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
 
-    padding:32px 0 55px;
-
-    font-family:'Inter',sans-serif;
-}
-
-.bd-conf-edit-shell {
-    width:min(calc(100% - 40px),1100px);
-
-    margin:auto;
-}
-
-.bd-conf-edit-header {
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-
-    gap:20px;
-
-    margin-bottom:24px;
-}
-
-.bd-conf-edit-header h1 {
-    margin:0;
-
-    color:var(--navy);
-
-    font-family:'Poppins',sans-serif;
-    font-size:32px;
-}
-
-.bd-conf-edit-header p {
-    margin:5px 0 0;
-
-    color:var(--muted);
-
-    font-size:11px;
-}
-
-.bd-conf-edit-back {
-    padding:11px 15px;
-
-    border:1px solid var(--line);
-    border-radius:9px;
-
-    color:var(--navy)!important;
-
-    text-decoration:none!important;
-
-    font-size:11px;
-    font-weight:700;
-}
-
-.bd-conf-edit-grid {
-    display:grid;
-
-    grid-template-columns:minmax(0,1fr) 320px;
-
-    gap:20px;
-}
-
-.bd-conf-edit-panel {
-    overflow:hidden;
-
-    border:1px solid var(--line);
-    border-radius:14px;
-
-    background:white;
-}
-
-.bd-conf-edit-panel + .bd-conf-edit-panel {
-    margin-top:18px;
-}
-
-.bd-conf-edit-head {
-    padding:17px 19px;
-
-    border-bottom:1px solid var(--line);
-}
-
-.bd-conf-edit-head h2 {
-    margin:0;
-
-    color:var(--navy);
-
-    font-family:'Poppins',sans-serif;
-    font-size:14px;
-}
-
-.bd-conf-edit-body {
-    padding:19px;
-}
-
-.bd-conf-edit-field + .bd-conf-edit-field {
-    margin-top:18px;
-}
-
-.bd-conf-edit-label {
-    display:block;
-
-    margin-bottom:7px;
-
-    color:#343840;
-
-    font-size:11px;
-    font-weight:700;
-}
-
-.bd-conf-edit-input {
-    width:100%;
-    min-height:44px;
-
-    padding:0 13px;
-
-    border:1px solid #DDE0E5;
-    border-radius:9px;
-
-    outline:0;
-
-    font-size:12px;
-}
-
-.bd-conf-edit-input:focus {
-    border-color:var(--navy);
-
-    box-shadow:0 0 0 3px rgba(36,27,82,.07);
-}
-
-.bd-conf-edit-date-time {
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:12px;
-}
-
-.bd-conf-current-poster {
-    width:100%;
-
-    overflow:hidden;
-
-    border-radius:11px;
-
-    background:#F5F6F8;
-}
-
-.bd-conf-current-poster img {
-    display:block;
-
-    width:100%;
-    max-height:360px;
-
-    object-fit:cover;
-}
-
-.bd-conf-poster-change {
-    margin-top:13px;
-}
-
-.bd-conf-poster-change input {
-    width:100%;
-
-    padding:10px;
-
-    border:1px dashed #CBD0D7;
-    border-radius:9px;
-
-    font-size:10px;
-}
-
-.bd-conf-edit-actions {
-    grid-column:1 / -1;
-
-    display:flex;
-    justify-content:flex-end;
-
-    gap:10px;
-
-    padding-top:18px;
-
-    border-top:1px solid var(--line);
-}
-
-.bd-conf-edit-actions a,
-.bd-conf-edit-actions button {
-    min-height:43px;
-
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:0 18px;
-
-    border-radius:9px;
-
-    font-size:11px;
-    font-weight:700;
-}
-
-.bd-conf-edit-cancel {
-    border:1px solid var(--line);
-
-    color:#626771!important;
-
-    text-decoration:none!important;
-}
-
-.bd-conf-edit-save {
-    border:0;
-
-    background:var(--orange);
-
-    color:#FFF;
-
-    cursor:pointer;
-}
-
-@media(max-width:800px) {
-    .bd-conf-edit-grid {
-        grid-template-columns:1fr;
-    }
-}
-
-@media(max-width:600px) {
-    .bd-conf-edit-date-time {
-        grid-template-columns:1fr;
-    }
-
-    .bd-conf-edit-header {
-        flex-direction:column;
-        align-items:flex-start;
-    }
-}
-</style>
-
-
-<div class="bd-conf-edit">
-
-    <div class="bd-conf-edit-shell">
-
-
-        <header class="bd-conf-edit-header">
-
+        <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
+                <div class="mb-2 flex items-center gap-2">
+                    <span class="h-[3px] w-7 rounded-full bg-orange-500"></span>
+                    <span class="text-[10px] font-bold uppercase tracking-[.14em] text-orange-600">
+                        Katalog Baca
+                    </span>
+                </div>
 
-                <h1>
+                <h1 class="text-2xl font-extrabold text-slate-900 sm:text-3xl">
                     Edit Conference
                 </h1>
 
-                <p>
-                    Perbarui jadwal dan informasi conference.
+                <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
+                    Perbarui informasi conference yang tampil pada katalog Baca Conference.
                 </p>
-
             </div>
-
 
             <a
                 href="{{ route('admin.conferences.index') }}"
-                class="bd-conf-edit-back"
+                class="inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
             >
-                ← Daftar Conference
+                ← Kembali
             </a>
+        </div>
 
-        </header>
+
+        @if($errors->any())
+            <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
+                <p class="mb-2 text-sm font-bold text-red-700">
+                    Perubahan belum dapat disimpan
+                </p>
+
+                <ul class="list-disc space-y-1 pl-5 text-sm text-red-600">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
 
         <form
             method="POST"
             action="{{ route('admin.conferences.update', $conference) }}"
             enctype="multipart/form-data"
-            class="bd-conf-edit-grid"
         >
-
             @csrf
             @method('PUT')
 
 
-            <div>
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
 
-                <section class="bd-conf-edit-panel">
+                <div class="space-y-6">
 
-                    <div class="bd-conf-edit-head">
+                    {{-- IDENTITAS --}}
+                    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                        <div class="mb-5">
+                            <h2 class="text-base font-extrabold text-slate-900">
+                                Identitas Conference
+                            </h2>
 
-                        <h2>
-                            Informasi Conference
-                        </h2>
-
-                    </div>
-
-
-                    <div class="bd-conf-edit-body">
-
-
-                        <div class="bd-conf-edit-field">
-
-                            <label class="bd-conf-edit-label">
-                                Judul Conference *
-                            </label>
-
-                            <input
-                                type="text"
-                                name="title"
-                                value="{{ old('title', $conference->title) }}"
-                                class="bd-conf-edit-input"
-                                required
-                            >
-
+                            <p class="mt-1 text-xs leading-relaxed text-slate-500">
+                                Nama dan edisi akan tampil sebagai satu identitas conference.
+                            </p>
                         </div>
 
 
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
 
-                        {{-- DATE + TIME --}}
+                            <div>
+                                <label
+                                    for="name"
+                                    class="mb-2 block text-sm font-bold text-slate-700"
+                                >
+                                    Nama Conference
+                                </label>
 
-                        <div class="bd-conf-edit-field">
-
-                            <div class="bd-conf-edit-date-time">
-
-                                <div>
-
-                                    <label class="bd-conf-edit-label">
-                                        Tanggal
-                                    </label>
-
-                                    <input
-                                        type="date"
-                                        name="event_date"
-                                        value="{{ old(
-                                            'event_date',
-                                            $conference->event_date
-                                                ? \Carbon\Carbon::parse($conference->event_date)->format('Y-m-d')
-                                                : ''
-                                        ) }}"
-                                        class="bd-conf-edit-input"
-                                    >
-
-                                </div>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value="{{ old('name', $conference->name) }}"
+                                    required
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-50"
+                                >
+                            </div>
 
 
-                                <div>
+                            <div>
+                                <label
+                                    for="edition"
+                                    class="mb-2 block text-sm font-bold text-slate-700"
+                                >
+                                    Edisi
+                                </label>
 
-                                    <label class="bd-conf-edit-label">
-                                        Waktu
-                                    </label>
-
-                                    <input
-                                        type="time"
-                                        name="event_time"
-                                        value="{{ old(
-                                            'event_time',
-                                            $conference->event_time
-                                                ? \Carbon\Carbon::parse($conference->event_time)->format('H:i')
-                                                : ''
-                                        ) }}"
-                                        class="bd-conf-edit-input"
-                                    >
-
-                                </div>
-
+                                <input
+                                    type="text"
+                                    id="edition"
+                                    name="edition"
+                                    value="{{ old('edition', $conference->edition) }}"
+                                    required
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-50"
+                                >
                             </div>
 
                         </div>
 
 
+                        <div class="mt-4 rounded-xl border border-[#F1EAE5] bg-[#FFF9F5] px-4 py-3">
+                            <p class="text-[10px] font-bold uppercase tracking-[.08em] text-slate-400">
+                                Tampilan saat ini
+                            </p>
 
-                        {{-- LOCATION --}}
-
-                        <div class="bd-conf-edit-field">
-
-                            <label class="bd-conf-edit-label">
-                                Tempat / Lokasi
-                            </label>
-
-                            <input
-                                type="text"
-                                name="location"
-                                value="{{ old(
-                                    'location',
-                                    $conference->location
-                                ) }}"
-                                class="bd-conf-edit-input"
+                            <p
+                                id="conferenceNamePreview"
+                                class="mt-1 text-sm font-extrabold text-[#241B52]"
                             >
+                                {{ trim(($conference->name ?? '') . ' ' . ($conference->edition ?? '')) }}
+                            </p>
+                        </div>
+                    </section>
+
+
+                    {{-- DESCRIPTION --}}
+                    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                        <div class="mb-4">
+                            <h2 class="text-base font-extrabold text-slate-900">
+                                Deskripsi Conference
+                            </h2>
+
+                            <p class="mt-1 text-xs leading-relaxed text-slate-500">
+                                Perbarui deskripsi singkat conference bila diperlukan.
+                            </p>
+                        </div>
+
+                        @include('admin.partials.rich-text-editor', [
+                            'name' => 'description',
+                            'label' => 'Deskripsi',
+                            'value' => old('description', $conference->description)
+                        ])
+                    </section>
+
+
+                    {{-- LINKS --}}
+                    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                        <div class="mb-5">
+                            <h2 class="text-base font-extrabold text-slate-900">
+                                Tautan Conference
+                            </h2>
+
+                            <p class="mt-1 text-xs leading-relaxed text-slate-500">
+                                Pastikan tautan mengarah ke halaman conference dan prosiding yang benar.
+                            </p>
+                        </div>
+
+
+                        <div class="space-y-5">
+
+                            <div>
+                                <label
+                                    for="conference_url"
+                                    class="mb-2 block text-sm font-bold text-slate-700"
+                                >
+                                    URL Conference
+                                </label>
+
+                                <input
+                                    type="url"
+                                    id="conference_url"
+                                    name="conference_url"
+                                    value="{{ old('conference_url', $conference->conference_url) }}"
+                                    placeholder="https://..."
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-50"
+                                >
+
+                                @if($conference->conference_url)
+                                    <a
+                                        href="{{ $conference->conference_url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="mt-2 inline-flex text-[11px] font-bold text-orange-600 hover:underline"
+                                    >
+                                        Buka Conference ↗
+                                    </a>
+                                @endif
+                            </div>
+
+
+                            <div>
+                                <label
+                                    for="proceeding_url"
+                                    class="mb-2 block text-sm font-bold text-slate-700"
+                                >
+                                    URL Prosiding
+                                </label>
+
+                                <input
+                                    type="url"
+                                    id="proceeding_url"
+                                    name="proceeding_url"
+                                    value="{{ old('proceeding_url', $conference->proceeding_url) }}"
+                                    placeholder="https://..."
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-50"
+                                >
+
+                                @if($conference->proceeding_url)
+                                    <a
+                                        href="{{ $conference->proceeding_url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="mt-2 inline-flex text-[11px] font-bold text-orange-600 hover:underline"
+                                    >
+                                        Buka Prosiding ↗
+                                    </a>
+                                @endif
+                            </div>
+
+                        </div>
+                    </section>
+
+                </div>
+
+
+                {{-- POSTER --}}
+                <aside>
+                    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-6">
+
+                        <div class="mb-4">
+                            <h2 class="text-sm font-extrabold text-slate-900">
+                                Poster Conference
+                            </h2>
+
+                            <p class="mt-1 text-[11px] leading-relaxed text-slate-500">
+                                Biarkan kosong jika poster tidak ingin diganti.
+                            </p>
+                        </div>
+
+
+                        <div class="mb-4 flex min-h-[285px] items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-3">
+
+                            @if($conference->poster)
+
+                                <img
+                                    id="posterPreview"
+                                    src="{{ asset('storage/' . $conference->poster) }}"
+                                    alt="{{ $conference->name }}"
+                                    class="max-h-[320px] max-w-full object-contain"
+                                >
+
+                                <div
+                                    id="posterPlaceholder"
+                                    class="hidden text-center"
+                                >
+                                    Preview poster
+                                </div>
+
+                            @else
+
+                                <div
+                                    id="posterPlaceholder"
+                                    class="px-5 text-center"
+                                >
+                                    <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-orange-50 text-orange-500">
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            class="h-5 w-5 fill-none stroke-current"
+                                            stroke-width="1.7"
+                                        >
+                                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                            <path d="m3 16 5-5 4 4 3-3 6 6"/>
+                                        </svg>
+                                    </div>
+
+                                    <p class="text-xs font-bold text-slate-600">
+                                        Belum ada poster
+                                    </p>
+                                </div>
+
+                                <img
+                                    id="posterPreview"
+                                    src=""
+                                    alt="Preview poster"
+                                    class="hidden max-h-[320px] max-w-full object-contain"
+                                >
+
+                            @endif
 
                         </div>
 
-                    </div>
 
-                </section>
+                        <label
+                            for="poster"
+                            class="mb-2 block text-xs font-bold text-slate-700"
+                        >
+                            Ganti Poster
+                        </label>
+
+                        <input
+                            type="file"
+                            id="poster"
+                            name="poster"
+                            accept="image/jpeg,image/png,image/webp"
+                            class="block w-full text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-orange-50 file:px-3 file:py-2 file:text-xs file:font-bold file:text-orange-700 hover:file:bg-orange-100"
+                        >
 
 
+                        @if($conference->poster)
+                            <a
+                                href="{{ asset('storage/' . $conference->poster) }}"
+                                target="_blank"
+                                class="mt-3 inline-flex text-[11px] font-bold text-orange-600 hover:underline"
+                            >
+                                Lihat poster asli ↗
+                            </a>
+                        @endif
 
-                <section class="bd-conf-edit-panel">
-
-                    <div class="bd-conf-edit-head">
-
-                        <h2>
-                            Deskripsi
-                        </h2>
-
-                    </div>
-
-
-                    <div class="bd-conf-edit-body">
-
-                        @include(
-                            'admin.partials.rich-text-editor',
-                            [
-                                'name' => 'description',
-                                'label' => '',
-                                'value' => old(
-                                    'description',
-                                    $conference->description
-                                )
-                            ]
-                        )
-
-                    </div>
-
-                </section>
+                    </section>
+                </aside>
 
             </div>
 
 
-
-            {{-- POSTER --}}
-
-            <aside>
-
-                <section class="bd-conf-edit-panel">
-
-                    <div class="bd-conf-edit-head">
-
-                        <h2>
-                            Poster Conference
-                        </h2>
-
-                    </div>
-
-
-                    <div class="bd-conf-edit-body">
-
-
-                        @if($conference->poster)
-
-                            <div class="bd-conf-current-poster">
-
-                                <img
-                                    src="{{ asset('storage/' . $conference->poster) }}"
-                                    alt="{{ $conference->title }}"
-                                >
-
-                            </div>
-
-                        @endif
-
-
-                        <div class="bd-conf-poster-change">
-
-                            <input
-                                type="file"
-                                name="poster"
-                                accept="image/jpeg,image/png,image/webp"
-                            >
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-            </aside>
-
-
-
-            <div class="bd-conf-edit-actions">
-
+            <div class="mt-6 flex flex-col-reverse gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                 <a
                     href="{{ route('admin.conferences.index') }}"
-                    class="bd-conf-edit-cancel"
+                    class="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-100 px-5 text-sm font-bold text-slate-600 transition hover:bg-slate-200"
                 >
                     Batal
                 </a>
 
                 <button
                     type="submit"
-                    class="bd-conf-edit-save"
+                    class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-orange-600 px-6 text-sm font-extrabold text-white shadow-sm transition hover:bg-orange-700"
                 >
                     Simpan Perubahan
                 </button>
-
             </div>
 
         </form>
 
     </div>
-
 </div>
+
+
+<script>
+(() => {
+    const name = document.getElementById('name');
+    const edition = document.getElementById('edition');
+    const namePreview = document.getElementById('conferenceNamePreview');
+
+    const updateNamePreview = () => {
+        const conferenceName = name?.value.trim() || 'Nama Conference';
+        const conferenceEdition = edition?.value.trim() || '#Edisi';
+
+        if (namePreview) {
+            namePreview.textContent = `${conferenceName} ${conferenceEdition}`;
+        }
+    };
+
+    name?.addEventListener('input', updateNamePreview);
+    edition?.addEventListener('input', updateNamePreview);
+
+
+    const input = document.getElementById('poster');
+    const preview = document.getElementById('posterPreview');
+    const placeholder = document.getElementById('posterPlaceholder');
+
+    if (!input || !preview || !placeholder) return;
+
+    let objectUrl = null;
+
+    input.addEventListener('change', () => {
+        const file = input.files?.[0];
+
+        if (!file) return;
+
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+        }
+
+        objectUrl = URL.createObjectURL(file);
+
+        preview.src = objectUrl;
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+    });
+})();
+</script>
 
 @endsection

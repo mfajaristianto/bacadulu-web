@@ -6,1141 +6,690 @@
 
 @php
     $conferenceItems = method_exists($conferences, 'items')
-        ? collect($conferences->items())->values()
-        : collect($conferences)->values();
-
-    $featuredConference = $conferenceItems->first();
-
-    $otherConferences = $conferenceItems->skip(1);
+        ? collect($conferences->items())
+        : collect($conferences);
 
     $totalConferences = method_exists($conferences, 'total')
         ? $conferences->total()
         : $conferenceItems->count();
-
-    $today = \Carbon\Carbon::today('Asia/Jakarta');
 @endphp
 
-
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
 
-.bd-conf {
+.bd-conference{
     --navy:#241B52;
+    --navy-soft:#30266B;
     --orange:#EF5843;
-    --ink:#17181C;
-    --body:#5A5F69;
-    --muted:#9498A1;
-    --line:#E7E8EC;
-    --soft:#F6F7F9;
-
+    --gold:#F7AA35;
+    --gold-hover:#EDA02C;
+    --cream:#FFF7EF;
+    --cream-hover:#FFF0E7;
+    --cream-border:#F1E2D7;
+    --body:#645F6E;
+    --muted:#96929C;
+    --line:#E8E7EC;
     width:100%;
     min-height:100vh;
-
-    padding:43px 0 72px;
-
     overflow-x:hidden;
-
-    background:#FFF;
-
+    padding-bottom:64px;
+    background:linear-gradient(180deg,#fff 0,#fff 360px,#FFF9F5 100%);
+    color:#1D1A27;
     font-family:'Inter',sans-serif;
 }
 
-.bd-conf *,
-.bd-conf *::before,
-.bd-conf *::after {
-    box-sizing:border-box;
-}
+.bd-conference *,
+.bd-conference *::before,
+.bd-conference *::after{box-sizing:border-box}
 
-.bd-conf-shell {
-    width:min(calc(100% - 72px),1360px);
+.bd-conference a{text-decoration:none}
 
+.bd-conference-shell{
+    width:min(calc(100% - 72px),1260px);
     margin:auto;
 }
 
-
-/* HEADER */
-
-.bd-conf-header {
-    display:grid;
-
-    grid-template-columns:minmax(0,1fr) 370px;
-
-    gap:65px;
-
-    align-items:end;
-
-    padding-bottom:29px;
-
+/* BRAND */
+.bd-conference-brandbar{
+    min-height:72px;
+    display:flex;
+    align-items:center;
     border-bottom:1px solid var(--line);
 }
 
-.bd-conf-eyebrow {
-    display:flex;
+.bd-conference-brand{
+    display:inline-flex;
     align-items:center;
-
-    gap:9px;
-
-    margin-bottom:9px;
-
-    color:var(--orange);
-
-    font-size:9px;
-    font-weight:800;
-
-    letter-spacing:.13em;
-
-    text-transform:uppercase;
+    gap:11px;
 }
 
-.bd-conf-eyebrow::before {
-    content:"";
-
-    width:23px;
-    height:2px;
-
+.bd-conference-brand-mark{
+    width:7px;
+    height:27px;
+    flex:0 0 7px;
     background:var(--orange);
 }
 
-.bd-conf-title {
-    margin:0;
-
+.bd-conference-brand-name{
     color:var(--navy);
-
-    font-family:'Poppins',sans-serif;
-
-    font-size:clamp(42px,5vw,67px);
-
+    font-family:'Fraunces',serif;
+    font-size:21px;
     font-weight:600;
-
-    line-height:1;
-
-    letter-spacing:-.05em;
 }
 
-.bd-conf-header-description {
-    margin:0;
-
-    color:var(--body);
-
-    font-size:13px;
-
-    line-height:1.75;
-}
-
-.bd-conf-count {
-    margin-top:12px;
-
+.bd-conference-brand-type{
     color:var(--muted);
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
 
-    font-size:9px;
+/* HERO */
+.bd-conference-hero{
+    max-width:900px;
+    margin:0 auto;
+    padding:58px 20px 43px;
+    text-align:center;
+}
+
+.bd-conference-title{
+    max-width:850px;
+    margin:0 auto;
+    color:var(--navy);
+    font-family:'Fraunces',serif;
+    font-size:clamp(40px,4.5vw,62px);
+    font-weight:600;
+    line-height:1.04;
+    letter-spacing:-.045em;
+}
+
+.bd-conference-word{
+    display:inline-block;
+    margin-right:.13em;
+}
+
+.bd-conference-description{
+    max-width:650px;
+    margin:18px auto 0;
+    color:var(--body);
+    font-size:12px;
+    line-height:1.8;
+}
+
+.bd-conference-count{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin-top:16px;
+    color:var(--muted);
+    font-size:8px;
+    font-weight:700;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+}
+
+.bd-conference-count-dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--orange);
+    box-shadow:0 0 0 4px rgba(239,88,67,.11);
+}
+
+/* DIVIDER */
+.bd-conference-divider{
+    position:relative;
+    height:1px;
+    margin-bottom:26px;
+    background:var(--line);
+}
+
+.bd-conference-divider-fill{
+    position:absolute;
+    left:50%;
+    top:0;
+    width:105px;
+    height:1px;
+    background:var(--orange);
+    transform:translateX(-50%);
+    transform-origin:center;
+}
+
+/* GRID */
+.bd-conference-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:22px;
+}
+
+/* CARD */
+.bd-conference-card{
+    position:relative;
+    overflow:hidden;
+    border:1px solid rgba(36,27,82,.09);
+    border-radius:15px;
+    background:#fff;
+    box-shadow:0 8px 24px rgba(36,27,82,.055);
+    will-change:transform,opacity;
+}
+
+.bd-conference-card::before{
+    content:"";
+    position:absolute;
+    z-index:5;
+    left:0;
+    top:0;
+    bottom:0;
+    width:4px;
+    background:var(--gold);
+    transform:scaleY(0);
+    transform-origin:center;
+    transition:transform .3s ease;
+}
+
+.bd-conference-card:hover::before{transform:scaleY(1)}
+
+/* CARD TOP NAVY */
+.bd-conference-card-top{
+    position:relative;
+    display:grid;
+    grid-template-columns:88px minmax(0,1fr);
+    gap:20px;
+    align-items:center;
+    min-height:142px;
+    margin:10px;
+    padding:18px 21px;
+    overflow:hidden;
+    border-radius:10px;
+    background:var(--navy);
+}
+
+.bd-conference-card-top::before,
+.bd-conference-card-top::after{
+    content:"";
+    position:absolute;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:50%;
+}
+
+.bd-conference-card-top::before{
+    right:-55px;
+    top:-65px;
+    width:150px;
+    height:150px;
+}
+
+.bd-conference-card-top::after{
+    right:-18px;
+    bottom:-65px;
+    width:115px;
+    height:115px;
+}
+
+/* POSTER */
+.bd-conference-poster-wrap{
+    position:relative;
+    z-index:2;
+    width:78px;
+}
+
+.bd-conference-poster-wrap::after{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    left:6px;
+    top:6px;
+    width:78px;
+    aspect-ratio:3/4;
+    border-radius:4px;
+    background:var(--gold);
+}
+
+.bd-conference-poster{
+    width:78px;
+    aspect-ratio:3/4;
+    overflow:hidden;
+    border-radius:4px;
+    background:#fff;
+    box-shadow:0 10px 23px rgba(0,0,0,.20);
+}
+
+.bd-conference-poster img{
+    width:100%;
+    height:100%;
+    display:block;
+    object-fit:contain;
+    background:#fff;
+}
+
+.bd-conference-poster-fallback{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px;
+    color:var(--navy);
+    background:#fff;
+    text-align:center;
+    font-size:7px;
     font-weight:700;
 }
 
-
-/* FEATURED */
-
-.bd-conf-featured {
-    display:grid;
-
-    grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);
-
-    gap:42px;
-
-    padding:30px 0 40px;
-
-    border-bottom:1px solid var(--line);
-}
-
-.bd-conf-featured-media {
+/* SERIES */
+.bd-conference-series-wrap{
     position:relative;
-
-    min-height:430px;
-
-    overflow:hidden;
-
-    border-radius:17px;
-
-    background:var(--navy);
+    z-index:2;
+    min-width:0;
 }
 
-.bd-conf-featured-image {
-    width:100%;
-    height:100%;
-
-    position:absolute;
-
-    inset:0;
-
-    object-fit:cover;
-
-    transition:transform .8s cubic-bezier(.22,1,.36,1);
-}
-
-.bd-conf-featured-media:hover
-.bd-conf-featured-image {
-    transform:scale(1.04);
-}
-
-.bd-conf-featured-fallback {
-    position:absolute;
-
-    inset:0;
-
-    display:flex;
+.bd-conference-type{
+    display:inline-flex;
     align-items:center;
-    justify-content:center;
-
-    background:var(--navy);
-}
-
-.bd-conf-featured-fallback span {
-    width:9px;
-    height:9px;
-
-    background:var(--orange);
-}
-
-.bd-conf-status {
-    position:absolute;
-
-    z-index:5;
-
-    left:15px;
-    bottom:15px;
-
-    padding:8px 13px;
-
-    border-radius:999px;
-
-    background:#FFF;
-
-    color:#777B84;
-
-    font-size:8px;
-    font-weight:800;
-
+    gap:6px;
+    margin-bottom:8px;
+    color:rgba(255,255,255,.68);
+    font-size:7px;
+    font-weight:700;
+    letter-spacing:.13em;
     text-transform:uppercase;
 }
 
-.bd-conf-status.upcoming {
-    color:var(--orange);
+.bd-conference-type::before{
+    content:"";
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--gold);
 }
 
-.bd-conf-status.today {
-    background:var(--orange);
-
-    color:#FFF;
-}
-
-.bd-conf-featured-copy {
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-}
-
-
-/* DATE */
-
-.bd-conf-date-large {
-    display:flex;
-    align-items:flex-start;
-
-    gap:14px;
-
-    margin-bottom:20px;
-}
-
-.bd-conf-day {
-    color:var(--orange);
-
-    font-family:'Poppins',sans-serif;
-
-    font-size:clamp(54px,5vw,78px);
-
-    font-weight:600;
-
-    line-height:.82;
-
-    letter-spacing:-.06em;
-}
-
-.bd-conf-date-side strong {
-    display:block;
-
-    color:var(--navy);
-
-    font-size:11px;
-
-    text-transform:uppercase;
-}
-
-.bd-conf-date-side span {
-    color:var(--muted);
-
-    font-size:10px;
-}
-
-
-/* TITLE */
-
-.bd-conf-featured-title {
+.bd-conference-series{
     margin:0;
-
-    color:var(--navy);
-
-    font-family:'Poppins',sans-serif;
-
-    font-size:clamp(27px,2.6vw,39px);
-
+    color:#fff;
+    font-family:'Fraunces',serif;
+    font-size:clamp(20px,1.7vw,26px);
     font-weight:600;
-
     line-height:1.15;
-
-    letter-spacing:-.035em;
 }
 
-
-/* EVENT INFO */
-
-.bd-conf-event-info {
-    display:flex;
-    flex-wrap:wrap;
-
-    gap:10px 18px;
-
-    margin-top:16px;
+/* BODY */
+.bd-conference-card-body{
+    padding:14px 21px 20px;
 }
 
-.bd-conf-info-item {
+.bd-conference-theme-label{
+    color:var(--orange);
+    font-size:7px;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+
+.bd-conference-theme{
+    margin:6px 0 0;
+    color:var(--navy);
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    font-weight:600;
+    line-height:1.38;
+}
+
+.bd-conference-card-description{
+    min-height:58px;
+    margin:11px 0 17px;
+    color:var(--body);
+    font-size:10.5px;
+    line-height:1.7;
+    display:-webkit-box;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+
+/* BUTTONS */
+.bd-conference-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.bd-conference-button{
+    min-height:40px;
     display:flex;
     align-items:center;
-
-    gap:7px;
-
-    color:#5E646D;
-
-    font-size:11px;
-    font-weight:600;
-}
-
-.bd-conf-info-item svg {
-    width:15px;
-    height:15px;
-
-    fill:none;
-    stroke:var(--orange);
-
-    stroke-width:1.6;
-}
-
-.bd-conf-time-value {
-    color:var(--orange);
-
-    font-weight:750;
-}
-
-
-/* DESCRIPTION */
-
-.bd-conf-description {
-    position:relative;
-
-    height:115px;
-
-    margin-top:17px;
-
-    overflow:hidden;
-}
-
-.bd-conf-description.has-overflow {
-    cursor:pointer;
-}
-
-.bd-conf-description-inner {
-    width:100%;
-    height:100%;
-
-    overflow:hidden;
-
-    padding-right:8px;
-
-    color:var(--body);
-
-    font-size:13px;
-
-    line-height:1.72;
-
-    scrollbar-width:thin;
-}
-
-.bd-conf-description-inner p {
-    margin:0 0 8px;
-}
-
-.bd-conf-description.is-scroll-active
-.bd-conf-description-inner {
-    overflow-y:auto;
-}
-
-.bd-conf-description-inner::-webkit-scrollbar {
-    width:4px;
-}
-
-.bd-conf-description-inner::-webkit-scrollbar-thumb {
-    border-radius:999px;
-
-    background:rgba(36,27,82,.25);
-}
-
-.bd-conf-description::after {
-    content:"";
-
-    position:absolute;
-
-    left:0;
-    right:0;
-    bottom:0;
-
-    height:28px;
-
-    background:linear-gradient(transparent,#FFF);
-
-    opacity:0;
-
-    pointer-events:none;
-}
-
-.bd-conf-description.has-overflow:not(.is-scroll-active)::after {
-    opacity:1;
-}
-
-
-/* OTHER */
-
-.bd-conf-others {
-    padding-top:40px;
-}
-
-.bd-conf-others-head {
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-
-    margin-bottom:10px;
-}
-
-.bd-conf-others-title {
-    margin:0;
-
-    color:var(--ink);
-
-    font-family:'Poppins',sans-serif;
-
-    font-size:24px;
-    font-weight:600;
-}
-
-.bd-conf-other {
-    display:grid;
-
-    grid-template-columns:45px 270px minmax(0,1fr);
-
-    gap:28px;
-
-    padding:30px 0;
-
-    border-top:1px solid var(--line);
-}
-
-.bd-conf-other:last-child {
-    border-bottom:1px solid var(--line);
-}
-
-.bd-conf-other-number {
-    padding-top:3px;
-
-    color:#BEC1C7;
-
-    font-family:'Poppins',sans-serif;
-
-    font-size:13px;
-}
-
-.bd-conf-other-media {
-    width:270px;
-    height:190px;
-
-    overflow:hidden;
-
-    border-radius:13px;
-
-    background:var(--navy);
-}
-
-.bd-conf-other-media img {
-    width:100%;
-    height:100%;
-
-    object-fit:cover;
-
-    transition:transform .8s cubic-bezier(.22,1,.36,1);
-}
-
-.bd-conf-other:hover
-.bd-conf-other-media img {
-    transform:scale(1.045);
-}
-
-.bd-conf-other-copy {
-    display:flex;
     justify-content:center;
-    flex-direction:column;
-}
-
-.bd-conf-other-date {
-    color:var(--orange);
-
+    gap:7px;
+    padding:0 13px;
+    border-radius:7px;
     font-size:10px;
-    font-weight:750;
+    font-weight:700;
 }
 
-.bd-conf-other-title {
-    margin:8px 0 0;
-
-    color:var(--navy);
-
-    font-family:'Poppins',sans-serif;
-
-    font-size:clamp(20px,2vw,28px);
-
-    font-weight:600;
-
-    line-height:1.25;
-
-    letter-spacing:-.03em;
+.bd-conference-button svg{
+    width:13px;
+    height:13px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
 }
 
-.bd-conf-other-info {
-    display:flex;
-    flex-wrap:wrap;
-
-    gap:9px 18px;
-
-    margin-top:11px;
+.bd-conference-button-conference{
+    border:1px solid var(--cream-border);
+    background:var(--cream);
+    color:var(--navy)!important;
 }
 
-.bd-conf-other-description {
-    position:relative;
-
-    max-width:800px;
-    height:75px;
-
-    margin-top:13px;
-
-    overflow:hidden;
+.bd-conference-button-conference:hover{
+    background:var(--cream-hover);
 }
 
-.bd-conf-other-description.has-overflow {
-    cursor:pointer;
+.bd-conference-button-proceeding{
+    border:1px solid var(--gold);
+    background:var(--gold);
+    color:var(--navy)!important;
 }
 
-.bd-conf-other-description-inner {
-    width:100%;
-    height:100%;
-
-    overflow:hidden;
-
-    padding-right:8px;
-
-    color:var(--body);
-
-    font-size:12px;
-
-    line-height:1.7;
-
-    scrollbar-width:thin;
+.bd-conference-button-proceeding:hover{
+    background:var(--gold-hover);
 }
 
-.bd-conf-other-description-inner p {
-    margin:0 0 7px;
+.bd-conference-button-disabled{
+    border:1px solid #EEEAEF;
+    background:#F5F3F5;
+    color:#B7B1BA!important;
 }
 
-.bd-conf-other-description.is-scroll-active
-.bd-conf-other-description-inner {
-    overflow-y:auto;
+/* EMPTY */
+.bd-conference-empty{
+    padding:65px 20px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    text-align:center;
+    color:var(--muted);
+    font-size:11px;
 }
 
-.bd-conf-other-description-inner::-webkit-scrollbar {
-    width:4px;
+.bd-conference-pagination{margin-top:30px}
+
+/* ANIMATION INITIAL */
+.bd-conference-brand-reveal,
+.bd-conference-hero-reveal,
+.bd-conference-card{opacity:0}
+
+.bd-conference-hero-reveal{transform:translateY(18px)}
+
+/* TABLET */
+@media(max-width:800px){
+    .bd-conference-shell{width:calc(100% - 40px)}
+    .bd-conference-hero{padding:45px 16px 36px}
+    .bd-conference-grid{grid-template-columns:1fr}
 }
 
-.bd-conf-other-description-inner::-webkit-scrollbar-thumb {
-    border-radius:999px;
-
-    background:rgba(36,27,82,.24);
-}
-
-.bd-conf-other-description::after {
-    content:"";
-
-    position:absolute;
-
-    bottom:0;
-    left:0;
-    right:0;
-
-    height:24px;
-
-    background:linear-gradient(transparent,#FFF);
-
-    opacity:0;
-
-    pointer-events:none;
-}
-
-.bd-conf-other-description.has-overflow:not(.is-scroll-active)::after {
-    opacity:1;
-}
-
-
-/* RESPONSIVE */
-
-@media(max-width:900px) {
-    .bd-conf-featured {
-        grid-template-columns:1fr;
-    }
-
-    .bd-conf-header {
-        grid-template-columns:1fr;
+/* MOBILE */
+@media(max-width:600px){
+    .bd-conference-shell{width:calc(100% - 30px)}
+    .bd-conference-brand-type{display:none}
+    .bd-conference-hero{padding:38px 5px 31px}
+    .bd-conference-title{font-size:38px}
+    .bd-conference-description{font-size:11px}
+    .bd-conference-card-top{
+        grid-template-columns:68px minmax(0,1fr);
         gap:14px;
+        min-height:118px;
+        margin:8px;
+        padding:14px;
     }
-
-    .bd-conf-other {
-        grid-template-columns:210px 1fr;
+    .bd-conference-poster,
+    .bd-conference-poster-wrap{width:62px}
+    .bd-conference-poster-wrap::after{
+        width:62px;
+        left:5px;
+        top:5px;
     }
-
-    .bd-conf-other-number {
-        display:none;
-    }
-
-    .bd-conf-other-media {
-        width:210px;
-    }
+    .bd-conference-series{font-size:18px}
+    .bd-conference-card-body{padding:12px 15px 16px}
+    .bd-conference-actions{grid-template-columns:1fr}
 }
 
-@media(max-width:640px) {
-    .bd-conf {
-        padding:28px 0 48px;
-    }
-
-    .bd-conf-shell {
-        width:calc(100% - 30px);
-    }
-
-    .bd-conf-title {
-        font-size:38px;
-    }
-
-    .bd-conf-featured-media {
-        min-height:280px;
-    }
-
-    .bd-conf-featured-title {
-        font-size:24px;
-    }
-
-    .bd-conf-other {
-        grid-template-columns:1fr;
-
-        gap:15px;
-
-        padding:24px 0;
-    }
-
-    .bd-conf-other-media {
-        width:100%;
-        height:210px;
-    }
-
-    .bd-conf-other-title {
-        font-size:20px;
+@media(prefers-reduced-motion:reduce){
+    .bd-conference-brand-reveal,
+    .bd-conference-hero-reveal,
+    .bd-conference-card{
+        opacity:1!important;
+        transform:none!important;
     }
 }
 </style>
 
 
-<section
-    class="bd-conf"
-    id="bdConferencePage"
->
+<section class="bd-conference" id="bdConferencePage">
 
-    <div class="bd-conf-shell">
+    <div class="bd-conference-shell">
 
-
-        {{-- HEADER --}}
-
-        <header class="bd-conf-header">
-
-            <div>
-
-                <div class="bd-conf-eyebrow">
-                    Event Ilmiah
-                </div>
-
-                <h1 class="bd-conf-title">
-                    Baca Conference
-                </h1>
-
+        {{-- BRAND --}}
+        <div class="bd-conference-brandbar">
+            <div class="bd-conference-brand bd-conference-brand-reveal">
+                <span class="bd-conference-brand-mark"></span>
+                <span class="bd-conference-brand-name">BacaDulu</span>
+                <span class="bd-conference-brand-type">Conference</span>
             </div>
+        </div>
 
 
-            <div>
+        {{-- HERO --}}
+        <header class="bd-conference-hero bd-conference-hero-reveal">
 
-                <p class="bd-conf-header-description">
-                    Temukan konferensi, seminar,
-                    dan kegiatan ilmiah terbaru
-                    yang dipublikasikan melalui Baca Dulu.
-                </p>
+            <h1 class="bd-conference-title" id="bdConferenceTitle">
+                Ruang Temu untuk Gagasan dan Kolaborasi Ilmiah.
+            </h1>
 
-                <div class="bd-conf-count">
+            <p class="bd-conference-description">
+                Jelajahi seri conference dan forum ilmiah dalam ekosistem BacaDulu yang mempertemukan gagasan, kolaborasi, dan publikasi untuk memperluas dampak pengetahuan.
+            </p>
 
-                    {{ $totalConferences }}
-                    conference tersedia
-
-                </div>
-
+            <div class="bd-conference-count">
+                <span class="bd-conference-count-dot"></span>
+                {{ $totalConferences }} conference tersedia
             </div>
 
         </header>
 
 
-
-        {{-- FEATURED --}}
-
-        @if($featuredConference)
-
-            @php
-                $featuredDate = $featuredConference->event_date
-                    ? \Carbon\Carbon::parse($featuredConference->event_date)
-                    : null;
-
-                $featuredTime = $featuredConference->event_time
-                    ? \Carbon\Carbon::parse($featuredConference->event_time)
-                        ->format('H:i')
-                    : null;
-
-                $featuredStatus = '';
-                $featuredStatusClass = '';
-
-                if ($featuredDate) {
-                    if ($featuredDate->isSameDay($today)) {
-                        $featuredStatus = 'Hari ini';
-                        $featuredStatusClass = 'today';
-                    } elseif ($featuredDate->greaterThan($today)) {
-                        $featuredStatus = 'Upcoming';
-                        $featuredStatusClass = 'upcoming';
-                    } else {
-                        $featuredStatus = 'Selesai';
-                    }
-                }
-            @endphp
-
-
-            <section class="bd-conf-featured">
-
-
-                <div class="bd-conf-featured-media">
-
-
-                    <div class="bd-conf-featured-fallback">
-                        <span></span>
-                    </div>
-
-
-                    @if($featuredConference->poster)
-
-                        <img
-                            src="{{ asset('storage/' . $featuredConference->poster) }}"
-                            alt="{{ $featuredConference->title }}"
-                            class="bd-conf-featured-image"
-                        >
-
-                    @endif
-
-
-                    @if($featuredStatus)
-
-                        <span
-                            class="
-                                bd-conf-status
-                                {{ $featuredStatusClass }}
-                            "
-                        >
-                            {{ $featuredStatus }}
-                        </span>
-
-                    @endif
-
-                </div>
-
-
-
-                <div class="bd-conf-featured-copy">
-
-
-                    @if($featuredDate)
-
-                        <div class="bd-conf-date-large">
-
-                            <div class="bd-conf-day">
-
-                                {{ $featuredDate->format('d') }}
-
-                            </div>
-
-
-                            <div class="bd-conf-date-side">
-
-                                <strong>
-
-                                    {{
-                                        $featuredDate
-                                            ->translatedFormat('F')
-                                    }}
-
-                                </strong>
-
-                                <span>
-
-                                    {{ $featuredDate->format('Y') }}
-
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    @endif
-
-
-                    <h2 class="bd-conf-featured-title">
-
-                        {{ $featuredConference->title }}
-
-                    </h2>
-
-
-
-                    {{-- TIME + LOCATION --}}
-
-                    <div class="bd-conf-event-info">
-
-
-                        @if($featuredTime)
-
-                            <div class="bd-conf-info-item">
-
-                                <svg viewBox="0 0 24 24">
-
-                                    <circle
-                                        cx="12"
-                                        cy="12"
-                                        r="9"
-                                    />
-
-                                    <path d="M12 7v5l3 2"/>
-
-                                </svg>
-
-
-                                <span class="bd-conf-time-value">
-
-                                    {{ $featuredTime }} WIB
-
-                                </span>
-
-                            </div>
-
-                        @endif
-
-
-
-                        @if($featuredConference->location)
-
-                            <div class="bd-conf-info-item">
-
-                                <svg viewBox="0 0 24 24">
-
-                                    <path
-                                        d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"
-                                    />
-
-                                    <circle
-                                        cx="12"
-                                        cy="10"
-                                        r="2.5"
-                                    />
-
-                                </svg>
-
-
-                                <span>
-
-                                    {{ $featuredConference->location }}
-
-                                </span>
-
-                            </div>
-
-                        @endif
-
-                    </div>
-
-
-
-                    @if($featuredConference->description)
-
-                        <div
-                            class="
-                                bd-conf-description
-                                js-conf-desc
-                            "
-                        >
-
-                            <div class="bd-conf-description-inner">
-
-                                {!! $featuredConference->description !!}
-
-                            </div>
-
-                        </div>
-
-                    @endif
-
-                </div>
-
-            </section>
-
-
-
-            {{-- CONFERENCE LAINNYA --}}
-
-            @if($otherConferences->count())
-
-                <section class="bd-conf-others">
-
-
-                    <div class="bd-conf-others-head">
-
-                        <h2 class="bd-conf-others-title">
-
-                            Conference lainnya
-
-                        </h2>
-
-                        <span class="bd-conf-count">
-
-                            {{ $otherConferences->count() }}
-                            event
-
-                        </span>
-
-                    </div>
-
-
-
-                    @foreach($otherConferences as $index => $conference)
-
-                        @php
-                            $conferenceDate = $conference->event_date
-                                ? \Carbon\Carbon::parse($conference->event_date)
-                                : null;
-
-                            $conferenceTime = $conference->event_time
-                                ? \Carbon\Carbon::parse($conference->event_time)
-                                    ->format('H:i')
-                                : null;
-
-                            $status = '';
-
-                            if ($conferenceDate) {
-                                if ($conferenceDate->isSameDay($today)) {
-                                    $status = 'Hari ini';
-                                } elseif ($conferenceDate->greaterThan($today)) {
-                                    $status = 'Upcoming';
-                                } else {
-                                    $status = 'Selesai';
-                                }
-                            }
-                        @endphp
-
-
-                        <article class="bd-conf-other">
-
-
-                            <div class="bd-conf-other-number">
-
-                                {{
-                                    str_pad(
-                                        $index + 1,
-                                        2,
-                                        '0',
-                                        STR_PAD_LEFT
-                                    )
-                                }}
-
-                            </div>
-
-
-
-                            <div class="bd-conf-other-media">
-
-                                @if($conference->poster)
-
-                                    <img
-                                        src="{{ asset('storage/' . $conference->poster) }}"
-                                        alt="{{ $conference->title }}"
-                                        loading="lazy"
-                                    >
-
-                                @endif
-
-                            </div>
-
-
-
-                            <div class="bd-conf-other-copy">
-
-
-                                @if($conferenceDate)
-
-                                    <div class="bd-conf-other-date">
-
-                                        {{
-                                            $conferenceDate
-                                                ->translatedFormat(
-                                                    'd F Y'
-                                                )
-                                        }}
-
-                                        @if($status)
-
-                                            · {{ $status }}
-
-                                        @endif
-
-                                    </div>
-
-                                @endif
-
-
-                                <h3 class="bd-conf-other-title">
-
-                                    {{ $conference->title }}
-
-                                </h3>
-
-
-
-                                {{-- TIME + LOCATION --}}
-
-                                <div class="bd-conf-other-info">
-
-
-                                    @if($conferenceTime)
-
-                                        <div class="bd-conf-info-item">
-
-                                            <svg viewBox="0 0 24 24">
-
-                                                <circle
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="9"
-                                                />
-
-                                                <path d="M12 7v5l3 2"/>
-
-                                            </svg>
-
-
-                                            <span class="bd-conf-time-value">
-
-                                                {{ $conferenceTime }}
-                                                WIB
-
-                                            </span>
-
+        {{-- DIVIDER --}}
+        <div class="bd-conference-divider">
+            <div class="bd-conference-divider-fill" id="bdConferenceDivider"></div>
+        </div>
+
+
+        {{-- GRID --}}
+        @if($conferenceItems->isNotEmpty())
+
+            <div class="bd-conference-grid">
+
+                @foreach($conferenceItems as $conference)
+
+                    @php
+                        $series = trim(
+                            ($conference->name ?? '') . ' ' .
+                            ($conference->edition ?? '')
+                        );
+
+                        if ($series === '') {
+                            $series = $conference->title ?? 'Conference';
+                        }
+
+                        $theme = (
+                            !empty($conference->name) ||
+                            !empty($conference->edition)
+                        )
+                            ? $conference->title
+                            : null;
+
+                        $poster = !empty($conference->poster)
+                            ? asset('storage/' . $conference->poster)
+                            : null;
+                    @endphp
+
+
+                    <article
+                        class="bd-conference-card"
+                        data-conference-card
+                    >
+
+                        <div class="bd-conference-card-top">
+
+                            <div class="bd-conference-poster-wrap">
+
+                                <div class="bd-conference-poster">
+
+                                    @if($poster)
+
+                                        <img
+                                            src="{{ $poster }}"
+                                            alt="{{ $series }}"
+                                            loading="lazy"
+                                            decoding="async"
+                                            onerror="
+                                                this.style.display='none';
+                                                this.nextElementSibling.style.display='flex';
+                                            "
+                                        >
+
+                                        <div
+                                            class="bd-conference-poster-fallback"
+                                            style="display:none;"
+                                        >
+                                            BacaDulu Conference
                                         </div>
 
-                                    @endif
+                                    @else
 
-
-
-                                    @if($conference->location)
-
-                                        <div class="bd-conf-info-item">
-
-                                            <svg viewBox="0 0 24 24">
-
-                                                <path
-                                                    d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"
-                                                />
-
-                                                <circle
-                                                    cx="12"
-                                                    cy="10"
-                                                    r="2.5"
-                                                />
-
-                                            </svg>
-
-
-                                            <span>
-
-                                                {{ $conference->location }}
-
-                                            </span>
-
+                                        <div class="bd-conference-poster-fallback">
+                                            BacaDulu Conference
                                         </div>
 
                                     @endif
 
                                 </div>
 
+                            </div>
 
 
-                                @if($conference->description)
+                            <div class="bd-conference-series-wrap">
 
-                                    <div
-                                        class="
-                                            bd-conf-other-description
-                                            js-conf-desc
-                                        "
+                                <div class="bd-conference-type">
+                                    Scientific Conference
+                                </div>
+
+                                <h2 class="bd-conference-series">
+                                    {{ $series }}
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="bd-conference-card-body">
+
+                            @if($theme)
+
+                              
+
+                                <h3 class="bd-conference-theme">
+                                    {{ $theme }}
+                                </h3>
+
+                            @endif
+
+
+                            <div class="bd-conference-card-description">
+                                {{
+                                    \Illuminate\Support\Str::limit(
+                                        trim(
+                                            strip_tags(
+                                                $conference->description ?? ''
+                                            )
+                                        ),
+                                        260
+                                    )
+                                    ?: 'Deskripsi conference belum tersedia.'
+                                }}
+                            </div>
+
+
+                            <div class="bd-conference-actions">
+
+                                @if($conference->conference_url)
+
+                                    <a
+                                        href="{{ $conference->conference_url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="bd-conference-button bd-conference-button-conference js-conference-button"
                                     >
+                                        <span>Lihat Conference</span>
 
-                                        <div class="bd-conf-other-description-inner">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M7 17L17 7"/>
+                                            <path d="M8 7h9v9"/>
+                                        </svg>
+                                    </a>
 
-                                            {!! $conference->description !!}
+                                @else
 
-                                        </div>
+                                    <span class="bd-conference-button bd-conference-button-disabled">
+                                        Lihat Conference
+                                    </span>
 
-                                    </div>
+                                @endif
+
+
+                                @if($conference->proceeding_url)
+
+                                    <a
+                                        href="{{ $conference->proceeding_url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="bd-conference-button bd-conference-button-proceeding js-conference-button"
+                                    >
+                                        <span>Lihat Prosiding</span>
+
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M5 12h14"/>
+                                            <path d="m14 7 5 5-5 5"/>
+                                        </svg>
+                                    </a>
+
+                                @else
+
+                                    <span class="bd-conference-button bd-conference-button-disabled">
+                                        Lihat Prosiding
+                                    </span>
 
                                 @endif
 
                             </div>
 
-                        </article>
+                        </div>
 
-                    @endforeach
+                    </article>
 
-                </section>
+                @endforeach
 
-            @endif
+            </div>
+
+        @else
+
+            <div class="bd-conference-empty">
+                Belum ada conference yang tersedia.
+            </div>
 
         @endif
-
 
 
         @if(
@@ -1148,17 +697,9 @@
             &&
             $conferences->hasPages()
         )
-
-            <div style="margin-top:38px;display:flex;justify-content:center;">
-
-                {{
-                    $conferences
-                        ->onEachSide(1)
-                        ->links('pagination::bootstrap-5')
-                }}
-
+            <div class="bd-conference-pagination">
+                {{ $conferences->onEachSide(1)->links() }}
             </div>
-
         @endif
 
     </div>
@@ -1168,52 +709,285 @@
 
 <script>
 (() => {
+    const page=document.getElementById('bdConferencePage');
+    if(!page)return;
 
-    const boxes =
-        document.querySelectorAll(
-            '#bdConferencePage .js-conf-desc'
-        );
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const resolveGsap=()=>{
+        const candidates=[window.bdGsap,window.bdGsap?.gsap,window.gsap,window.GSAP];
+        return candidates.find(item=>item&&typeof item.to==='function'&&typeof item.fromTo==='function'&&typeof item.timeline==='function')||null;
+    };
 
-    boxes.forEach(box => {
+    const splitTitle=()=>{
+        const title=document.getElementById('bdConferenceTitle');
+        if(!title||title.dataset.split==='1')return[];
 
-        const content =
-            box.firstElementChild;
+        const text=title.textContent.trim().replace(/\s+/g,' ');
+        title.dataset.split='1';
+        title.setAttribute('aria-label',text);
 
+        title.innerHTML=text
+            .split(' ')
+            .map(word=>`<span class="bd-conference-word" aria-hidden="true">${word}</span>`)
+            .join(' ');
 
-        const checkOverflow = () => {
+        return [...title.querySelectorAll('.bd-conference-word')];
+    };
 
-            box.classList.toggle(
-                'has-overflow',
-                content.scrollHeight >
-                content.clientHeight + 2
+    if(reduced){
+        page.querySelectorAll('.bd-conference-brand-reveal,.bd-conference-hero-reveal,.bd-conference-card')
+            .forEach(el=>{
+                el.style.opacity='1';
+                el.style.transform='none';
+            });
+        return;
+    }
+
+    let attempts=0;
+
+    const waiter=setInterval(()=>{
+        const gsap=resolveGsap();
+        attempts++;
+
+        if(!gsap){
+            if(attempts>=60){
+                clearInterval(waiter);
+                page.querySelectorAll('.bd-conference-brand-reveal,.bd-conference-hero-reveal,.bd-conference-card')
+                    .forEach(el=>{
+                        el.style.opacity='1';
+                        el.style.transform='none';
+                    });
+            }
+            return;
+        }
+
+        clearInterval(waiter);
+
+        const brand=page.querySelector('.bd-conference-brand-reveal');
+
+        if(brand){
+            gsap.fromTo(
+                brand,
+                {opacity:0,x:-12,y:0},
+                {
+                    opacity:1,
+                    x:0,
+                    y:0,
+                    duration:.48,
+                    ease:'power3.out',
+                    clearProps:'transform'
+                }
             );
+        }
 
-        };
+        const hero=page.querySelector('.bd-conference-hero-reveal');
 
+        if(hero){
+            gsap.fromTo(
+                hero,
+                {opacity:0,y:20},
+                {
+                    opacity:1,
+                    y:0,
+                    duration:.65,
+                    ease:'power3.out'
+                }
+            );
+        }
 
-        checkOverflow();
+        const words=splitTitle();
 
+        if(words.length){
+            gsap.fromTo(
+                words,
+                {opacity:0,y:24},
+                {
+                    opacity:1,
+                    y:0,
+                    duration:.55,
+                    stagger:.045,
+                    delay:.08,
+                    ease:'power3.out'
+                }
+            );
+        }
 
-        box.addEventListener(
-            'click',
-            () => {
+        const divider=document.getElementById('bdConferenceDivider');
 
-                if (
-                    box.classList.contains(
-                        'has-overflow'
-                    )
-                ) {
-                    box.classList.add(
-                        'is-scroll-active'
+        if(divider){
+            gsap.fromTo(
+                divider,
+                {scaleX:0},
+                {
+                    scaleX:1,
+                    duration:.7,
+                    delay:.2,
+                    ease:'power3.out'
+                }
+            );
+        }
+
+        const cards=[...page.querySelectorAll('[data-conference-card]')];
+
+        const observer=new IntersectionObserver(entries=>{
+            entries.forEach(entry=>{
+                if(!entry.isIntersecting)return;
+
+                const card=entry.target;
+
+                if(card.dataset.animated==='1')return;
+                card.dataset.animated='1';
+
+                const poster=card.querySelector('.bd-conference-poster-wrap');
+                const series=card.querySelector('.bd-conference-series-wrap');
+                const body=card.querySelector('.bd-conference-card-body');
+
+                const tl=gsap.timeline();
+
+                tl.fromTo(
+                    card,
+                    {opacity:0,y:26,scale:.975},
+                    {
+                        opacity:1,
+                        y:0,
+                        scale:1,
+                        duration:.55,
+                        ease:'power3.out'
+                    }
+                );
+
+                if(poster){
+                    tl.fromTo(
+                        poster,
+                        {opacity:0,x:-17},
+                        {
+                            opacity:1,
+                            x:0,
+                            duration:.4,
+                            ease:'power3.out'
+                        },
+                        '-=.34'
                     );
                 }
 
-            }
-        );
+                if(series){
+                    tl.fromTo(
+                        series,
+                        {opacity:0,x:15},
+                        {
+                            opacity:1,
+                            x:0,
+                            duration:.4,
+                            ease:'power3.out'
+                        },
+                        '-=.32'
+                    );
+                }
 
-    });
+                if(body){
+                    tl.fromTo(
+                        body.children,
+                        {opacity:0,y:10},
+                        {
+                            opacity:1,
+                            y:0,
+                            duration:.38,
+                            stagger:.05,
+                            ease:'power3.out'
+                        },
+                        '-=.2'
+                    );
+                }
 
+                observer.unobserve(card);
+            });
+        },{
+            threshold:.15,
+            rootMargin:'0px 0px -5% 0px'
+        });
+
+        cards.forEach(card=>observer.observe(card));
+
+        if(window.matchMedia('(hover:hover) and (pointer:fine)').matches){
+
+            cards.forEach(card=>{
+                const poster=card.querySelector('.bd-conference-poster-wrap');
+
+                card.addEventListener('mouseenter',()=>{
+                    gsap.to(card,{
+                        y:-5,
+                        duration:.28,
+                        ease:'power2.out',
+                        overwrite:'auto'
+                    });
+
+                    if(poster){
+                        gsap.to(poster,{
+                            y:-3,
+                            x:2,
+                            duration:.28,
+                            ease:'power2.out',
+                            overwrite:'auto'
+                        });
+                    }
+                });
+
+                card.addEventListener('mouseleave',()=>{
+                    gsap.to(card,{
+                        y:0,
+                        duration:.38,
+                        ease:'power3.out',
+                        overwrite:'auto'
+                    });
+
+                    if(poster){
+                        gsap.to(poster,{
+                            y:0,
+                            x:0,
+                            duration:.38,
+                            ease:'power3.out',
+                            overwrite:'auto'
+                        });
+                    }
+                });
+            });
+
+            page.querySelectorAll('.js-conference-button').forEach(button=>{
+                const icon=button.querySelector('svg');
+
+                button.addEventListener('mouseenter',()=>{
+                    gsap.to(button,{
+                        y:-2,
+                        duration:.2,
+                        ease:'power2.out'
+                    });
+
+                    if(icon){
+                        gsap.to(icon,{
+                            x:2,
+                            duration:.2
+                        });
+                    }
+                });
+
+                button.addEventListener('mouseleave',()=>{
+                    gsap.to(button,{
+                        y:0,
+                        duration:.25,
+                        ease:'power3.out'
+                    });
+
+                    if(icon){
+                        gsap.to(icon,{
+                            x:0,
+                            duration:.25
+                        });
+                    }
+                });
+            });
+        }
+    },50);
 })();
 </script>
 
