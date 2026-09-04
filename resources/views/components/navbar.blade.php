@@ -2,7 +2,8 @@
     $isBloggingArea =
         request()->routeIs('blog.*')
         || request()->routeIs('event.*')
-        || request()->routeIs('community.*');
+        || request()->routeIs('community.*')
+        || request()->routeIs('profile.*');
 @endphp
 
 <nav id="main-navbar" class="bd-navbar">
@@ -231,10 +232,11 @@
                                     class="bd-nav-profile-trigger"
                                 >
 
-                                    <img
-                                        src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}"
-                                        alt="{{ auth()->user()->name }}"
-                                    >
+                                    <x-user-avatar
+                                        :user="auth()->user()"
+                                        :size="40"
+                                        class="border border-gray-200 shadow-sm"
+                                    />
 
                                     <span>
                                         {{ auth()->user()->name }}
@@ -256,6 +258,12 @@
                                         </a>
 
                                     @endif
+
+
+                                    {{-- TAMBAHAN EDIT FOTO PROFIL --}}
+                                    <a href="{{ route('profile.edit') }}">
+                                        Edit Foto Profil
+                                    </a>
 
 
                                     <a href="{{ route('blog.myPosts') }}">
@@ -459,10 +467,11 @@
 
                         <div class="bd-mobile-user">
 
-                            <img
-                                src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) }}"
-                                alt="{{ auth()->user()->name }}"
-                            >
+                            <x-user-avatar
+                                :user="auth()->user()"
+                                :size="42"
+                                class="border border-gray-200 shadow-sm"
+                            />
 
                             <div>
 
@@ -489,6 +498,15 @@
                             </a>
 
                         @endif
+
+
+                        {{-- TAMBAHAN EDIT FOTO PROFIL MOBILE --}}
+                        <a
+                            href="{{ route('profile.edit') }}"
+                            class="bd-mobile-secondary"
+                        >
+                            Edit Foto Profil
+                        </a>
 
 
                         <a

@@ -117,62 +117,33 @@
             {{-- AUTHOR --}}
             <div class="flex items-center gap-3 mb-4">
 
-                @if($post->user && !empty($post->user->avatar))
+    <x-user-avatar
+        :user="$post->user"
+        :size="36"
+        class="border border-slate-200"
+    />
 
-                    @php
-                        $avatar = $post->user->avatar;
+    <div class="min-w-0">
 
-                        if (filter_var($avatar, FILTER_VALIDATE_URL)) {
-                            $avatarUrl = $avatar;
-                        } elseif (\Illuminate\Support\Str::startsWith($avatar, 'storage/')) {
-                            $avatarUrl = asset($avatar);
-                        } else {
-                            $avatarUrl = asset('storage/' . $avatar);
-                        }
-                    @endphp
+        <p class="text-sm font-bold text-slate-800 truncate">
+            {{ $post->user->name
+                ?? $post->author
+                ?? 'Penulis'
+            }}
+        </p>
 
-                    <img
-                        src="{{ $avatarUrl }}"
-                        alt="{{ $post->user->name }}"
-                        class="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
-                    >
+        <p class="text-xs text-slate-400 mt-0.5">
+            {{ $post
+                ->created_at
+                ->copy()
+                ->timezone('Asia/Jakarta')
+                ->translatedFormat('d F Y')
+            }}
+        </p>
 
-                @else
+    </div>
 
-                    <div class="w-9 h-9 rounded-full bg-orange-600 text-white flex items-center justify-center text-sm font-bold shrink-0">
-                        {{ strtoupper(
-                            mb_substr(
-                                $post->user->name
-                                    ?? $post->author
-                                    ?? 'A',
-                                0,
-                                1
-                            )
-                        ) }}
-                    </div>
-
-                @endif
-
-                <div class="min-w-0">
-                    <p class="text-sm font-bold text-slate-800 truncate">
-                        {{ $post->user->name
-                            ?? $post->author
-                            ?? 'Penulis'
-                        }}
-                    </p>
-
-                    <p class="text-xs text-slate-400 mt-0.5">
-                        {{ $post
-                            ->created_at
-                            ->copy()
-                            ->timezone('Asia/Jakarta')
-                            ->translatedFormat('d F Y')
-                        }}
-                    </p>
-                </div>
-
-            </div>
-
+</div>
             {{-- CATEGORY --}}
             @if($post->category)
                 <div class="mb-3">

@@ -18,6 +18,7 @@ use App\Http\Controllers\JurnalController;
 use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\ProfileController;
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminGoogleVerificationController;
@@ -79,6 +80,43 @@ Route::post('/logout', function () {
 })
     ->middleware('auth')
     ->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| USER PROFILE
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/avatar/google/{user}', [
+    ProfileController::class,
+    'googleAvatar',
+])->name('profile.google-avatar');
+
+Route::middleware('auth')
+    ->prefix('profil')
+    ->name('profile.')
+    ->group(function () {
+
+        Route::get('/', [
+            ProfileController::class,
+            'edit',
+        ])->name('edit');
+
+        Route::post('/foto', [
+            ProfileController::class,
+            'updatePhoto',
+        ])->name('photo.update');
+
+        Route::patch('/foto/google', [
+            ProfileController::class,
+            'useGoogle',
+        ])->name('photo.google');
+
+        Route::patch('/foto/inisial', [
+            ProfileController::class,
+            'useInitials',
+        ])->name('photo.initials');
+    });
 
 /*
 |--------------------------------------------------------------------------
