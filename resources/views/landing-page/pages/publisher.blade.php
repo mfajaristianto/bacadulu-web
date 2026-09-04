@@ -834,12 +834,7 @@
 
             <div class="bd-publisher-hero-copy">
 
-                <div
-                    class="bd-publisher-eyebrow js-typewriter"
-                    data-text="Baca Publisher"
-                >
-                    Baca Publisher
-                </div>
+                
 
                 <h1 class="js-word-reveal">
                     Karya yang layak diterbitkan dan dibaca lebih luas.
