@@ -19,55 +19,36 @@
 
 .bd-journal{
     --navy:#241B52;
-    --navy-hover:#31256E;
     --orange:#EF5843;
     --gold:#F7AA35;
     --gold-hover:#EDA02C;
     --cream:#FFF7EF;
     --cream-hover:#FFF0E7;
     --cream-border:#F1E2D7;
-    --ink:#1D1A27;
     --body:#645F6E;
     --muted:#96929C;
     --line:#E8E7EC;
-
     width:100%;
     min-height:100vh;
     overflow-x:hidden;
     padding-bottom:64px;
     background:linear-gradient(180deg,#fff 0,#fff 360px,#FFF9F5 100%);
-    color:var(--ink);
+    color:#1D1A27;
     font-family:'Inter',sans-serif;
-    -webkit-font-smoothing:antialiased;
 }
 
 .bd-journal *,
 .bd-journal *::before,
-.bd-journal *::after{
-    box-sizing:border-box;
-}
+.bd-journal *::after{box-sizing:border-box}
 
-.bd-journal a{
-    text-decoration:none;
-}
-
-
-/* =========================================================
-   SHELL
-   SAMA PERSIS PUBLISHER
-========================================================= */
+.bd-journal a{text-decoration:none}
 
 .bd-journal-shell{
     width:min(calc(100% - 72px),1260px);
     margin:auto;
 }
 
-
-/* =========================================================
-   BRAND
-   UKURAN + POSISI SAMA PERSIS PUBLISHER
-========================================================= */
-
+/* BRAND */
 .bd-journal-brandbar{
     min-height:72px;
     display:flex;
@@ -97,67 +78,53 @@
 
 .bd-journal-brand-type{
     color:var(--muted);
-    font-family:'Inter',sans-serif;
     font-size:10px;
     font-weight:600;
     letter-spacing:.1em;
     text-transform:uppercase;
 }
 
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-.bd-journal-header{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(280px,370px);
-    gap:52px;
-    align-items:end;
-    padding-top:47px;
-    margin-bottom:32px;
-}
-
-.bd-journal-header-left{
-    min-width:0;
+/* HERO */
+.bd-journal-hero{
+    max-width:930px;
+    margin:0 auto;
+    padding:58px 20px 43px;
+    text-align:center;
 }
 
 .bd-journal-title{
-    max-width:700px;
-    margin:0;
+    max-width:900px;
+    margin:0 auto;
     color:var(--navy);
     font-family:'Fraunces',serif;
-    font-size:clamp(38px,4vw,55px);
+    font-size:clamp(40px,4.5vw,62px);
     font-weight:600;
-    line-height:1.02;
+    line-height:1.04;
     letter-spacing:-.045em;
 }
 
 .bd-journal-word{
     display:inline-block;
-    margin-right:.14em;
-}
-
-.bd-journal-header-right{
-    padding-bottom:2px;
+    margin-right:.13em;
 }
 
 .bd-journal-description{
-    max-width:370px;
-    margin:0;
+    max-width:650px;
+    margin:18px auto 0;
     color:var(--body);
     font-size:12px;
-    line-height:1.75;
+    line-height:1.8;
 }
 
 .bd-journal-count{
-    display:flex;
+    display:inline-flex;
     align-items:center;
+    justify-content:center;
     gap:8px;
-    margin-top:12px;
+    margin-top:16px;
     color:var(--muted);
     font-size:8px;
-    font-weight:800;
+    font-weight:700;
     letter-spacing:.09em;
     text-transform:uppercase;
 }
@@ -170,43 +137,33 @@
     box-shadow:0 0 0 4px rgba(239,88,67,.11);
 }
 
-
-/* =========================================================
-   DIVIDER
-========================================================= */
-
+/* DIVIDER */
 .bd-journal-divider{
     position:relative;
     height:1px;
     margin-bottom:26px;
-    overflow:hidden;
     background:var(--line);
 }
 
 .bd-journal-divider-fill{
     position:absolute;
-    inset:0 auto 0 0;
+    left:50%;
+    top:0;
     width:105px;
+    height:1px;
     background:var(--orange);
-    transform-origin:left center;
+    transform:translateX(-50%);
+    transform-origin:center;
 }
 
-
-/* =========================================================
-   GRID
-========================================================= */
-
+/* GRID */
 .bd-journal-grid{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:22px;
 }
 
-
-/* =========================================================
-   CARD
-========================================================= */
-
+/* CARD */
 .bd-journal-card{
     position:relative;
     min-width:0;
@@ -215,7 +172,6 @@
     border-radius:15px;
     background:#fff;
     box-shadow:0 8px 24px rgba(36,27,82,.055);
-    transform-origin:center center;
     will-change:transform,opacity;
 }
 
@@ -233,15 +189,9 @@
     transition:transform .3s ease;
 }
 
-.bd-journal-card:hover::before{
-    transform:scaleY(1);
-}
+.bd-journal-card:hover::before{transform:scaleY(1)}
 
-
-/* =========================================================
-   CARD TOP
-========================================================= */
-
+/* CARD TOP */
 .bd-journal-card-top{
     position:relative;
     z-index:1;
@@ -257,33 +207,29 @@
     background:var(--orange);
 }
 
-.bd-journal-card-top::before{
+.bd-journal-card-top::before,
+.bd-journal-card-top::after{
     content:"";
     position:absolute;
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:50%;
+}
+
+.bd-journal-card-top::before{
     right:-55px;
     top:-65px;
     width:150px;
     height:150px;
-    border:1px solid rgba(255,255,255,.16);
-    border-radius:50%;
 }
 
 .bd-journal-card-top::after{
-    content:"";
-    position:absolute;
     right:-18px;
     bottom:-65px;
     width:115px;
     height:115px;
-    border:1px solid rgba(255,255,255,.13);
-    border-radius:50%;
 }
 
-
-/* =========================================================
-   COVER
-========================================================= */
-
+/* COVER */
 .bd-journal-cover-wrap{
     position:relative;
     z-index:2;
@@ -303,11 +249,9 @@
 }
 
 .bd-journal-cover{
-    position:relative;
     width:78px;
     aspect-ratio:3/4;
     overflow:hidden;
-    border:1px solid rgba(255,255,255,.35);
     border-radius:4px;
     background:#fff;
     box-shadow:0 10px 23px rgba(64,24,18,.22);
@@ -324,35 +268,17 @@
     width:100%;
     height:100%;
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:7px;
-    padding:9px;
+    padding:8px;
     background:#fff;
     color:var(--navy);
+    font-size:7px;
+    font-weight:700;
     text-align:center;
 }
 
-.bd-journal-cover-fallback-dot{
-    width:7px;
-    height:7px;
-    background:var(--orange);
-}
-
-.bd-journal-cover-fallback span:last-child{
-    font-size:6px;
-    font-weight:800;
-    line-height:1.4;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-}
-
-
-/* =========================================================
-   JOURNAL NAME
-========================================================= */
-
+/* NAME */
 .bd-journal-name-wrap{
     position:relative;
     z-index:2;
@@ -366,7 +292,7 @@
     margin-bottom:8px;
     color:rgba(255,255,255,.72);
     font-size:7px;
-    font-weight:800;
+    font-weight:700;
     letter-spacing:.13em;
     text-transform:uppercase;
 }
@@ -380,7 +306,6 @@
 }
 
 .bd-journal-card-name{
-    max-width:430px;
     margin:0;
     color:#fff;
     font-family:'Fraunces',serif;
@@ -388,24 +313,12 @@
     font-weight:600;
     line-height:1.16;
     letter-spacing:-.025em;
-    overflow-wrap:anywhere;
 }
 
-
-/* =========================================================
-   CARD BODY
-========================================================= */
-
+/* BODY */
 .bd-journal-card-body{
-    position:relative;
-    z-index:1;
     padding:4px 21px 20px;
 }
-
-
-/* =========================================================
-   ISSN
-========================================================= */
 
 .bd-journal-issn{
     display:flex;
@@ -429,11 +342,6 @@
     font-size:9px;
 }
 
-
-/* =========================================================
-   DESCRIPTION
-========================================================= */
-
 .bd-journal-card-description{
     min-height:72px;
     margin:14px 0 17px;
@@ -446,11 +354,7 @@
     -webkit-box-orient:vertical;
 }
 
-
-/* =========================================================
-   ACTIONS
-========================================================= */
-
+/* BUTTON */
 .bd-journal-actions{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -458,22 +362,15 @@
 }
 
 .bd-journal-button{
-    position:relative;
     min-height:40px;
     display:flex;
     align-items:center;
     justify-content:center;
     gap:7px;
-    overflow:hidden;
     padding:0 13px;
     border-radius:7px;
     font-size:10px;
-    font-weight:800;
-    transition:
-        background .2s ease,
-        color .2s ease,
-        border-color .2s ease,
-        box-shadow .2s ease;
+    font-weight:700;
 }
 
 .bd-journal-button svg{
@@ -486,61 +383,33 @@
     stroke-linejoin:round;
 }
 
-
-/* =========================================================
-   LIHAT JURNAL
-========================================================= */
-
 .bd-journal-button-secondary{
     border:1px solid var(--cream-border);
     background:var(--cream);
     color:var(--navy)!important;
-    box-shadow:0 4px 12px rgba(36,27,82,.035);
 }
 
 .bd-journal-button-secondary:hover{
-    border-color:#F2C8B8;
     background:var(--cream-hover);
-    color:var(--navy)!important;
-    box-shadow:0 7px 16px rgba(239,88,67,.08);
 }
-
-
-/* =========================================================
-   EDISI TERKINI
-========================================================= */
 
 .bd-journal-button-primary{
     border:1px solid var(--gold);
     background:var(--gold);
     color:var(--navy)!important;
-    box-shadow:0 5px 14px rgba(247,170,53,.18);
 }
 
 .bd-journal-button-primary:hover{
-    border-color:var(--gold-hover);
     background:var(--gold-hover);
-    color:var(--navy)!important;
-    box-shadow:0 8px 19px rgba(247,170,53,.26);
 }
 
-
-/* =========================================================
-   DISABLED
-========================================================= */
-
 .bd-journal-button-disabled{
-    cursor:not-allowed;
     border:1px solid #EEEAEF;
     background:#F5F3F5;
     color:#B7B1BA!important;
 }
 
-
-/* =========================================================
-   EMPTY + PAGINATION
-========================================================= */
-
+/* EMPTY */
 .bd-journal-empty{
     padding:65px 20px;
     border-top:1px solid var(--line);
@@ -550,111 +419,27 @@
     font-size:11px;
 }
 
-.bd-journal-pagination{
-    margin-top:30px;
-}
+.bd-journal-pagination{margin-top:30px}
 
-.bd-journal-pagination nav{
-    display:flex;
-    justify-content:center;
-}
-
-
-/* =========================================================
-   INITIAL ANIMATION
-========================================================= */
-
+/* INITIAL */
 .bd-journal-brand-reveal,
-.bd-journal-header-reveal,
-.bd-journal-card{
-    opacity:0;
-}
+.bd-journal-hero-reveal,
+.bd-journal-card{opacity:0}
 
-/*
-|--------------------------------------------------------------------------
-| PENTING:
-|--------------------------------------------------------------------------
-| Brand JANGAN dikasih translateY.
-| Publisher posisinya center murni di brandbar 72px.
-|--------------------------------------------------------------------------
-*/
-
-.bd-journal-brand-reveal{
-    transform:none;
-}
-
-.bd-journal-header-reveal{
-    transform:translateY(18px);
-}
-
-
-/* =========================================================
-   TABLET
-========================================================= */
+.bd-journal-hero-reveal{transform:translateY(18px)}
 
 @media(max-width:800px){
-
-    .bd-journal-shell{
-        width:calc(100% - 40px);
-    }
-
-    .bd-journal-header{
-        grid-template-columns:1fr;
-        gap:13px;
-        padding-top:37px;
-        margin-bottom:25px;
-    }
-
-    .bd-journal-description{
-        max-width:540px;
-    }
-
-    .bd-journal-grid{
-        grid-template-columns:1fr;
-    }
-
-    .bd-journal-card-top{
-        grid-template-columns:76px minmax(0,1fr);
-        gap:16px;
-    }
-
-    .bd-journal-cover,
-    .bd-journal-cover-wrap{
-        width:70px;
-    }
-
-    .bd-journal-cover-wrap::after{
-        width:70px;
-    }
+    .bd-journal-shell{width:calc(100% - 40px)}
+    .bd-journal-hero{padding:45px 16px 36px}
+    .bd-journal-grid{grid-template-columns:1fr}
 }
 
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
 @media(max-width:600px){
-
-    .bd-journal-shell{
-        width:calc(100% - 30px);
-    }
-
-    .bd-journal-brand-type{
-        display:none;
-    }
-
-    .bd-journal-header{
-        padding-top:31px;
-    }
-
-    .bd-journal-title{
-        font-size:36px;
-    }
-
-    .bd-journal-description{
-        font-size:11px;
-    }
-
+    .bd-journal-shell{width:calc(100% - 30px)}
+    .bd-journal-brand-type{display:none}
+    .bd-journal-hero{padding:38px 5px 31px}
+    .bd-journal-title{font-size:38px}
+    .bd-journal-description{font-size:11px}
     .bd-journal-card-top{
         grid-template-columns:68px minmax(0,1fr);
         gap:14px;
@@ -662,51 +447,22 @@
         margin:8px;
         padding:14px;
     }
-
     .bd-journal-cover,
-    .bd-journal-cover-wrap{
-        width:62px;
-    }
-
+    .bd-journal-cover-wrap{width:62px}
     .bd-journal-cover-wrap::after{
         width:62px;
         left:5px;
         top:5px;
     }
-
-    .bd-journal-card-name{
-        font-size:17px;
-    }
-
-    .bd-journal-type{
-        margin-bottom:6px;
-        font-size:6px;
-    }
-
-    .bd-journal-card-body{
-        padding:3px 15px 16px;
-    }
-
-    .bd-journal-card-description{
-        min-height:0;
-        margin:13px 0 15px;
-        font-size:10px;
-    }
-
-    .bd-journal-actions{
-        grid-template-columns:1fr;
-    }
+    .bd-journal-card-name{font-size:17px}
+    .bd-journal-card-body{padding:3px 15px 16px}
+    .bd-journal-card-description{min-height:0}
+    .bd-journal-actions{grid-template-columns:1fr}
 }
 
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
 @media(prefers-reduced-motion:reduce){
-
     .bd-journal-brand-reveal,
-    .bd-journal-header-reveal,
+    .bd-journal-hero-reveal,
     .bd-journal-card{
         opacity:1!important;
         transform:none!important;
@@ -719,94 +475,49 @@
 
     <div class="bd-journal-shell">
 
-        {{-- =====================================================
-             BRAND
-        ====================================================== --}}
-
+        {{-- BRAND --}}
         <div class="bd-journal-brandbar">
-
             <div class="bd-journal-brand bd-journal-brand-reveal">
-
                 <span class="bd-journal-brand-mark"></span>
-
-                <span class="bd-journal-brand-name">
-                    BacaDulu
-                </span>
-
-                <span class="bd-journal-brand-type">
-                    Journal
-                </span>
-
+                <span class="bd-journal-brand-name">BacaDulu</span>
+                <span class="bd-journal-brand-type">Journal</span>
             </div>
-
         </div>
 
 
-        {{-- =====================================================
-             HEADER
-        ====================================================== --}}
+        {{-- HERO --}}
+        <header class="bd-journal-hero bd-journal-hero-reveal">
 
-        <header class="bd-journal-header">
+            <h1 class="bd-journal-title" id="bdJournalTitle">
+                Ruang Publikasi untuk Pengetahuan yang Terus Bertumbuh.
+            </h1>
 
-            <div class="bd-journal-header-left bd-journal-header-reveal">
+            <p class="bd-journal-description">
+                Temukan jurnal ilmiah dalam ekosistem BacaDulu sebagai ruang publikasi, referensi, dan penyebaran pengetahuan untuk mendukung riset yang berkualitas dan berdampak.
+            </p>
 
-                <h1
-                    class="bd-journal-title"
-                    id="bdJournalTitle"
-                >
-                    Koleksi jurnal BacaDulu.
-                </h1>
-
-            </div>
-
-
-            <div class="bd-journal-header-right bd-journal-header-reveal">
-
-                <p class="bd-journal-description">
-                    Temukan jurnal ilmiah dalam ekosistem BacaDulu sebagai ruang publikasi, referensi, dan penyebaran pengetahuan akademik.
-                </p>
-
-                <div class="bd-journal-count">
-
-                    <span class="bd-journal-count-dot"></span>
-
-                    {{ $totalJournals }} jurnal tersedia
-
-                </div>
-
+            <div class="bd-journal-count">
+                <span class="bd-journal-count-dot"></span>
+                {{ $totalJournals }} jurnal tersedia
             </div>
 
         </header>
 
 
-        {{-- =====================================================
-             DIVIDER
-        ====================================================== --}}
-
+        {{-- DIVIDER --}}
         <div class="bd-journal-divider">
-
-            <div
-                class="bd-journal-divider-fill"
-                id="bdJournalDivider"
-            ></div>
-
+            <div class="bd-journal-divider-fill" id="bdJournalDivider"></div>
         </div>
 
 
-        {{-- =====================================================
-             GRID
-        ====================================================== --}}
-
+        {{-- GRID --}}
         @if($journalItems->isNotEmpty())
 
             <div class="bd-journal-grid">
 
                 @foreach($journalItems as $jurnal)
 
-                    <article
-                        class="bd-journal-card"
-                        data-journal-card
-                    >
+                    <article class="bd-journal-card" data-journal-card>
 
                         <div class="bd-journal-card-top">
 
@@ -831,15 +542,13 @@
                                             class="bd-journal-cover-fallback"
                                             style="display:none;"
                                         >
-                                            <span class="bd-journal-cover-fallback-dot"></span>
-                                            <span>BacaDulu Journal</span>
+                                            BacaDulu Journal
                                         </div>
 
                                     @else
 
                                         <div class="bd-journal-cover-fallback">
-                                            <span class="bd-journal-cover-fallback-dot"></span>
-                                            <span>BacaDulu Journal</span>
+                                            BacaDulu Journal
                                         </div>
 
                                     @endif
@@ -882,7 +591,6 @@
 
 
                             <div class="bd-journal-card-description">
-
                                 {{
                                     \Illuminate\Support\Str::limit(
                                         trim(
@@ -894,7 +602,6 @@
                                     )
                                     ?: 'Deskripsi jurnal belum tersedia.'
                                 }}
-
                             </div>
 
 
@@ -908,14 +615,12 @@
                                         rel="noopener noreferrer"
                                         class="bd-journal-button bd-journal-button-secondary js-journal-button"
                                     >
-
                                         <span>Lihat Jurnal</span>
 
                                         <svg viewBox="0 0 24 24">
                                             <path d="M7 17L17 7"/>
                                             <path d="M8 7h9v9"/>
                                         </svg>
-
                                     </a>
 
                                 @else
@@ -935,14 +640,12 @@
                                         rel="noopener noreferrer"
                                         class="bd-journal-button bd-journal-button-primary js-journal-button"
                                     >
-
                                         <span>Edisi Terkini</span>
 
                                         <svg viewBox="0 0 24 24">
                                             <path d="M5 12h14"/>
                                             <path d="m14 7 5 5-5 5"/>
                                         </svg>
-
                                     </a>
 
                                 @else
@@ -972,16 +675,10 @@
         @endif
 
 
-        @if(
-            method_exists($jurnals, 'hasPages')
-            &&
-            $jurnals->hasPages()
-        )
-
+        @if(method_exists($jurnals, 'hasPages') && $jurnals->hasPages())
             <div class="bd-journal-pagination">
                 {{ $jurnals->links() }}
             </div>
-
         @endif
 
     </div>
@@ -991,626 +688,286 @@
 
 <script>
 (() => {
+    const page=document.getElementById('bdJournalPage');
+    if(!page)return;
 
-    const initBdJournal = () => {
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        const page =
-            document.getElementById('bdJournalPage');
+    const resolveGsap=()=>{
+        const candidates=[window.bdGsap,window.bdGsap?.gsap,window.gsap,window.GSAP];
+        return candidates.find(item=>item&&typeof item.to==='function'&&typeof item.fromTo==='function'&&typeof item.timeline==='function')||null;
+    };
 
-        if (!page) return;
+    const splitTitle=()=>{
+        const title=document.getElementById('bdJournalTitle');
+        if(!title||title.dataset.split==='1')return[];
 
+        const text=title.textContent.trim().replace(/\s+/g,' ');
+        title.dataset.split='1';
+        title.setAttribute('aria-label',text);
 
-        const reducedMotion =
-            window.matchMedia(
-                '(prefers-reduced-motion: reduce)'
-            ).matches;
+        title.innerHTML=text
+            .split(' ')
+            .map(word=>`<span class="bd-journal-word" aria-hidden="true">${word}</span>`)
+            .join(' ');
 
+        return [...title.querySelectorAll('.bd-journal-word')];
+    };
 
-        const resolveGsap = () => {
+    if(reduced){
+        page.querySelectorAll('.bd-journal-brand-reveal,.bd-journal-hero-reveal,.bd-journal-card')
+            .forEach(el=>{
+                el.style.opacity='1';
+                el.style.transform='none';
+            });
+        return;
+    }
 
-            const candidates = [
-                window.bdGsap,
-                window.bdGsap?.gsap,
-                window.gsap,
-                window.GSAP
-            ];
+    let attempts=0;
 
-            return candidates.find(
-                item =>
-                    item &&
-                    typeof item.to === 'function' &&
-                    typeof item.fromTo === 'function' &&
-                    typeof item.timeline === 'function'
-            ) || null;
-        };
+    const waiter=setInterval(()=>{
+        const gsap=resolveGsap();
+        attempts++;
 
+        if(!gsap){
+            if(attempts>=60){
+                clearInterval(waiter);
 
-        const splitTitle = () => {
-
-            const title =
-                document.getElementById('bdJournalTitle');
-
-            if (
-                !title ||
-                title.dataset.split === '1'
-            ) {
-                return [];
+                page.querySelectorAll('.bd-journal-brand-reveal,.bd-journal-hero-reveal,.bd-journal-card')
+                    .forEach(el=>{
+                        el.style.opacity='1';
+                        el.style.transform='none';
+                    });
             }
-
-
-            const text =
-                title
-                    .textContent
-                    .trim()
-                    .replace(/\s+/g,' ');
-
-
-            title.dataset.split = '1';
-
-            title.setAttribute(
-                'aria-label',
-                text
-            );
-
-
-            title.innerHTML =
-                text
-                    .split(' ')
-                    .map(
-                        word => `
-                            <span
-                                class="bd-journal-word"
-                                aria-hidden="true"
-                            >
-                                ${word}
-                            </span>
-                        `
-                    )
-                    .join(' ');
-
-
-            return [
-                ...title.querySelectorAll(
-                    '.bd-journal-word'
-                )
-            ];
-        };
-
-
-        if (reducedMotion) {
-
-            page
-                .querySelectorAll(
-                    '.bd-journal-brand-reveal,.bd-journal-header-reveal,.bd-journal-card'
-                )
-                .forEach(
-                    element => {
-
-                        element.style.opacity = '1';
-                        element.style.transform = 'none';
-
-                    }
-                );
-
             return;
         }
 
+        clearInterval(waiter);
 
-        let attempts = 0;
+        const brand=page.querySelector('.bd-journal-brand-reveal');
 
+        if(brand){
+            gsap.fromTo(
+                brand,
+                {opacity:0,x:-12,y:0},
+                {
+                    opacity:1,
+                    x:0,
+                    y:0,
+                    duration:.48,
+                    ease:'power3.out',
+                    clearProps:'transform'
+                }
+            );
+        }
 
-        const waitForGsap =
-            setInterval(
-                () => {
+        const hero=page.querySelector('.bd-journal-hero-reveal');
 
-                    const gsap =
-                        resolveGsap();
+        if(hero){
+            gsap.fromTo(
+                hero,
+                {opacity:0,y:20},
+                {
+                    opacity:1,
+                    y:0,
+                    duration:.65,
+                    ease:'power3.out'
+                }
+            );
+        }
 
-                    attempts++;
+        const words=splitTitle();
 
+        if(words.length){
+            gsap.fromTo(
+                words,
+                {opacity:0,y:24},
+                {
+                    opacity:1,
+                    y:0,
+                    duration:.55,
+                    stagger:.045,
+                    delay:.08,
+                    ease:'power3.out'
+                }
+            );
+        }
 
-                    if (!gsap) {
+        const divider=document.getElementById('bdJournalDivider');
 
-                        if (
-                            attempts >= 70
-                        ) {
+        if(divider){
+            gsap.fromTo(
+                divider,
+                {scaleX:0},
+                {
+                    scaleX:1,
+                    duration:.7,
+                    delay:.2,
+                    ease:'power3.out'
+                }
+            );
+        }
 
-                            clearInterval(
-                                waitForGsap
-                            );
+        const cards=[...page.querySelectorAll('[data-journal-card]')];
 
+        const observer=new IntersectionObserver(entries=>{
+            entries.forEach(entry=>{
+                if(!entry.isIntersecting)return;
 
-                            page
-                                .querySelectorAll(
-                                    '.bd-journal-brand-reveal,.bd-journal-header-reveal,.bd-journal-card'
-                                )
-                                .forEach(
-                                    element => {
+                const card=entry.target;
 
-                                        element.style.opacity = '1';
-                                        element.style.transform = 'none';
+                if(card.dataset.animated==='1')return;
+                card.dataset.animated='1';
 
-                                    }
-                                );
-                        }
+                const cover=card.querySelector('.bd-journal-cover-wrap');
+                const name=card.querySelector('.bd-journal-name-wrap');
+                const body=card.querySelector('.bd-journal-card-body');
 
-                        return;
+                const tl=gsap.timeline();
+
+                tl.fromTo(
+                    card,
+                    {opacity:0,y:26,scale:.975},
+                    {
+                        opacity:1,
+                        y:0,
+                        scale:1,
+                        duration:.55,
+                        ease:'power3.out'
                     }
+                );
 
-
-                    clearInterval(
-                        waitForGsap
-                    );
-
-
-                    /* =================================================
-                       BRAND
-                       Y HARUS 0
-                    ================================================= */
-
-                    const brand =
-                        page.querySelector(
-                            '.bd-journal-brand-reveal'
-                        );
-
-
-                    if (brand) {
-
-                        gsap.fromTo(
-                            brand,
-                            {
-                                opacity:0,
-                                x:-12,
-                                y:0
-                            },
-                            {
-                                opacity:1,
-                                x:0,
-                                y:0,
-                                duration:.48,
-                                ease:'power3.out',
-                                clearProps:'transform'
-                            }
-                        );
-
-                    }
-
-
-                    /* =================================================
-                       HEADER
-                    ================================================= */
-
-                    const headerItems =
-                        page.querySelectorAll(
-                            '.bd-journal-header-reveal'
-                        );
-
-
-                    const words =
-                        splitTitle();
-
-
-                    const divider =
-                        document.getElementById(
-                            'bdJournalDivider'
-                        );
-
-
-                    gsap.fromTo(
-                        headerItems,
+                if(cover){
+                    tl.fromTo(
+                        cover,
+                        {opacity:0,x:-17},
                         {
-                            opacity:0,
-                            y:20
+                            opacity:1,
+                            x:0,
+                            duration:.4,
+                            ease:'power3.out'
                         },
+                        '-=.34'
+                    );
+                }
+
+                if(name){
+                    tl.fromTo(
+                        name,
+                        {opacity:0,x:15},
+                        {
+                            opacity:1,
+                            x:0,
+                            duration:.4,
+                            ease:'power3.out'
+                        },
+                        '-=.32'
+                    );
+                }
+
+                if(body){
+                    tl.fromTo(
+                        body.children,
+                        {opacity:0,y:10},
                         {
                             opacity:1,
                             y:0,
-                            duration:.62,
-                            stagger:.08,
-                            delay:.08,
+                            duration:.38,
+                            stagger:.05,
                             ease:'power3.out'
-                        }
+                        },
+                        '-=.20'
                     );
+                }
 
+                observer.unobserve(card);
+            });
+        },{
+            threshold:.15,
+            rootMargin:'0px 0px -5% 0px'
+        });
 
-                    if (words.length) {
+        cards.forEach(card=>observer.observe(card));
 
-                        gsap.fromTo(
-                            words,
-                            {
-                                opacity:0,
-                                y:24
-                            },
-                            {
-                                opacity:1,
-                                y:0,
-                                duration:.54,
-                                stagger:.05,
-                                delay:.13,
-                                ease:'power3.out'
-                            }
-                        );
+        if(window.matchMedia('(hover:hover) and (pointer:fine)').matches){
 
+            cards.forEach(card=>{
+                const cover=card.querySelector('.bd-journal-cover-wrap');
+
+                card.addEventListener('mouseenter',()=>{
+                    gsap.to(card,{
+                        y:-5,
+                        duration:.28,
+                        ease:'power2.out',
+                        overwrite:'auto'
+                    });
+
+                    if(cover){
+                        gsap.to(cover,{
+                            y:-3,
+                            x:2,
+                            duration:.28,
+                            ease:'power2.out',
+                            overwrite:'auto'
+                        });
                     }
+                });
 
+                card.addEventListener('mouseleave',()=>{
+                    gsap.to(card,{
+                        y:0,
+                        duration:.38,
+                        ease:'power3.out',
+                        overwrite:'auto'
+                    });
 
-                    if (divider) {
-
-                        gsap.fromTo(
-                            divider,
-                            {
-                                scaleX:0
-                            },
-                            {
-                                scaleX:1,
-                                duration:.72,
-                                delay:.25,
-                                ease:'power3.out'
-                            }
-                        );
-
+                    if(cover){
+                        gsap.to(cover,{
+                            y:0,
+                            x:0,
+                            duration:.38,
+                            ease:'power3.out',
+                            overwrite:'auto'
+                        });
                     }
-
-
-                    /* =================================================
-                       CARDS
-                    ================================================= */
-
-                    const cards = [
-                        ...page.querySelectorAll(
-                            '[data-journal-card]'
-                        )
-                    ];
-
-
-                    const observer =
-                        new IntersectionObserver(
-                            entries => {
-
-                                entries.forEach(
-                                    entry => {
-
-                                        if (!entry.isIntersecting) {
-                                            return;
-                                        }
-
-
-                                        const card =
-                                            entry.target;
-
-
-                                        if (
-                                            card.dataset.animated ===
-                                            '1'
-                                        ) {
-                                            return;
-                                        }
-
-
-                                        card.dataset.animated =
-                                            '1';
-
-
-                                        const cover =
-                                            card.querySelector(
-                                                '.bd-journal-cover-wrap'
-                                            );
-
-
-                                        const name =
-                                            card.querySelector(
-                                                '.bd-journal-name-wrap'
-                                            );
-
-
-                                        const body =
-                                            card.querySelector(
-                                                '.bd-journal-card-body'
-                                            );
-
-
-                                        const tl =
-                                            gsap.timeline();
-
-
-                                        tl.fromTo(
-                                            card,
-                                            {
-                                                opacity:0,
-                                                y:26,
-                                                scale:.975
-                                            },
-                                            {
-                                                opacity:1,
-                                                y:0,
-                                                scale:1,
-                                                duration:.55,
-                                                ease:'power3.out'
-                                            }
-                                        );
-
-
-                                        if (cover) {
-
-                                            tl.fromTo(
-                                                cover,
-                                                {
-                                                    opacity:0,
-                                                    x:-17
-                                                },
-                                                {
-                                                    opacity:1,
-                                                    x:0,
-                                                    duration:.4,
-                                                    ease:'power3.out'
-                                                },
-                                                '-=.34'
-                                            );
-
-                                        }
-
-
-                                        if (name) {
-
-                                            tl.fromTo(
-                                                name,
-                                                {
-                                                    opacity:0,
-                                                    x:15
-                                                },
-                                                {
-                                                    opacity:1,
-                                                    x:0,
-                                                    duration:.4,
-                                                    ease:'power3.out'
-                                                },
-                                                '-=.32'
-                                            );
-
-                                        }
-
-
-                                        if (body) {
-
-                                            tl.fromTo(
-                                                body.children,
-                                                {
-                                                    opacity:0,
-                                                    y:10
-                                                },
-                                                {
-                                                    opacity:1,
-                                                    y:0,
-                                                    duration:.38,
-                                                    stagger:.05,
-                                                    ease:'power3.out'
-                                                },
-                                                '-=.20'
-                                            );
-
-                                        }
-
-
-                                        observer.unobserve(
-                                            card
-                                        );
-
-                                    }
-                                );
-
-                            },
-                            {
-                                threshold:.15,
-                                rootMargin:'0px 0px -5% 0px'
-                            }
-                        );
-
-
-                    cards.forEach(
-                        card => {
-
-                            observer.observe(
-                                card
-                            );
-
-                        }
-                    );
-
-
-                    /* =================================================
-                       HOVER
-                    ================================================= */
-
-                    if (
-                        window.matchMedia(
-                            '(hover:hover) and (pointer:fine)'
-                        ).matches
-                    ) {
-
-                        cards.forEach(
-                            card => {
-
-                                const cover =
-                                    card.querySelector(
-                                        '.bd-journal-cover-wrap'
-                                    );
-
-
-                                card.addEventListener(
-                                    'mouseenter',
-                                    () => {
-
-                                        gsap.to(
-                                            card,
-                                            {
-                                                y:-5,
-                                                duration:.28,
-                                                ease:'power2.out',
-                                                overwrite:'auto'
-                                            }
-                                        );
-
-
-                                        if (cover) {
-
-                                            gsap.to(
-                                                cover,
-                                                {
-                                                    y:-3,
-                                                    x:2,
-                                                    duration:.28,
-                                                    ease:'power2.out',
-                                                    overwrite:'auto'
-                                                }
-                                            );
-
-                                        }
-
-                                    }
-                                );
-
-
-                                card.addEventListener(
-                                    'mouseleave',
-                                    () => {
-
-                                        gsap.to(
-                                            card,
-                                            {
-                                                y:0,
-                                                duration:.38,
-                                                ease:'power3.out',
-                                                overwrite:'auto'
-                                            }
-                                        );
-
-
-                                        if (cover) {
-
-                                            gsap.to(
-                                                cover,
-                                                {
-                                                    y:0,
-                                                    x:0,
-                                                    duration:.38,
-                                                    ease:'power3.out',
-                                                    overwrite:'auto'
-                                                }
-                                            );
-
-                                        }
-
-                                    }
-                                );
-
-                            }
-                        );
-
-
-                        page
-                            .querySelectorAll(
-                                '.js-journal-button'
-                            )
-                            .forEach(
-                                button => {
-
-                                    const icon =
-                                        button.querySelector(
-                                            'svg'
-                                        );
-
-
-                                    button.addEventListener(
-                                        'mouseenter',
-                                        () => {
-
-                                            gsap.to(
-                                                button,
-                                                {
-                                                    y:-2,
-                                                    duration:.2,
-                                                    ease:'power2.out'
-                                                }
-                                            );
-
-
-                                            if (icon) {
-
-                                                gsap.to(
-                                                    icon,
-                                                    {
-                                                        x:2,
-                                                        duration:.2,
-                                                        ease:'power2.out'
-                                                    }
-                                                );
-
-                                            }
-
-                                        }
-                                    );
-
-
-                                    button.addEventListener(
-                                        'mouseleave',
-                                        () => {
-
-                                            gsap.to(
-                                                button,
-                                                {
-                                                    y:0,
-                                                    duration:.25,
-                                                    ease:'power3.out'
-                                                }
-                                            );
-
-
-                                            if (icon) {
-
-                                                gsap.to(
-                                                    icon,
-                                                    {
-                                                        x:0,
-                                                        duration:.25,
-                                                        ease:'power3.out'
-                                                    }
-                                                );
-
-                                            }
-
-                                        }
-                                    );
-
-                                }
-                            );
-
+                });
+            });
+
+            page.querySelectorAll('.js-journal-button').forEach(button=>{
+                const icon=button.querySelector('svg');
+
+                button.addEventListener('mouseenter',()=>{
+                    gsap.to(button,{
+                        y:-2,
+                        duration:.2,
+                        ease:'power2.out'
+                    });
+
+                    if(icon){
+                        gsap.to(icon,{
+                            x:2,
+                            duration:.2
+                        });
                     }
+                });
 
-                },
-                50
-            );
+                button.addEventListener('mouseleave',()=>{
+                    gsap.to(button,{
+                        y:0,
+                        duration:.25,
+                        ease:'power3.out'
+                    });
 
-    };
-
-
-    if (
-        document.readyState === 'loading'
-    ) {
-
-        document.addEventListener(
-            'DOMContentLoaded',
-            initBdJournal,
-            {
-                once:true
-            }
-        );
-
-    } else {
-
-        initBdJournal();
-
-    }
-
+                    if(icon){
+                        gsap.to(icon,{
+                            x:0,
+                            duration:.25
+                        });
+                    }
+                });
+            });
+        }
+    },50);
 })();
 </script>
 

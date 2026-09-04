@@ -6,18 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Conference extends Model
 {
-    protected $table = 'conferences';
-
     protected $fillable = [
-        'title',
-        'event_date',
-        'event_time',
-        'location',
+        'name',
+        'edition',
         'description',
         'poster',
-    ];
-
-    protected $casts = [
-        'event_date' => 'date',
+        'conference_url',
+        'proceeding_url',
     ];
 }
