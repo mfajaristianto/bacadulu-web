@@ -155,8 +155,12 @@
     <div class="w-full max-w-md relative z-10">
 
         <div class="text-center mb-8 entrance">
-            <div class="logo-pulse inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 text-white text-xl font-bold shadow-lg transition-transform duration-300 hover:scale-110 hover:rotate-3">
-                BD
+            <div class="logo-pulse inline-flex items-center justify-center w-16 h-16 overflow-hidden rounded-2xl bg-white shadow-lg transition-transform duration-300 hover:scale-110 hover:rotate-3">
+                <img
+                    src="{{ asset('bacadulu-logo.jpg') }}"
+                    alt="Logo BacaDulu"
+                    class="block w-full h-full object-cover"
+                >
             </div>
             <h1 class="mt-4 text-2xl font-bold text-slate-900">Verifikasi Perangkat</h1>
             <p class="mt-2 text-sm text-slate-500">Kami mendeteksi login dari perangkat baru.</p>
