@@ -2,417 +2,1521 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#f97316">
 
-    <title>Koneksi Terputus | Baca Dulu</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#241B52"
+    >
+
+    <title>Anda Sedang Offline - BacaDulu</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
         }
+
+        :root{
+            --navy:#241B52;
+            --navy-soft:#332667;
+
+            --orange:#EF5843;
+            --orange-dark:#DE4C38;
+            --orange-soft:#FFF1ED;
+
+            --gold:#F7AA35;
+            --gold-soft:#FFF5DB;
+
+            --cream:#FFF9F5;
+
+            --ink:#1D1A27;
+            --body:#6B6674;
+            --muted:#9B96A2;
+
+            --line:#E9E6EC;
+
+            --white:#FFFFFF;
+        }
+
 
         html,
-        body {
-            min-height: 100%;
+        body{
+            width:100%;
+            min-height:100%;
         }
 
-        body {
-            min-height: 100vh;
+
+        body{
+            min-height:100vh;
+
+            overflow-x:hidden;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            padding:28px;
+
+            background:
+                radial-gradient(
+                    circle at 16% 17%,
+                    rgba(239,88,67,.08),
+                    transparent 29%
+                ),
+                radial-gradient(
+                    circle at 86% 83%,
+                    rgba(247,170,53,.10),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #FBFAFC 0%,
+                    #F8F7FA 45%,
+                    #FFF9F5 100%
+                );
+
+            color:var(--ink);
+
             font-family:
                 Inter,
-                ui-sans-serif,
-                system-ui,
                 -apple-system,
                 BlinkMacSystemFont,
                 "Segoe UI",
                 sans-serif;
 
-            background:
-                radial-gradient(
-                    circle at top right,
-                    rgba(249, 115, 22, 0.10),
-                    transparent 34%
+            -webkit-font-smoothing:antialiased;
+        }
+
+
+        button{
+            font:inherit;
+        }
+
+
+        /* =========================================================
+           BACKGROUND DECORATION
+        ========================================================= */
+
+        .offline-background{
+            position:fixed;
+            inset:0;
+            overflow:hidden;
+            pointer-events:none;
+        }
+
+
+        .offline-grid{
+            position:absolute;
+            inset:0;
+
+            opacity:.30;
+
+            background-image:
+                linear-gradient(
+                    rgba(36,27,82,.035) 1px,
+                    transparent 1px
                 ),
-                #f8fafc;
+                linear-gradient(
+                    90deg,
+                    rgba(36,27,82,.035) 1px,
+                    transparent 1px
+                );
 
-            color: #0f172a;
+            background-size:42px 42px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            padding: 24px;
+            mask-image:
+                linear-gradient(
+                    to bottom,
+                    rgba(0,0,0,.5),
+                    transparent 82%
+                );
         }
 
-        .offline-card {
-            width: min(100%, 560px);
 
-            background: #ffffff;
+        .offline-blob{
+            position:absolute;
 
-            border: 1px solid #e2e8f0;
-            border-radius: 24px;
+            border-radius:50%;
 
-            padding: 42px 36px;
+            filter:blur(2px);
+
+            opacity:.7;
+
+            animation:
+                blobFloat 9s ease-in-out infinite;
+        }
+
+
+        .offline-blob-1{
+            width:280px;
+            height:280px;
+
+            left:-105px;
+            top:-80px;
+
+            background:
+                rgba(239,88,67,.08);
+        }
+
+
+        .offline-blob-2{
+            width:350px;
+            height:350px;
+
+            right:-150px;
+            bottom:-130px;
+
+            background:
+                rgba(247,170,53,.11);
+
+            animation-delay:-2.5s;
+        }
+
+
+        .offline-blob-3{
+            width:170px;
+            height:170px;
+
+            right:13%;
+            top:12%;
+
+            background:
+                rgba(36,27,82,.045);
+
+            animation-delay:-5s;
+        }
+
+
+        /* =========================================================
+           PAGE
+        ========================================================= */
+
+        .offline-page{
+            position:relative;
+            z-index:2;
+
+            width:100%;
+            max-width:980px;
+
+            display:grid;
+
+            grid-template-columns:
+                minmax(0,1fr)
+                minmax(340px,430px);
+
+            gap:64px;
+
+            align-items:center;
+        }
+
+
+        /* =========================================================
+           LEFT
+        ========================================================= */
+
+        .offline-copy{
+            min-width:0;
+
+            animation:
+                contentEntrance .72s
+                cubic-bezier(.22,1,.36,1)
+                both;
+        }
+
+
+        .offline-brand{
+            display:flex;
+            align-items:center;
+
+            gap:11px;
+
+            margin-bottom:42px;
+        }
+
+
+        .offline-brand-mark{
+            width:7px;
+            height:27px;
+
+            flex:0 0 7px;
+
+            background:
+                var(--orange);
+
+            animation:
+                markReveal .7s
+                cubic-bezier(.22,1,.36,1)
+                both;
+        }
+
+
+        .offline-brand-name{
+            color:var(--navy);
+
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size:21px;
+            font-weight:700;
+
+            line-height:1;
+        }
+
+
+        .offline-brand-type{
+            color:var(--muted);
+
+            font-size:10px;
+            font-weight:700;
+
+            letter-spacing:.12em;
+
+            text-transform:uppercase;
+        }
+
+
+        .offline-code{
+            display:inline-flex;
+            align-items:center;
+
+            gap:8px;
+
+            margin-bottom:16px;
+
+            color:var(--orange);
+
+            font-size:10px;
+            font-weight:800;
+
+            letter-spacing:.16em;
+
+            text-transform:uppercase;
+        }
+
+
+        .offline-code-dot{
+            width:6px;
+            height:6px;
+
+            border-radius:50%;
+
+            background:var(--orange);
 
             box-shadow:
-                0 24px 60px rgba(15, 23, 42, 0.08);
+                0 0 0 5px
+                rgba(239,88,67,.10);
+
+            animation:
+                statusPulse 1.8s
+                ease-in-out
+                infinite;
         }
 
-        .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
 
-            margin-bottom: 34px;
+        .offline-title{
+            max-width:600px;
 
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
+            color:var(--navy);
+
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size:
+                clamp(43px,6vw,70px);
+
+            font-weight:700;
+
+            line-height:.99;
+
+            letter-spacing:-.045em;
         }
 
-        .brand-dot {
-            width: 12px;
-            height: 12px;
 
-            border-radius: 999px;
+        .offline-description{
+            max-width:560px;
 
-            background: #f97316;
+            margin-top:23px;
+
+            color:var(--body);
+
+            font-size:15px;
+
+            line-height:1.8;
+        }
+
+
+        .offline-meta{
+            display:flex;
+            align-items:center;
+
+            gap:8px;
+
+            margin-top:24px;
+
+            color:var(--muted);
+
+            font-size:11px;
+            font-weight:700;
+        }
+
+
+        .offline-meta-indicator{
+            width:7px;
+            height:7px;
+
+            border-radius:50%;
+
+            background:var(--orange);
+        }
+
+
+        /* =========================================================
+           CARD
+        ========================================================= */
+
+        .offline-card{
+            position:relative;
+
+            overflow:hidden;
+
+            padding:32px;
+
+            border:
+                1px solid
+                rgba(36,27,82,.08);
+
+            border-radius:26px;
+
+            background:
+                rgba(255,255,255,.94);
 
             box-shadow:
-                0 0 0 6px rgba(249, 115, 22, 0.12);
+                0 28px 80px
+                rgba(36,27,82,.12);
+
+            animation:
+                cardEntrance .82s
+                .08s
+                cubic-bezier(.22,1,.36,1)
+                both;
         }
 
-        .icon-wrapper {
-            width: 72px;
-            height: 72px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .offline-card::before{
+            content:"";
 
-            margin-bottom: 28px;
+            position:absolute;
 
-            border-radius: 22px;
+            right:-55px;
+            top:-65px;
 
-            background: #fff7ed;
-            color: #ea580c;
+            width:155px;
+            height:155px;
+
+            border:
+                1px solid
+                rgba(239,88,67,.09);
+
+            border-radius:50%;
         }
 
-        .icon-wrapper svg {
-            width: 36px;
-            height: 36px;
+
+        .offline-card::after{
+            content:"";
+
+            position:absolute;
+
+            right:-15px;
+            top:-25px;
+
+            width:90px;
+            height:90px;
+
+            border:
+                1px solid
+                rgba(247,170,53,.12);
+
+            border-radius:50%;
         }
 
-        h1 {
-            font-size: clamp(28px, 5vw, 38px);
-            line-height: 1.15;
 
-            margin-bottom: 16px;
+        /* =========================================================
+           SIGNAL ANIMATION
+        ========================================================= */
 
-            letter-spacing: -0.03em;
+        .offline-visual{
+            position:relative;
+
+            width:144px;
+            height:144px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            margin:
+                4px auto 28px;
         }
 
-        .description {
-            color: #64748b;
 
-            font-size: 16px;
-            line-height: 1.75;
+        .offline-ring{
+            position:absolute;
 
-            margin-bottom: 30px;
+            inset:0;
+
+            border:
+                1px solid
+                rgba(239,88,67,.15);
+
+            border-radius:50%;
+
+            animation:
+                offlineRing 2.4s
+                ease-out
+                infinite;
         }
 
-        .status-box {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
 
-            padding: 16px;
+        .offline-ring-2{
+            inset:15px;
 
-            margin-bottom: 26px;
-
-            border-radius: 16px;
-
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-
-            color: #475569;
-
-            font-size: 14px;
-            line-height: 1.6;
+            animation-delay:.55s;
         }
 
-        .status-indicator {
-            flex: 0 0 auto;
 
-            width: 9px;
-            height: 9px;
+        .offline-ring-3{
+            inset:29px;
 
-            margin-top: 6px;
-
-            border-radius: 999px;
-
-            background: #ef4444;
+            animation-delay:1.1s;
         }
 
-        .actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+
+        .offline-icon{
+            position:relative;
+            z-index:3;
+
+            width:72px;
+            height:72px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            border-radius:22px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--orange),
+                    #F66B55
+                );
+
+            color:#fff;
+
+            box-shadow:
+                0 15px 35px
+                rgba(239,88,67,.27);
+
+            animation:
+                iconFloat 3s
+                ease-in-out
+                infinite;
         }
 
-        button {
-            appearance: none;
-            border: 0;
 
-            min-height: 48px;
+        .offline-icon svg{
+            width:34px;
+            height:34px;
 
-            padding: 0 22px;
+            fill:none;
+            stroke:currentColor;
 
-            border-radius: 14px;
+            stroke-width:1.8;
 
-            font: inherit;
-            font-size: 14px;
-            font-weight: 700;
+            stroke-linecap:round;
+            stroke-linejoin:round;
+        }
 
-            cursor: pointer;
+
+        .offline-icon-slash{
+            position:absolute;
+
+            width:42px;
+            height:3px;
+
+            border-radius:99px;
+
+            background:#fff;
+
+            transform:
+                rotate(-45deg);
+
+            box-shadow:
+                0 0 0 2px
+                rgba(239,88,67,.35);
+        }
+
+
+        /* =========================================================
+           CARD CONTENT
+        ========================================================= */
+
+        .offline-card-title{
+            position:relative;
+            z-index:2;
+
+            margin:0;
+
+            color:var(--navy);
+
+            text-align:center;
+
+            font-size:20px;
+            font-weight:800;
+        }
+
+
+        .offline-card-description{
+            position:relative;
+            z-index:2;
+
+            margin:
+                9px auto 0;
+
+            max-width:320px;
+
+            color:var(--body);
+
+            text-align:center;
+
+            font-size:12px;
+
+            line-height:1.7;
+        }
+
+
+        /* =========================================================
+           STATUS
+        ========================================================= */
+
+        .offline-status{
+            position:relative;
+            z-index:2;
+
+            display:flex;
+            align-items:center;
+
+            gap:10px;
+
+            min-height:49px;
+
+            margin-top:24px;
+
+            padding:
+                0 14px;
+
+            border:
+                1px solid
+                #EEE9F0;
+
+            border-radius:12px;
+
+            background:#FAF9FB;
+        }
+
+
+        .offline-status-icon{
+            position:relative;
+
+            width:10px;
+            height:10px;
+
+            flex:0 0 10px;
+
+            border-radius:50%;
+
+            background:var(--orange);
+        }
+
+
+        .offline-status-icon::after{
+            content:"";
+
+            position:absolute;
+
+            inset:-4px;
+
+            border:
+                1px solid
+                rgba(239,88,67,.20);
+
+            border-radius:50%;
+
+            animation:
+                miniPulse 1.8s
+                ease-out
+                infinite;
+        }
+
+
+        .offline-status-text{
+            min-width:0;
+
+            color:#6E6876;
+
+            font-size:11px;
+            font-weight:700;
+        }
+
+
+        .offline-status.is-checking
+        .offline-status-icon{
+            background:var(--gold);
+
+            animation:
+                checkingPulse .65s
+                ease-in-out
+                infinite alternate;
+        }
+
+
+        .offline-status.is-online{
+            border-color:#D9EDDF;
+
+            background:#F5FBF6;
+        }
+
+
+        .offline-status.is-online
+        .offline-status-icon{
+            background:#31A764;
+        }
+
+
+        .offline-status.is-online
+        .offline-status-text{
+            color:#2F8050;
+        }
+
+
+        .offline-status.is-offline{
+            border-color:#F2E0DD;
+
+            background:#FFF8F6;
+        }
+
+
+        /* =========================================================
+           BUTTON
+        ========================================================= */
+
+        .offline-button{
+            position:relative;
+            z-index:2;
+
+            width:100%;
+            min-height:49px;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            gap:9px;
+
+            margin-top:12px;
+
+            border:0;
+
+            border-radius:12px;
+
+            background:
+                var(--navy);
+
+            color:#fff;
+
+            cursor:pointer;
+
+            font-size:12px;
+            font-weight:800;
+
+            box-shadow:
+                0 10px 24px
+                rgba(36,27,82,.18);
 
             transition:
-                transform 0.15s ease,
-                background 0.15s ease,
-                box-shadow 0.15s ease;
+                transform .22s ease,
+                background .22s ease,
+                box-shadow .22s ease;
         }
 
-        .retry-button {
-            background: #f97316;
-            color: #ffffff;
+
+        .offline-button:hover{
+            transform:
+                translateY(-2px);
+
+            background:
+                var(--navy-soft);
 
             box-shadow:
-                0 10px 24px rgba(249, 115, 22, 0.22);
+                0 15px 30px
+                rgba(36,27,82,.22);
         }
 
-        .retry-button:hover {
-            background: #ea580c;
-            transform: translateY(-1px);
+
+        .offline-button:active{
+            transform:
+                translateY(0)
+                scale(.985);
         }
 
-        .retry-button:active {
-            transform: translateY(0);
+
+        .offline-button:disabled{
+            cursor:wait;
         }
 
-        .connection-text {
-            margin-top: 24px;
 
-            color: #94a3b8;
+        .offline-button svg{
+            width:15px;
+            height:15px;
 
-            font-size: 13px;
-            line-height: 1.6;
+            fill:none;
+            stroke:currentColor;
+
+            stroke-width:2;
+
+            stroke-linecap:round;
+            stroke-linejoin:round;
         }
 
-        @media (max-width: 600px) {
-            body {
-                padding: 16px;
+
+        .offline-button.is-checking svg{
+            animation:
+                retrySpin .8s
+                linear
+                infinite;
+        }
+
+
+        /* =========================================================
+           FOOT
+        ========================================================= */
+
+        .offline-foot{
+            position:relative;
+            z-index:2;
+
+            margin-top:17px;
+
+            color:#AAA5AE;
+
+            text-align:center;
+
+            font-size:9px;
+
+            line-height:1.6;
+        }
+
+
+        /* =========================================================
+           ANIMATIONS
+        ========================================================= */
+
+        @keyframes contentEntrance{
+            from{
+                opacity:0;
+                transform:
+                    translateY(22px);
             }
 
-            .offline-card {
-                padding: 32px 24px;
-                border-radius: 20px;
-            }
-
-            .brand {
-                margin-bottom: 28px;
-            }
-
-            .icon-wrapper {
-                width: 64px;
-                height: 64px;
-
-                border-radius: 18px;
-            }
-
-            .actions,
-            button {
-                width: 100%;
+            to{
+                opacity:1;
+                transform:
+                    translateY(0);
             }
         }
 
-        @media (prefers-reduced-motion: reduce) {
+
+        @keyframes cardEntrance{
+            from{
+                opacity:0;
+
+                transform:
+                    translateY(30px)
+                    scale(.965);
+            }
+
+            to{
+                opacity:1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+        }
+
+
+        @keyframes markReveal{
+            from{
+                opacity:0;
+                transform:
+                    scaleY(0);
+
+                transform-origin:
+                    bottom;
+            }
+
+            to{
+                opacity:1;
+                transform:
+                    scaleY(1);
+
+                transform-origin:
+                    bottom;
+            }
+        }
+
+
+        @keyframes blobFloat{
+            0%,
+            100%{
+                transform:
+                    translate3d(0,0,0)
+                    scale(1);
+            }
+
+            50%{
+                transform:
+                    translate3d(12px,-15px,0)
+                    scale(1.04);
+            }
+        }
+
+
+        @keyframes statusPulse{
+            0%,
+            100%{
+                transform:scale(1);
+                opacity:1;
+            }
+
+            50%{
+                transform:scale(.78);
+                opacity:.55;
+            }
+        }
+
+
+        @keyframes iconFloat{
+            0%,
+            100%{
+                transform:
+                    translateY(0)
+                    rotate(0deg);
+            }
+
+            50%{
+                transform:
+                    translateY(-7px)
+                    rotate(-1deg);
+            }
+        }
+
+
+        @keyframes offlineRing{
+            0%{
+                transform:scale(.7);
+                opacity:0;
+            }
+
+            30%{
+                opacity:1;
+            }
+
+            100%{
+                transform:scale(1.12);
+                opacity:0;
+            }
+        }
+
+
+        @keyframes miniPulse{
+            0%{
+                transform:scale(.8);
+                opacity:1;
+            }
+
+            100%{
+                transform:scale(1.7);
+                opacity:0;
+            }
+        }
+
+
+        @keyframes checkingPulse{
+            from{
+                transform:scale(.75);
+            }
+
+            to{
+                transform:scale(1.12);
+            }
+        }
+
+
+        @keyframes retrySpin{
+            to{
+                transform:rotate(360deg);
+            }
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media(max-width:860px){
+
+            body{
+                align-items:flex-start;
+
+                padding:
+                    35px 20px;
+            }
+
+
+            .offline-page{
+                max-width:580px;
+
+                grid-template-columns:1fr;
+
+                gap:34px;
+            }
+
+
+            .offline-copy{
+                text-align:center;
+            }
+
+
+            .offline-brand{
+                justify-content:center;
+
+                margin-bottom:30px;
+            }
+
+
+            .offline-code{
+                justify-content:center;
+            }
+
+
+            .offline-title{
+                margin:auto;
+            }
+
+
+            .offline-description{
+                margin:
+                    20px auto 0;
+            }
+
+
+            .offline-meta{
+                justify-content:center;
+            }
+
+
+            .offline-card{
+                max-width:430px;
+
+                width:100%;
+
+                margin:auto;
+            }
+        }
+
+
+        @media(max-width:520px){
+
+            body{
+                padding:
+                    24px 15px;
+            }
+
+
+            .offline-brand{
+                margin-bottom:25px;
+            }
+
+
+            .offline-title{
+                font-size:43px;
+            }
+
+
+            .offline-description{
+                font-size:13px;
+            }
+
+
+            .offline-card{
+                padding:
+                    27px 21px;
+
+                border-radius:22px;
+            }
+
+
+            .offline-visual{
+                width:125px;
+                height:125px;
+
+                margin-bottom:23px;
+            }
+
+
+            .offline-icon{
+                width:65px;
+                height:65px;
+            }
+
+
+            .offline-icon svg{
+                width:31px;
+                height:31px;
+            }
+        }
+
+
+        /* =========================================================
+           REDUCED MOTION
+        ========================================================= */
+
+        @media(prefers-reduced-motion:reduce){
+
             *,
             *::before,
-            *::after {
-                scroll-behavior: auto !important;
-                transition: none !important;
-                animation: none !important;
+            *::after{
+                scroll-behavior:auto!important;
+
+                animation-duration:.01ms!important;
+                animation-iteration-count:1!important;
+
+                transition-duration:.01ms!important;
             }
         }
     </style>
 </head>
 
+
 <body>
-    <main class="offline-card">
-        <div class="brand">
-            <span class="brand-dot"></span>
-            <span>Baca Dulu</span>
-        </div>
 
-        <div class="icon-wrapper" aria-hidden="true">
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
-                <path d="M5 12.55a11 11 0 0 1 14.08-.02"/>
-                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-                <path d="M12 20h.01"/>
-                <path d="m3 3 18 18"/>
-            </svg>
-        </div>
+    {{-- BACKGROUND --}}
+    <div class="offline-background" aria-hidden="true">
 
-        <h1>Koneksi internet terputus</h1>
+        <div class="offline-grid"></div>
 
-        <p class="description">
-            Perangkat Anda belum dapat terhubung ke Baca Dulu.
-            Periksa koneksi internet lalu coba kembali.
-        </p>
+        <span class="offline-blob offline-blob-1"></span>
 
-        <div class="status-box">
-            <span class="status-indicator"></span>
+        <span class="offline-blob offline-blob-2"></span>
 
-            <div>
-                Halaman yang Anda buka belum dapat dimuat.
-                Data yang tersedia di server tidak mengalami perubahan
-                karena koneksi terputus sebelum permintaan dapat diproses.
+        <span class="offline-blob offline-blob-3"></span>
+
+    </div>
+
+
+    <main class="offline-page">
+
+        {{-- =====================================================
+             COPY
+        ====================================================== --}}
+
+        <section class="offline-copy">
+
+            <div class="offline-brand">
+
+                <span class="offline-brand-mark"></span>
+
+                <span class="offline-brand-name">
+                    BacaDulu
+                </span>
+
+                <span class="offline-brand-type">
+                    Network
+                </span>
+
             </div>
-        </div>
 
-        <div class="actions">
-            <button
-                class="retry-button"
-                type="button"
-                onclick="retryConnection()"
+
+            <div class="offline-code">
+
+                <span class="offline-code-dot"></span>
+
+                Connection interrupted
+
+            </div>
+
+
+            <h1 class="offline-title">
+                Ups, koneksi Anda terputus.
+            </h1>
+
+
+            <p class="offline-description">
+                Halaman BacaDulu belum dapat dimuat karena perangkat sedang tidak terhubung ke internet. Periksa jaringan Anda lalu coba kembali.
+            </p>
+
+
+            <div class="offline-meta">
+
+                <span class="offline-meta-indicator"></span>
+
+                Tidak ada koneksi internet
+
+            </div>
+
+        </section>
+
+
+        {{-- =====================================================
+             CARD
+        ====================================================== --}}
+
+        <section class="offline-card">
+
+            <div class="offline-visual" aria-hidden="true">
+
+                <span class="offline-ring"></span>
+
+                <span class="offline-ring offline-ring-2"></span>
+
+                <span class="offline-ring offline-ring-3"></span>
+
+
+                <div class="offline-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path
+                            d="M5 12.55a11 11 0 0 1 14.08 0"
+                        ></path>
+
+                        <path
+                            d="M8.53 16.11a6 6 0 0 1 6.95 0"
+                        ></path>
+
+                        <path
+                            d="M12 20h.01"
+                        ></path>
+
+                    </svg>
+
+
+                    <span class="offline-icon-slash"></span>
+
+                </div>
+
+            </div>
+
+
+            <h2 class="offline-card-title">
+                BacaDulu sedang menunggu jaringan
+            </h2>
+
+
+            <p class="offline-card-description">
+                Setelah koneksi kembali tersedia, tekan tombol di bawah untuk melanjutkan ke halaman sebelumnya.
+            </p>
+
+
+            <div
+                class="offline-status is-offline"
+                id="connectionStatus"
             >
-                Coba Lagi
-            </button>
-        </div>
 
-        <p class="connection-text" id="connection-status">
-            Menunggu koneksi internet kembali tersedia.
-        </p>
+                <span class="offline-status-icon"></span>
+
+                <span
+                    class="offline-status-text"
+                    id="connectionStatusText"
+                >
+                    Perangkat sedang offline
+                </span>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="offline-button"
+                id="retryButton"
+            >
+
+                <svg viewBox="0 0 24 24">
+
+                    <path
+                        d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"
+                    ></path>
+
+                    <path
+                        d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"
+                    ></path>
+
+                </svg>
+
+                <span id="retryButtonText">
+                    Coba Lagi
+                </span>
+
+            </button>
+
+
+            <p class="offline-foot">
+                Data yang sudah tersimpan tidak hilang. BacaDulu akan melanjutkan saat jaringan kembali tersedia.
+            </p>
+
+        </section>
+
     </main>
 
-  <script>
-    const connectionStatus =
-        document.getElementById('connection-status');
 
-    const retryButton =
-        document.querySelector('.retry-button');
+    <script>
+        (() => {
 
-    let checkingConnection = false;
-
-    function sleep(ms) {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, ms);
-        });
-    }
-
-    function getRetryUrl() {
-        /*
-         * Kalau offline.html dibuka secara manual,
-         * setelah koneksi tersedia arahkan ke homepage.
-         */
-        if (
-            window.location.pathname === '/offline.html'
-            ||
-            window.location.pathname.startsWith('/offline.html/')
-        ) {
-            return '/';
-        }
-
-        /*
-         * Kalau offline.html sedang dipakai service worker
-         * sebagai fallback /information, /articles, dll,
-         * pertahankan URL aslinya.
-         */
-        return window.location.pathname +
-            window.location.search +
-            window.location.hash;
-    }
-
-    async function retryConnection() {
-        if (checkingConnection) {
-            return;
-        }
-
-        checkingConnection = true;
-
-        retryButton.disabled = true;
-        retryButton.textContent = 'Memeriksa...';
-
-        connectionStatus.textContent =
-            'Sedang memeriksa koneksi ke Baca Dulu...';
-
-        const retryUrl = getRetryUrl();
-
-        try {
-            /*
-             * Jalankan pengecekan server.
-             *
-             * Promise.all + sleep membuat tulisan
-             * "Memeriksa..." terlihat minimal 700ms,
-             * meskipun browser langsung tahu sedang offline.
-             */
-            const results = await Promise.all([
-                fetch(retryUrl, {
-                    method: 'HEAD',
-                    cache: 'no-store',
-                    credentials: 'same-origin'
-                }),
-                sleep(1800)
-            ]);
-
-            const response = results[0];
-
-            if (!response.ok) {
-                throw new Error(
-                    'Baca Dulu belum dapat dihubungi.'
+            const button =
+                document.getElementById(
+                    'retryButton'
                 );
+
+            const buttonText =
+                document.getElementById(
+                    'retryButtonText'
+                );
+
+            const status =
+                document.getElementById(
+                    'connectionStatus'
+                );
+
+            const statusText =
+                document.getElementById(
+                    'connectionStatusText'
+                );
+
+
+            if (
+                !button ||
+                !buttonText ||
+                !status ||
+                !statusText
+            ) {
+                return;
             }
 
-            connectionStatus.textContent =
-                'Koneksi kembali tersedia. Memuat halaman...';
 
-            retryButton.textContent = 'Terhubung';
+            let checking = false;
 
-            await sleep(600);
 
-            window.location.replace(retryUrl);
-        } catch (error) {
-            /*
-             * Tetap beri sedikit waktu supaya perubahan
-             * tombol tidak terlihat seperti kedipan.
-             */
-            await sleep(300);
+            const setOffline = () => {
 
-            connectionStatus.textContent =
-                'Koneksi masih terputus. Periksa internet Anda lalu coba kembali.';
+                status.classList.remove(
+                    'is-online',
+                    'is-checking'
+                );
 
-            retryButton.disabled = false;
-            retryButton.textContent = 'Coba Lagi';
+                status.classList.add(
+                    'is-offline'
+                );
 
-            checkingConnection = false;
-        }
-    }
+                statusText.textContent =
+                    'Perangkat sedang offline';
 
-    connectionStatus.textContent =
-        'Menunggu koneksi internet kembali tersedia.';
-</script>
+            };
+
+
+            const setOnline = () => {
+
+                status.classList.remove(
+                    'is-offline',
+                    'is-checking'
+                );
+
+                status.classList.add(
+                    'is-online'
+                );
+
+                statusText.textContent =
+                    'Koneksi kembali tersedia';
+
+            };
+
+
+            const setChecking = () => {
+
+                status.classList.remove(
+                    'is-offline',
+                    'is-online'
+                );
+
+                status.classList.add(
+                    'is-checking'
+                );
+
+                statusText.textContent =
+                    'Memeriksa koneksi...';
+
+            };
+
+
+            const updateNetworkState = () => {
+
+                if (navigator.onLine) {
+
+                    setOnline();
+
+                    return true;
+
+                }
+
+                setOffline();
+
+                return false;
+
+            };
+
+
+            button.addEventListener(
+                'click',
+                () => {
+
+                    if (checking) {
+                        return;
+                    }
+
+
+                    checking = true;
+
+                    button.disabled = true;
+
+                    button.classList.add(
+                        'is-checking'
+                    );
+
+                    buttonText.textContent =
+                        'Memeriksa...';
+
+                    setChecking();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | STATUS DIBIARKAN TERLIHAT
+                    |--------------------------------------------------------------------------
+                    |
+                    | Tidak langsung reload supaya admin/user sempat melihat
+                    | status "Memeriksa...".
+                    |
+                    */
+
+                    setTimeout(
+                        () => {
+
+                            if (
+                                navigator.onLine
+                            ) {
+
+                                setOnline();
+
+                                buttonText.textContent =
+                                    'Terhubung';
+
+
+                                setTimeout(
+                                    () => {
+
+                                        window.location.reload();
+
+                                    },
+                                    650
+                                );
+
+                                return;
+                            }
+
+
+                            setOffline();
+
+                            buttonText.textContent =
+                                'Coba Lagi';
+
+                            button.classList.remove(
+                                'is-checking'
+                            );
+
+                            button.disabled = false;
+
+                            checking = false;
+
+                        },
+                        1600
+                    );
+
+                }
+            );
+
+
+            window.addEventListener(
+                'online',
+                () => {
+
+                    setOnline();
+
+                    if (!checking) {
+
+                        buttonText.textContent =
+                            'Muat Ulang';
+
+                    }
+
+                }
+            );
+
+
+            window.addEventListener(
+                'offline',
+                () => {
+
+                    setOffline();
+
+                    buttonText.textContent =
+                        'Coba Lagi';
+
+                    button.classList.remove(
+                        'is-checking'
+                    );
+
+                    button.disabled = false;
+
+                    checking = false;
+
+                }
+            );
+
+
+            updateNetworkState();
+
+        })();
+    </script>
 
 </body>
 </html>

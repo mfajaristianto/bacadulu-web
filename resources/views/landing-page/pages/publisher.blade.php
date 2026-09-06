@@ -1430,14 +1430,16 @@
     .bd-process-step-copy p{font-size:10px}
 
     .bd-publisher-grid{
-        grid-template-columns:1fr;
-        justify-items:start;
-        gap:28px;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        justify-content:stretch;
+        justify-items:stretch;
+        column-gap:12px;
+        row-gap:24px;
     }
 
     .bd-publisher-card{
-        width:min(70vw,205px);
-        max-width:205px;
+        width:100%;
+        max-width:none;
     }
 
     .bd-publisher-card-title{
