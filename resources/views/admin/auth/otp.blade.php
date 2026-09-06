@@ -147,7 +147,7 @@
     </style>
 </head>
 
-<body class="min-h-screen bg-slate-100 flex items-center justify-center px-4 relative overflow-hidden">
+<body class="min-h-screen bg-slate-100 flex items-center justify-center px-4 relative overflow-x-hidden overflow-y-auto">
 
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -157,7 +157,7 @@
         <div class="text-center mb-8 entrance">
             <div class="logo-pulse inline-flex items-center justify-center w-16 h-16 overflow-hidden rounded-2xl bg-white shadow-lg transition-transform duration-300 hover:scale-110 hover:rotate-3">
                 <img
-                    src="{{ asset('bacadulu-logo.jpg') }}"
+                    src="{{ asset('img/bacadulu-logo.jpg') }}"
                     alt="Logo BacaDulu"
                     class="block w-full h-full object-cover"
                 >
