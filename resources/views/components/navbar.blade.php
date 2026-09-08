@@ -178,7 +178,7 @@
                             {{ $isBloggingArea ? 'is-active' : '' }}
                         "
                     >
-                        Blogging
+                        Bloging
                     </a>
 
                 </div>
