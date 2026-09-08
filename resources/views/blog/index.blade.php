@@ -25,7 +25,7 @@
     </div>
 
     <h1 class="text-2xl font-extrabold text-slate-900">
-        Blogging
+        Bloging
     </h1>
 
     <p class="text-sm text-slate-500 mt-1">
