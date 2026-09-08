@@ -1086,47 +1086,7 @@
 
 
 
-                {{-- =================================================
-                     PUBLISHER
-                ================================================== --}}
-
-                <a
-                    href="{{ route('admin.publishers.index') }}"
-                    class="cms-nav-link {{ request()->routeIs('admin.publishers.*') ? 'active' : '' }}"
-                >
-
-                    <span class="nav-icon">
-
-                        <svg
-                            class="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                        >
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 19V5a2 2 0 012-2h12a2 2 0 012 2v14"
-                            />
-
-                            <path
-                                stroke-linecap="round"
-                                d="M4 19c0-1.1.9-2 2-2h14M8 7h8M8 11h6"
-                            />
-
-                        </svg>
-
-                    </span>
-
-
-                    <span class="flex-1">
-                        Publisher
-                    </span>
-
-                </a>
-
+               
 
 
                 {{-- ===============================

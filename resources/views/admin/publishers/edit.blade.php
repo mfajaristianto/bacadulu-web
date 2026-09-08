@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+{{-- @extends('layouts.admin')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -24,4 +24,4 @@
         </div>
     </form>
 </div>
-@endsection
+@endsection --}}
