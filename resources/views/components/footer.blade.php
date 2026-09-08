@@ -96,40 +96,75 @@
                     <h5>Ikuti Kami</h5>
 
                     <div class="bd-footer-socials">
+
+                        {{-- YOUTUBE --}}
                         <a
                             href="https://www.youtube.com/@Bacaduluofficial"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="YouTube Baca Dulu"
                         >
-                            <svg class="bd-social-icon bd-social-icon--fill" viewBox="0 0 24 24" aria-hidden="true">
+                            <svg
+                                class="bd-social-icon bd-social-icon--fill"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
                                 <path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.507a3.003 3.003 0 00-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 002.11 2.11c1.871.507 9.387.507 9.387.507s7.517 0 9.387-.507a3.003 3.003 0 002.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                             </svg>
                         </a>
 
+                        {{-- INSTAGRAM --}}
                         <a
                             href="https://www.instagram.com/bacaduluofficial/"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Instagram Baca Dulu"
                         >
-                            <svg class="bd-social-icon bd-social-icon--instagram" viewBox="0 0 24 24" aria-hidden="true">
-                                <rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/>
-                                <circle cx="12" cy="12" r="4.25"/>
-                                <circle class="bd-social-instagram-dot" cx="17.6" cy="6.45" r="1.15"/>
+                            <svg
+                                class="bd-social-icon bd-social-icon--instagram"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <rect
+                                    x="2.5"
+                                    y="2.5"
+                                    width="19"
+                                    height="19"
+                                    rx="5.5"
+                                />
+
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="4.25"
+                                />
+
+                                <circle
+                                    class="bd-social-instagram-dot"
+                                    cx="17.6"
+                                    cy="6.45"
+                                    r="1.15"
+                                />
                             </svg>
                         </a>
 
+                        {{-- LINKEDIN --}}
                         <a
-                            href="https://www.tiktok.com/@mpl.id.official"
+                            href="https://www.linkedin.com/in/bacadulu?originalSubdomain=id"
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="TikTok"
+                            aria-label="LinkedIn Baca Dulu"
+                            title="LinkedIn Baca Dulu"
                         >
-                            <svg class="bd-social-icon bd-social-icon--fill" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 11-2.88-2.89h.54V9.66h-.54a6.33 6.33 0 106.33 6.33V8.89a8.16 8.16 0 004.25 1.15V6.69z"/>
+                            <svg
+                                class="bd-social-icon bd-social-icon--fill"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.047c.476-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 110-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452z"/>
                             </svg>
                         </a>
+
                     </div>
                 </div>
             </div>

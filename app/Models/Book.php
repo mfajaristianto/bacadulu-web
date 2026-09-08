@@ -47,6 +47,8 @@ class Book extends Model
 
         'print_stock',
 
+        'print_isbn',
+
         'print_discount_percent',
 
         'print_discounted_price',
@@ -63,6 +65,8 @@ class Book extends Model
         'has_ebook',
 
         'ebook_price',
+
+        'ebook_isbn',
 
         'ebook_discount_percent',
 

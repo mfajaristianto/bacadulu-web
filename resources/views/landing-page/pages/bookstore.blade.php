@@ -5,6 +5,45 @@
 
 @section('content')
 
+@php
+    /*
+    |--------------------------------------------------------------------------
+    | IKAPI
+    |--------------------------------------------------------------------------
+    | Isi nomor anggota di sini setelah nomor resmi diterima.
+    | Contoh:
+    | $ikapiMemberNumber = '12345/IKAPI/2026';
+    */
+    $ikapiMemberNumber = null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dokumen IKAPI
+    |--------------------------------------------------------------------------
+    | Dokumen pertama menggunakan:
+    | public/img/serti_ikapi.jpeg
+    |
+    | Slot dokumen kedua sudah disiapkan:
+    | public/img/serti_ikapi_2.jpeg
+    |
+    | Dokumen hanya akan tampil jika filenya benar-benar ada.
+    */
+    $ikapiDocuments = collect([
+        [
+            'title' => 'Sertifikat IKAPI',
+            'description' => 'Sertifikat keanggotaan Baca Dulu Publisher pada Ikatan Penerbit Indonesia.',
+            'image' => 'img/serti_ikapi.jpeg',
+        ],
+        [
+            'title' => 'Dokumen IKAPI',
+            'description' => 'Dokumen pendukung keanggotaan Baca Dulu Publisher.',
+            'image' => 'img/serti_ikapi_2.jpeg',
+        ],
+    ])->filter(
+        fn ($document) => file_exists(public_path($document['image']))
+    )->values();
+@endphp
+
 <style>
 
 /* =========================================================
@@ -855,86 +894,636 @@
     line-height:1.5;
 }
 
-.ikapi-bottom{
+/* =========================================================
+   IKAPI MEMBER NUMBER
+========================================================= */
+
+.ikapi-member-number{
     position:relative;
     z-index:3;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
+    gap:14px;
 
-    gap:15px;
+    margin-top:15px;
+    padding:11px 12px;
 
-    margin-top:22px;
-    padding-top:15px;
+    border:1px solid rgba(19,64,116,.11);
+    border-radius:12px;
 
-    border-top:
-        1px solid
-        rgba(19,64,116,.11);
+    background:rgba(255,255,255,.68);
 }
 
-.ikapi-publisher{
+.ikapi-member-number-copy{
     min-width:0;
 }
 
-.ikapi-publisher strong{
+.ikapi-member-number-label{
     display:block;
 
-    margin-bottom:2px;
+    margin-bottom:3px;
+
+    color:#7C90A4;
+
+    font-size:7px;
+    font-weight:800;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+}
+
+.ikapi-member-number strong{
+    display:block;
 
     color:var(--ikapi-deep);
 
     font-size:10px;
     font-weight:800;
+
+    overflow-wrap:anywhere;
 }
 
-.ikapi-publisher span{
+.ikapi-member-number.is-pending strong{
+    color:#8193A4;
+    font-size:8.5px;
+    font-weight:700;
+}
+
+.ikapi-member-number-icon{
+    width:30px;
+    height:30px;
+
+    display:grid;
+    place-items:center;
+
+    flex:0 0 30px;
+
+    border-radius:9px;
+
+    color:var(--ikapi-blue);
+    background:rgba(220,234,247,.72);
+}
+
+.ikapi-member-number-icon svg{
+    width:14px;
+    height:14px;
+
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+
+/* =========================================================
+   IKAPI DOCUMENTS
+========================================================= */
+
+.ikapi-documents{
+    position:relative;
+    z-index:3;
+
+    margin-top:18px;
+    padding-top:16px;
+
+    border-top:1px solid rgba(19,64,116,.11);
+}
+
+.ikapi-documents-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+
+    margin-bottom:11px;
+}
+
+.ikapi-documents-head strong{
+    display:block;
+    color:var(--ikapi-deep);
+    font-size:10.5px;
+    font-weight:800;
+}
+
+.ikapi-documents-head span{
+    color:#8DA0B2;
+    font-size:7.5px;
+    font-weight:600;
+}
+
+.ikapi-document-grid{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+
+    width:100%;
+    margin-inline:auto;
+}
+
+.ikapi-document-card{
+    display:grid;
+    grid-template-columns:78px minmax(0,1fr);
+    align-items:center;
+    gap:12px;
+
+    flex:1 1 195px;
+    width:100%;
+    max-width:320px;
+    min-width:0;
+
+    padding:11px;
+
+    border:1px solid rgba(19,64,116,.12);
+    border-radius:13px;
+
+    color:inherit!important;
+    background:rgba(255,255,255,.82);
+
+    font:inherit;
+    text-align:left;
+    cursor:pointer;
+
+    box-shadow:0 5px 16px rgba(11,37,69,.045);
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        background .25s ease,
+        box-shadow .25s ease;
+}
+
+.ikapi-document-thumb{
+    position:relative;
+
+    width:78px;
+    height:98px;
+
+    overflow:hidden;
+
+    border:1px solid rgba(19,64,116,.12);
+    border-radius:8px;
+
+    background:#FFFFFF;
+    box-shadow:0 5px 13px rgba(11,37,69,.07);
+}
+
+.ikapi-document-thumb img{
+    width:100%;
+    height:100%;
+
+    display:block;
+    padding:3px;
+
+    object-fit:contain;
+    object-position:center;
+
+    background:#FFFFFF;
+}
+
+.ikapi-document-thumb::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:linear-gradient(
+        180deg,
+        transparent 52%,
+        rgba(11,37,69,.52)
+    );
+
+    opacity:.10;
+    transition:opacity .25s ease;
+}
+
+.ikapi-document-zoom{
+    position:absolute;
+    z-index:3;
+
+    right:5px;
+    bottom:5px;
+
+    width:23px;
+    height:23px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:7px;
+
+    color:#FFFFFF;
+    background:rgba(11,37,69,.90);
+
+    opacity:0;
+    transform:translateY(3px);
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+}
+
+.ikapi-document-zoom svg{
+    width:11px;
+    height:11px;
+
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.ikapi-document-copy{
+    min-width:0;
+}
+
+.ikapi-document-copy strong{
+    display:block;
+    color:var(--ikapi-deep);
+    font-size:9.5px;
+    font-weight:800;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+
+.ikapi-document-copy span{
+    display:block;
+    margin-top:4px;
+    color:#8497A9;
+    font-size:7.3px;
+    line-height:1.5;
+}
+
+.ikapi-document-action{
+    display:inline-flex!important;
+    align-items:center;
+    gap:4px;
+    margin-top:6px!important;
+    color:var(--ikapi-blue)!important;
+    font-size:7.2px!important;
+    font-weight:800;
+}
+
+.ikapi-document-action svg{
+    width:9px;
+    height:9px;
+
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.ikapi-document-card:hover{
+    transform:translateY(-2px);
+    border-color:rgba(91,155,213,.34);
+    background:#FFFFFF;
+    box-shadow:0 10px 24px rgba(11,37,69,.08);
+}
+
+.ikapi-document-card:hover .ikapi-document-thumb::after{
+    opacity:.28;
+}
+
+.ikapi-document-card:hover .ikapi-document-zoom{
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* =========================================================
+   IKAPI DOCUMENT VIEWER
+========================================================= */
+
+.ikapi-document-modal{
+    position:fixed;
+    z-index:9998;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:22px;
+
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+
+    background:rgba(7,19,34,.82);
+    backdrop-filter:blur(7px);
+
+    transition:
+        opacity .22s ease,
+        visibility .22s ease;
+}
+
+.ikapi-document-modal.is-open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+
+.ikapi-document-modal-card{
+    width:min(100%,1000px);
+    max-height:94vh;
+
+    display:flex;
+    flex-direction:column;
+
+    overflow:hidden;
+
+    border:1px solid rgba(220,234,247,.30);
+    border-radius:18px;
+
+    background:#FFFFFF;
+
+    box-shadow:
+        0 30px 95px
+        rgba(0,0,0,.34);
+
+    transform:translateY(12px) scale(.985);
+
+    transition:transform .28s var(--ease);
+}
+
+.ikapi-document-modal.is-open
+.ikapi-document-modal-card{
+    transform:none;
+}
+
+.ikapi-document-modal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+
+    padding:13px 15px;
+
+    border-bottom:1px solid #E8EEF3;
+}
+
+.ikapi-document-modal-title{
+    min-width:0;
+}
+
+.ikapi-document-modal-title span{
     display:block;
 
-    color:#7D91A5;
+    margin-bottom:2px;
 
-    font-size:8px;
+    color:var(--ikapi-light);
+
+    font-size:7px;
+    font-weight:850;
+    letter-spacing:.11em;
+    text-transform:uppercase;
 }
 
-.ikapi-member-badge{
+.ikapi-document-modal-title strong{
+    display:block;
+
+    color:var(--ikapi-deep);
+
+    font-family:'Poppins',sans-serif;
+    font-size:13px;
+    font-weight:700;
+
+    overflow-wrap:anywhere;
+}
+
+.ikapi-document-modal-close{
+    width:35px;
+    height:35px;
+
+    display:grid;
+    place-items:center;
+
+    flex:0 0 35px;
+
+    padding:0;
+
+    border:1px solid #E2EAF0;
+    border-radius:9px;
+
+    color:#61778B;
+    background:#F7FAFC;
+
+    cursor:pointer;
+
+    transition:
+        color .2s ease,
+        border-color .2s ease,
+        background .2s ease;
+}
+
+.ikapi-document-modal-close svg{
+    width:14px;
+    height:14px;
+
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+    stroke-linecap:round;
+}
+
+.ikapi-document-modal-view{
+    min-height:360px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+
+    overflow:auto;
+
+    background:
+        radial-gradient(
+            circle at 50% 0,
+            rgba(91,155,213,.10),
+            transparent 36%
+        ),
+        #F3F7FA;
+}
+
+.ikapi-document-modal-view img{
+    width:auto;
+    max-width:100%;
+
+    height:auto;
+    max-height:78vh;
+
+    display:block;
+
+    margin:auto;
+
+    border-radius:4px;
+
+    background:#FFFFFF;
+
+    box-shadow:
+        0 14px 38px
+        rgba(11,37,69,.15);
+
+    object-fit:contain;
+}
+
+.ikapi-document-modal-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+
+    padding:11px 15px;
+
+    border-top:1px solid #E8EEF3;
+}
+
+.ikapi-document-modal-foot p{
+    max-width:560px;
+
+    margin:0;
+
+    color:#8395A6;
+
+    font-size:7.5px;
+    line-height:1.55;
+}
+
+.ikapi-document-full{
     display:inline-flex;
     align-items:center;
     justify-content:center;
     gap:6px;
 
+    min-height:34px;
+    padding:0 11px;
+
     flex-shrink:0;
 
-    padding:6px 10px;
+    border-radius:8px;
 
-    border:
-        1px solid
-        rgba(19,64,116,.14);
+    color:#FFFFFF!important;
 
-    border-radius:999px;
-
-    color:var(--ikapi-blue);
-
-    background:
-        rgba(220,234,247,.58);
+    background:linear-gradient(
+        135deg,
+        var(--ikapi-deep),
+        var(--ikapi-blue)
+    );
 
     font-size:7.5px;
     font-weight:800;
-
-    letter-spacing:.05em;
-    text-transform:uppercase;
 }
 
-.ikapi-member-badge svg{
-    width:12px;
-    height:12px;
+.ikapi-document-full svg{
+    width:10px;
+    height:10px;
 
     fill:none;
-
-    stroke:var(--ikapi-light);
+    stroke:currentColor;
     stroke-width:2;
-
     stroke-linecap:round;
     stroke-linejoin:round;
+}
+
+
+@media (hover:hover) and (pointer:fine){
+
+    .ikapi-document-card:hover{
+        transform:translateY(-2px);
+
+        border-color:rgba(91,155,213,.30);
+
+        background:#FFFFFF;
+
+        box-shadow:
+            0 8px 20px
+            rgba(11,37,69,.075);
+    }
+
+    .ikapi-document-card:hover
+    .ikapi-document-thumb::after{
+        opacity:.65;
+    }
+
+    .ikapi-document-card:hover
+    .ikapi-document-zoom{
+        opacity:1;
+        transform:none;
+    }
+
+    .ikapi-document-modal-close:hover{
+        color:#FFFFFF;
+        border-color:var(--ikapi-deep);
+        background:var(--ikapi-deep);
+    }
+
+}
+
+
+@media (max-width:480px){
+
+    .ikapi-member-number{
+        margin-top:12px;
+        padding:9px 10px;
+    }
+
+    .ikapi-document-grid{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .ikapi-document-card{
+        grid-template-columns:50px minmax(0,1fr);
+        flex:none;
+        max-width:100%;
+    }
+
+    .ikapi-document-thumb{
+        width:50px;
+        height:62px;
+    }
+
+    .ikapi-document-modal{
+        padding:9px;
+    }
+
+    .ikapi-document-modal-card{
+        border-radius:14px;
+    }
+
+    .ikapi-document-modal-head{
+        padding:11px;
+    }
+
+    .ikapi-document-modal-title strong{
+        font-size:11px;
+    }
+
+    .ikapi-document-modal-view{
+        padding:9px;
+    }
+
+    .ikapi-document-modal-view img{
+        max-height:70vh;
+    }
+
+    .ikapi-document-modal-foot{
+        align-items:flex-start;
+        flex-direction:column;
+
+        padding:10px 11px;
+    }
+
+    .ikapi-document-full{
+        width:100%;
+        min-height:38px;
+    }
+
 }
 
 
@@ -2740,19 +3329,38 @@
         font-size:8.5px;
     }
 
-    .ikapi-bottom{
-        margin-top:17px;
+    .ikapi-documents{
+        margin-top:15px;
         padding-top:14px;
     }
 
-    .ikapi-publisher span{
-        font-size:7px;
+    .ikapi-documents-head strong{
+        font-size:10px;
     }
 
-    .ikapi-member-badge{
-        padding:5px 7px;
+    .ikapi-document-grid{
+        gap:9px;
+    }
 
-        font-size:6.5px;
+    .ikapi-document-card{
+        grid-template-columns:68px minmax(0,1fr);
+        gap:10px;
+
+        max-width:100%;
+        padding:10px;
+    }
+
+    .ikapi-document-thumb{
+        width:68px;
+        height:86px;
+    }
+
+    .ikapi-document-copy strong{
+        font-size:9px;
+    }
+
+    .ikapi-document-copy span{
+        font-size:7px;
     }
 
     .latest-slide{
@@ -2889,7 +3497,10 @@
                 {{-- RIGHT HERO — IKAPI --}}
                 <div class="ikapi-area">
 
-                    <article class="ikapi-card">
+                    <article
+                        class="ikapi-card"
+                        id="ikapiMembership"
+                    >
 
                         <div class="ikapi-card-head">
 
@@ -2897,13 +3508,9 @@
                                 Publishing Association
                             </span>
 
-
                             <span class="ikapi-status">
-
                                 <span class="ikapi-status-dot"></span>
-
                                 Member
-
                             </span>
 
                         </div>
@@ -2930,11 +3537,9 @@
                                     Member of
                                 </span>
 
-
                                 <strong class="ikapi-name">
                                     IKAPI
                                 </strong>
-
 
                                 <p class="ikapi-full-name">
                                     Ikatan Penerbit Indonesia
@@ -2945,45 +3550,123 @@
                         </div>
 
 
-                        <div class="ikapi-bottom">
+                        {{-- NOMOR ANGGOTA --}}
+                        <div
+                            class="ikapi-member-number {{ $ikapiMemberNumber ? '' : 'is-pending' }}"
+                        >
 
-                            <div class="ikapi-publisher">
+                            <div class="ikapi-member-number-copy">
+
+                                <span class="ikapi-member-number-label">
+                                    Nomor Anggota IKAPI
+                                </span>
 
                                 <strong>
-                                    Baca Dulu Publisher
+                                    {{ $ikapiMemberNumber ?: 'Nomor anggota akan diperbarui' }}
                                 </strong>
-
-                                <span>
-                                    Member of Ikatan Penerbit Indonesia
-                                </span>
 
                             </div>
 
 
-                            <span class="ikapi-member-badge">
+                            <span class="ikapi-member-number-icon">
 
                                 <svg viewBox="0 0 24 24">
-
-                                    <path
-                                        d="M12 3l7 3v5c0 4.6-2.9 8.7-7 10-4.1-1.3-7-5.4-7-10V6l7-3z"
-                                    />
-
-                                    <path
-                                        d="M9 12l2 2 4-4"
-                                    />
-
+                                    <path d="M5 4h14v16H5z"/>
+                                    <path d="M8 8h8M8 12h5M8 16h6"/>
                                 </svg>
-
-                                Member
 
                             </span>
 
                         </div>
 
+
+                        {{-- DOKUMEN IKAPI --}}
+                        @if($ikapiDocuments->isNotEmpty())
+
+                            <div class="ikapi-documents">
+
+                                <div class="ikapi-documents-head">
+
+                                    <strong>
+                                        Dokumen Keanggotaan
+                                    </strong>
+
+                                    <span>
+                                        Klik untuk melihat
+                                    </span>
+
+                                </div>
+
+
+                                <div class="ikapi-document-grid">
+
+                                    @foreach($ikapiDocuments as $index => $document)
+
+                                        <button
+                                            type="button"
+                                            class="ikapi-document-card"
+                                            data-ikapi-open="{{ $index }}"
+                                            aria-controls="ikapi-document-{{ $index }}"
+                                            aria-label="Lihat {{ $document['title'] }}"
+                                        >
+
+                                            <span class="ikapi-document-thumb">
+
+                                                <img
+                                                    src="{{ asset($document['image']) }}"
+                                                    alt="{{ $document['title'] }} Baca Dulu Publisher"
+                                                    loading="lazy"
+                                                >
+
+                                                <span class="ikapi-document-zoom">
+
+                                                    <svg viewBox="0 0 24 24">
+                                                        <circle cx="11" cy="11" r="6"/>
+                                                        <path d="m16 16 4 4"/>
+                                                        <path d="M11 8v6M8 11h6"/>
+                                                    </svg>
+
+                                                </span>
+
+                                            </span>
+
+
+                                            <span class="ikapi-document-copy">
+
+                                                <strong>
+                                                    {{ $document['title'] }}
+                                                </strong>
+
+                                                <span>
+                                                    {{ $document['description'] }}
+                                                </span>
+
+                                                <span class="ikapi-document-action">
+
+                                                    Lihat dokumen
+
+                                                    <svg viewBox="0 0 24 24">
+                                                        <path d="M5 12h14"/>
+                                                        <path d="m14 7 5 5-5 5"/>
+                                                    </svg>
+
+                                                </span>
+
+                                            </span>
+
+                                        </button>
+
+                                    @endforeach
+
+                                </div>
+
+                            </div>
+
+                        @endif
+
                     </article>
 
                 </div>
-
             </div>
 
         </div>
@@ -3516,6 +4199,213 @@
         class="cart-toast"
         id="cartToast"
     ></div>
+
+
+    {{-- =====================================================
+         IKAPI DOCUMENT VIEWERS
+    ====================================================== --}}
+
+    @foreach($ikapiDocuments as $index => $document)
+
+        <div
+            class="ikapi-document-modal"
+            id="ikapi-document-{{ $index }}"
+            data-ikapi-modal="{{ $index }}"
+            role="dialog"
+            aria-modal="true"
+            aria-hidden="true"
+            aria-labelledby="ikapi-document-title-{{ $index }}"
+        >
+
+            <div class="ikapi-document-modal-card">
+
+                <div class="ikapi-document-modal-head">
+
+                    <div class="ikapi-document-modal-title">
+
+                        <span>
+                            Dokumen Keanggotaan
+                        </span>
+
+                        <strong id="ikapi-document-title-{{ $index }}">
+                            {{ $document['title'] }}
+                        </strong>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="ikapi-document-modal-close"
+                        data-ikapi-close
+                        aria-label="Tutup dokumen"
+                    >
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 6l12 12"/>
+                            <path d="M18 6L6 18"/>
+                        </svg>
+                    </button>
+
+                </div>
+
+
+                <div class="ikapi-document-modal-view">
+
+                    <img
+                        src="{{ asset($document['image']) }}"
+                        alt="{{ $document['title'] }} Baca Dulu Publisher"
+                    >
+
+                </div>
+
+
+                <div class="ikapi-document-modal-foot">
+
+                    <p>
+                        Dokumen ditampilkan dalam ukuran besar agar
+                        informasi pada sertifikat dapat dibaca dengan jelas.
+                    </p>
+
+
+                    <a
+                        href="{{ asset($document['image']) }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="ikapi-document-full"
+                    >
+                        Buka Ukuran Penuh
+
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 5h5v5"/>
+                            <path d="M10 14 19 5"/>
+                            <path d="M19 14v5H5V5h5"/>
+                        </svg>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endforeach
+
+
+    <script>
+    (() => {
+        const initIkapiDocuments = () => {
+            const page = document.querySelector('.bookstore-page');
+
+            if (!page || page.dataset.ikapiViewerReady === '1') {
+                return;
+            }
+
+            page.dataset.ikapiViewerReady = '1';
+
+            const openButtons = page.querySelectorAll('[data-ikapi-open]');
+            const modals = page.querySelectorAll('[data-ikapi-modal]');
+
+            let activeModal = null;
+            let lastTrigger = null;
+
+            const unlockScroll = () => {
+                document.documentElement.style.overflow = '';
+                document.body.style.overflow = '';
+            };
+
+            const lockScroll = () => {
+                document.documentElement.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeModal = modal => {
+                if (!modal) {
+                    return;
+                }
+
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+
+                if (activeModal === modal) {
+                    activeModal = null;
+                }
+
+                unlockScroll();
+
+                if (lastTrigger) {
+                    lastTrigger.focus({ preventScroll: true });
+                }
+            };
+
+            const openModal = (modal, trigger) => {
+                if (!modal) {
+                    return;
+                }
+
+                if (activeModal && activeModal !== modal) {
+                    closeModal(activeModal);
+                }
+
+                activeModal = modal;
+                lastTrigger = trigger || null;
+
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+
+                lockScroll();
+
+                window.requestAnimationFrame(() => {
+                    modal.querySelector('[data-ikapi-close]')?.focus({
+                        preventScroll: true
+                    });
+                });
+            };
+
+            openButtons.forEach(button => {
+                button.addEventListener('click', event => {
+                    event.preventDefault();
+
+                    const index = button.dataset.ikapiOpen;
+                    const modal = page.querySelector(
+                        `[data-ikapi-modal="${index}"]`
+                    );
+
+                    openModal(modal, button);
+                });
+            });
+
+            modals.forEach(modal => {
+                modal.querySelectorAll('[data-ikapi-close]').forEach(button => {
+                    button.addEventListener('click', () => {
+                        closeModal(modal);
+                    });
+                });
+
+                modal.addEventListener('click', event => {
+                    if (event.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            });
+
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && activeModal) {
+                    closeModal(activeModal);
+                }
+            });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener(
+                'DOMContentLoaded',
+                initIkapiDocuments,
+                { once: true }
+            );
+        } else {
+            initIkapiDocuments();
+        }
+    })();
+    </script>
 
 </div>
 
