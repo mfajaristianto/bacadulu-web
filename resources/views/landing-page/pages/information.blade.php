@@ -33,6 +33,8 @@
 @endphp
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap');
+
 .bd-information{
     --navy:#241B52;
     --navy-soft:#332A63;
@@ -57,6 +59,45 @@
 .bd-information *::after{box-sizing:border-box}
 .bd-information a{text-decoration:none}
 .bd-info-shell{width:min(calc(100% - 40px),1080px);margin-inline:auto}
+
+/* BRAND */
+.bd-info-brandbar{
+    min-height:72px;
+    display:flex;
+    align-items:center;
+    border-bottom:1px solid #E8E7EC;
+    background:#fff;
+}
+.bd-info-brand-shell {
+    width: min(calc(100% - 72px), 1260px);
+    margin: auto;
+}
+.bd-info-brand{
+    display:inline-flex;
+    align-items:center;
+    gap:11px;
+}
+.bd-info-brand-mark{
+    width:7px;
+    height:27px;
+    flex:0 0 7px;
+    background:var(--orange);
+}
+.bd-info-brand-name{
+    color:var(--navy);
+    font-family:'Fraunces',serif;
+    font-size:21px;
+    font-weight:600;
+    line-height:1;
+}
+.bd-info-brand-type{
+    color:#96929C;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.1em;
+    line-height:1;
+    text-transform:uppercase;
+}
 
 /* HERO */
 .bd-info-hero{
@@ -88,24 +129,6 @@
     grid-template-columns:minmax(0,1fr) 145px;
     gap:45px;
     align-items:end;
-}
-.bd-info-eyebrow{
-    display:inline-flex;
-    align-items:center;
-    gap:9px;
-    margin-bottom:11px;
-    color:var(--orange);
-    font-size:8px;
-    font-weight:850;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-}
-.bd-info-eyebrow::before{
-    content:"";
-    width:25px;
-    height:3px;
-    border-radius:99px;
-    background:linear-gradient(90deg,var(--orange),var(--gold));
 }
 .bd-info-title{
     max-width:650px;
@@ -586,6 +609,7 @@
 /* TABLET */
 @media(max-width:900px){
     .bd-info-shell{width:calc(100% - 34px)}
+    .bd-info-brand-shell{width:calc(100% - 40px)}
     .bd-info-hero-layout{gap:28px}
     .bd-info-latest-grid{
         grid-template-columns:repeat(2,minmax(0,1fr));
@@ -607,6 +631,7 @@
 /* MOBILE */
 @media(max-width:640px){
     .bd-info-shell{width:calc(100% - 28px)}
+    .bd-info-brand-shell{width:calc(100% - 30px)}
     .bd-info-hero{padding:40px 0 27px}
     .bd-info-hero-layout{grid-template-columns:1fr;gap:17px}
     .bd-info-title{font-size:36px}
@@ -662,15 +687,22 @@
 
 <div class="bd-information" id="bdInformationPage">
 
+    {{-- BRAND --}}
+    <div class="bd-info-brandbar">
+        <div class="bd-info-brand-shell">
+            <div class="bd-info-brand">
+                <span class="bd-info-brand-mark" aria-hidden="true"></span>
+                <span class="bd-info-brand-name">BacaDulu</span>
+                <span class="bd-info-brand-type">Information</span>
+            </div>
+        </div>
+    </div>
+
     {{-- HERO --}}
     <section class="bd-info-hero">
         <div class="bd-info-shell">
             <div class="bd-info-hero-layout">
                 <div>
-                    <div class="bd-info-eyebrow" data-info-hero>
-                        Baca Dulu / Information
-                    </div>
-
                     <h1 class="bd-info-title" data-info-hero>
                         Informasi yang
                         <span>perlu dibaca.</span>
