@@ -432,7 +432,7 @@
 /* MOBILE */
 @media(max-width:600px){
     .bd-conference-shell{width:calc(100% - 30px)}
-    .bd-conference-brand-type{display:none}
+    
     .bd-conference-hero{padding:38px 5px 31px}
     .bd-conference-title{font-size:38px}
     .bd-conference-description{font-size:11px}

@@ -91,10 +91,6 @@
     .bd-consultation-shell{
         width:calc(100% - 30px);
     }
-
-    .bd-consultation-brand-type{
-        display:none;
-    }
 }
 </style>
 

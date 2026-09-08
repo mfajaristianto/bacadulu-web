@@ -1344,7 +1344,7 @@
         width:calc(100% - 30px);
     }
 
-    .bd-publisher-brand-type{display:none}
+    
 
     .bd-publisher-hero{
         min-height:0;

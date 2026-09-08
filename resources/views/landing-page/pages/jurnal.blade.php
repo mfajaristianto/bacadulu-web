@@ -436,7 +436,6 @@
 
 @media(max-width:600px){
     .bd-journal-shell{width:calc(100% - 30px)}
-    .bd-journal-brand-type{display:none}
     .bd-journal-hero{padding:38px 5px 31px}
     .bd-journal-title{font-size:38px}
     .bd-journal-description{font-size:11px}
