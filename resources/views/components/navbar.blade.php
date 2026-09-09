@@ -204,7 +204,7 @@
                 <div class="bd-nav-slot bd-nav-submit-slot">
 
                     <a
-                        href="https://wa.me/6285139461070"
+                        href="{{ config('bacadulu.call_center') }}"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="bd-nav-submit"
@@ -452,7 +452,7 @@
             <div class="bd-mobile-actions">
 
                 <a
-                    href="https://wa.me/6285139461070"
+                    href="{{ config('bacadulu.call_center') }}"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="bd-mobile-submit"

@@ -76,7 +76,7 @@
                     </a>
 
                     <a
-                        href="https://wa.me/6285139461070"
+                        {{ config('bacadulu.call_center_wa') }}
                         target="_blank"
                         rel="noopener noreferrer"
                         class="bd-footer-contact"
@@ -88,7 +88,7 @@
                             >
                         </span>
 
-                        <span>+62 851-3946-1070</span>
+                        <span>{{ config('bacadulu.call_center_wa') }}</span>
                     </a>
                 </div>
 
