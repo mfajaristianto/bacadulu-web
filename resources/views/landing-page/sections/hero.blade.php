@@ -92,7 +92,7 @@
 
 
             <a
-                href="https://wa.me/6285139461070"
+                href="{{ config('bacadulu.call_center') }}?text=Halo%20BacaDulu,%20saya%20ingin%20menanyakan%20layanan"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="bd-wa-btn"

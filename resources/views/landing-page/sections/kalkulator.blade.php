@@ -464,7 +464,7 @@
                              WHATSAPP
                         ================================================== --}}
                         <a
-                            href="https://wa.me/6285139461070?text=Halo%20Admin%20BacaDulu,%20saya%20ingin%20konsultasi%20penerbitan%20buku."
+                            href="{{ config('bacadulu.call_center') }}?text=Halo%20Admin%20BacaDulu,%20saya%20ingin%20konsultasi%20penerbitan%20buku."
                             target="_blank"
                             rel="noopener noreferrer"
                             class="bd-calc-wa"

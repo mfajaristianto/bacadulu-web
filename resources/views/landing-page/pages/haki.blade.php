@@ -1541,7 +1541,7 @@
                     </p>
 
                     <a
-                        href="https://wa.me/6285139461070?text={{ urlencode('Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI.') }}"
+                        href="{{ config('bacadulu.call_center') }}{{ urlencode('Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI.') }}"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="haki-cta-button"
@@ -1570,7 +1570,7 @@
 
         <a
             id="pilihan-wa"
-            href="https://wa.me/6285139461070"
+            href={{ config('bacadulu.call_center') }}
             target="_blank"
             rel="noopener noreferrer"
             class="haki-bar-button"
@@ -1635,7 +1635,7 @@
         const label = document.getElementById('pilihan-label');
         const waButton = document.getElementById('pilihan-wa');
 
-        const waNumber = '6285139461070';
+        const waNumber = config('bacadulu.call_center_wa');
 
         if (!bar || !label || !waButton) {
             return;
