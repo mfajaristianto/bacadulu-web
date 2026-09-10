@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\HtmlSanitizer;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -22,6 +24,26 @@ class Information extends Model
         'is_pinned' => 'boolean',
         'pinned_at' => 'datetime',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONTENT SANITIZER
+    |--------------------------------------------------------------------------
+    |
+    | Halaman detail Information menampilkan content sebagai rich HTML.
+    | Karena itu, content dibersihkan ketika disimpan DAN ketika dibaca.
+    |
+    | Proteksi saat dibaca juga menjaga data lama yang mungkin dibuat sebelum
+    | sanitizer ini diterapkan.
+    |
+    */
+    protected function content(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => HtmlSanitizer::clean((string) $value),
+            set: fn ($value) => HtmlSanitizer::clean((string) $value),
+        );
+    }
 
     protected static function booted(): void
     {

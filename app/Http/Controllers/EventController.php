@@ -6,63 +6,46 @@ use App\Models\Event;
 
 class EventController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | INDEX
-    |--------------------------------------------------------------------------
-    */
-
     public function index()
     {
-        $featured = Event::where(
-                'is_featured',
-                true
-            )
+        $featured = Event::query()
+            ->where('is_featured', true)
             ->orderByDesc('start_date')
             ->first();
 
-
         $events = Event::query()
-            ->orderByDesc('start_date')
             ->when(
                 $featured,
-                function ($query) use ($featured) {
-
-                    $query->where(
-                        'id',
-                        '!=',
-                        $featured->id
-                    );
-                }
+                fn ($query) => $query->whereKeyNot($featured->id)
             )
+            ->orderByDesc('start_date')
             ->paginate(9)
             ->withQueryString();
 
+        $latestEvents = Event::query()
+            ->when(
+                $featured,
+                fn ($query) => $query->whereKeyNot($featured->id)
+            )
+            ->orderByDesc('start_date')
+            ->limit(5)
+            ->get();
 
         return view(
             'event.index',
             compact(
                 'featured',
-                'events'
+                'events',
+                'latestEvents'
             )
         );
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | SHOW
-    |--------------------------------------------------------------------------
-    */
-
-    public function show($slug)
+    public function show(string $slug)
     {
-        $event = Event::where(
-                'slug',
-                $slug
-            )
+        $event = Event::query()
+            ->where('slug', $slug)
             ->firstOrFail();
-
 
         return view(
             'event.show',

@@ -425,6 +425,19 @@ class BookController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * Resource show diarahkan ke form edit karena CMS buku tidak memiliki
+     * halaman detail admin terpisah. Ini mencegah route resource /books/{book}
+     * berakhir pada method yang tidak ada.
+     */
+    public function show(Book $book)
+    {
+        return redirect()->route(
+            'admin.books.edit',
+            $book
+        );
+    }
+
     public function edit(Book $book)
     {
         $book->load(
@@ -1068,14 +1081,19 @@ class BookController extends Controller
 
     public function destroy(Book $book)
     {
-        if ($book->cover) {
+        $coverPath =
+            $book->cover;
+
+        DB::transaction(function () use ($book) {
+            $book->delete();
+        });
+
+        if ($coverPath) {
             Storage::disk('public')
                 ->delete(
-                    $book->cover
+                    $coverPath
                 );
         }
-
-        $book->delete();
 
         return redirect()
             ->route('admin.books.index')

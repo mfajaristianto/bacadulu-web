@@ -301,12 +301,79 @@
     })();
     </script>
 
-    <title>
-        @yield(
+    @php
+        $pageTitle = trim($__env->yieldContent(
             'title',
             'Baca Dulu - Platform Penerbitan Modern'
-        )
-    </title>
+        ));
+
+        $pageDescription = trim($__env->yieldContent(
+            'meta_description',
+            'Baca Dulu adalah platform informasi, penerbitan, bookstore, jurnal, conference, konsultasi, dan layanan HAKI untuk mendukung pembelajaran dan publikasi.'
+        ));
+
+        $pageCanonical = trim($__env->yieldContent(
+            'canonical',
+            url()->current()
+        ));
+
+        $pageOgImage = trim($__env->yieldContent(
+            'og_image',
+            asset('img/images.jpg')
+        ));
+
+        $privatePage = request()->routeIs(
+            'profile.*',
+            'blog.create',
+            'blog.edit',
+            'blog.myPosts',
+            'community.create',
+            'community.edit',
+            'search'
+        );
+
+        $pageRobots = trim($__env->yieldContent(
+            'robots',
+            $privatePage
+                ? 'noindex,nofollow'
+                : 'index,follow,max-image-preview:large'
+        ));
+
+        $pageOgType = trim($__env->yieldContent(
+            'og_type',
+            request()->routeIs('blog.show')
+                ? 'article'
+                : 'website'
+        ));
+    @endphp
+
+    <title>{{ $pageTitle }}</title>
+
+    <meta name="description" content="{{ $pageDescription }}">
+    <meta name="robots" content="{{ $pageRobots }}">
+    <meta name="theme-color" content="#241B52">
+
+    <link rel="canonical" href="{{ $pageCanonical }}">
+
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:type" content="{{ $pageOgType }}">
+    <meta property="og:site_name" content="Baca Dulu">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDescription }}">
+    <meta property="og:url" content="{{ $pageCanonical }}">
+    <meta property="og:image" content="{{ $pageOgImage }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDescription }}">
+    <meta name="twitter:image" content="{{ $pageOgImage }}">
+
+    <meta
+        name="baca-call-center-wa"
+        content="{{ config('bacadulu.call_center_wa') }}"
+    >
+
+    @stack('head')
 
     <link
         rel="preconnect"
@@ -629,15 +696,45 @@
         </style>
     @endif
 
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/trix@2.1.15/dist/trix.css"
-    >
+    @if(request()->routeIs('blog.create'))
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/trix@2.1.15/dist/trix.css"
+        >
 
-    <script
-        src="https://unpkg.com/trix@2.1.15/dist/trix.umd.min.js"
-        defer
-    ></script>
+        <script
+            src="https://unpkg.com/trix@2.1.15/dist/trix.umd.min.js"
+            defer
+        ></script>
+    @endif
+
+    <style>
+        .bd-skip-link{
+            position:fixed;
+            top:12px;
+            left:12px;
+            z-index:100000;
+            padding:12px 16px;
+            border-radius:10px;
+            background:#241B52;
+            color:#fff;
+            font-weight:800;
+            text-decoration:none;
+            transform:translateY(-160%);
+            transition:transform .16s ease;
+        }
+
+        .bd-skip-link:focus{
+            transform:translateY(0);
+            outline:3px solid #F0A52E;
+            outline-offset:3px;
+        }
+
+        :focus-visible{
+            outline:3px solid #F0A52E;
+            outline-offset:3px;
+        }
+    </style>
 
     @stack('styles')
 </head>
@@ -658,18 +755,31 @@
         selection:text-white
     "
 >
+    <a href="#main-content" class="bd-skip-link">
+        Lewati ke konten utama
+    </a>
+
     {{-- NAVBAR CUMA SATU --}}
     <x-navbar />
 
-    <main class="flex-grow w-full max-w-full">
+    <main
+        id="main-content"
+        class="flex-grow w-full max-w-full"
+        tabindex="-1"
+    >
         <div
             data-barba="container"
             data-barba-namespace="@yield('barba-namespace','default')"
-            data-page-title="@yield('title','Baca Dulu - Platform Penerbitan Modern')"
+            data-page-title="{{ $pageTitle }}"
+            data-page-description="{{ $pageDescription }}"
+            data-page-canonical="{{ $pageCanonical }}"
+            data-page-robots="{{ $pageRobots }}"
+            data-page-og-type="{{ $pageOgType }}"
+            data-page-og-image="{{ $pageOgImage }}"
         >
             @if(session('success'))
                 <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 py-4">
-                    <div class="rounded-xl bg-green-50 border border-green-200 p-4 text-sm text-green-800">
+                    <div role="status" aria-live="polite" class="rounded-xl bg-green-50 border border-green-200 p-4 text-sm text-green-800">
                         {{ session('success') }}
                     </div>
                 </div>
@@ -677,7 +787,7 @@
 
             @if(session('error'))
                 <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 py-4">
-                    <div class="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-800">
+                    <div role="alert" class="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-800">
                         {{ session('error') }}
                     </div>
                 </div>
@@ -685,7 +795,7 @@
 
             @if(session('warning'))
                 <div class="max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 py-4">
-                    <div class="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">
+                    <div role="status" aria-live="polite" class="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">
                         {{ session('warning') }}
                     </div>
                 </div>
@@ -719,13 +829,16 @@
         window.addEventListener('load', function () {
             navigator.serviceWorker
                 .register('/sw.js', {
-                    scope: '/'
+                    scope: '/',
+                    updateViaCache: 'none'
                 })
                 .then(function (registration) {
-                    console.log(
-                        'Service Worker Baca Dulu aktif:',
-                        registration.scope
-                    );
+                    // Paksa browser memeriksa sw.js terbaru saat website dibuka.
+                    // Ini mencegah perangkat mobile terlalu lama memakai
+                    // service worker/offline page versi lama.
+                    registration.update().catch(function () {
+                        // Tidak perlu mengganggu user bila pemeriksaan update gagal.
+                    });
                 })
                 .catch(function (error) {
                     console.error(

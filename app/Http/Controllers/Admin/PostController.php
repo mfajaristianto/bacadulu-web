@@ -7,6 +7,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 class PostController extends Controller
 {
@@ -157,45 +158,33 @@ class PostController extends Controller
     | user_id tidak diubah.
     |--------------------------------------------------------------------------
     */
-
     public function update(
         Request $request,
         Post $post
     ) {
-        /*
-        |--------------------------------------------------------------------------
-        | Validasi
-        |--------------------------------------------------------------------------
-        */
-
         $validated = $request->validate([
             'title' => [
                 'required',
                 'string',
                 'max:255',
             ],
-
             'author' => [
                 'required',
                 'string',
                 'max:255',
             ],
-
             'category' => [
                 'required',
                 'in:Kesehatan,Sosial,Ekonomi,Teknik',
             ],
-
             'content' => [
                 'required',
                 'string',
             ],
-
             'status' => [
                 'required',
                 'in:pending,approved,rejected',
             ],
-
             'image' => [
                 'nullable',
                 'image',
@@ -204,81 +193,49 @@ class PostController extends Controller
             ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update slug jika judul berubah
-        |--------------------------------------------------------------------------
-        */
+        $validated['title'] = trim($validated['title']);
+        $validated['author'] = trim($validated['author']);
 
         if ($post->title !== $validated['title']) {
-
-            $validated['slug'] =
-                Str::slug($validated['title'])
-                . '-'
-                . time();
+            $validated['slug'] = $this->generateUniqueSlug(
+                $validated['title'],
+                $post->id
+            );
         }
 
+        $oldImage = $post->image;
+        $newImagePath = null;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Update gambar jika admin upload gambar baru
-        |--------------------------------------------------------------------------
-        */
+        try {
+            if ($request->hasFile('image')) {
+                $newImagePath = $request
+                    ->file('image')
+                    ->store('post-images', 'public');
 
-        if ($request->hasFile('image')) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Hapus gambar lama
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                $post->image &&
-                Storage::disk('public')->exists($post->image)
-            ) {
-                Storage::disk('public')
-                    ->delete($post->image);
+                $validated['image'] = $newImagePath;
             }
 
+            $post->update($validated);
+        } catch (Throwable $e) {
+            if ($newImagePath) {
+                Storage::disk('public')->delete($newImagePath);
+            }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Simpan gambar baru
-            |--------------------------------------------------------------------------
-            */
-
-            $validated['image'] = $request
-                ->file('image')
-                ->store(
-                    'post-images',
-                    'public'
-                );
+            throw $e;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update artikel
-        |--------------------------------------------------------------------------
-        */
-
-        $post->update($validated);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect kembali
-        |--------------------------------------------------------------------------
-        */
+        if (
+            $newImagePath &&
+            $oldImage &&
+            $oldImage !== $newImagePath
+        ) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
         return redirect()
             ->route(
                 'admin.posts.index',
-                [
-                    'status' => $post->status
-                ]
+                ['status' => $post->status]
             )
             ->with(
                 'success',
@@ -366,49 +323,54 @@ class PostController extends Controller
     | Menghapus artikel dari dashboard admin.
     |--------------------------------------------------------------------------
     */
-
     public function destroy(Post $post)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Hapus gambar jika ada
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $post->image &&
-            Storage::disk('public')->exists($post->image)
-        ) {
-            Storage::disk('public')
-                ->delete($post->image);
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Hapus artikel
-        |--------------------------------------------------------------------------
-        */
+        $imagePath = $post->image;
 
         $post->delete();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect ke daftar artikel
-        |--------------------------------------------------------------------------
-        */
+        if ($imagePath) {
+            Storage::disk('public')->delete($imagePath);
+        }
 
         return redirect()
             ->route(
                 'admin.posts.index',
-                [
-                    'status' => 'all'
-                ]
+                ['status' => 'all']
             )
             ->with(
                 'success',
                 'Artikel berhasil dihapus.'
             );
+    }
+
+
+    private function generateUniqueSlug(
+        string $title,
+        ?int $ignoreId = null
+    ): string {
+        $base = Str::slug($title);
+
+        if ($base === '') {
+            $base = 'artikel';
+        }
+
+        $slug = $base;
+        $counter = 1;
+
+        while (
+            Post::query()
+                ->where('slug', $slug)
+                ->when(
+                    $ignoreId,
+                    fn ($query) => $query->where('id', '!=', $ignoreId)
+                )
+                ->exists()
+        ) {
+            $slug = $base . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

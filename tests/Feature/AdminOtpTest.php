@@ -10,6 +10,8 @@ class AdminOtpTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const VALID_OTP = '123456';
+
     private function createAdmin(): User
     {
         return User::factory()->create([
@@ -24,16 +26,21 @@ class AdminOtpTest extends TestCase
         return [
             'admin_pending_user_id' => $admin->id,
 
-            // Dipakai oleh flow admin terbaru
+            // Credential yang sedang diverifikasi.
             'admin_pending_credential_type' => 'primary',
 
-            // Bukti tahap Google sudah dilewati
+            // Bukti tahap Google sudah dilewati.
             'admin_google_name' => 'Google Test User',
             'admin_google_email' => 'google-user@example.com',
             'admin_google_id' => 'google-test-123',
 
-            // OTP
-            'admin_otp_code' => '123456',
+            // OTP tidak lagi disimpan plaintext.
+            'admin_otp_hash' => hash_hmac(
+                'sha256',
+                self::VALID_OTP,
+                (string) config('app.key')
+            ),
+            'admin_otp_attempts' => 0,
             'admin_otp_expires_at' => now()->addMinutes(5),
 
             'admin_remember' => false,
@@ -145,9 +152,11 @@ class AdminOtpTest extends TestCase
             'error'
         );
 
-        /*
-         * OTP salah tidak boleh dianggap verified.
-         */
+        $response->assertSessionHas(
+            'admin_otp_attempts',
+            1
+        );
+
         $response->assertSessionMissing(
             'admin_otp_verified'
         );
@@ -162,66 +171,59 @@ class AdminOtpTest extends TestCase
     */
 
     public function test_expired_otp_is_rejected(): void
-{
-    $admin = $this->createAdmin();
+    {
+        $admin = $this->createAdmin();
 
-    $session = $this->validOtpSession(
-        $admin
-    );
-
-    $session['admin_otp_expires_at'] =
-        now()->subMinute();
-
-    $response = $this
-        ->withSession($session)
-
-        /*
-         * Mensimulasikan user memang sedang berada
-         * di halaman OTP sebelum submit.
-         */
-        ->from(
-            route('admin.otp')
-        )
-
-        ->post(
-            route('admin.otp.submit'),
-            [
-                'otp' => '123456',
-            ]
+        $session = $this->validOtpSession(
+            $admin
         );
 
-    /*
-     * Controller menggunakan return back(),
-     * sehingga user kembali ke halaman OTP.
-     */
-    $response->assertRedirect(
-        route('admin.otp')
-    );
+        $session['admin_otp_expires_at'] =
+            now()->subMinute();
 
-    $response->assertSessionHas(
-        'error'
-    );
+        $response = $this
+            ->withSession($session)
+            ->from(
+                route('admin.otp')
+            )
+            ->post(
+                route('admin.otp.submit'),
+                [
+                    'otp' => self::VALID_OTP,
+                ]
+            );
 
-    /*
-     * OTP expired harus benar-benar dibuang.
-     */
-    $response->assertSessionMissing(
-        'admin_otp_code'
-    );
+        $response->assertRedirect(
+            route('admin.otp')
+        );
 
-    $response->assertSessionMissing(
-        'admin_otp_expires_at'
-    );
+        $response->assertSessionHas(
+            'error'
+        );
 
-    $response->assertSessionMissing(
-        'admin_otp_verified'
-    );
+        // Semua material OTP expired harus dibuang.
+        $response->assertSessionMissing(
+            'admin_otp_code'
+        );
 
-    /*
-     * Expired OTP tidak boleh membuat admin login.
-     */
-    $this->assertGuest('admin');
-}
+        $response->assertSessionMissing(
+            'admin_otp_hash'
+        );
+
+        $response->assertSessionMissing(
+            'admin_otp_attempts'
+        );
+
+        $response->assertSessionMissing(
+            'admin_otp_expires_at'
+        );
+
+        $response->assertSessionMissing(
+            'admin_otp_verified'
+        );
+
+        $this->assertGuest('admin');
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -240,7 +242,7 @@ class AdminOtpTest extends TestCase
             ->post(
                 route('admin.otp.submit'),
                 [
-                    'otp' => '123456',
+                    'otp' => self::VALID_OTP,
                 ]
             );
 
@@ -253,28 +255,30 @@ class AdminOtpTest extends TestCase
             true
         );
 
-        /*
-         * OTP sudah digunakan.
-         * Jangan disimpan lagi setelah lolos.
-         */
+        // OTP sudah dipakai dan harus dibuang dari session.
         $response->assertSessionMissing(
             'admin_otp_code'
+        );
+
+        $response->assertSessionMissing(
+            'admin_otp_hash'
+        );
+
+        $response->assertSessionMissing(
+            'admin_otp_attempts'
         );
 
         $response->assertSessionMissing(
             'admin_otp_expires_at'
         );
 
-        /*
-         * Belum login admin.
-         * Masih harus melewati Confirm Access.
-         */
+        // Belum login admin. Masih harus melewati Confirm Access.
         $this->assertGuest('admin');
     }
 
     /*
     |--------------------------------------------------------------------------
-    | 7. Tidak bisa POST OTP jika session OTP hilang
+    | 7. Tidak bisa POST OTP jika material OTP hilang
     |--------------------------------------------------------------------------
     */
 
@@ -284,23 +288,24 @@ class AdminOtpTest extends TestCase
 
         $response = $this
             ->withSession([
-                'admin_pending_user_id' =>
-                    $admin->id,
+                'admin_pending_user_id' => $admin->id,
+                'admin_pending_credential_type' => 'primary',
+                'admin_google_email' => 'google-user@example.com',
 
-                'admin_google_email' =>
-                    'google-user@example.com',
-
-                // sengaja tidak ada admin_otp_code
+                // Sengaja tidak ada admin_otp_hash dan expires_at.
             ])
+            ->from(
+                route('admin.otp')
+            )
             ->post(
                 route('admin.otp.submit'),
                 [
-                    'otp' => '123456',
+                    'otp' => self::VALID_OTP,
                 ]
             );
 
         $response->assertRedirect(
-            route('admin.login')
+            route('admin.otp')
         );
 
         $response->assertSessionHas(

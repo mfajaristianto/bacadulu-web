@@ -77,6 +77,8 @@
             <img
                 src="{{ asset('storage/' . $event->banner_image) }}"
                 alt="{{ $event->title }}"
+                fetchpriority="high"
+                decoding="async"
                 class="w-full
                        max-h-[430px]
                        object-cover"
@@ -415,6 +417,7 @@
     <a
         href="{{ route('event.index') }}"
         class="inline-flex
+               min-h-11
                items-center
                gap-2
                text-sm

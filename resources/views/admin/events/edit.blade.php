@@ -355,10 +355,15 @@
                 id="description"
                 name="description"
                 rows="8"
+                maxlength="10000"
                 required
                 class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-orange-500 focus:ring-orange-500"
             >{{ old('description', $event->description) }}</textarea>
 
+
+            <p class="mt-1 text-xs text-slate-500">
+                Maksimal 10.000 karakter.
+            </p>
 
             @error('description')
 
@@ -396,7 +401,7 @@
 
 
                     <span class="block text-xs text-slate-500 mt-1">
-                        Event unggulan akan ditampilkan lebih menonjol pada halaman Event.
+                        Hanya satu event yang dapat menjadi unggulan. Memilih ini akan menggantikan event unggulan sebelumnya.
                     </span>
 
                 </span>

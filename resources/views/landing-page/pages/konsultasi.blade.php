@@ -1839,14 +1839,14 @@
 
                 </div>
 
-
                 <a
-                    href="{{ config('bacadulu.call_center') }}?text=Halo%20BacaDulu,%20saya%20ingin%20menanyakan%20layanan%20Baca%20Konsultasi%20dan%20mitra%20yang%20sesuai%20dengan%20kebutuhan%20saya."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="bd-cta-btn"
+                 href="https://wa.me/{{ config('bacadulu.call_center_wa') }}?text={{ rawurlencode('Halo BacaDulu, saya ingin menanyakan layanan Baca Konsultasi dan mitra yang sesuai dengan kebutuhan saya.') }}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="bd-cta-btn"
                 >
-
+            
+                </a>
                     Hubungi Baca Dulu
 
                     <svg viewBox="0 0 24 24">

@@ -9,10 +9,12 @@ use App\Models\AdminAccessPassword;
 use App\Models\AdminRecoveryRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class AdminRecoveryController extends Controller
@@ -42,9 +44,13 @@ class AdminRecoveryController extends Controller
                 );
         }
 
+        $adminEmailDisplay = $this->maskEmail(
+            $adminEmail
+        );
+
         return view(
             'admin.auth.forgot-password',
-            compact('adminEmail')
+            compact('adminEmailDisplay')
         );
     }
 
@@ -291,9 +297,25 @@ class AdminRecoveryController extends Controller
             )
             ->firstOrFail();
 
+        $requesterEmailDisplay = $this->maskEmail(
+            $recovery->requester_email
+        );
+
+        $referenceCode = strtoupper(
+            substr(
+                str_replace('-', '', $recovery->public_id),
+                0,
+                8
+            )
+        );
+
         return view(
             'admin.auth.recovery-waiting',
-            compact('recovery')
+            compact(
+                'recovery',
+                'requesterEmailDisplay',
+                'referenceCode'
+            )
         );
     }
 
@@ -453,20 +475,38 @@ class AdminRecoveryController extends Controller
         |
         */
 
-        if ($decision === 'approve') {
-            $recovery->update([
+        $decisionData = $decision === 'approve'
+            ? [
                 'status' => 'approved',
                 'approved_by' => $approverEmail,
                 'approved_at' => now(),
                 'rejected_at' => null,
-            ]);
-        } else {
-            $recovery->update([
+            ]
+            : [
                 'status' => 'rejected',
                 'approved_by' => $approverEmail,
                 'approved_at' => null,
                 'rejected_at' => now(),
-            ]);
+            ];
+
+        $updated = AdminRecoveryRequest::query()
+            ->whereKey($recovery->id)
+            ->where('status', 'pending')
+            ->update($decisionData);
+
+        if ($updated !== 1) {
+            $recovery->refresh();
+
+            return view(
+                'admin.auth.recovery-decision-result',
+                [
+                    'recovery' => $recovery,
+                    'notificationSent' => null,
+                    'retryUrl' => null,
+                    'alreadyProcessed' => true,
+                    'decision' => $decision,
+                ]
+            );
         }
 
         $recovery->refresh();
@@ -519,12 +559,15 @@ class AdminRecoveryController extends Controller
             |
             */
 
-            $recovery->update([
-                'status' => 'pending',
-                'approved_by' => null,
-                'approved_at' => null,
-                'rejected_at' => null,
-            ]);
+            AdminRecoveryRequest::query()
+                ->whereKey($recovery->id)
+                ->where('status', $decision === 'approve' ? 'approved' : 'rejected')
+                ->update([
+                    'status' => 'pending',
+                    'approved_by' => null,
+                    'approved_at' => null,
+                    'rejected_at' => null,
+                ]);
 
             $recovery->refresh();
 
@@ -690,116 +733,107 @@ class AdminRecoveryController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Find Main Admin
+        | Create Access Password Safely
         |--------------------------------------------------------------------------
+        |
+        | Recovery row dikunci selama pembuatan password agar link yang sama
+        | tidak dapat diproses dua kali secara bersamaan.
+        |
         */
 
-        $user = User::query()
-            ->whereRaw(
-                'LOWER(email) = ?',
-                [
-                    strtolower(
-                        trim(
-                            $recovery->admin_email
-                        )
-                    ),
-                ]
-            )
-            ->first();
+        DB::transaction(function () use (
+            $recovery,
+            $validated
+        ): void {
+            $lockedRecovery = AdminRecoveryRequest::query()
+                ->whereKey($recovery->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if (
-            !$user ||
-            !$user->is_admin
-        ) {
-            return back()
-                ->with(
-                    'error',
-                    'Akun admin tidak ditemukan.'
-                );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Prevent Same Password as Primary Password
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            Hash::check(
-                $validated['password'],
-                $user->password
-            )
-        ) {
-            return back()
-                ->withErrors([
+            if ($lockedRecovery->status !== 'approved') {
+                throw ValidationException::withMessages([
                     'password' =>
-                        'Password akses pribadi tidak boleh sama dengan password utama admin.',
+                        'Permohonan belum mendapatkan persetujuan.',
                 ]);
-        }
+            }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Prevent Duplicate Supplemental Password
-        |--------------------------------------------------------------------------
-        */
+            if ($lockedRecovery->password_created_at) {
+                throw ValidationException::withMessages([
+                    'password' =>
+                        'Password akses untuk permohonan ini sudah pernah dibuat.',
+                ]);
+            }
 
-        $existingPasswords = AdminAccessPassword::query()
-            ->where(
-                'user_id',
-                $user->id
-            )
-            ->where(
-                'is_active',
-                true
-            )
-            ->get();
+            $user = User::query()
+                ->whereRaw(
+                    'LOWER(email) = ?',
+                    [
+                        strtolower(
+                            trim(
+                                $lockedRecovery->admin_email
+                            )
+                        ),
+                    ]
+                )
+                ->first();
 
-        foreach ($existingPasswords as $accessPassword) {
+            if (
+                !$user ||
+                !$user->is_admin
+            ) {
+                throw ValidationException::withMessages([
+                    'password' =>
+                        'Akun admin tidak ditemukan.',
+                ]);
+            }
+
             if (
                 Hash::check(
                     $validated['password'],
-                    $accessPassword->password_hash
+                    $user->password
                 )
             ) {
-                return back()
-                    ->withErrors([
+                throw ValidationException::withMessages([
+                    'password' =>
+                        'Password akses pribadi tidak boleh sama dengan password utama admin.',
+                ]);
+            }
+
+            $existingPasswords = AdminAccessPassword::query()
+                ->where('user_id', $user->id)
+                ->where('is_active', true)
+                ->whereNull('revoked_at')
+                ->get();
+
+            foreach ($existingPasswords as $accessPassword) {
+                if (
+                    Hash::check(
+                        $validated['password'],
+                        $accessPassword->password_hash
+                    )
+                ) {
+                    throw ValidationException::withMessages([
                         'password' =>
                             'Password tersebut sudah digunakan sebagai password akses lain.',
                     ]);
+                }
             }
-        }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Create Supplemental Access Password
-        |--------------------------------------------------------------------------
-        */
+            AdminAccessPassword::create([
+                'user_id' => $user->id,
+                'recovery_request_id' => $lockedRecovery->id,
+                'holder_name' => $lockedRecovery->requester_name,
+                'holder_email' => $lockedRecovery->requester_email,
+                'password_hash' => Hash::make(
+                    $validated['password']
+                ),
+                'is_active' => true,
+            ]);
 
-        AdminAccessPassword::create([
-            'user_id' => $user->id,
-
-            'recovery_request_id' => $recovery->id,
-
-            'holder_name' => $recovery->requester_name,
-
-            'holder_email' => $recovery->requester_email,
-
-            'password_hash' => Hash::make(
-                $validated['password']
-            ),
-
-            'is_active' => true,
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Mark Password as Created
-        |--------------------------------------------------------------------------
-        */
-
-        $recovery->update([
-            'password_created_at' => now(),
-        ]);
+            $lockedRecovery->update([
+                'password_created_at' => now(),
+            ]);
+        });
 
         return redirect()
             ->route('admin.login')
@@ -807,5 +841,26 @@ class AdminRecoveryController extends Controller
                 'success',
                 'Password akses berhasil dibuat. Silakan login menggunakan password baru Anda.'
             );
+    }
+
+    private function maskEmail(string $email): string
+    {
+        $email = strtolower(
+            trim($email)
+        );
+
+        if (!str_contains($email, '@')) {
+            return 'akun admin';
+        }
+
+        [$local, $domain] = explode('@', $email, 2);
+
+        if ($local === '') {
+            return '***@' . $domain;
+        }
+
+        $visible = substr($local, 0, min(2, strlen($local)));
+
+        return $visible . '***@' . $domain;
     }
 }

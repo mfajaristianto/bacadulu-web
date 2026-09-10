@@ -3,15 +3,6 @@
 
 @section('blogging-main')
 
-@php
-
-    $latestEvents = $events
-        ->getCollection()
-        ->take(5);
-
-@endphp
-
-
 {{-- ========================================================= --}}
 {{-- HEADER --}}
 {{-- ========================================================= --}}
@@ -96,8 +87,12 @@
                         $featured->banner_image
                     ) }}"
                     alt="{{ $featured->title }}"
+                    fetchpriority="high"
+                    decoding="async"
                     class="w-full
-                           h-72
+                           h-48
+                           sm:h-64
+                           lg:h-72
                            object-cover"
                 >
 
@@ -388,7 +383,8 @@
                         'event.show',
                         $featured->slug
                     ) }}"
-                    class="text-sm
+                    class="inline-flex min-h-11 items-center
+                           text-sm
                            font-semibold
                            text-orange-600
                            hover:text-orange-700
@@ -444,8 +440,11 @@
                             $event->banner_image
                         ) }}"
                         alt="{{ $event->title }}"
+                        loading="lazy"
+                        decoding="async"
                         class="w-full
-                               h-56
+                               h-44
+                               sm:h-56
                                object-cover"
                     >
 
@@ -455,7 +454,7 @@
 
 
 
-            <div class="p-5">
+            <div class="p-4 sm:p-5">
 
 
                 {{-- CATEGORY & DATE --}}
@@ -631,7 +630,8 @@
                             'event.show',
                             $event->slug
                         ) }}"
-                        class="text-sm
+                        class="inline-flex min-h-11 items-center
+                               text-sm
                                font-semibold
                                text-orange-600
                                hover:text-orange-700

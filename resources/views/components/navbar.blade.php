@@ -4,9 +4,29 @@
         || request()->routeIs('event.*')
         || request()->routeIs('community.*')
         || request()->routeIs('profile.*');
+
+    $isAboutArea = request()->routeIs('tentang.*');
+
+    $isCatalogArea = request()->routeIs(
+        'informasi*',
+        'konsultasi*',
+        'jurnal*',
+        'conference*',
+        'publisher*'
+    );
+
+    $submitMessage = 'Halo BacaDulu, saya ingin mengirim naskah dan berkonsultasi mengenai layanan penerbitan.';
+    $submitUrl = 'https://wa.me/'
+        . config('bacadulu.call_center_wa')
+        . '?text='
+        . rawurlencode($submitMessage);
 @endphp
 
-<nav id="main-navbar" class="bd-navbar">
+<nav
+    id="main-navbar"
+    class="bd-navbar"
+    aria-label="Navigasi utama"
+>
 
     <div class="bd-navbar-container">
 
@@ -21,6 +41,7 @@
                 <a
                     href="{{ route('home') }}"
                     class="bd-navbar-logo"
+                    aria-label="Baca Dulu - Beranda"
                 >
                     <img
                         src="{{ asset('img/images.jpg') }}"
@@ -51,6 +72,7 @@
                             bd-nav-link
                             {{ request()->is('/') ? 'is-active' : '' }}
                         "
+                        @if(request()->is('/')) aria-current="page" @endif
                     >
                         Home
                     </a>
@@ -65,7 +87,11 @@
 
                         <button
                             type="button"
-                            class="bd-nav-link bd-nav-dropdown-trigger"
+                            id="bd-about-trigger"
+                            class="bd-nav-link bd-nav-dropdown-trigger {{ $isAboutArea ? 'is-active' : '' }}"
+                            aria-expanded="false"
+                            aria-controls="bd-about-menu"
+                            aria-haspopup="true"
                         >
                             <span>
                                 Tentang Kami
@@ -77,7 +103,11 @@
                         </button>
 
 
-                        <div class="bd-nav-dropdown-menu">
+                        <div
+                            id="bd-about-menu"
+                            class="bd-nav-dropdown-menu"
+                            aria-labelledby="bd-about-trigger"
+                        >
 
                             <a
                                 href="{{ route('tentang.dewan-redaksi') }}#team-bacadulu"
@@ -111,7 +141,11 @@
 
                         <button
                             type="button"
-                            class="bd-nav-link bd-nav-dropdown-trigger"
+                            id="bd-catalog-trigger"
+                            class="bd-nav-link bd-nav-dropdown-trigger {{ $isCatalogArea ? 'is-active' : '' }}"
+                            aria-expanded="false"
+                            aria-controls="bd-catalog-menu"
+                            aria-haspopup="true"
                         >
                             <span>
                                 Katalog Baca
@@ -123,7 +157,11 @@
                         </button>
 
 
-                        <div class="bd-nav-dropdown-menu bd-nav-dropdown-wide">
+                        <div
+                            id="bd-catalog-menu"
+                            class="bd-nav-dropdown-menu bd-nav-dropdown-wide"
+                            aria-labelledby="bd-catalog-trigger"
+                        >
 
                             <a href="{{ route('informasi') }}">
                                 Baca Informasi
@@ -161,6 +199,7 @@
                             bd-nav-link
                             {{ request()->routeIs('portofolio.bookstore*') ? 'is-active' : '' }}
                         "
+                        @if(request()->routeIs('portofolio.bookstore*')) aria-current="page" @endif
                     >
                         Bookstore
                     </a>
@@ -177,8 +216,9 @@
                             bd-nav-link
                             {{ $isBloggingArea ? 'is-active' : '' }}
                         "
+                        @if($isBloggingArea) aria-current="page" @endif
                     >
-                        Bloging
+                        Blogging
                     </a>
 
                 </div>
@@ -193,6 +233,7 @@
                             bd-nav-link
                             {{ request()->routeIs('haki.*') ? 'is-active' : '' }}
                         "
+                        @if(request()->routeIs('haki.*')) aria-current="page" @endif
                     >
                         HAKI
                     </a>
@@ -204,10 +245,11 @@
                 <div class="bd-nav-slot bd-nav-submit-slot">
 
                     <a
-                        href="{{ config('bacadulu.call_center') }}"
+                        href="{{ $submitUrl }}"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="bd-nav-submit"
+                        aria-label="Kirim naskah melalui WhatsApp Baca Dulu"
                     >
                         Kirim Naskah
                     </a>
@@ -230,6 +272,9 @@
                                 <button
                                     type="button"
                                     class="bd-nav-profile-trigger"
+                                    aria-expanded="false"
+                                    aria-controls="bd-profile-menu"
+                                    aria-haspopup="true"
                                 >
 
                                     <x-user-avatar
@@ -249,7 +294,10 @@
                                 </button>
 
 
-                                <div class="bd-nav-profile-menu">
+                                <div
+                                    id="bd-profile-menu"
+                                    class="bd-nav-profile-menu"
+                                >
 
                                     @if(auth()->user()->is_admin)
 
@@ -346,6 +394,7 @@
     <div
         id="mobile-menu"
         class="bd-mobile-menu"
+        aria-hidden="true"
     >
 
         <div class="bd-mobile-menu-inner">
@@ -357,6 +406,7 @@
                     bd-mobile-main-link
                     {{ request()->is('/') ? 'is-active' : '' }}
                 "
+                @if(request()->is('/')) aria-current="page" @endif
             >
                 Home
             </a>
@@ -425,6 +475,7 @@
                 <a
                     href="{{ route('portofolio.bookstore') }}"
                     class="{{ request()->routeIs('portofolio.bookstore*') ? 'is-active' : '' }}"
+                    @if(request()->routeIs('portofolio.bookstore*')) aria-current="page" @endif
                 >
                     Bookstore
                 </a>
@@ -433,6 +484,7 @@
                 <a
                     href="{{ route('blog.index') }}"
                     class="{{ $isBloggingArea ? 'is-active' : '' }}"
+                    @if($isBloggingArea) aria-current="page" @endif
                 >
                     Blogging
                 </a>
@@ -441,6 +493,7 @@
                 <a
                     href="{{ route('haki.index') }}"
                     class="{{ request()->routeIs('haki.*') ? 'is-active' : '' }}"
+                    @if(request()->routeIs('haki.*')) aria-current="page" @endif
                 >
                     HAKI
                 </a>
@@ -452,10 +505,11 @@
             <div class="bd-mobile-actions">
 
                 <a
-                    href="{{ config('bacadulu.call_center') }}"
+                    href="{{ $submitUrl }}"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="bd-mobile-submit"
+                    aria-label="Kirim naskah melalui WhatsApp Baca Dulu"
                 >
                     Kirim Naskah
                 </a>
@@ -1232,6 +1286,12 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
 
 html[data-baca-device="desktop"][data-baca-input="fine"]
 .bd-nav-dropdown:hover
+.bd-nav-dropdown-trigger svg,
+html[data-baca-device="desktop"][data-baca-input="fine"]
+.bd-nav-dropdown:focus-within
+.bd-nav-dropdown-trigger svg,
+html[data-baca-device="desktop"][data-baca-input="fine"]
+.bd-nav-dropdown.is-open
 .bd-nav-dropdown-trigger svg{
     transform:
         rotate(180deg);
@@ -1289,6 +1349,12 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
 
 html[data-baca-device="desktop"][data-baca-input="fine"]
 .bd-nav-dropdown:hover
+.bd-nav-dropdown-menu,
+html[data-baca-device="desktop"][data-baca-input="fine"]
+.bd-nav-dropdown:focus-within
+.bd-nav-dropdown-menu,
+html[data-baca-device="desktop"][data-baca-input="fine"]
+.bd-nav-dropdown.is-open
 .bd-nav-dropdown-menu{
     opacity:1;
 
@@ -1559,6 +1625,12 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
 
 html[data-baca-device="desktop"][data-baca-input="fine"]
 .bd-nav-profile:hover
+.bd-nav-profile-menu,
+html[data-baca-device="desktop"][data-baca-input="fine"]
+.bd-nav-profile:focus-within
+.bd-nav-profile-menu,
+html[data-baca-device="desktop"][data-baca-input="fine"]
+.bd-nav-profile.is-open
 .bd-nav-profile-menu{
     opacity:1;
 
@@ -1612,6 +1684,18 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
 html[data-baca-device="desktop"][data-baca-input="fine"]
 .bd-nav-profile-menu button:hover{
     background:#FEF2F2;
+}
+
+
+.bd-nav-link:focus-visible,
+.bd-nav-submit:focus-visible,
+.bd-nav-login:focus-visible,
+.bd-nav-profile-trigger:focus-visible,
+.bd-mobile-menu-button:focus-visible,
+.bd-mobile-menu a:focus-visible,
+.bd-mobile-menu button:focus-visible{
+    outline:3px solid #F0A52E;
+    outline-offset:3px;
 }
 
 
@@ -1818,14 +1902,9 @@ body.bd-menu-open{
 
 <script>
 (function () {
-
     function initBacaNavbar() {
-
         const nav =
-            document.getElementById(
-                'main-navbar'
-            );
-
+            document.getElementById('main-navbar');
 
         if (
             !nav
@@ -1835,107 +1914,308 @@ body.bd-menu-open{
             return;
         }
 
-
-        nav.dataset.navReady =
-            '1';
-
+        nav.dataset.navReady = '1';
 
         const menu =
-            nav.querySelector(
-                '#mobile-menu'
-            );
-
+            nav.querySelector('#mobile-menu');
 
         const button =
-            nav.querySelector(
-                '#mobile-menu-button'
-            );
-
+            nav.querySelector('#mobile-menu-button');
 
         const hamburger =
-            nav.querySelector(
-                '#hamburger-icon'
-            );
-
+            nav.querySelector('#hamburger-icon');
 
         const close =
-            nav.querySelector(
-                '#close-icon'
-            );
+            nav.querySelector('#close-icon');
 
-
-        if (
-            !menu
-            ||
-            !button
-        ) {
+        if (!menu || !button) {
             return;
         }
 
+        const desktopDropdowns = [
+            ...nav.querySelectorAll(
+                '.bd-nav-dropdown'
+            )
+        ];
 
-        /* =========================================================
-           DEVICE
-        ========================================================== */
+        const profile =
+            nav.querySelector('.bd-nav-profile');
+
         function isDesktop() {
-
-            if (
-                window.BacaDevice
-            ) {
-
+            if (window.BacaDevice) {
                 return (
-                    window.BacaDevice.type ===
-                    'desktop'
+                    window.BacaDevice.type === 'desktop'
                     &&
-                    window.BacaDevice.input ===
-                    'fine'
+                    window.BacaDevice.input === 'fine'
                 );
             }
 
-
             return (
-                window.matchMedia(
-                    '(min-width:1024px)'
-                ).matches
+                window.matchMedia('(min-width:1024px)').matches
                 &&
-                window.matchMedia(
-                    '(hover:hover)'
-                ).matches
+                window.matchMedia('(hover:hover)').matches
                 &&
-                window.matchMedia(
-                    '(pointer:fine)'
-                ).matches
+                window.matchMedia('(pointer:fine)').matches
             );
         }
 
-
-        /* =========================================================
-           MENU STATE
-        ========================================================== */
-        function setMenu(
+        function setDisclosure(
+            wrapper,
             open
         ) {
-
-            if (
-                isDesktop()
-            ) {
-                open =
-                    false;
+            if (!wrapper) {
+                return;
             }
 
+            wrapper.classList.toggle(
+                'is-open',
+                open
+            );
+
+            wrapper
+                .querySelector(
+                    '.bd-nav-dropdown-trigger, .bd-nav-profile-trigger'
+                )
+                ?.setAttribute(
+                    'aria-expanded',
+                    open ? 'true' : 'false'
+                );
+        }
+
+        function closeDesktopDisclosures(
+            except = null
+        ) {
+            [
+                ...desktopDropdowns,
+                profile
+            ]
+                .filter(Boolean)
+                .forEach(wrapper => {
+                    if (wrapper !== except) {
+                        setDisclosure(
+                            wrapper,
+                            false
+                        );
+                    }
+                });
+        }
+
+        desktopDropdowns.forEach(wrapper => {
+            const trigger =
+                wrapper.querySelector(
+                    '.bd-nav-dropdown-trigger'
+                );
+
+            if (!trigger) {
+                return;
+            }
+
+            trigger.addEventListener(
+                'click',
+                event => {
+                    if (!isDesktop()) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const shouldOpen =
+                        !wrapper.classList
+                            .contains('is-open');
+
+                    closeDesktopDisclosures(
+                        wrapper
+                    );
+
+                    setDisclosure(
+                        wrapper,
+                        shouldOpen
+                    );
+                }
+            );
+
+            wrapper.addEventListener(
+                'mouseenter',
+                () => {
+                    if (isDesktop()) {
+                        setDisclosure(
+                            wrapper,
+                            true
+                        );
+                    }
+                }
+            );
+
+            wrapper.addEventListener(
+                'mouseleave',
+                () => {
+                    if (isDesktop()) {
+                        setDisclosure(
+                            wrapper,
+                            false
+                        );
+                    }
+                }
+            );
+
+            wrapper.addEventListener(
+                'focusin',
+                () => {
+                    if (isDesktop()) {
+                        closeDesktopDisclosures(
+                            wrapper
+                        );
+
+                        setDisclosure(
+                            wrapper,
+                            true
+                        );
+                    }
+                }
+            );
+
+            wrapper.addEventListener(
+                'focusout',
+                () => {
+                    window.setTimeout(
+                        () => {
+                            if (
+                                !wrapper.contains(
+                                    document.activeElement
+                                )
+                            ) {
+                                setDisclosure(
+                                    wrapper,
+                                    false
+                                );
+                            }
+                        },
+                        0
+                    );
+                }
+            );
+        });
+
+        if (profile) {
+            const profileTrigger =
+                profile.querySelector(
+                    '.bd-nav-profile-trigger'
+                );
+
+            profileTrigger?.addEventListener(
+                'click',
+                event => {
+                    if (!isDesktop()) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const shouldOpen =
+                        !profile.classList
+                            .contains('is-open');
+
+                    closeDesktopDisclosures(
+                        profile
+                    );
+
+                    setDisclosure(
+                        profile,
+                        shouldOpen
+                    );
+                }
+            );
+
+            profile.addEventListener(
+                'mouseenter',
+                () => {
+                    if (isDesktop()) {
+                        setDisclosure(
+                            profile,
+                            true
+                        );
+                    }
+                }
+            );
+
+            profile.addEventListener(
+                'mouseleave',
+                () => {
+                    if (isDesktop()) {
+                        setDisclosure(
+                            profile,
+                            false
+                        );
+                    }
+                }
+            );
+
+            profile.addEventListener(
+                'focusin',
+                () => {
+                    if (isDesktop()) {
+                        closeDesktopDisclosures(
+                            profile
+                        );
+
+                        setDisclosure(
+                            profile,
+                            true
+                        );
+                    }
+                }
+            );
+
+            profile.addEventListener(
+                'focusout',
+                () => {
+                    window.setTimeout(
+                        () => {
+                            if (
+                                !profile.contains(
+                                    document.activeElement
+                                )
+                            ) {
+                                setDisclosure(
+                                    profile,
+                                    false
+                                );
+                            }
+                        },
+                        0
+                    );
+                }
+            );
+        }
+
+        function setMenu(open) {
+            if (isDesktop()) {
+                open = false;
+            }
 
             menu.classList.toggle(
                 'is-open',
                 open
             );
 
+            menu.setAttribute(
+                'aria-hidden',
+                open ? 'false' : 'true'
+            );
+
+            if ('inert' in menu) {
+                menu.inert = !open;
+            }
 
             button.setAttribute(
                 'aria-expanded',
-                open
-                    ? 'true'
-                    : 'false'
+                open ? 'true' : 'false'
             );
 
+            button.setAttribute(
+                'aria-label',
+                open ? 'Tutup menu' : 'Buka menu'
+            );
 
             hamburger
                 ?.classList
@@ -1944,14 +2224,12 @@ body.bd-menu-open{
                     open
                 );
 
-
             close
                 ?.classList
                 .toggle(
                     'is-hidden',
                     !open
                 );
-
 
             document.body
                 .classList
@@ -1961,170 +2239,81 @@ body.bd-menu-open{
                 );
         }
 
-
-        /* =========================================================
-           BUTTON
-        ========================================================== */
         button.addEventListener(
             'click',
             function () {
-
-                if (
-                    isDesktop()
-                ) {
-
-                    setMenu(
-                        false
-                    );
-
+                if (isDesktop()) {
+                    setMenu(false);
                     return;
                 }
 
-
                 setMenu(
                     !menu.classList
-                        .contains(
-                            'is-open'
-                        )
+                        .contains('is-open')
                 );
             }
         );
 
-
-        /* =========================================================
-           CLOSE AFTER LINK
-        ========================================================== */
-        menu.querySelectorAll(
-            'a'
-        ).forEach(
-            function (
-                link
-            ) {
-
+        menu.querySelectorAll('a').forEach(
+            link => {
                 link.addEventListener(
                     'click',
-                    function () {
-
-                        setMenu(
-                            false
-                        );
-
-                    }
+                    () => setMenu(false)
                 );
-
             }
         );
 
-
-        /* =========================================================
-           ESC
-        ========================================================== */
         document.addEventListener(
             'keydown',
-            function (
-                event
-            ) {
-
-                if (
-                    event.key ===
-                    'Escape'
-                ) {
-
-                    setMenu(
-                        false
-                    );
-
+            function (event) {
+                if (event.key !== 'Escape') {
+                    return;
                 }
 
+                const mobileWasOpen =
+                    menu.classList
+                        .contains('is-open');
+
+                setMenu(false);
+                closeDesktopDisclosures();
+
+                if (mobileWasOpen) {
+                    button.focus();
+                }
             }
         );
 
-
-        /* =========================================================
-           CLICK OUTSIDE
-        ========================================================== */
         document.addEventListener(
             'click',
-            function (
-                event
-            ) {
-
-                if (
-                    !menu.classList
-                        .contains(
-                            'is-open'
-                        )
-                ) {
-                    return;
+            function (event) {
+                if (!nav.contains(event.target)) {
+                    setMenu(false);
+                    closeDesktopDisclosures();
                 }
-
-
-                if (
-                    nav.contains(
-                        event.target
-                    )
-                ) {
-                    return;
-                }
-
-
-                setMenu(
-                    false
-                );
-
             }
         );
 
-
-        /* =========================================================
-           DEVICE CHANGE
-        ========================================================== */
         window.addEventListener(
             'baca:devicechange',
             function () {
-
-                if (
-                    isDesktop()
-                ) {
-
-                    setMenu(
-                        false
-                    );
-
-                }
-
+                setMenu(false);
+                closeDesktopDisclosures();
             }
         );
 
-
-        /* =========================================================
-           INITIAL
-        ========================================================== */
-        setMenu(
-            false
-        );
+        setMenu(false);
+        closeDesktopDisclosures();
     }
 
-
-    if (
-        document.readyState ===
-        'loading'
-    ) {
-
+    if (document.readyState === 'loading') {
         document.addEventListener(
             'DOMContentLoaded',
             initBacaNavbar,
-            {
-                once:true
-            }
+            { once:true }
         );
-
     }
     else {
-
         initBacaNavbar();
-
     }
-
 })();
 </script>

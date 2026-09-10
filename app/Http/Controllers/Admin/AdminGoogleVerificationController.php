@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\AdminOtpMail;
+use App\Models\AdminAccessPassword;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -21,11 +22,7 @@ class AdminGoogleVerificationController extends Controller
 
     public function show(Request $request)
     {
-        if (
-            !$request->session()->has(
-                'admin_pending_user_id'
-            )
-        ) {
+        if (!$this->hasValidPendingCredential($request)) {
             return redirect()
                 ->route('admin.login')
                 ->with(
@@ -47,11 +44,7 @@ class AdminGoogleVerificationController extends Controller
 
     public function redirect(Request $request)
     {
-        if (
-            !$request->session()->has(
-                'admin_pending_user_id'
-            )
-        ) {
+        if (!$this->hasValidPendingCredential($request)) {
             return redirect()
                 ->route('admin.login')
                 ->with(
@@ -88,6 +81,19 @@ class AdminGoogleVerificationController extends Controller
         | Check Pending Admin Session
         |--------------------------------------------------------------------------
         */
+
+        if (!$this->hasValidPendingCredential($request)) {
+            $this->clearAdminVerificationSession(
+                $request
+            );
+
+            return redirect()
+                ->route('admin.login')
+                ->with(
+                    'error',
+                    'Sesi login admin tidak valid atau sudah berakhir.'
+                );
+        }
 
         $userId = $request->session()->get(
             'admin_pending_user_id'
@@ -243,6 +249,29 @@ class AdminGoogleVerificationController extends Controller
             (string) $googleUser->getId()
         );
 
+        if ($googleId === '') {
+            return redirect()
+                ->route('admin.google.verify')
+                ->with(
+                    'error',
+                    'Identitas akun Google tidak dapat diverifikasi. Silakan gunakan akun Google lain.'
+                );
+        }
+
+        $googleRaw = $googleUser->getRaw();
+
+        if (
+            array_key_exists('email_verified', $googleRaw) &&
+            $googleRaw['email_verified'] === false
+        ) {
+            return redirect()
+                ->route('admin.google.verify')
+                ->with(
+                    'error',
+                    'Alamat email pada akun Google tersebut belum terverifikasi.'
+                );
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Save Google Identity
@@ -275,6 +304,8 @@ class AdminGoogleVerificationController extends Controller
 
         $request->session()->forget([
             'admin_otp_code',
+            'admin_otp_hash',
+            'admin_otp_attempts',
             'admin_otp_expires_at',
             'admin_otp_verified',
         ]);
@@ -411,6 +442,8 @@ class AdminGoogleVerificationController extends Controller
              */
             $request->session()->forget([
                 'admin_otp_code',
+                'admin_otp_hash',
+                'admin_otp_attempts',
                 'admin_otp_expires_at',
                 'admin_otp_verified',
             ]);
@@ -430,8 +463,17 @@ class AdminGoogleVerificationController extends Controller
         */
 
         $request->session()->put(
-            'admin_otp_code',
-            $otp
+            'admin_otp_hash',
+            hash_hmac(
+                'sha256',
+                $otp,
+                (string) config('app.key')
+            )
+        );
+
+        $request->session()->put(
+            'admin_otp_attempts',
+            0
         );
 
         $request->session()->put(
@@ -465,6 +507,8 @@ class AdminGoogleVerificationController extends Controller
     ): void {
         $request->session()->forget([
             'admin_pending_user_id',
+            'admin_pending_credential_type',
+            'admin_pending_access_password_id',
             'admin_remember',
 
             'admin_google_name',
@@ -472,9 +516,53 @@ class AdminGoogleVerificationController extends Controller
             'admin_google_id',
 
             'admin_otp_code',
+            'admin_otp_hash',
+            'admin_otp_attempts',
             'admin_otp_expires_at',
             'admin_otp_verified',
         ]);
+    }
+
+    private function hasValidPendingCredential(
+        Request $request
+    ): bool {
+        $userId = $request->session()->get(
+            'admin_pending_user_id'
+        );
+
+        $credentialType = $request->session()->get(
+            'admin_pending_credential_type'
+        );
+
+        if (
+            !$userId ||
+            !in_array(
+                $credentialType,
+                ['primary', 'access'],
+                true
+            )
+        ) {
+            return false;
+        }
+
+        if ($credentialType === 'primary') {
+            return true;
+        }
+
+        $accessPasswordId = $request->session()->get(
+            'admin_pending_access_password_id'
+        );
+
+        if (!$accessPasswordId) {
+            return false;
+        }
+
+        return AdminAccessPassword::query()
+            ->where('id', $accessPasswordId)
+            ->where('user_id', $userId)
+            ->where('is_active', true)
+            ->whereNull('revoked_at')
+            ->exists();
     }
 
     /*

@@ -190,13 +190,15 @@
                 {{-- LIKE --}}
                 @auth
                     @php
-                        $liked = $post->isLikedBy(auth()->id());
+                        $liked = (bool) ($post->is_liked_by_user ?? false);
                     @endphp
 
                     <button
                         type="button"
                         id="like-btn-{{ $post->id }}"
                         onclick='toggleLike(@json($post->slug), {{ $post->id }})'
+                        aria-pressed="{{ $liked ? 'true' : 'false' }}"
+                        aria-label="{{ $liked ? 'Batalkan suka' : 'Sukai' }} artikel {{ $post->title }}"
                         class="inline-flex items-center gap-1.5 hover:text-orange-600 transition
                         {{ $liked ? 'text-orange-600' : '' }}"
                     >
@@ -216,7 +218,7 @@
                         </svg>
 
                         <span id="like-count-{{ $post->id }}">
-                            {{ $post->likes()->count() }}
+                            {{ $post->likes_count ?? 0 }}
                         </span>
                     </button>
 
@@ -234,7 +236,7 @@
                             />
                         </svg>
 
-                        <span>{{ $post->likes()->count() }}</span>
+                        <span>{{ $post->likes_count ?? 0 }}</span>
                     </a>
 
                 @endauth
@@ -252,7 +254,7 @@
                         />
                     </svg>
 
-                    <span>{{ $post->comments->count() }}</span>
+                    <span>{{ $post->comments_count ?? 0 }}</span>
                 </a>
 
                 {{-- SHARE --}}
@@ -525,26 +527,42 @@
 @push('scripts')
 
 <script>
-function toggleLike(slug,postId){
-    fetch(`/blog/${slug}/like`,{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json',
-            'X-CSRF-TOKEN':'{{ csrf_token() }}',
-            'Accept':'application/json',
-            'X-Requested-With':'XMLHttpRequest'
-        }
-    })
-    .then(response=>{
+async function toggleLike(slug,postId){
+    const button=document.getElementById(`like-btn-${postId}`);
+
+    if(button?.dataset.busy==='1'){
+        return;
+    }
+
+    if(button){
+        button.dataset.busy='1';
+        button.disabled=true;
+        button.setAttribute('aria-busy','true');
+    }
+
+    try{
+        const response=await fetch(`/blog/${slug}/like`,{
+            method:'POST',
+            credentials:'same-origin',
+            headers:{
+                'Content-Type':'application/json',
+                'X-CSRF-TOKEN':'{{ csrf_token() }}',
+                'Accept':'application/json',
+                'X-Requested-With':'XMLHttpRequest'
+            }
+        });
+
+        const data=await response.json().catch(()=>({}));
+
         if(!response.ok){
-            throw new Error('Gagal memproses like.');
+            if(response.status===429 && data.message){
+                window.alert(data.message);
+            }
+
+            throw new Error(data.message || 'Gagal memproses like.');
         }
 
-        return response.json();
-    })
-    .then(data=>{
         const count=document.getElementById(`like-count-${postId}`);
-        const button=document.getElementById(`like-btn-${postId}`);
         const icon=document.getElementById(`like-icon-${postId}`);
 
         if(count){
@@ -553,6 +571,7 @@ function toggleLike(slug,postId){
 
         if(button){
             button.classList.toggle('text-orange-600',data.liked);
+            button.setAttribute('aria-pressed',data.liked?'true':'false');
         }
 
         if(icon){
@@ -561,10 +580,15 @@ function toggleLike(slug,postId){
                 data.liked ? 'currentColor' : 'none'
             );
         }
-    })
-    .catch(error=>{
+    }catch(error){
         console.error(error);
-    });
+    }finally{
+        if(button){
+            button.dataset.busy='0';
+            button.disabled=false;
+            button.removeAttribute('aria-busy');
+        }
+    }
 }
 
 function sharePost(title,url){

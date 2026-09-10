@@ -291,7 +291,8 @@
 
 @php
     $authorName=$post->user->name ?? $post->author ?? 'Admin Utama';
-    $isLiked=auth()->check() && $post->likes()->where('user_id',auth()->id())->exists();
+    $isLiked=(bool) ($post->is_liked_by_user ?? false);
+    $canInteract=$post->status==='approved';
 @endphp
 
 <div class="bd-article-page">
@@ -353,17 +354,33 @@
 <div class="bd-content prose prose-slate max-w-none">{!! $post->content !!}</div>
 
 <div class="bd-engagement">
-@auth
-<button type="button" onclick="toggleLike('{{ $post->slug }}')" id="like-btn" class="bd-like {{ $isLiked?'liked':'' }}">
-    <svg id="like-icon" width="17" height="17" fill="{{ $isLiked?'currentColor':'none' }}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4.3 6.3a4.5 4.5 0 000 6.4L12 20.4l7.7-7.7a4.5 4.5 0 00-6.4-6.4L12 7.6l-1.3-1.3a4.5 4.5 0 00-6.4 0z"/>
-    </svg>
-    Suka
-    <span class="bd-like-count" id="like-count">{{ $post->likes()->count() }}</span>
-</button>
+@if($canInteract)
+    @auth
+    <button
+        type="button"
+        onclick="toggleLike('{{ $post->slug }}')"
+        id="like-btn"
+        class="bd-like {{ $isLiked?'liked':'' }}"
+        aria-pressed="{{ $isLiked?'true':'false' }}"
+        aria-label="{{ $isLiked?'Batalkan suka':'Sukai' }} artikel {{ $post->title }}"
+    >
+        <svg id="like-icon" width="17" height="17" fill="{{ $isLiked?'currentColor':'none' }}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.3 6.3a4.5 4.5 0 000 6.4L12 20.4l7.7-7.7a4.5 4.5 0 00-6.4-6.4L12 7.6l-1.3-1.3a4.5 4.5 0 00-6.4 0z"/>
+        </svg>
+        Suka
+        <span class="bd-like-count" id="like-count">{{ $post->likes_count ?? 0 }}</span>
+    </button>
+    @else
+    <a href="{{ route('login') }}" class="bd-like">
+        Suka
+        <span class="bd-like-count">{{ $post->likes_count ?? 0 }}</span>
+    </a>
+    @endauth
 @else
-<a href="{{ route('login') }}" class="bd-like">Suka <span class="bd-like-count">{{ $post->likes()->count() }}</span></a>
-@endauth
+    <span class="bd-like" aria-disabled="true">
+        Interaksi aktif setelah artikel disetujui
+    </span>
+@endif
 </div>
 
 </article>
@@ -376,39 +393,54 @@
         <h2 class="bd-discussion-title">Komentar</h2>
         <p class="bd-discussion-subtitle">Bagikan tanggapan atau pemikiran yang relevan dengan artikel.</p>
     </div>
-    <span class="bd-comment-count" id="bdCommentCount">{{ $post->comments->count() }} komentar</span>
+    <span class="bd-comment-count" id="bdCommentCount">{{ $post->comments_count ?? $post->comments->count() }} komentar</span>
 </div>
 
-@auth
-<form action="{{ route('post.comment.store',$post->slug) }}" method="POST" class="bd-compose" id="bdCommentForm">
-    @csrf
-    <div class="bd-compose-row">
-        <div class="bd-avatar">{{ strtoupper(mb_substr(auth()->user()->name ?? 'U',0,1)) }}</div>
+@if($canInteract)
+    @auth
+    <form action="{{ route('post.comment.store',$post->slug) }}" method="POST" class="bd-compose" id="bdCommentForm">
+        @csrf
+        <div class="bd-compose-row">
+            <div class="bd-avatar">{{ strtoupper(mb_substr(auth()->user()->name ?? 'U',0,1)) }}</div>
 
-        <div class="bd-compose-main">
-            <textarea name="content" id="bdCommentTextarea" placeholder="Tulis tanggapan Anda..." required></textarea>
+            <div class="bd-compose-main">
+                <textarea
+                    name="content"
+                    id="bdCommentTextarea"
+                    placeholder="Tulis tanggapan Anda..."
+                    maxlength="2000"
+                    required
+                ></textarea>
 
-            <div class="bd-compose-footer">
-                <span class="bd-compose-help">Jaga diskusi tetap relevan dan nyaman dibaca.</span>
-                <button type="submit" class="bd-send" id="bdCommentSubmit">
-                    <span id="bdCommentSubmitText">Kirim</span>
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6"/>
-                    </svg>
-                </button>
+                <div class="bd-compose-footer">
+                    <span class="bd-compose-help">Jaga diskusi tetap relevan dan nyaman dibaca. Maksimal 2000 karakter.</span>
+                    <button type="submit" class="bd-send" id="bdCommentSubmit">
+                        <span id="bdCommentSubmitText">Kirim</span>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
+    </form>
+    @else
+    <div class="bd-login-comment">
+        <div>
+            <strong>Ingin ikut berdiskusi?</strong>
+            <p>Masuk ke akun Baca Dulu untuk menulis komentar.</p>
+        </div>
+        <a href="{{ route('login') }}" class="bd-login-btn">Masuk untuk berkomentar</a>
     </div>
-</form>
+    @endauth
 @else
 <div class="bd-login-comment">
     <div>
-        <strong>Ingin ikut berdiskusi?</strong>
-        <p>Masuk ke akun Baca Dulu untuk menulis komentar.</p>
+        <strong>Interaksi belum aktif</strong>
+        <p>Like dan komentar akan aktif setelah artikel disetujui admin.</p>
     </div>
-    <a href="{{ route('login') }}" class="bd-login-btn">Masuk untuk berkomentar</a>
 </div>
-@endauth
+@endif
 
 <div class="bd-comments" id="bdCommentsList">
 
@@ -455,7 +487,7 @@
         @auth
         @if(auth()->id()===$comment->user_id)
         <div class="bd-comment-edit">
-            <textarea class="bd-edit-textarea">{{ $comment->content }}</textarea>
+            <textarea class="bd-edit-textarea" maxlength="2000">{{ $comment->content }}</textarea>
 
             <div class="bd-edit-actions">
                 <button type="button" class="bd-edit-btn js-comment-cancel">Batal</button>
@@ -608,6 +640,18 @@
     }
 
     window.toggleLike=async slug=>{
+        const btn=document.getElementById('like-btn');
+
+        if(btn?.dataset.busy==='1'){
+            return;
+        }
+
+        if(btn){
+            btn.dataset.busy='1';
+            btn.disabled=true;
+            btn.setAttribute('aria-busy','true');
+        }
+
         try{
             const response=await fetch(`/blog/${slug}/like`,{
                 method:'POST',
@@ -619,20 +663,28 @@
                 }
             });
 
-            if(!response.ok)throw new Error();
+            const data=await response.json().catch(()=>({}));
 
-            const data=await response.json();
+            if(!response.ok){
+                throw new Error(data.message || 'Silakan coba kembali.');
+            }
 
             document.getElementById('like-count').textContent=data.likes_count;
 
-            const btn=document.getElementById('like-btn');
             const icon=document.getElementById('like-icon');
 
             btn?.classList.toggle('liked',data.liked);
+            btn?.setAttribute('aria-pressed',data.liked?'true':'false');
             icon?.setAttribute('fill',data.liked?'currentColor':'none');
 
-        }catch{
-            showFeedback('error','Like gagal','Silakan coba kembali.');
+        }catch(error){
+            showFeedback('error','Like gagal',error.message || 'Silakan coba kembali.');
+        }finally{
+            if(btn){
+                btn.dataset.busy='0';
+                btn.disabled=false;
+                btn.removeAttribute('aria-busy');
+            }
         }
     };
 
@@ -681,7 +733,7 @@
                 <p class="bd-comment-text">${escapeHtml(comment.content)}</p>
 
                 <div class="bd-comment-edit">
-                    <textarea class="bd-edit-textarea">${escapeHtml(comment.content)}</textarea>
+                    <textarea class="bd-edit-textarea" maxlength="2000">${escapeHtml(comment.content)}</textarea>
                     <div class="bd-edit-actions">
                         <button type="button" class="bd-edit-btn js-comment-cancel">Batal</button>
                         <button type="button" class="bd-edit-btn save js-comment-save">Simpan</button>
@@ -723,9 +775,16 @@
                 body:JSON.stringify({content})
             });
 
-            if(!response.ok)throw new Error();
+            const data=await response.json().catch(()=>({}));
 
-            const data=await response.json();
+            if(!response.ok){
+                const validationMessage=
+                    data?.errors?.content?.[0] ||
+                    data?.message ||
+                    'Silakan coba kembali.';
+
+                throw new Error(validationMessage);
+            }
 
             textarea.value='';
 
@@ -742,11 +801,11 @@
                 'Komentar Anda sudah masuk ke diskusi.'
             );
 
-        }catch{
+        }catch(error){
             showFeedback(
                 'error',
                 'Komentar gagal',
-                'Silakan coba kembali.'
+                error.message || 'Silakan coba kembali.'
             );
         }finally{
             submit.disabled=false;
@@ -803,9 +862,16 @@
                     body:JSON.stringify({content})
                 });
 
-                if(!response.ok)throw new Error();
+                const data=await response.json().catch(()=>({}));
 
-                const data=await response.json();
+                if(!response.ok){
+                    const validationMessage=
+                        data?.errors?.content?.[0] ||
+                        data?.message ||
+                        'Silakan coba kembali.';
+
+                    throw new Error(validationMessage);
+                }
 
                 comment.querySelector('.bd-comment-text').textContent=data.comment.content;
                 textarea.value=data.comment.content;
@@ -817,8 +883,8 @@
                     'Perubahan berhasil disimpan.'
                 );
 
-            }catch{
-                showFeedback('error','Gagal menyimpan','Silakan coba kembali.');
+            }catch(error){
+                showFeedback('error','Gagal menyimpan',error.message || 'Silakan coba kembali.');
             }finally{
                 save.disabled=false;
                 save.textContent='Simpan';
@@ -903,9 +969,16 @@
                 }
             });
 
-            if(!response.ok)throw new Error();
+            const data=await response.json().catch(()=>({}));
 
-            const data=await response.json();
+            if(!response.ok){
+                const validationMessage=
+                    data?.errors?.content?.[0] ||
+                    data?.message ||
+                    'Silakan coba kembali.';
+
+                throw new Error(validationMessage);
+            }
             const target=commentToDelete;
 
             closeDeleteConfirm();
