@@ -935,6 +935,15 @@
     stroke-linejoin:round;
 }
 
+.bd-cta-btn img{
+    width:24px;
+    height:24px;
+    flex:0 0 24px;
+    display:block;
+    object-fit:cover;
+    border-radius:50%;
+}
+
 /* =========================================================
    HOVER DESKTOP
 ========================================================= */
@@ -1840,20 +1849,21 @@
                 </div>
 
                 <a
-                 href="https://wa.me/{{ config('bacadulu.call_center_wa') }}?text={{ rawurlencode('Halo BacaDulu, saya ingin menanyakan layanan Baca Konsultasi dan mitra yang sesuai dengan kebutuhan saya.') }}"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 class="bd-cta-btn"
+                    href="https://wa.me/{{ config('bacadulu.call_center_wa') }}?text={{ rawurlencode('Halo BacaDulu, saya ingin menanyakan layanan Baca Konsultasi dan mitra yang sesuai dengan kebutuhan saya.') }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="bd-cta-btn"
+                    aria-label="Hubungi Baca Dulu melalui WhatsApp"
                 >
-            
-                </a>
-                    Hubungi Baca Dulu
+                    <img
+                        src="{{ asset('img/waa.jpg') }}"
+                        alt=""
+                        aria-hidden="true"
+                    >
 
-                    <svg viewBox="0 0 24 24">
-                        <path d="M5 12h14"/>
-                        <path d="m14 7 5 5-5 5"/>
-                    </svg>
-
+                    <span>
+                        Hubungi Baca Dulu
+                    </span>
                 </a>
 
             </div>
