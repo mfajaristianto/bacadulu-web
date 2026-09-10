@@ -1060,12 +1060,6 @@
                 <span class="bd-journal-list-kicker">Katalog Jurnal</span>
                 <h2>Pilih jurnal yang ingin Anda jelajahi.</h2>
             </div>
-
-            <p>
-                Warna pada setiap kartu mengikuti visual cover jurnal agar identitas
-                masing-masing jurnal lebih mudah dikenali tanpa mengurangi keterbacaan.
-            </p>
-
         </div>
 
         {{-- GRID --}}

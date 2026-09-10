@@ -10,7 +10,7 @@ class ConferenceController extends Controller
     {
         $conferences = Conference::query()
             ->latest()
-            ->paginate(5)
+            ->paginate(6)
             ->withQueryString();
 
         return view(

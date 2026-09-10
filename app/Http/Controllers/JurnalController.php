@@ -10,7 +10,7 @@ class JurnalController extends Controller
     {
         $jurnals = Jurnal::query()
             ->latest()
-            ->paginate(8)
+            ->paginate(6)
             ->withQueryString();
 
         return view(
