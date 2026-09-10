@@ -23,11 +23,13 @@
         </div>
     @elseif($type === 'conference')
         <div class="mt-6 space-y-4">
-            <h2 class="text-2xl font-semibold">{{ $model->title }}</h2>
-            <p class="text-slate-600">Tanggal: {{ $model->event_date }}</p>
+            <h2 class="text-2xl font-semibold">{{ $model->name ?? 'Conference' }}</h2>
+            @if($model->edition)
+                <p class="text-slate-600">Edisi: {{ $model->edition }}</p>
+            @endif
             <div class="prose max-w-none">{!! $model->description !!}</div>
             @if($model->poster)
-                <img src="{{ asset('storage/' . $model->poster) }}" alt="{{ $model->title }}" class="rounded-lg max-h-80 object-cover">
+                <img src="{{ asset('storage/' . $model->poster) }}" alt="{{ $model->name ?? 'Conference' }}" class="rounded-lg max-h-80 object-cover">
             @endif
         </div>
     @elseif($type === 'publisher')

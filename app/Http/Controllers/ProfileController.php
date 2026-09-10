@@ -43,9 +43,17 @@ class ProfileController extends Controller
             $request->file('photo')
         );
 
-        $user->profile_photo = $newPhoto;
-        $user->avatar_source = 'custom';
-        $user->save();
+        try {
+            $user->profile_photo = $newPhoto;
+            $user->avatar_source = 'custom';
+            $user->save();
+        } catch (Throwable $exception) {
+            // File baru sudah terbuat, tetapi database gagal diperbarui.
+            // Bersihkan file baru agar storage tidak menumpuk file yatim.
+            Storage::disk('public')->delete($newPhoto);
+
+            throw $exception;
+        }
 
         if (
             $oldPhoto &&
@@ -64,13 +72,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        if (
-            !$user->avatar ||
-            !filter_var(
-                $user->avatar,
-                FILTER_VALIDATE_URL
-            )
-        ) {
+        if (!$this->validatedGoogleAvatarUrl($user->avatar)) {
             return back()->withErrors([
                 'avatar' => 'Foto dari akun Google tidak tersedia.',
             ]);
@@ -100,42 +102,25 @@ class ProfileController extends Controller
 
     public function googleAvatar(User $user)
     {
-        $url = trim((string) $user->avatar);
-
-        if (
-            !$url ||
-            !filter_var(
-                $url,
-                FILTER_VALIDATE_URL
-            )
-        ) {
-            abort(404);
-        }
-
-        $host = strtolower(
-            (string) parse_url(
-                $url,
-                PHP_URL_HOST
-            )
+        $googleUrl = $this->validatedGoogleAvatarUrl(
+            $user->avatar
         );
 
-        $allowed =
-            $host === 'googleusercontent.com' ||
-            str_ends_with(
-                $host,
-                '.googleusercontent.com'
-            );
-
-        if (!$allowed) {
+        if (!$googleUrl) {
             abort(404);
         }
 
-        $googleUrl = preg_replace(
+        $resizedUrl = preg_replace(
             '/=s\d+-c$/',
             '=s256-c',
-            $url
+            $googleUrl
         );
 
+        if (!is_string($resizedUrl) || $resizedUrl === '') {
+            abort(404);
+        }
+
+        $googleUrl = $resizedUrl;
         $hash = sha1($googleUrl);
 
         $relativePath =
@@ -143,7 +128,7 @@ class ProfileController extends Controller
             $user->id .
             '-' .
             $hash .
-            '.jpg';
+            '.img';
 
         $disk = Storage::disk('public');
 
@@ -152,35 +137,81 @@ class ProfileController extends Controller
                 $response = Http::timeout(6)
                     ->connectTimeout(4)
                     ->retry(1, 150)
+                    ->withHeaders([
+                        'Accept' => 'image/jpeg,image/png,image/webp',
+                    ])
+                    ->withOptions([
+                        'allow_redirects' => false,
+                    ])
                     ->get($googleUrl);
 
                 if (!$response->successful()) {
                     abort(404);
                 }
 
+                $contentLength = (int) (
+                    $response->header('Content-Length') ?: 0
+                );
+
+                if ($contentLength > 5 * 1024 * 1024) {
+                    abort(404);
+                }
+
                 $contentType = strtolower(
-                    (string) $response->header(
-                        'Content-Type'
+                    trim(
+                        (string) $response->header('Content-Type')
                     )
                 );
 
-                if (!str_starts_with(
-                    $contentType,
-                    'image/'
+                $allowedContentTypes = [
+                    'image/jpeg',
+                    'image/jpg',
+                    'image/png',
+                    'image/webp',
+                ];
+
+                $normalizedContentType = trim(
+                    explode(';', $contentType)[0] ?? ''
+                );
+
+                if (!in_array(
+                    $normalizedContentType,
+                    $allowedContentTypes,
+                    true
                 )) {
                     abort(404);
                 }
 
                 $body = $response->body();
 
-                if ($body === '') {
+                if (
+                    $body === '' ||
+                    strlen($body) > 5 * 1024 * 1024
+                ) {
                     abort(404);
                 }
 
-                if (!$disk->put(
-                    $relativePath,
-                    $body
+                $imageInfo = @getimagesizefromstring($body);
+
+                if (!$imageInfo) {
+                    abort(404);
+                }
+
+                $imageType = $imageInfo[2] ?? null;
+
+                if (!in_array(
+                    $imageType,
+                    [
+                        IMAGETYPE_JPEG,
+                        IMAGETYPE_PNG,
+                        IMAGETYPE_WEBP,
+                    ],
+                    true
                 )) {
+                    abort(404);
+                }
+
+                if (!$disk->put($relativePath, $body)) {
                     abort(404);
                 }
             } catch (Throwable $exception) {
@@ -196,13 +227,54 @@ class ProfileController extends Controller
             abort(404);
         }
 
+        if (!@getimagesize($path)) {
+            $disk->delete($relativePath);
+            abort(404);
+        }
+
         return response()->file(
             $path,
             [
                 'Cache-Control' =>
                     'public, max-age=604800, immutable',
+                'X-Content-Type-Options' => 'nosniff',
             ]
         );
+    }
+
+    private function validatedGoogleAvatarUrl(
+        ?string $url
+    ): ?string {
+        $url = trim((string) $url);
+
+        if (
+            $url === '' ||
+            !filter_var($url, FILTER_VALIDATE_URL)
+        ) {
+            return null;
+        }
+
+        $scheme = strtolower(
+            (string) parse_url($url, PHP_URL_SCHEME)
+        );
+
+        $host = strtolower(
+            (string) parse_url($url, PHP_URL_HOST)
+        );
+
+        if ($scheme !== 'https') {
+            return null;
+        }
+
+        $allowedHost =
+            $host === 'googleusercontent.com' ||
+            str_ends_with($host, '.googleusercontent.com');
+
+        if (!$allowedHost) {
+            return null;
+        }
+
+        return $url;
     }
 
     /*

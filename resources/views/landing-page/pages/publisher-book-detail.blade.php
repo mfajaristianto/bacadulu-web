@@ -493,19 +493,61 @@
                 <div class="bd-book-detail-meta">
 
 
-                    <div class="bd-book-detail-meta-item">
+                    @if($book->has_print)
 
-                        <div class="bd-book-detail-meta-label">
-                            ISBN
+                        <div class="bd-book-detail-meta-item">
+
+                            <div class="bd-book-detail-meta-label">
+                                ISBN Buku Cetak
+                            </div>
+
+                            <div class="bd-book-detail-meta-value">
+
+                                {{ $book->effective_print_isbn ?: '-' }}
+
+                            </div>
+
                         </div>
 
-                        <div class="bd-book-detail-meta-value">
+                    @endif
 
-                            {{ $book->isbn ?: '-' }}
+
+                    @if($book->has_ebook)
+
+                        <div class="bd-book-detail-meta-item">
+
+                            <div class="bd-book-detail-meta-label">
+                                ISBN E-Book
+                            </div>
+
+                            <div class="bd-book-detail-meta-value">
+
+                                {{ $book->effective_ebook_isbn ?: '-' }}
+
+                            </div>
 
                         </div>
 
-                    </div>
+                    @endif
+
+
+                    @if($book->has_print && !empty($book->size))
+
+                        <div class="bd-book-detail-meta-item">
+
+                            <div class="bd-book-detail-meta-label">
+                                Ukuran Buku Cetak
+                            </div>
+
+                            <div class="bd-book-detail-meta-value">
+
+                                {{ $book->size }}
+
+                            </div>
+
+                        </div>
+
+                    @endif
 
 
                     <div class="bd-book-detail-meta-item">

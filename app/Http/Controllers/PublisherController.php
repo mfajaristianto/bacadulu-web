@@ -18,4 +18,12 @@ class PublisherController extends Controller
             compact('books')
         );
     }
+
+    public function show(Book $book)
+    {
+        return view(
+            'landing-page.pages.publisher-book-detail',
+            compact('book')
+        );
+    }
 }

@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Jurnal; // Pastikan Model-nya dipanggil
+use App\Models\Jurnal;
 
 class JurnalController extends Controller
 {
     public function index()
     {
-        $jurnals = Jurnal::all(); // Mengambil semua data dari database
-        return view('landing-page.pages.jurnal', compact('jurnals')); // Diubah ke sini
+        $jurnals = Jurnal::query()
+            ->latest()
+            ->paginate(8)
+            ->withQueryString();
+
+        return view(
+            'landing-page.pages.jurnal',
+            compact('jurnals')
+        );
     }
 }

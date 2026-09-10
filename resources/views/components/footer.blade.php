@@ -65,6 +65,7 @@
                     <a
                         href="mailto:admnbacadulu.net@gmail.com"
                         class="bd-footer-contact"
+                        aria-label="Email Baca Dulu"
                     >
                         <span class="bd-footer-contact-icon">
                             <svg viewBox="0 0 24 24">
@@ -76,19 +77,21 @@
                     </a>
 
                     <a
-                        {{ config('bacadulu.call_center_wa') }}
+                        href="https://wa.me/{{ config('bacadulu.call_center_wa') }}"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="bd-footer-contact"
+                        aria-label="Hubungi Call Center Baca Dulu melalui WhatsApp"
                     >
                         <span class="bd-footer-contact-icon">
                             <img
                                 src="{{ asset('img/waa.jpg') }}"
                                 alt=""
+                                aria-hidden="true"
                             >
                         </span>
 
-                        <span>{{ config('bacadulu.call_center_wa') }}</span>
+                        <span>{{ config('bacadulu.call_center') }}</span>
                     </a>
                 </div>
 
@@ -287,7 +290,7 @@
 .bd-footer-location p{
     margin:7px 0 0;
     color:#9CA3AF;
-    font-size:10px;
+    font-size:12px;
     line-height:1.7;
 }
 
@@ -320,7 +323,7 @@
     gap:11px;
     min-width:0;
     color:#D1D5DB!important;
-    font-size:11px;
+    font-size:13px;
     font-weight:650;
     text-decoration:none!important;
 }
@@ -362,7 +365,7 @@
 .bd-footer-social-area h5{
     margin:0 0 12px;
     color:#9CA3AF;
-    font-size:9px;
+    font-size:11px;
     font-weight:750;
     letter-spacing:.1em;
     text-transform:uppercase;
@@ -375,8 +378,8 @@
 }
 
 .bd-footer-socials a{
-    width:42px;
-    height:42px;
+    width:44px;
+    height:44px;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -426,20 +429,26 @@
 .bd-footer-bottom p{
     margin:0;
     color:#6B7280;
-    font-size:10px;
+    font-size:11px;
 }
 
 @media(hover:hover) and (pointer:fine){
     .bd-footer-contact:hover{
-        color:#ffaa00!important;
+        color:#F0A52E!important;
     }
 
     .bd-footer-socials a:hover{
         color:#111122!important;
-        border-color:#ffaa00;
-        background:#ffaa00;
+        border-color:#F0A52E;
+        background:#F0A52E;
         transform:translateY(-2px);
     }
+}
+
+.bd-footer-contact:focus-visible,
+.bd-footer-socials a:focus-visible{
+    outline:3px solid #F0A52E;
+    outline-offset:3px;
 }
 
 /* TABLET */
@@ -484,7 +493,7 @@
     }
 
     .bd-footer-description{
-        font-size:11px;
+        font-size:12px;
     }
 
     .bd-footer-company{

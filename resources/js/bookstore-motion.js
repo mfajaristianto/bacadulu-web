@@ -7,8 +7,6 @@ gsap.registerPlugin(ScrollTrigger);
    GLOBAL
 ===================================================== */
 const CART_KEY = 'bacadulu_cart';
-const WA_NUMBER = '6285139461070';
-const STORE_PATH = '/portofolio/bookstore';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -98,6 +96,70 @@ const escapeHtml = value => {
     return el.innerHTML;
 };
 
+
+const safeHttpUrl = value => {
+    if (!value) return '';
+
+    try {
+        const url = new URL(
+            String(value),
+            window.location.origin
+        );
+
+        if (
+            url.protocol !== 'http:' &&
+            url.protocol !== 'https:'
+        ) {
+            return '';
+        }
+
+        return url.href;
+    } catch {
+        return '';
+    }
+};
+
+const safeSameOriginUrl = value => {
+    const url = safeHttpUrl(value);
+
+    if (!url) return '';
+
+    try {
+        const parsed = new URL(url);
+
+        return parsed.origin === window.location.origin
+            ? parsed.href
+            : '';
+    } catch {
+        return '';
+    }
+};
+
+const getActiveStoreRoot = () =>
+    document.querySelector(
+        '.bookstore-page,' +
+        '.book-detail-page'
+    );
+
+const getStorePath = () => {
+    const root = getActiveStoreRoot();
+
+    const configuredUrl =
+        root?.dataset?.bookstoreUrl ||
+        '/portofolio/bookstore';
+
+    try {
+        const url = new URL(
+            configuredUrl,
+            window.location.origin
+        );
+
+        return url.pathname.replace(/\/$/, '') || '/';
+    } catch {
+        return '/portofolio/bookstore';
+    }
+};
+
 const normalizeCart = data => {
     if (!Array.isArray(data)) return [];
 
@@ -105,6 +167,16 @@ const normalizeCart = data => {
         .map((item, index) => {
             let title = String(item.title ?? '');
             let format = item.format ?? 'Buku';
+
+            const rawKey = String(
+                item.key ??
+                item.productKey ??
+                ''
+            );
+
+            const keyBookId =
+                rawKey.match(/^book-(\d+)-(?:print|ebook)$/i)?.[1] ||
+                null;
 
             if (!item.format && title.toLowerCase().includes('e-book')) {
                 format = 'E-book';
@@ -121,7 +193,11 @@ const normalizeCart = data => {
                     `legacy-${item.id ?? index}-${index}`
                 ),
 
-                bookId: item.bookId ?? item.id ?? null,
+                bookId:
+                    item.bookId ??
+                    item.id ??
+                    keyBookId ??
+                    null,
 
                 title: title.replace(
                     /\s*-\s*(Buku Cetak|E-book)$/i,
@@ -131,9 +207,9 @@ const normalizeCart = data => {
                 format,
                 author: String(item.author ?? ''),
                 publisher: String(item.publisher ?? ''),
-                cover: String(item.cover ?? ''),
+                cover: safeHttpUrl(item.cover ?? ''),
                 description: String(item.description ?? ''),
-                detailUrl: String(item.detailUrl ?? ''),
+                detailUrl: safeSameOriginUrl(item.detailUrl ?? ''),
                 price: Number(item.price ?? 0),
                 stock:
                     item.stock === undefined ||
@@ -163,10 +239,17 @@ const loadCart = () => {
 };
 
 const saveCart = cart => {
-    localStorage.setItem(
-        CART_KEY,
-        JSON.stringify(cart)
-    );
+    try {
+        localStorage.setItem(
+            CART_KEY,
+            JSON.stringify(cart)
+        );
+    } catch (error) {
+        console.warn(
+            '[BacaDulu] Keranjang tidak dapat disimpan ke browser.',
+            error
+        );
+    }
 
     window.dispatchEvent(
         new CustomEvent('bacadulu:cart-updated')
@@ -2745,6 +2828,18 @@ const initStoreCart = root => {
     let cart =
         loadCart();
 
+    const WA_NUMBER =
+        root?.dataset?.callCenterWa?.trim() || '';
+
+    const CART_VALIDATE_URL =
+        root?.dataset?.cartValidateUrl?.trim() || '';
+
+    const CSRF_TOKEN =
+        document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content')
+            ?.trim() || '';
+
     const fab =
         root.querySelector('#cartFab');
 
@@ -2782,6 +2877,17 @@ const initStoreCart = root => {
         root.querySelector('#cartToast');
 
     let toastTimer = null;
+    let lastCartTrigger = null;
+
+    fab?.setAttribute(
+        'aria-expanded',
+        'false'
+    );
+
+    drawer?.setAttribute(
+        'aria-hidden',
+        'true'
+    );
 
     const getCount = () =>
         cart.reduce(
@@ -2835,8 +2941,23 @@ const initStoreCart = root => {
     };
 
     const openCart = () => {
+        lastCartTrigger =
+            document.activeElement instanceof HTMLElement
+                ? document.activeElement
+                : null;
+
         drawer?.classList.add(
             'open'
+        );
+
+        drawer?.setAttribute(
+            'aria-hidden',
+            'false'
+        );
+
+        fab?.setAttribute(
+            'aria-expanded',
+            'true'
         );
 
         overlay?.classList.add(
@@ -2847,6 +2968,10 @@ const initStoreCart = root => {
             'hidden';
 
         window.bdLenis?.stop();
+
+        requestAnimationFrame(() => {
+            drawer?.focus?.();
+        });
 
         if (
             drawer &&
@@ -2869,8 +2994,21 @@ const initStoreCart = root => {
     };
 
     const closeCart = () => {
+        const wasOpen =
+            drawer?.classList.contains('open');
+
         drawer?.classList.remove(
             'open'
+        );
+
+        drawer?.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+        fab?.setAttribute(
+            'aria-expanded',
+            'false'
         );
 
         overlay?.classList.remove(
@@ -2881,6 +3019,15 @@ const initStoreCart = root => {
             '';
 
         window.bdLenis?.start();
+
+        if (
+            wasOpen &&
+            lastCartTrigger?.isConnected
+        ) {
+            requestAnimationFrame(() => {
+                lastCartTrigger?.focus?.();
+            });
+        }
     };
 
     const render = () => {
@@ -3643,50 +3790,210 @@ const initStoreCart = root => {
 
     /* =================================================
        CHECKOUT WHATSAPP
+       Harga dan stok divalidasi ulang ke server agar
+       LocalStorage tidak menjadi sumber kebenaran transaksi.
     ================================================= */
     checkout?.addEventListener(
         'click',
-        () => {
+        async () => {
             if (!cart.length) {
                 return;
             }
 
-            const lines =
-                cart.map(
-                    (
-                        item,
-                        index
-                    ) => {
-                        const subtotal =
-                            Number(item.price) *
-                            Number(item.qty);
+            if (!WA_NUMBER) {
+                showToast(
+                    'Nomor WhatsApp Baca Dulu belum dikonfigurasi.',
+                    true
+                );
 
-                        return `${index + 1}. ${item.title}
+                return;
+            }
+
+            if (
+                !CART_VALIDATE_URL ||
+                !CSRF_TOKEN
+            ) {
+                showToast(
+                    'Validasi keranjang belum tersedia. Muat ulang halaman lalu coba lagi.',
+                    true
+                );
+
+                return;
+            }
+
+            const invalidLegacyItems =
+                cart.filter(item =>
+                    !Number.isInteger(Number(item.bookId)) ||
+                    Number(item.bookId) < 1
+                );
+
+            if (invalidLegacyItems.length) {
+                cart = cart.filter(item =>
+                    Number.isInteger(Number(item.bookId)) &&
+                    Number(item.bookId) > 0
+                );
+
+                persist();
+
+                showToast(
+                    'Ada item keranjang lama yang tidak lagi valid dan sudah dihapus. Silakan periksa kembali.',
+                    true
+                );
+
+                return;
+            }
+
+            const originalLabel =
+                checkout.textContent;
+
+            checkout.disabled = true;
+            checkout.textContent =
+                'Memeriksa harga & stok...';
+
+            let waWindow = null;
+
+            try {
+                /*
+                 * Dibuka saat masih berada di event klik supaya browser
+                 * tidak memblokir tab WhatsApp setelah proses fetch async.
+                 */
+                waWindow = window.open(
+                    'about:blank',
+                    '_blank'
+                );
+
+                if (waWindow) {
+                    waWindow.opener = null;
+                }
+
+                const response =
+                    await fetch(
+                        CART_VALIDATE_URL,
+                        {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': CSRF_TOKEN
+                            },
+                            body: JSON.stringify({
+                                items: cart.map(item => ({
+                                    key: item.key,
+                                    book_id: Number(item.bookId),
+                                    format: /e-?book/i.test(item.format)
+                                        ? 'ebook'
+                                        : 'print',
+                                    qty: Number(item.qty),
+                                    price: Number(item.price)
+                                }))
+                            })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+                    const firstValidationError =
+                        data?.errors
+                            ? Object.values(data.errors)
+                                .flat()
+                                .find(Boolean)
+                            : null;
+
+                    throw new Error(
+                        firstValidationError ||
+                        data?.message ||
+                        'Keranjang gagal divalidasi.'
+                    );
+                }
+
+                if (Array.isArray(data?.items)) {
+                    cart = normalizeCart(data.items);
+                    persist();
+                }
+
+                if (!data?.ok) {
+                    waWindow?.close?.();
+
+                    const issue =
+                        Array.isArray(data?.issues) &&
+                        data.issues.length
+                            ? data.issues[0]
+                            : data?.message;
+
+                    showToast(
+                        issue ||
+                        'Keranjang berubah. Silakan periksa kembali.',
+                        true
+                    );
+
+                    openCart();
+                    return;
+                }
+
+                const lines =
+                    cart.map(
+                        (
+                            item,
+                            index
+                        ) => {
+                            const subtotal =
+                                Number(item.price) *
+                                Number(item.qty);
+
+                            return `${index + 1}. ${item.title}
 Format: ${item.format}
 Penulis: ${item.author}
 Penerbit: ${item.publisher || '-'}
 Harga: ${rupiah(item.price)}
 Jumlah: ${item.qty}
 Subtotal: ${rupiah(subtotal)}`;
-                    }
-                ).join(
-                    '\n\n'
-                );
+                        }
+                    ).join(
+                        '\n\n'
+                    );
 
-            const message =
+                const message =
 `Halo Baca Dulu, saya ingin melakukan pemesanan:
 
 ${lines}
 
 TOTAL: ${rupiah(getTotal())}
 
-Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih.`;
+Mohon konfirmasi ongkir/file E-book serta metode pembayaran. Terima kasih.`;
 
-            window.open(
-                `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`,
-                '_blank',
-                'noopener,noreferrer'
-            );
+                const waUrl =
+                    `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
+
+                if (waWindow) {
+                    waWindow.location.href =
+                        waUrl;
+                } else {
+                    window.location.href =
+                        waUrl;
+                }
+            } catch (error) {
+                waWindow?.close?.();
+
+                console.error(
+                    '[BacaDulu] Checkout gagal:',
+                    error
+                );
+
+                showToast(
+                    error?.message ||
+                    'Checkout gagal diproses. Silakan coba lagi.',
+                    true
+                );
+            } finally {
+                checkout.textContent =
+                    originalLabel;
+
+                checkout.disabled =
+                    cart.length === 0;
+            }
         }
     );
 
@@ -3730,17 +4037,61 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
         closeCart
     );
 
-    const handleEscape = e => {
+    const handleCartKeyboard = e => {
         if (
-            e.key === 'Escape'
+            e.key === 'Escape' &&
+            drawer?.classList.contains('open')
         ) {
+            e.preventDefault();
             closeCart();
+            return;
+        }
+
+        if (
+            e.key !== 'Tab' ||
+            !drawer?.classList.contains('open')
+        ) {
+            return;
+        }
+
+        const focusable = [
+            ...drawer.querySelectorAll(
+                'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
+            )
+        ].filter(element =>
+            element.offsetParent !== null
+        );
+
+        if (!focusable.length) {
+            e.preventDefault();
+            drawer.focus();
+            return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (
+            e.shiftKey &&
+            (
+                document.activeElement === first ||
+                document.activeElement === drawer
+            )
+        ) {
+            e.preventDefault();
+            last.focus();
+        } else if (
+            !e.shiftKey &&
+            document.activeElement === last
+        ) {
+            e.preventDefault();
+            first.focus();
         }
     };
 
     document.addEventListener(
         'keydown',
-        handleEscape
+        handleCartKeyboard
     );
 
     /* =================================================
@@ -3749,7 +4100,7 @@ Mohon konfirmasi stok, ongkir/file E-book, serta metode pembayaran. Terima kasih
     root.__bdCartCleanup = () => {
         document.removeEventListener(
             'keydown',
-            handleEscape
+            handleCartKeyboard
         );
 
         window.removeEventListener(
@@ -4580,10 +4931,13 @@ const isStoreUrl = href => {
             return false;
         }
 
+        const storePath =
+            getStorePath();
+
         return (
-            url.pathname === STORE_PATH ||
+            url.pathname === storePath ||
             url.pathname.startsWith(
-                STORE_PATH + '/'
+                storePath + '/'
             )
         );
     } catch {
@@ -4678,6 +5032,109 @@ const restoreStoreScroll = data => {
                 );
             }
         }
+    );
+};
+
+const syncPageHead = container => {
+    if (!container) {
+        return;
+    }
+
+    const data =
+        container.dataset || {};
+
+    const setMetaContent = (
+        selector,
+        value
+    ) => {
+        if (!value) {
+            return;
+        }
+
+        document
+            .head
+            .querySelector(selector)
+            ?.setAttribute(
+                'content',
+                value
+            );
+    };
+
+    const setLinkHref = (
+        selector,
+        value
+    ) => {
+        if (!value) {
+            return;
+        }
+
+        document
+            .head
+            .querySelector(selector)
+            ?.setAttribute(
+                'href',
+                value
+            );
+    };
+
+    if (data.pageTitle) {
+        document.title =
+            data.pageTitle;
+    }
+
+    setMetaContent(
+        'meta[name="description"]',
+        data.pageDescription
+    );
+
+    setMetaContent(
+        'meta[name="robots"]',
+        data.pageRobots
+    );
+
+    setLinkHref(
+        'link[rel="canonical"]',
+        data.pageCanonical
+    );
+
+    setMetaContent(
+        'meta[property="og:title"]',
+        data.pageTitle
+    );
+
+    setMetaContent(
+        'meta[property="og:description"]',
+        data.pageDescription
+    );
+
+    setMetaContent(
+        'meta[property="og:url"]',
+        data.pageCanonical
+    );
+
+    setMetaContent(
+        'meta[property="og:type"]',
+        data.pageOgType
+    );
+
+    setMetaContent(
+        'meta[property="og:image"]',
+        data.pageOgImage
+    );
+
+    setMetaContent(
+        'meta[name="twitter:title"]',
+        data.pageTitle
+    );
+
+    setMetaContent(
+        'meta[name="twitter:description"]',
+        data.pageDescription
+    );
+
+    setMetaContent(
+        'meta[name="twitter:image"]',
+        data.pageOgImage
     );
 };
 
@@ -4895,16 +5352,9 @@ const initBarba = async () => {
                 },
 
                 afterEnter(data) {
-                    const nextTitle =
-                        data.next
-                            .container
-                            .dataset
-                            .pageTitle;
-
-                    if (nextTitle) {
-                        document.title =
-                            nextTitle;
-                    }
+                    syncPageHead(
+                        data.next.container
+                    );
 
                     gsap.set(
                         wipe,

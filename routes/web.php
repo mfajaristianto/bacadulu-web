@@ -400,6 +400,13 @@ Route::get('/portofolio/bookstore', [
     'index',
 ])->name('portofolio.bookstore');
 
+Route::post('/portofolio/bookstore/cart/validate', [
+    BookstoreController::class,
+    'validateCart',
+])
+    ->middleware('throttle:60,1')
+    ->name('portofolio.bookstore.cart.validate');
+
 Route::get('/portofolio/bookstore/{book:slug}', [
     BookstoreController::class,
     'show',

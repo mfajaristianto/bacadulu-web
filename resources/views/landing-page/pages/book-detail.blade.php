@@ -460,11 +460,20 @@
 }
 .description-text{
     color:#475569;
-    font-size:14px;
+    font-size:15px;
     line-height:1.85;
-    white-space:pre-line;
+    white-space:normal;
     overflow-wrap:anywhere
 }
+.description-text p{margin:0 0 1em}
+.description-text p:last-child{margin-bottom:0}
+.description-text ul,
+.description-text ol{margin:.75em 0 1em;padding-left:1.4em}
+.description-text li{margin:.35em 0}
+.description-text h2,
+.description-text h3,
+.description-text h4{margin:1.2em 0 .55em;color:#0F172A;line-height:1.35}
+.description-text a{color:#C94F35!important;text-decoration:underline;text-underline-offset:3px}
 
 /* DETAIL CART */
 .cart-fab{position:fixed;right:24px;bottom:24px;z-index:1200;display:flex;align-items:center;justify-content:center;width:56px;height:56px;padding:0;border:0;border-radius:50%;color:#fff;background:var(--navy);cursor:pointer;box-shadow:0 12px 28px rgba(36,27,82,.32)}
@@ -559,7 +568,7 @@
     .detail-title{font-size:29px}
     .format-grid{grid-template-columns:1fr}
     .detail-info-grid{grid-template-columns:1fr 1fr}
-    .description-text{font-size:13px}
+    .description-text{font-size:14px}
     .cart-fab{right:17px;bottom:17px;width:54px;height:54px}
     .cart-drawer{width:100%}
     .cart-toast{left:16px;right:16px;bottom:82px;max-width:none}
@@ -580,7 +589,12 @@
 }
 </style>
 
-<div class="book-detail-page">
+<div
+    class="book-detail-page"
+    data-call-center-wa="{{ config('bacadulu.call_center_wa') }}"
+    data-cart-validate-url="{{ route('portofolio.bookstore.cart.validate') }}"
+    data-bookstore-url="{{ route('portofolio.bookstore') }}"
+>
     <div class="detail-page-wrap">
 
         <div data-detail-intro>
@@ -646,22 +660,31 @@
                             </div>
 
                             <div>
-                                <span class="biblio-label">ISBN</span>
-                                <span class="biblio-value">{{ $book->isbn ?? '-' }}</span>
-                            </div>
-                        </div>
-
-                        <div class="biblio-grid">
-                            <div>
                                 <span class="biblio-label">Halaman</span>
                                 <span class="biblio-value">{{ $book->pages ?? '-' }}</span>
                             </div>
-
-                            <div>
-                                <span class="biblio-label">Ukuran</span>
-                                <span class="biblio-value">{{ $book->size ?? '-' }}</span>
-                            </div>
                         </div>
+
+                        @if($book->has_print)
+                            <div class="biblio-grid">
+                                <div>
+                                    <span class="biblio-label">ISBN Buku Cetak</span>
+                                    <span class="biblio-value">{{ $book->effective_print_isbn ?: '-' }}</span>
+                                </div>
+
+                                <div>
+                                    <span class="biblio-label">Ukuran Buku Cetak</span>
+                                    <span class="biblio-value">{{ $book->size ?: '-' }}</span>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if($book->has_ebook)
+                            <div>
+                                <span class="biblio-label">ISBN E-Book</span>
+                                <span class="biblio-value">{{ $book->effective_ebook_isbn ?: '-' }}</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -838,7 +861,11 @@
                     <div class="description-section" data-detail-scroll>
                         <h2 class="description-title">Sinopsis & Deskripsi</h2>
                         <div class="description-text">
-                            {{ $book->description ?? 'Belum ada deskripsi.' }}
+                            @if(!empty($book->description))
+                                {!! $book->description !!}
+                            @else
+                                <p>Belum ada deskripsi.</p>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -851,6 +878,8 @@
         class="cart-fab"
         id="cartFab"
         aria-label="Buka keranjang"
+        aria-controls="cartDrawer"
+        aria-expanded="false"
     >
         <svg viewBox="0 0 24 24">
             <circle cx="9" cy="20" r="1"/>
@@ -862,10 +891,18 @@
 
     <div class="cart-overlay" id="cartOverlay"></div>
 
-    <aside class="cart-drawer" id="cartDrawer" aria-label="Keranjang belanja">
+    <aside
+        class="cart-drawer"
+        id="cartDrawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cartDrawerTitle"
+        aria-hidden="true"
+        tabindex="-1"
+    >
         <div class="cart-drawer-head">
             <div class="cart-heading">
-                <h3>Keranjang Anda</h3>
+                <h3 id="cartDrawerTitle">Keranjang Anda</h3>
                 <p id="cartHeaderCount">Belum ada produk</p>
             </div>
 
@@ -883,11 +920,17 @@
             <div class="cart-summary-row"><span>Jumlah produk</span><strong id="cartItemCount">0 item</strong></div>
             <div class="cart-total-row"><span>Total</span><strong id="cartTotal">IDR 0,00</strong></div>
             <button type="button" class="checkout-btn" id="checkoutBtn" disabled>Checkout via WhatsApp</button>
-            <p class="cart-note">Stok, ongkir, file E-book, dan pembayaran akan dikonfirmasi oleh tim Baca Dulu.</p>
+            <p class="cart-note">Harga dan stok diverifikasi ulang sebelum WhatsApp dibuka. Ongkir, file E-book, dan pembayaran dikonfirmasi oleh tim Baca Dulu.</p>
         </div>
     </aside>
 
-    <div class="cart-toast" id="cartToast"></div>
+    <div
+        class="cart-toast"
+        id="cartToast"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+    ></div>
 </div>
 
 @endsection

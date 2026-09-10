@@ -1288,229 +1288,153 @@
 
     <script>
         (() => {
+            const button = document.getElementById('retryButton');
+            const buttonText = document.getElementById('retryButtonText');
+            const status = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('connectionStatusText');
 
-            const button =
-                document.getElementById(
-                    'retryButton'
-                );
-
-            const buttonText =
-                document.getElementById(
-                    'retryButtonText'
-                );
-
-            const status =
-                document.getElementById(
-                    'connectionStatus'
-                );
-
-            const statusText =
-                document.getElementById(
-                    'connectionStatusText'
-                );
-
-
-            if (
-                !button ||
-                !buttonText ||
-                !status ||
-                !statusText
-            ) {
+            if (!button || !buttonText || !status || !statusText) {
                 return;
             }
 
-
             let checking = false;
 
-
-            const setOffline = () => {
-
-                status.classList.remove(
-                    'is-online',
-                    'is-checking'
-                );
-
-                status.classList.add(
-                    'is-offline'
-                );
-
-                statusText.textContent =
-                    'Perangkat sedang offline';
-
+            const setOffline = (message = 'Perangkat sedang offline') => {
+                status.classList.remove('is-online', 'is-checking');
+                status.classList.add('is-offline');
+                statusText.textContent = message;
             };
-
 
             const setOnline = () => {
-
-                status.classList.remove(
-                    'is-offline',
-                    'is-checking'
-                );
-
-                status.classList.add(
-                    'is-online'
-                );
-
-                statusText.textContent =
-                    'Koneksi kembali tersedia';
-
+                status.classList.remove('is-offline', 'is-checking');
+                status.classList.add('is-online');
+                statusText.textContent = 'Koneksi ke Baca Dulu tersedia';
             };
-
 
             const setChecking = () => {
-
-                status.classList.remove(
-                    'is-offline',
-                    'is-online'
-                );
-
-                status.classList.add(
-                    'is-checking'
-                );
-
-                statusText.textContent =
-                    'Memeriksa koneksi...';
-
+                status.classList.remove('is-offline', 'is-online');
+                status.classList.add('is-checking');
+                statusText.textContent = 'Memeriksa koneksi...';
             };
 
-
-            const updateNetworkState = () => {
-
-                if (navigator.onLine) {
-
-                    setOnline();
-
-                    return true;
-
+            const checkServerConnection = async () => {
+                if (!navigator.onLine) {
+                    return false;
                 }
 
-                setOffline();
-
-                return false;
-
-            };
-
-
-            button.addEventListener(
-                'click',
-                () => {
-
-                    if (checking) {
-                        return;
-                    }
-
-
-                    checking = true;
-
-                    button.disabled = true;
-
-                    button.classList.add(
-                        'is-checking'
-                    );
-
-                    buttonText.textContent =
-                        'Memeriksa...';
-
-                    setChecking();
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | STATUS DIBIARKAN TERLIHAT
-                    |--------------------------------------------------------------------------
-                    |
-                    | Tidak langsung reload supaya admin/user sempat melihat
-                    | status "Memeriksa...".
-                    |
-                    */
-
-                    setTimeout(
-                        () => {
-
-                            if (
-                                navigator.onLine
-                            ) {
-
-                                setOnline();
-
-                                buttonText.textContent =
-                                    'Terhubung';
-
-
-                                setTimeout(
-                                    () => {
-
-                                        window.location.reload();
-
-                                    },
-                                    650
-                                );
-
-                                return;
+                try {
+                    const separator = '/up'.includes('?') ? '&' : '?';
+                    const response = await fetch(
+                        `/up${separator}offline-check=${Date.now()}`,
+                        {
+                            method: 'GET',
+                            cache: 'no-store',
+                            credentials: 'same-origin',
+                            headers: {
+                                'X-Offline-Check': '1'
                             }
-
-
-                            setOffline();
-
-                            buttonText.textContent =
-                                'Coba Lagi';
-
-                            button.classList.remove(
-                                'is-checking'
-                            );
-
-                            button.disabled = false;
-
-                            checking = false;
-
-                        },
-                        1600
+                        }
                     );
 
+                    return response.ok;
+                } catch (error) {
+                    return false;
                 }
-            );
+            };
 
+            const refreshServiceWorker = async () => {
+                if (!('serviceWorker' in navigator)) {
+                    return;
+                }
 
-            window.addEventListener(
-                'online',
-                () => {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration('/');
 
-                    setOnline();
-
-                    if (!checking) {
-
-                        buttonText.textContent =
-                            'Muat Ulang';
-
+                    if (registration) {
+                        await registration.update();
                     }
-
+                } catch (error) {
+                    // Update SW tidak boleh menghalangi proses retry.
                 }
-            );
+            };
 
+            const resetButton = () => {
+                buttonText.textContent = 'Coba Lagi';
+                button.classList.remove('is-checking');
+                button.disabled = false;
+                checking = false;
+            };
 
-            window.addEventListener(
-                'offline',
-                () => {
+            const verifyConnection = async ({ reloadWhenOnline = false } = {}) => {
+                if (checking) {
+                    return;
+                }
 
-                    setOffline();
+                checking = true;
+                button.disabled = true;
+                button.classList.add('is-checking');
+                buttonText.textContent = 'Memeriksa...';
+                setChecking();
 
-                    buttonText.textContent =
-                        'Coba Lagi';
+                const startedAt = Date.now();
+                const online = await checkServerConnection();
+                const elapsed = Date.now() - startedAt;
+                const minimumDelay = 650;
 
-                    button.classList.remove(
-                        'is-checking'
+                if (elapsed < minimumDelay) {
+                    await new Promise((resolve) => {
+                        window.setTimeout(resolve, minimumDelay - elapsed);
+                    });
+                }
+
+                if (!online) {
+                    setOffline(
+                        navigator.onLine
+                            ? 'Jaringan ada, tetapi Baca Dulu belum dapat dijangkau'
+                            : 'Perangkat sedang offline'
                     );
-
-                    button.disabled = false;
-
-                    checking = false;
-
+                    resetButton();
+                    return;
                 }
-            );
 
+                setOnline();
+                buttonText.textContent = 'Terhubung';
 
-            updateNetworkState();
+                await refreshServiceWorker();
 
+                if (reloadWhenOnline) {
+                    window.setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                    return;
+                }
+
+                buttonText.textContent = 'Muat Ulang';
+                button.classList.remove('is-checking');
+                button.disabled = false;
+                checking = false;
+            };
+
+            button.addEventListener('click', () => {
+                verifyConnection({ reloadWhenOnline: true });
+            });
+
+            window.addEventListener('online', () => {
+                if (!checking) {
+                    verifyConnection();
+                }
+            });
+
+            window.addEventListener('offline', () => {
+                setOffline();
+                resetButton();
+            });
+
+            if (navigator.onLine) {
+                verifyConnection();
+            } else {
+                setOffline();
+            }
         })();
     </script>
 

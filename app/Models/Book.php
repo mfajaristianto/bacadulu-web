@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\HtmlSanitizer;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -96,6 +98,26 @@ class Book extends Model
         'publish_year',
 
     ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DESCRIPTION SANITIZER
+    |--------------------------------------------------------------------------
+    |
+    | Deskripsi buku ditampilkan sebagai rich HTML pada halaman detail.
+    | Karena itu, HTML dibersihkan saat disimpan dan saat dibaca agar data lama
+    | yang belum melalui sanitizer tetap aman ketika dirender dengan {!! !!}.
+    |
+    */
+
+    protected function description(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => HtmlSanitizer::clean((string) $value),
+            set: fn ($value) => HtmlSanitizer::clean((string) $value),
+        );
+    }
 
 
     protected $casts = [
@@ -280,6 +302,84 @@ class Book extends Model
     }
 
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | ISBN CETAK AKTIF
+    |--------------------------------------------------------------------------
+    |
+    | Data lama hanya memiliki satu kolom ISBN. Fallback ke ISBN lama hanya
+    | dilakukan ketika buku memang cuma mempunyai satu format agar ISBN tidak
+    | salah ditampilkan pada dua format sekaligus.
+    |
+    */
+
+    public function getEffectivePrintIsbnAttribute(): ?string
+    {
+        if (!$this->has_print) {
+
+            return null;
+
+        }
+
+
+        if (!empty($this->print_isbn)) {
+
+            return $this->print_isbn;
+
+        }
+
+
+        if (
+            !$this->has_ebook &&
+            !empty($this->isbn)
+        ) {
+
+            return $this->isbn;
+
+        }
+
+
+        return null;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ISBN E-BOOK AKTIF
+    |--------------------------------------------------------------------------
+    */
+
+    public function getEffectiveEbookIsbnAttribute(): ?string
+    {
+        if (!$this->has_ebook) {
+
+            return null;
+
+        }
+
+
+        if (!empty($this->ebook_isbn)) {
+
+            return $this->ebook_isbn;
+
+        }
+
+
+        if (
+            !$this->has_print &&
+            !empty($this->isbn)
+        ) {
+
+            return $this->isbn;
+
+        }
+
+
+        return null;
+    }
+
+
     /*
     |--------------------------------------------------------------------------
     | STOK BUKU CETAK
@@ -382,6 +482,13 @@ class Book extends Model
 
         $slug =
             Str::slug($title);
+
+
+        if ($slug === '') {
+
+            $slug = 'buku';
+
+        }
 
 
         $base =

@@ -84,7 +84,7 @@ class AdminAuthController extends Controller
             return back()
                 ->withErrors([
                     'email' =>
-                        'Akun ini tidak memiliki akses sebagai admin.',
+                        'Email atau password salah.',
                 ])
                 ->withInput();
         }
@@ -111,7 +111,7 @@ class AdminAuthController extends Controller
             return back()
                 ->withErrors([
                     'email' =>
-                        'Akun admin tidak ditemukan.',
+                        'Email atau password salah.',
                 ])
                 ->withInput();
         }
@@ -291,6 +291,10 @@ class AdminAuthController extends Controller
 
                     $request->session()->regenerate();
 
+                    $this->clearPendingSession(
+                        $request
+                    );
+
                     return redirect()
                         ->route(
                             'admin.dashboard'
@@ -319,6 +323,8 @@ class AdminAuthController extends Controller
             'admin_google_id',
 
             'admin_otp_code',
+            'admin_otp_hash',
+            'admin_otp_attempts',
             'admin_otp_expires_at',
             'admin_otp_verified',
 
@@ -415,8 +421,13 @@ class AdminAuthController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $sessionOtp = $request->session()->get(
-            'admin_otp_code'
+        $sessionOtpHash = $request->session()->get(
+            'admin_otp_hash'
+        );
+
+        $otpAttempts = (int) $request->session()->get(
+            'admin_otp_attempts',
+            0
         );
 
         $expiresAt = $request->session()->get(
@@ -470,7 +481,7 @@ class AdminAuthController extends Controller
         */
 
         if (
-            !$sessionOtp ||
+            !$sessionOtpHash ||
             !$expiresAt
         ) {
             return back()
@@ -493,6 +504,8 @@ class AdminAuthController extends Controller
         ) {
             $request->session()->forget([
                 'admin_otp_code',
+                'admin_otp_hash',
+                'admin_otp_attempts',
                 'admin_otp_expires_at',
                 'admin_otp_verified',
             ]);
@@ -510,16 +523,63 @@ class AdminAuthController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        if ($otpAttempts >= 5) {
+            $request->session()->forget([
+                'admin_otp_code',
+                'admin_otp_hash',
+                'admin_otp_attempts',
+                'admin_otp_expires_at',
+                'admin_otp_verified',
+            ]);
+
+            return redirect()
+                ->route('admin.google.verify')
+                ->with(
+                    'error',
+                    'Batas percobaan OTP telah tercapai. Silakan ulangi verifikasi Google untuk mendapatkan kode baru.'
+                );
+        }
+
+        $submittedOtpHash = hash_hmac(
+            'sha256',
+            (string) $request->otp,
+            (string) config('app.key')
+        );
+
         if (
             !hash_equals(
-                (string) $sessionOtp,
-                (string) $request->otp
+                (string) $sessionOtpHash,
+                $submittedOtpHash
             )
         ) {
+            $otpAttempts++;
+
+            $request->session()->put(
+                'admin_otp_attempts',
+                $otpAttempts
+            );
+
+            if ($otpAttempts >= 5) {
+                $request->session()->forget([
+                    'admin_otp_code',
+                    'admin_otp_hash',
+                    'admin_otp_attempts',
+                    'admin_otp_expires_at',
+                    'admin_otp_verified',
+                ]);
+
+                return redirect()
+                    ->route('admin.google.verify')
+                    ->with(
+                        'error',
+                        'Kode OTP salah terlalu banyak kali. Silakan ulangi verifikasi Google.'
+                    );
+            }
+
             return back()
                 ->with(
                     'error',
-                    'Kode OTP salah.'
+                    'Kode OTP salah. Sisa percobaan: ' . (5 - $otpAttempts) . '.'
                 );
         }
 
@@ -536,6 +596,8 @@ class AdminAuthController extends Controller
 
         $request->session()->forget([
             'admin_otp_code',
+            'admin_otp_hash',
+            'admin_otp_attempts',
             'admin_otp_expires_at',
         ]);
 
@@ -869,6 +931,31 @@ class AdminAuthController extends Controller
         |
         */
 
+        TrustedDevice::query()
+            ->where('user_id', $user->id)
+            ->where(function ($query) {
+                $query
+                    ->whereNotNull('expires_at')
+                    ->where('expires_at', '<=', now());
+            })
+            ->delete();
+
+        TrustedDevice::query()
+            ->where('user_id', $user->id)
+            ->where('credential_type', $credentialType)
+            ->where('user_agent', (string) $request->userAgent())
+            ->when(
+                $credentialType === 'access',
+                fn ($query) => $query->where(
+                    'access_password_id',
+                    $accessPassword?->id
+                ),
+                fn ($query) => $query->whereNull(
+                    'access_password_id'
+                )
+            )
+            ->delete();
+
         TrustedDevice::create([
             'user_id' => $user->id,
 
@@ -1084,6 +1171,8 @@ class AdminAuthController extends Controller
             'admin_remember',
 
             'admin_otp_code',
+            'admin_otp_hash',
+            'admin_otp_attempts',
             'admin_otp_expires_at',
 
             'admin_google_name',

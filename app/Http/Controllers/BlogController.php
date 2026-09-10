@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 class BlogController extends Controller
 {
@@ -56,16 +59,20 @@ class BlogController extends Controller
         */
 
         $query = Post::query()
-            ->with([
-                'user',
-                'comments',
-                'likes',
-            ])
+            ->with('user')
             ->withCount([
                 'likes',
                 'comments',
             ])
             ->where('status', 'approved');
+
+        if (auth()->check()) {
+            $query->withExists([
+                'likes as is_liked_by_user' => function ($likeQuery) {
+                    $likeQuery->where('user_id', auth()->id());
+                },
+            ]);
+        }
 
 
         /*
@@ -148,7 +155,6 @@ class BlogController extends Controller
     | STORE
     |--------------------------------------------------------------------------
     */
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -157,17 +163,14 @@ class BlogController extends Controller
                 'string',
                 'max:255',
             ],
-
             'content' => [
                 'required',
                 'string',
             ],
-
             'category' => [
                 'required',
                 'in:Kesehatan,Sosial,Ekonomi,Teknik',
             ],
-
             'image' => [
                 'nullable',
                 'image',
@@ -176,65 +179,37 @@ class BlogController extends Controller
             ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | IMAGE
-        |--------------------------------------------------------------------------
-        */
-
         $imagePath = null;
 
-        if ($request->hasFile('image')) {
+        try {
+            if ($request->hasFile('image')) {
+                $imagePath = $request
+                    ->file('image')
+                    ->store('post-images', 'public');
+            }
 
-            $imagePath = $request
-                ->file('image')
-                ->store(
-                    'post-images',
-                    'public'
-                );
+            $slug = $this->generateUniqueSlug(
+                $validated['title']
+            );
+
+            Post::create([
+                'user_id' => auth()->id(),
+                'author' => auth()->user()->name,
+                'title' => trim($validated['title']),
+                'slug' => $slug,
+                'content' => $validated['content'],
+                'image' => $imagePath,
+                'category' => $validated['category'],
+                'status' => 'pending',
+                'views' => 0,
+            ]);
+        } catch (Throwable $e) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+
+            throw $e;
         }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SLUG
-        |--------------------------------------------------------------------------
-        */
-
-        $slug = $this->generateUniqueSlug(
-            $validated['title']
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | CREATE
-        |--------------------------------------------------------------------------
-        */
-
-        Post::create([
-            'user_id' => auth()->id(),
-
-            'author' => auth()
-                ->user()
-                ->name,
-
-            'title' => $validated['title'],
-
-            'slug' => $slug,
-
-            'content' => $validated['content'],
-
-            'image' => $imagePath,
-
-            'category' => $validated['category'],
-
-            'status' => 'pending',
-
-            'views' => 0,
-        ]);
-
 
         return redirect()
             ->route('blog.myPosts')
@@ -276,9 +251,26 @@ class BlogController extends Controller
 
         $post->load([
             'user',
-            'comments.user',
-            'likes',
+            'comments' => function ($query) {
+                $query
+                    ->with('user')
+                    ->latest();
+            },
         ]);
+
+        $post->loadCount([
+            'likes',
+            'comments',
+        ]);
+
+        $post->setAttribute(
+            'is_liked_by_user',
+            auth()->check()
+                ? $post->likes()
+                    ->where('user_id', auth()->id())
+                    ->exists()
+                : false
+        );
 
 
         /*
@@ -349,17 +341,13 @@ class BlogController extends Controller
     | UPDATE
     |--------------------------------------------------------------------------
     */
-
     public function update(
         Request $request,
         Post $post
     ) {
-        if (
-            auth()->id() !== $post->user_id
-        ) {
+        if (auth()->id() !== $post->user_id) {
             abort(403);
         }
-
 
         $validated = $request->validate([
             'title' => [
@@ -367,17 +355,14 @@ class BlogController extends Controller
                 'string',
                 'max:255',
             ],
-
             'content' => [
                 'required',
                 'string',
             ],
-
             'category' => [
                 'required',
                 'in:Kesehatan,Sosial,Ekonomi,Teknik',
             ],
-
             'image' => [
                 'nullable',
                 'image',
@@ -386,93 +371,60 @@ class BlogController extends Controller
             ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | DATA
-        |--------------------------------------------------------------------------
-        */
-
         $data = [
-            'title' => $validated['title'],
-
-            'author' => auth()
-                ->user()
-                ->name,
-
+            'title' => trim($validated['title']),
+            'author' => auth()->user()->name,
             'content' => $validated['content'],
-
             'category' => $validated['category'],
+
+            // Artikel yang diedit user harus dimoderasi ulang.
+            // Tanpa ini artikel approved dapat diubah setelah lolos review.
+            'status' => 'pending',
         ];
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | SLUG
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $post->title !==
-            $validated['title']
-        ) {
-
-            $data['slug'] =
-                $this->generateUniqueSlug(
-                    $validated['title'],
-                    $post->id
-                );
+        if ($post->title !== $validated['title']) {
+            $data['slug'] = $this->generateUniqueSlug(
+                $validated['title'],
+                $post->id
+            );
         }
 
+        $oldImage = $post->image;
+        $newImagePath = null;
 
-        /*
-        |--------------------------------------------------------------------------
-        | IMAGE
-        |--------------------------------------------------------------------------
-        */
+        try {
+            if ($request->hasFile('image')) {
+                $newImagePath = $request
+                    ->file('image')
+                    ->store('post-images', 'public');
 
-        if ($request->hasFile('image')) {
-
-            if (
-                $post->image
-                &&
-                Storage::disk('public')
-                    ->exists($post->image)
-            ) {
-
-                Storage::disk('public')
-                    ->delete($post->image);
+                $data['image'] = $newImagePath;
             }
 
+            $post->update($data);
+        } catch (Throwable $e) {
+            if ($newImagePath) {
+                Storage::disk('public')->delete($newImagePath);
+            }
 
-            $data['image'] = $request
-                ->file('image')
-                ->store(
-                    'post-images',
-                    'public'
-                );
+            throw $e;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE
-        |--------------------------------------------------------------------------
-        */
-
-        $post->update($data);
+        if (
+            $newImagePath &&
+            $oldImage &&
+            $oldImage !== $newImagePath
+        ) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
         $post->refresh();
 
-
         return redirect()
-            ->route(
-                'blog.show',
-                $post->slug
-            )
+            ->route('blog.show', $post->slug)
             ->with(
                 'success',
-                'Artikel berhasil diperbarui.'
+                'Artikel berhasil diperbarui dan sedang menunggu persetujuan admin kembali.'
             );
     }
 
@@ -482,42 +434,19 @@ class BlogController extends Controller
     | DESTROY
     |--------------------------------------------------------------------------
     */
-
     public function destroy(Post $post)
     {
-        if (
-            auth()->id() !== $post->user_id
-        ) {
+        if (auth()->id() !== $post->user_id) {
             abort(403);
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | DELETE IMAGE
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $post->image
-            &&
-            Storage::disk('public')
-                ->exists($post->image)
-        ) {
-
-            Storage::disk('public')
-                ->delete($post->image);
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | DELETE POST
-        |--------------------------------------------------------------------------
-        */
+        $imagePath = $post->image;
 
         $post->delete();
 
+        if ($imagePath) {
+            Storage::disk('public')->delete($imagePath);
+        }
 
         return redirect()
             ->route('blog.myPosts')
@@ -534,86 +463,66 @@ class BlogController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function toggleLike($post)
+    public function toggleLike(Request $request, Post $post)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | FIND POST
-        |--------------------------------------------------------------------------
-        |
-        | Bisa menggunakan ID maupun slug.
-        |
-        */
+        if ($post->status !== 'approved') {
+            abort(404);
+        }
 
-        $article = Post::query()
-            ->where('id', $post)
-            ->orWhere('slug', $post)
-            ->firstOrFail();
-
-
-        $userId = auth()->id();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | AUTH
-        |--------------------------------------------------------------------------
-        */
+        $userId = (int) auth()->id();
 
         if (!$userId) {
-
             return response()->json([
                 'message' => 'Unauthenticated.',
             ], 401);
         }
 
+        $rateKey = "blog-like:{$userId}";
 
-        /*
-        |--------------------------------------------------------------------------
-        | EXISTING LIKE
-        |--------------------------------------------------------------------------
-        */
+        if (RateLimiter::tooManyAttempts($rateKey, 20)) {
+            $seconds = max(1, RateLimiter::availableIn($rateKey));
 
-        $existing = $article
-            ->likes()
-            ->where(
-                'user_id',
-                $userId
-            )
-            ->first();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | TOGGLE
-        |--------------------------------------------------------------------------
-        */
-
-        if ($existing) {
-
-            $existing->delete();
-
-            $liked = false;
-
-        } else {
-
-            $article
-                ->likes()
-                ->create([
-                    'user_id' => $userId,
-                ]);
-
-            $liked = true;
+            return response()->json([
+                'message' => "Terlalu banyak aktivitas like. Coba lagi dalam {$seconds} detik.",
+                'retry_after' => $seconds,
+            ], 429);
         }
 
+        RateLimiter::hit($rateKey, 60);
 
-        return response()->json([
-            'liked' => $liked,
+        $result = DB::transaction(function () use ($post, $userId) {
+            $lockedPost = Post::query()
+                ->whereKey($post->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            'likes_count' => $article
+            $existing = $lockedPost
                 ->likes()
-                ->count(),
-        ]);
+                ->where('user_id', $userId)
+                ->first();
+
+            if ($existing) {
+                $existing->delete();
+                $liked = false;
+            } else {
+                $lockedPost
+                    ->likes()
+                    ->create([
+                        'user_id' => $userId,
+                    ]);
+
+                $liked = true;
+            }
+
+            return [
+                'liked' => $liked,
+                'likes_count' => $lockedPost
+                    ->likes()
+                    ->count(),
+            ];
+        });
+
+        return response()->json($result);
     }
 
 

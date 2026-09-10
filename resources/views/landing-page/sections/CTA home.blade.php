@@ -412,7 +412,7 @@
                 </p>
 
                 <a
-                    href="https://wa.me/6285139461070?text=Halo%20Admin%20BacaDulu,%20saya%20ingin%20konsultasi%20penerbitan%20buku."
+                    href="https://wa.me/{{ config('bacadulu.call_center_wa') }}?text={{ rawurlencode('Halo Admin BacaDulu, saya ingin konsultasi penerbitan buku.') }}"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="bd-publish-button"

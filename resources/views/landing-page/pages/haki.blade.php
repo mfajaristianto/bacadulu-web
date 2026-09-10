@@ -1153,6 +1153,10 @@
 }
 </style>
 
+@php
+    $callCenterNumber = (string) config('bacadulu.call_center_wa', '');
+@endphp
+
 
 <div class="haki-page">
 
@@ -1474,9 +1478,7 @@
                         </p>
                     </div>
 
-                    <span class="haki-journal-action">
-                        Pilih Jurnal →
-                    </span>
+                    
 
                 </article>
 
@@ -1541,7 +1543,7 @@
                     </p>
 
                     <a
-                        href="{{ config('bacadulu.call_center') }}{{ urlencode('Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI.') }}"
+                        href="https://wa.me/{{ $callCenterNumber }}?text={{ rawurlencode('Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI.') }}"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="haki-cta-button"
@@ -1570,7 +1572,7 @@
 
         <a
             id="pilihan-wa"
-            href={{ config('bacadulu.call_center') }}
+            href="https://wa.me/{{ $callCenterNumber }}"
             target="_blank"
             rel="noopener noreferrer"
             class="haki-bar-button"
@@ -1635,9 +1637,24 @@
         const label = document.getElementById('pilihan-label');
         const waButton = document.getElementById('pilihan-wa');
 
-        const waNumber = config('bacadulu.call_center_wa');
+        const waNumber = @json($callCenterNumber);
 
-        if (!bar || !label || !waButton) {
+        const consultationMessages = {
+            'buku-ajar':
+                'Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI untuk Buku Ajar / Buku Teks.',
+            'buku-referensi':
+                'Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI untuk Buku Referensi.',
+            'monograf':
+                'Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI untuk Monograf.',
+            'book-chapter':
+                'Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI untuk Book Chapter / Bunga Rampai.',
+            'modul-praktikum':
+                'Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI untuk Modul / Panduan Praktikum.',
+            'jurnal':
+                'Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI untuk Jurnal Ilmiah.'
+        };
+
+        if (!bar || !label || !waButton || !waNumber) {
             return;
         }
 
@@ -1662,12 +1679,16 @@
             const text =
                 card.dataset.label || 'HAKI';
 
+            const slug =
+                card.dataset.slug || '';
+
             label.textContent = text;
 
             const message =
-                'Halo Baca Dulu, saya ingin konsultasi pendaftaran HAKI untuk ' +
-                text +
-                '.';
+                consultationMessages[slug] ||
+                'Halo Baca Dulu, saya ingin berkonsultasi mengenai pendaftaran HAKI untuk ' +
+                    text +
+                    '.';
 
             waButton.href =
                 'https://wa.me/' +

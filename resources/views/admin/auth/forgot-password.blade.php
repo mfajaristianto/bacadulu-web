@@ -399,14 +399,14 @@
                             </label>
 
                             <input
-                                type="email"
+                                type="text"
                                 class="form-control"
-                                value="{{ $adminEmail }}"
+                                value="{{ $adminEmailDisplay }}"
                                 readonly
                             >
 
                             <span class="field-help">
-                                Email ini ditentukan otomatis oleh sistem dan tidak dapat diubah.
+                                Akun admin ditentukan otomatis oleh sistem. Alamat email disamarkan untuk keamanan.
                             </span>
                         </div>
 

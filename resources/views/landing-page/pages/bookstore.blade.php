@@ -3401,7 +3401,12 @@
 </style>
 
 
-<div class="bookstore-page">
+<div
+    class="bookstore-page"
+    data-call-center-wa="{{ config('bacadulu.call_center_wa') }}"
+    data-cart-validate-url="{{ route('portofolio.bookstore.cart.validate') }}"
+    data-bookstore-url="{{ route('portofolio.bookstore') }}"
+>
 
     {{-- =====================================================
          HERO
@@ -4032,7 +4037,7 @@
 
 
                 <a
-                    href="https://wa.me/6285139461070"
+                    href="https://wa.me/{{ config('bacadulu.call_center_wa') }}?text={{ rawurlencode('Halo BacaDulu, saya ingin menanyakan layanan penerbitan dan pengiriman naskah.') }}"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="cta-btn"
@@ -4056,6 +4061,8 @@
         class="cart-fab"
         id="cartFab"
         aria-label="Buka keranjang"
+        aria-controls="cartDrawer"
+        aria-expanded="false"
     >
 
         <svg viewBox="0 0 24 24">
@@ -4095,13 +4102,18 @@
     <aside
         class="cart-drawer"
         id="cartDrawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cartDrawerTitle"
+        aria-hidden="true"
+        tabindex="-1"
     >
 
         <div class="cart-drawer-head">
 
             <div class="cart-heading">
 
-                <h3>
+                <h3 id="cartDrawerTitle">
                     Keranjang Anda
                 </h3>
 
@@ -4186,8 +4198,8 @@
 
 
             <p class="cart-note">
-                Stok, ongkir, file E-book, dan pembayaran
-                akan dikonfirmasi oleh tim Baca Dulu.
+                Harga dan stok diverifikasi ulang sebelum WhatsApp dibuka.
+                Ongkir, file E-book, dan pembayaran dikonfirmasi oleh tim Baca Dulu.
             </p>
 
         </div>
@@ -4198,6 +4210,9 @@
     <div
         class="cart-toast"
         id="cartToast"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
     ></div>
 
 

@@ -7,6 +7,7 @@ use App\Models\Information;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class InformationAdminController extends Controller
 {
@@ -32,25 +33,35 @@ class InformationAdminController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateInformation($request);
-
-        if ($request->hasFile('image')) {
-            $data['image'] = $request
-                ->file('image')
-                ->store('uploads/informations', 'public');
-        }
-
+        $newImagePath = null;
         $isPinned = $request->boolean('is_pinned');
 
-        DB::transaction(function () use ($data, $isPinned) {
-            if ($isPinned) {
-                $this->clearPinnedInformation();
+        if ($request->hasFile('image')) {
+            $newImagePath = $request
+                ->file('image')
+                ->store('uploads/informations', 'public');
+
+            $data['image'] = $newImagePath;
+        }
+
+        try {
+            DB::transaction(function () use ($data, $isPinned) {
+                if ($isPinned) {
+                    $this->clearPinnedInformation();
+                }
+
+                $data['is_pinned'] = $isPinned;
+                $data['pinned_at'] = $isPinned ? now() : null;
+
+                Information::create($data);
+            });
+        } catch (Throwable $e) {
+            if ($newImagePath) {
+                Storage::disk('public')->delete($newImagePath);
             }
 
-            $data['is_pinned'] = $isPinned;
-            $data['pinned_at'] = $isPinned ? now() : null;
-
-            Information::create($data);
-        });
+            throw $e;
+        }
 
         return redirect()
             ->route('admin.informations.index')
@@ -60,6 +71,14 @@ class InformationAdminController extends Controller
                     ? 'Informasi berhasil disimpan dan dijadikan informasi pilihan.'
                     : 'Informasi berhasil disimpan.'
             );
+    }
+
+    public function show(Information $information)
+    {
+        return redirect()->route(
+            'admin.informations.edit',
+            $information
+        );
     }
 
     public function edit(Information $information)
@@ -75,40 +94,34 @@ class InformationAdminController extends Controller
         Information $information
     ) {
         $data = $this->validateInformation($request);
-
-        if ($request->hasFile('image')) {
-            if (
-                $information->image &&
-                Storage::disk('public')->exists($information->image)
-            ) {
-                Storage::disk('public')->delete($information->image);
-            }
-
-            $data['image'] = $request
-                ->file('image')
-                ->store('uploads/informations', 'public');
-        }
-
         $isPinned = $request->boolean('is_pinned');
 
-        DB::transaction(
-            function () use (
+        $oldImagePath = $information->image;
+        $newImagePath = null;
+
+        if ($request->hasFile('image')) {
+            $newImagePath = $request
+                ->file('image')
+                ->store('uploads/informations', 'public');
+
+            $data['image'] = $newImagePath;
+        }
+
+        try {
+            DB::transaction(function () use (
                 $information,
                 $data,
                 $isPinned
             ) {
                 if ($isPinned) {
-                    $this->clearPinnedInformation(
-                        $information->id
-                    );
+                    $this->clearPinnedInformation($information->id);
                 }
 
                 $data['is_pinned'] = $isPinned;
 
                 if ($isPinned) {
                     $data['pinned_at'] =
-                        $information->is_pinned &&
-                        $information->pinned_at
+                        $information->is_pinned && $information->pinned_at
                             ? $information->pinned_at
                             : now();
                 } else {
@@ -116,8 +129,22 @@ class InformationAdminController extends Controller
                 }
 
                 $information->update($data);
+            });
+        } catch (Throwable $e) {
+            if ($newImagePath) {
+                Storage::disk('public')->delete($newImagePath);
             }
-        );
+
+            throw $e;
+        }
+
+        if (
+            $newImagePath &&
+            $oldImagePath &&
+            $oldImagePath !== $newImagePath
+        ) {
+            Storage::disk('public')->delete($oldImagePath);
+        }
 
         return redirect()
             ->route('admin.informations.index')
@@ -146,9 +173,7 @@ class InformationAdminController extends Controller
         }
 
         DB::transaction(function () use ($information) {
-            $this->clearPinnedInformation(
-                $information->id
-            );
+            $this->clearPinnedInformation($information->id);
 
             $information->update([
                 'is_pinned' => true,
@@ -166,14 +191,13 @@ class InformationAdminController extends Controller
 
     public function destroy(Information $information)
     {
-        if (
-            $information->image &&
-            Storage::disk('public')->exists($information->image)
-        ) {
-            Storage::disk('public')->delete($information->image);
-        }
+        $imagePath = $information->image;
 
         $information->delete();
+
+        if ($imagePath) {
+            Storage::disk('public')->delete($imagePath);
+        }
 
         return redirect()
             ->route('admin.informations.index')
@@ -194,17 +218,26 @@ class InformationAdminController extends Controller
             'content' => [
                 'required',
                 'string',
+                'max:50000',
             ],
             'image' => [
                 'nullable',
                 'image',
                 'mimes:jpeg,png,jpg,webp',
-                'max:2048',
+                'max:4096',
             ],
             'is_pinned' => [
                 'nullable',
                 'boolean',
             ],
+        ], [
+            'title.required' => 'Judul informasi wajib diisi.',
+            'title.max' => 'Judul informasi maksimal 255 karakter.',
+            'content.required' => 'Isi informasi wajib diisi.',
+            'content.max' => 'Isi informasi terlalu panjang.',
+            'image.image' => 'Gambar informasi harus berupa file gambar.',
+            'image.mimes' => 'Format gambar harus JPG, JPEG, PNG, atau WebP.',
+            'image.max' => 'Ukuran gambar maksimal 4 MB.',
         ]);
     }
 

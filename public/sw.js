@@ -1,29 +1,29 @@
 const CACHE_PREFIX = 'bacadulu-offline-';
-const CACHE_NAME = `${CACHE_PREFIX}v3`;
+const CACHE_VERSION = 'v4-20260909';
+const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const OFFLINE_URL = '/offline.html';
+const OFFLINE_CACHE_KEY = `${OFFLINE_URL}?v=${CACHE_VERSION}`;
 
 /*
 |--------------------------------------------------------------------------
 | INSTALL
 |--------------------------------------------------------------------------
 |
-| Kita hanya cache halaman offline.
-| Tidak cache halaman website, admin, OTP, recovery, OAuth, dll.
+| Cache hanya halaman fallback offline. Query version pada cache key
+| sengaja diubah setiap kali desain offline berubah supaya perangkat lama
+| tidak terus memakai offline.html dari cache versi sebelumnya.
 |
 */
-
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches
-            .open(CACHE_NAME)
-            .then((cache) => {
-                return cache.add(
-                    new Request(OFFLINE_URL, {
-                        cache: 'reload',
-                    })
-                );
-            })
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.add(
+                new Request(OFFLINE_CACHE_KEY, {
+                    cache: 'reload',
+                })
+            );
+        })
     );
 
     self.skipWaiting();
@@ -34,10 +34,10 @@ self.addEventListener('install', (event) => {
 | ACTIVATE
 |--------------------------------------------------------------------------
 |
-| Bersihkan versi cache offline Baca Dulu yang lama.
+| Hapus seluruh cache offline Baca Dulu versi lama lalu langsung ambil
+| alih halaman yang masih dikontrol service worker lama.
 |
 */
-
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches
@@ -52,7 +52,7 @@ self.addEventListener('activate', (event) => {
                             return caches.delete(cacheName);
                         }
 
-                        return Promise.resolve();
+                        return Promise.resolve(false);
                     })
                 );
             })
@@ -65,32 +65,18 @@ self.addEventListener('activate', (event) => {
 | FETCH
 |--------------------------------------------------------------------------
 |
-| Service worker TIDAK menyimpan response website.
-|
-| Normal:
-| Browser -> Laravel -> response normal
-|
-| Internet/server tidak dapat dijangkau:
-| Browser -> offline.html
+| Service worker tidak menyimpan halaman website, API, gambar, CSS, JS,
+| admin, OTP, recovery, maupun OAuth. Hanya navigasi GET yang gagal karena
+| jaringan/server tidak dapat dijangkau yang mendapat fallback offline.
 |
 */
-
 self.addEventListener('fetch', (event) => {
     const request = event.request;
 
-    /*
-     * Jangan sentuh POST / PUT / PATCH / DELETE.
-     */
     if (request.method !== 'GET') {
         return;
     }
 
-    /*
-     * Kita hanya menyediakan fallback untuk navigasi halaman.
-     *
-     * Jadi request gambar, CSS, JS, API, AJAX, dll
-     * tidak diubah oleh service worker.
-     */
     if (request.mode !== 'navigate') {
         return;
     }
@@ -98,25 +84,20 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         fetch(request).catch(async () => {
             const cache = await caches.open(CACHE_NAME);
-
-            const offlineResponse =
-                await cache.match(OFFLINE_URL);
+            const offlineResponse = await cache.match(OFFLINE_CACHE_KEY);
 
             if (offlineResponse) {
                 return offlineResponse;
             }
 
-            return new Response(
-                'Koneksi internet terputus.',
-                {
-                    status: 503,
-                    statusText: 'Service Unavailable',
-                    headers: {
-                        'Content-Type':
-                            'text/plain; charset=utf-8',
-                    },
-                }
-            );
+            return new Response('Koneksi internet terputus.', {
+                status: 503,
+                statusText: 'Service Unavailable',
+                headers: {
+                    'Content-Type': 'text/plain; charset=utf-8',
+                    'Cache-Control': 'no-store',
+                },
+            });
         })
     );
 });

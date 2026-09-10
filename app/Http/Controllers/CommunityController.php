@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Community;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class CommunityController extends Controller
 {
@@ -41,24 +43,19 @@ class CommunityController extends Controller
      */
     public function store(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI
-        |--------------------------------------------------------------------------
-        */
-
         $validated = $request->validate([
             'name' => [
                 'required',
                 'string',
                 'max:255',
+                'unique:communities,name',
             ],
-
             'description' => [
                 'required',
                 'string',
+                'min:10',
+                'max:1000',
             ],
-
             'icon' => [
                 'nullable',
                 'image',
@@ -67,79 +64,46 @@ class CommunityController extends Controller
             ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | DATA KOMUNITAS
-        |--------------------------------------------------------------------------
-        */
-
         $data = [
             'user_id' => auth()->id(),
-            'name' => $validated['name'],
-            'description' => $validated['description'],
+            'name' => trim($validated['name']),
+            'description' => trim($validated['description']),
             'status' => 'pending',
         ];
 
+        $newImagePath = null;
+        $imageColumn = $this->getImageColumn();
 
-        /*
-        |--------------------------------------------------------------------------
-        | UPLOAD ICON / COVER
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->hasFile('icon')) {
-
-            $imageColumn = $this->getImageColumn();
-
-            if ($imageColumn) {
-
-                $data[$imageColumn] = $request
+        try {
+            if ($request->hasFile('icon') && $imageColumn) {
+                $newImagePath = $request
                     ->file('icon')
-                    ->store(
-                        'community-icons',
-                        'public'
-                    );
+                    ->store('community-icons', 'public');
+
+                $data[$imageColumn] = $newImagePath;
             }
+
+            $community = DB::transaction(function () use ($data) {
+                $community = Community::create($data);
+
+                $community
+                    ->members()
+                    ->syncWithoutDetaching([
+                        auth()->id(),
+                    ]);
+
+                return $community;
+            });
+        } catch (Throwable $e) {
+            if ($newImagePath) {
+                Storage::disk('public')->delete($newImagePath);
+            }
+
+            throw $e;
         }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN KOMUNITAS
-        |--------------------------------------------------------------------------
-        */
-
-        $community = Community::create($data);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | PEMBUAT OTOMATIS MENJADI ANGGOTA
-        |--------------------------------------------------------------------------
-        */
-
-        if (method_exists($community, 'members')) {
-
-            $community
-                ->members()
-                ->syncWithoutDetaching([
-                    auth()->id()
-                ]);
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | REDIRECT
-        |--------------------------------------------------------------------------
-        */
 
         return redirect()
-            ->route(
-                'community.show',
-                $community
-            )
+            ->route('community.show', $community)
             ->with(
                 'success',
                 'Komunitas berhasil dibuat dan sedang menunggu persetujuan admin.'
@@ -237,37 +201,23 @@ class CommunityController extends Controller
         Request $request,
         Community $community
     ) {
-        /*
-        |--------------------------------------------------------------------------
-        | HANYA PEMILIK
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            auth()->id() !== $community->user_id
-        ) {
+        if (auth()->id() !== $community->user_id) {
             abort(403);
         }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDASI
-        |--------------------------------------------------------------------------
-        */
 
         $validated = $request->validate([
             'name' => [
                 'required',
                 'string',
                 'max:255',
+                'unique:communities,name,' . $community->id,
             ],
-
             'description' => [
                 'required',
                 'string',
+                'min:10',
+                'max:1000',
             ],
-
             'icon' => [
                 'nullable',
                 'image',
@@ -276,95 +226,52 @@ class CommunityController extends Controller
             ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | DATA UPDATE
-        |--------------------------------------------------------------------------
-        |
-        | Status TIDAK diubah oleh user.
-        |
-        | Status hanya dikelola admin.
-        |--------------------------------------------------------------------------
-        */
-
         $data = [
-            'name' => $validated['name'],
-            'description' => $validated['description'],
+            'name' => trim($validated['name']),
+            'description' => trim($validated['description']),
+
+            // Setiap perubahan oleh pemilik harus direview ulang.
+            // Ini mencegah konten yang sudah approved diubah tanpa moderasi.
+            'status' => 'pending',
         ];
 
+        $imageColumn = $this->getImageColumn();
+        $oldImage = $imageColumn
+            ? $community->getAttribute($imageColumn)
+            : null;
+        $newImagePath = null;
 
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE ICON / COVER
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->hasFile('icon')) {
-
-            $imageColumn = $this->getImageColumn();
-
-            if ($imageColumn) {
-
-                /*
-                |--------------------------------------------------------------------------
-                | HAPUS GAMBAR LAMA
-                |--------------------------------------------------------------------------
-                */
-
-                $oldImage = $community
-                    ->getAttribute($imageColumn);
-
-
-                if (
-                    $oldImage &&
-                    Storage::disk('public')->exists($oldImage)
-                ) {
-
-                    Storage::disk('public')
-                        ->delete($oldImage);
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | SIMPAN GAMBAR BARU
-                |--------------------------------------------------------------------------
-                */
-
-                $data[$imageColumn] = $request
+        try {
+            if ($request->hasFile('icon') && $imageColumn) {
+                $newImagePath = $request
                     ->file('icon')
-                    ->store(
-                        'community-icons',
-                        'public'
-                    );
+                    ->store('community-icons', 'public');
+
+                $data[$imageColumn] = $newImagePath;
             }
+
+            $community->update($data);
+        } catch (Throwable $e) {
+            if ($newImagePath) {
+                Storage::disk('public')->delete($newImagePath);
+            }
+
+            throw $e;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE DATABASE
-        |--------------------------------------------------------------------------
-        */
-
-        $community->update($data);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | REDIRECT KE HALAMAN USER
-        |--------------------------------------------------------------------------
-        */
+        if (
+            $newImagePath &&
+            $oldImage &&
+            $oldImage !== $newImagePath
+        ) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
         return redirect()
-            ->route(
-                'community.show',
-                $community
-            )
+            ->route('community.show', $community)
             ->with(
                 'success',
-                'Komunitas berhasil diperbarui.'
+                'Perubahan berhasil disimpan dan komunitas menunggu persetujuan admin kembali.'
             );
     }
 

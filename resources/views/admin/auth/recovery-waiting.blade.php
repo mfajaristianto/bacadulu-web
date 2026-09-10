@@ -384,7 +384,7 @@
                                 </p>
 
                                 <span class="approved-email">
-                                    {{ $recovery->requester_email }}
+                                    {{ $requesterEmailDisplay }}
                                 </span>
                             </div>
                         </div>
@@ -460,7 +460,7 @@
                         </span>
 
                         <span class="request-value">
-                            #{{ $recovery->id }}
+                            #{{ $referenceCode }}
                         </span>
                     </div>
 
@@ -490,7 +490,7 @@
                         </span>
 
                         <span class="request-value">
-                            {{ $recovery->requester_email }}
+                            {{ $requesterEmailDisplay }}
                         </span>
                     </div>
 
