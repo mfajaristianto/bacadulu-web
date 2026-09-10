@@ -1,0 +1,11 @@
+// =========================================================
+// LEGAL PAGES - GOOGLE OAUTH BRANDING
+// Taruh di routes/web.php pada bagian PUBLIC ROUTES,
+// JANGAN taruh di dalam middleware auth/admin.
+// =========================================================
+
+Route::view('/privacy-policy', 'legal.privacy-policy')
+    ->name('privacy-policy');
+
+Route::view('/terms', 'legal.terms')
+    ->name('terms');

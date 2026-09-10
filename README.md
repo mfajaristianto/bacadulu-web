@@ -1,36 +1,33 @@
-# BacaDulu Runtime Clarity Fix
+# Cara Pasang Privacy Policy + Terms Baca Dulu
 
-Patch ini merapikan konfigurasi runtime yang masih tidak konsisten:
-- Application Name masih `Laravel`
-- Timezone masih `UTC`
-- Locale masih `en`
+1. Extract ZIP ini langsung ke root project:
+   D:\Pkl\landing-page
 
-Yang diubah:
-- `APP_NAME="Baca Dulu"`
-- `APP_TIMEZONE=Asia/Jakarta`
-- `APP_LOCALE=id`
-- `APP_FALLBACK_LOCALE=en`
-- `APP_FAKER_LOCALE=id_ID`
-- `config/app.php` dibuat membaca `APP_TIMEZONE`
+2. File Blade otomatis berada di:
+   resources/views/legal/privacy-policy.blade.php
+   resources/views/legal/terms.blade.php
 
-Script membuat backup `.env` dan `config/app.php` sebelum mengubah apa pun.
+3. Buka routes/web.php lalu salin isi `routes-snippet.txt`.
+   Tempel pada bagian PUBLIC ROUTES, bukan di dalam middleware auth/admin.
 
-Cara pakai:
+4. Opsional tapi disarankan:
+   salin dua link dari `footer-snippet.blade.php` ke footer website.
 
-```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-.\fix-runtime-config.ps1
-```
+5. Jalankan:
 
-Lalu cek:
+   & "C:\xampp\php\php.exe" artisan optimize:clear
+   & "C:\xampp\php\php.exe" artisan route:list --name=privacy-policy
+   & "C:\xampp\php\php.exe" artisan route:list --name=terms
 
-```powershell
-& "C:\xampp\php\php.exe" artisan about
-```
+6. Tes lokal:
+   http://127.0.0.1:8000/privacy-policy
+   http://127.0.0.1:8000/terms
 
-Target:
-- Application Name = Baca Dulu
-- Timezone = Asia/Jakarta
-- Locale = id
+7. Setelah deploy ke staging, URL yang dimasukkan ke Google Auth Platform:
+   https://staging.bacadulu.net/privacy-policy
+   https://staging.bacadulu.net/terms
 
-`SESSION_DRIVER` sengaja belum diubah otomatis. Untuk alur admin/OTP, driver `database` lebih mudah dikelola, tetapi perubahan itu sebaiknya dilakukan setelah memastikan tabel `sessions` tersedia dan setelah regression test.
+Catatan:
+- Halaman legal harus bisa dibuka tanpa login.
+- Jangan gunakan URL localhost untuk Google Branding.
+- Teks ini adalah draft operasional umum untuk website Baca Dulu dan dapat diperbarui bila alur pengumpulan data atau layanan berubah.
