@@ -55,6 +55,7 @@
             {{-- Google Login --}}
             <a
                 href="{{ route('google.login') }}"
+                data-barba-prevent="self"
                 class="w-full flex items-center justify-center gap-3
                        border border-slate-300
                        bg-white
@@ -102,7 +103,7 @@
 
                 <div class="h-px bg-slate-200 flex-1"></div>
 
-                
+
 
                 <div class="h-px bg-slate-200 flex-1"></div>
 

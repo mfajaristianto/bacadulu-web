@@ -57,6 +57,8 @@ Route::get('/', function () {
 */
 
 Route::get('/login', function () {
+    request()->session()->put('_oauth_session_ready', true);
+
     return view('auth.login');
 })->name('login');
 
