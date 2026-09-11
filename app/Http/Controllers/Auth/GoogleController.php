@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
@@ -29,8 +30,16 @@ class GoogleController extends Controller
 
     public function redirect(): RedirectResponse
     {
-        return Socialite::driver('google')
+        $response = Socialite::driver('google')
             ->redirect();
+
+        Log::info('GOOGLE_OAUTH_REDIRECT', [
+            'host' => request()->getHost(),
+            'session_id' => request()->session()->getId(),
+            'has_state' => request()->session()->has('state'),
+        ]);
+
+        return $response;
     }
 
     /*
@@ -49,6 +58,21 @@ class GoogleController extends Controller
 
     public function callback(): RedirectResponse
     {
+        $sessionState = (string) request()->session()->get('state', '');
+        $queryState = (string) request()->query('state', '');
+
+        Log::info('GOOGLE_OAUTH_CALLBACK_ENTRY', [
+            'host' => request()->getHost(),
+            'session_id' => request()->session()->getId(),
+            'has_session_state' => $sessionState !== '',
+            'has_query_state' => $queryState !== '',
+            'state_matches' => $sessionState !== ''
+                && $queryState !== ''
+                && hash_equals($sessionState, $queryState),
+            'has_code' => request()->has('code'),
+            'google_error' => request()->query('error'),
+        ]);
+
         try {
             /*
             |--------------------------------------------------------------------------
@@ -80,6 +104,13 @@ class GoogleController extends Controller
                 'email_verified',
                 false
             );
+
+            Log::info('GOOGLE_OAUTH_USER_RECEIVED', [
+                'google_id' => $googleId,
+                'email' => $email,
+                'email_verified' => $emailVerified,
+                'has_avatar' => !empty($avatar),
+            ]);
 
             /*
             |--------------------------------------------------------------------------
@@ -297,10 +328,23 @@ class GoogleController extends Controller
             |
             */
 
+            Log::info('GOOGLE_OAUTH_LOGIN_SUCCESS', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'guard_check' => Auth::guard('web')->check(),
+                'session_id' => request()->session()->getId(),
+            ]);
+
             return redirect()
                 ->route('blog.index');
 
         } catch (InvalidStateException $exception) {
+            Log::warning('GOOGLE_OAUTH_INVALID_STATE', [
+                'session_id' => request()->session()->getId(),
+                'has_session_state' => request()->session()->has('state'),
+                'has_query_state' => request()->query('state') !== null,
+            ]);
+
             /*
             |--------------------------------------------------------------------------
             | Invalid / Expired OAuth State
@@ -323,6 +367,10 @@ class GoogleController extends Controller
                 );
 
         } catch (RuntimeException $exception) {
+            Log::warning('GOOGLE_OAUTH_RUNTIME_EXCEPTION', [
+                'message' => $exception->getMessage(),
+            ]);
+
             /*
             |--------------------------------------------------------------------------
             | Known Account Conflict
@@ -337,6 +385,11 @@ class GoogleController extends Controller
                 );
 
         } catch (Throwable $exception) {
+            Log::error('GOOGLE_OAUTH_UNEXPECTED_EXCEPTION', [
+                'class' => $exception::class,
+                'message' => $exception->getMessage(),
+            ]);
+
             /*
             |--------------------------------------------------------------------------
             | Unexpected Google Login Error
