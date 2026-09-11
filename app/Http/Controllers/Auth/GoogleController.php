@@ -33,10 +33,17 @@ class GoogleController extends Controller
         $response = Socialite::driver('google')
             ->redirect();
 
+        $sessionCookieName = (string) config('session.cookie');
+        $rawCookieHeader = (string) request()->headers->get('cookie', '');
+
         Log::info('GOOGLE_OAUTH_REDIRECT', [
             'host' => request()->getHost(),
             'session_id' => request()->session()->getId(),
             'has_state' => request()->session()->has('state'),
+            'session_cookie_name' => $sessionCookieName,
+            'request_has_session_cookie' => request()->cookies->has($sessionCookieName),
+            'raw_header_has_session_cookie' => $sessionCookieName !== ''
+                && str_contains($rawCookieHeader, $sessionCookieName.'='),
         ]);
 
         return $response;
@@ -61,6 +68,9 @@ class GoogleController extends Controller
         $sessionState = (string) request()->session()->get('state', '');
         $queryState = (string) request()->query('state', '');
 
+        $sessionCookieName = (string) config('session.cookie');
+        $rawCookieHeader = (string) request()->headers->get('cookie', '');
+
         Log::info('GOOGLE_OAUTH_CALLBACK_ENTRY', [
             'host' => request()->getHost(),
             'session_id' => request()->session()->getId(),
@@ -71,6 +81,10 @@ class GoogleController extends Controller
                 && hash_equals($sessionState, $queryState),
             'has_code' => request()->has('code'),
             'google_error' => request()->query('error'),
+            'session_cookie_name' => $sessionCookieName,
+            'request_has_session_cookie' => request()->cookies->has($sessionCookieName),
+            'raw_header_has_session_cookie' => $sessionCookieName !== ''
+                && str_contains($rawCookieHeader, $sessionCookieName.'='),
         ]);
 
         try {
