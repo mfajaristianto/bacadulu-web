@@ -706,6 +706,21 @@ Route::post('books/{book:slug}/stock/sale', [
     'recordSale',
 ])->name('books.stock.sale');
 
+Route::patch('books/{book:slug}/approve', [
+    AdminBookController::class,
+    'approveStore',
+])->name('books.approve');
+
+Route::patch('books/{book:slug}/reject', [
+    AdminBookController::class,
+    'rejectStore',
+])->name('books.reject');
+
+Route::patch('books/{book:slug}/pending', [
+    AdminBookController::class,
+    'markStorePending',
+])->name('books.pending');
+
 Route::resource('books', AdminBookController::class)
     ->scoped([
         'book' => 'slug',
@@ -756,14 +771,58 @@ Route::resource(
 
         /*
         |--------------------------------------------------------------------------
-        | Publishers
+        | Publisher Review Workflow
         |--------------------------------------------------------------------------
+        |
+        | Publisher dan Bookstore memakai satu master Book. Data dari API nanti
+        | masuk sebagai pending dan ditinjau dari menu Publisher terlebih dahulu.
+        |
         */
 
-        Route::resource(
-            'publishers',
-            PublisherAdminController::class
-        );
+        Route::get('publishers', [
+            PublisherAdminController::class,
+            'index',
+        ])->name('publishers.index');
+
+        Route::get('publishers/create', [
+            PublisherAdminController::class,
+            'create',
+        ])->name('publishers.create');
+
+        Route::post('publishers', [
+            PublisherAdminController::class,
+            'store',
+        ])->name('publishers.store');
+
+        Route::get('publishers/{book:slug}/edit', [
+            PublisherAdminController::class,
+            'edit',
+        ])->name('publishers.edit');
+
+        Route::put('publishers/{book:slug}', [
+            PublisherAdminController::class,
+            'update',
+        ])->name('publishers.update');
+
+        Route::patch('publishers/{book:slug}/approve', [
+            PublisherAdminController::class,
+            'approve',
+        ])->name('publishers.approve');
+
+        Route::patch('publishers/{book:slug}/reject', [
+            PublisherAdminController::class,
+            'reject',
+        ])->name('publishers.reject');
+
+        Route::patch('publishers/{book:slug}/pending', [
+            PublisherAdminController::class,
+            'markPending',
+        ])->name('publishers.pending');
+
+        Route::delete('publishers/{book:slug}', [
+            PublisherAdminController::class,
+            'destroy',
+        ])->name('publishers.destroy');
 
         /*
         |--------------------------------------------------------------------------

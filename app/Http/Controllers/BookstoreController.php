@@ -160,6 +160,11 @@ class BookstoreController extends Controller
                 continue;
             }
 
+            if (!$book->isStoreApproved()) {
+                $issues[] = "Buku \"{$book->title}\" sedang tidak ditayangkan di Bookstore.";
+                continue;
+            }
+
             $format = (string) $item['format'];
             $qty = (int) $item['qty'];
             $clientPrice = isset($item['price'])
@@ -266,6 +271,7 @@ class BookstoreController extends Controller
     private function storeBooksQuery()
     {
         return Book::query()
+            ->storeApproved()
             ->where(function ($query) {
                 $query
                     ->where(function ($print) {
@@ -283,6 +289,10 @@ class BookstoreController extends Controller
 
     private function bookCanBeSold(Book $book): bool
     {
+        if (!$book->isStoreApproved()) {
+            return false;
+        }
+
         return (
             $book->has_print &&
             $book->print_price !== null

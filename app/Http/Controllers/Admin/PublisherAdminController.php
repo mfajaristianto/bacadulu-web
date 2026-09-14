@@ -3,20 +3,42 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Publisher;
+use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class PublisherAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $publishers = Publisher::latest()->get();
+        $status = (string) $request->query('status', 'pending');
+
+        if (!in_array($status, ['pending', 'approved', 'rejected', 'all'], true)) {
+            $status = 'pending';
+        }
+
+        $books = Book::query()
+            ->when(
+                $status !== 'all',
+                fn ($query) => $query->where('publisher_status', $status)
+            )
+            ->orderByRaw("CASE WHEN publisher_status = 'pending' THEN 0 WHEN publisher_status = 'rejected' THEN 1 ELSE 2 END")
+            ->latest('updated_at')
+            ->get();
+
+        $counts = [
+            'pending' => Book::query()->where('publisher_status', 'pending')->count(),
+            'approved' => Book::query()->where('publisher_status', 'approved')->count(),
+            'rejected' => Book::query()->where('publisher_status', 'rejected')->count(),
+            'all' => Book::query()->count(),
+        ];
 
         return view(
             'admin.publishers.index',
-            compact('publishers')
+            compact('books', 'status', 'counts')
         );
     }
 
@@ -27,136 +49,231 @@ class PublisherAdminController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validatePublisher($request);
-        $newLogoPath = null;
+        $data = $this->validateBookMetadata($request);
+        $coverPath = null;
 
-        if ($request->hasFile('logo_or_cover')) {
-            $newLogoPath = $request
-                ->file('logo_or_cover')
-                ->store('uploads/publishers', 'public');
-
-            $data['logo_or_cover'] = $newLogoPath;
+        if ($request->hasFile('cover')) {
+            $coverPath = $request
+                ->file('cover')
+                ->store('book-covers', 'public');
         }
 
         try {
-            Publisher::create($data);
+            $book = DB::transaction(function () use ($data, $coverPath) {
+                return Book::create([
+                    'title' => trim($data['title']),
+                    'slug' => Book::makeSlug($data['title']),
+                    'publisher' => trim($data['publisher']),
+                    'author' => trim($data['author']),
+                    'category' => $data['category'] ?? 'Umum',
+                    'pages' => $data['pages'] ?? null,
+                    'size' => $data['size'] ?? null,
+                    'isbn' => $data['isbn'] ?? null,
+                    'publish_year' => $data['publish_year'] ?? null,
+                    'description' => $data['description'] ?? null,
+                    'cover' => $coverPath,
+
+                    // Kolom legacy price masih NOT NULL pada database lama.
+                    // Nilai ini tidak pernah tampil di Bookstore selama format
+                    // penjualan belum dipilih dan store_status belum approved.
+                    'price' => 0,
+                    'has_print' => false,
+                    'print_stock' => 0,
+                    'has_ebook' => false,
+
+                    'source' => 'manual',
+                    'publisher_status' => Book::STATUS_PENDING,
+                    'publisher_review_note' => null,
+                    'publisher_approved_at' => null,
+                    'store_status' => Book::STATUS_PENDING,
+                    'store_review_note' => null,
+                    'store_approved_at' => null,
+                ]);
+            });
         } catch (Throwable $e) {
-            if ($newLogoPath) {
-                Storage::disk('public')->delete($newLogoPath);
+            if ($coverPath) {
+                Storage::disk('public')->delete($coverPath);
             }
 
             throw $e;
         }
 
         return redirect()
-            ->route('admin.publishers.index')
-            ->with('success', 'Publisher berhasil disimpan.');
+            ->route('admin.publishers.edit', $book->slug)
+            ->with(
+                'success',
+                'Buku berhasil dibuat sebagai Pending. Periksa datanya lalu Approve jika sudah benar.'
+            );
     }
 
-    public function show(Publisher $publisher)
-    {
-        return redirect()
-            ->route('admin.publishers.edit', $publisher);
-    }
-
-    public function edit(Publisher $publisher)
+    public function edit(Book $book)
     {
         return view(
             'admin.publishers.edit',
-            compact('publisher')
+            compact('book')
         );
     }
 
-    public function update(
-        Request $request,
-        Publisher $publisher
-    ) {
-        $data = $this->validatePublisher($request);
+    public function update(Request $request, Book $book)
+    {
+        $data = $this->validateBookMetadata($request);
+        $oldCover = $book->cover;
+        $newCover = null;
 
-        $oldLogoPath = $publisher->logo_or_cover;
-        $newLogoPath = null;
+        if ($request->hasFile('cover')) {
+            $newCover = $request
+                ->file('cover')
+                ->store('book-covers', 'public');
 
-        if ($request->hasFile('logo_or_cover')) {
-            $newLogoPath = $request
-                ->file('logo_or_cover')
-                ->store('uploads/publishers', 'public');
-
-            $data['logo_or_cover'] = $newLogoPath;
+            $data['cover'] = $newCover;
         }
 
         try {
-            $publisher->update($data);
+            DB::transaction(function () use ($book, $data) {
+                $book->update([
+                    'title' => trim($data['title']),
+                    'publisher' => trim($data['publisher']),
+                    'author' => trim($data['author']),
+                    'category' => $data['category'] ?? 'Umum',
+                    'pages' => $data['pages'] ?? null,
+                    'size' => $data['size'] ?? null,
+                    'isbn' => $data['isbn'] ?? null,
+                    'publish_year' => $data['publish_year'] ?? null,
+                    'description' => $data['description'] ?? null,
+                    'cover' => $data['cover'] ?? $book->cover,
+                ]);
+            });
         } catch (Throwable $e) {
-            if ($newLogoPath) {
-                Storage::disk('public')->delete($newLogoPath);
+            if ($newCover) {
+                Storage::disk('public')->delete($newCover);
             }
 
             throw $e;
         }
 
-        if (
-            $newLogoPath &&
-            $oldLogoPath &&
-            $oldLogoPath !== $newLogoPath
-        ) {
-            Storage::disk('public')->delete($oldLogoPath);
+        if ($newCover && $oldCover && $oldCover !== $newCover) {
+            Storage::disk('public')->delete($oldCover);
         }
 
         return redirect()
-            ->route('admin.publishers.index')
-            ->with('success', 'Publisher berhasil diperbarui.');
+            ->route('admin.publishers.edit', $book->slug)
+            ->with('success', 'Data buku Publisher berhasil diperbarui.');
     }
 
-    public function destroy(Publisher $publisher)
+    public function approve(Book $book)
     {
-        $logoPath = $publisher->logo_or_cover;
+        $this->ensurePublisherReady($book);
 
-        $publisher->delete();
-
-        if ($logoPath) {
-            Storage::disk('public')->delete($logoPath);
-        }
+        $book->update([
+            'publisher_status' => Book::STATUS_APPROVED,
+            'publisher_review_note' => null,
+            'publisher_approved_at' => now(),
+        ]);
 
         return redirect()
-            ->route('admin.publishers.index')
-            ->with('success', 'Publisher berhasil dihapus.');
+            ->route('admin.publishers.index', ['status' => 'pending'])
+            ->with('success', "\"{$book->title}\" sudah di-approve dan sekarang tampil di Publisher.");
     }
 
-    private function validatePublisher(Request $request): array
+    public function reject(Request $request, Book $book)
+    {
+        $validated = $request->validate([
+            'note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $book->update([
+            'publisher_status' => Book::STATUS_REJECTED,
+            'publisher_review_note' => $validated['note'] ?? 'Ditolak oleh admin.',
+            'publisher_approved_at' => null,
+        ]);
+
+        return redirect()
+            ->route('admin.publishers.index', ['status' => 'rejected'])
+            ->with('success', "\"{$book->title}\" dipindahkan ke status Rejected.");
+    }
+
+    public function markPending(Book $book)
+    {
+        $book->update([
+            'publisher_status' => Book::STATUS_PENDING,
+            'publisher_review_note' => null,
+            'publisher_approved_at' => null,
+        ]);
+
+        return redirect()
+            ->route('admin.publishers.index', ['status' => 'pending'])
+            ->with('success', "\"{$book->title}\" dikembalikan ke Pending Review.");
+    }
+
+    public function destroy(Book $book)
+    {
+        // Publisher dan Bookstore memakai record Book yang sama.
+        // Karena itu aksi ini tidak menghapus master buku; hanya melepasnya
+        // dari Publisher agar data/stock Bookstore tidak ikut hilang.
+        $book->update([
+            'publisher_status' => Book::STATUS_REJECTED,
+            'publisher_review_note' => 'Dilepas dari Publisher oleh admin.',
+            'publisher_approved_at' => null,
+        ]);
+
+        return redirect()
+            ->route('admin.publishers.index', ['status' => 'rejected'])
+            ->with('success', 'Buku dilepas dari Publisher tanpa menghapus data Bookstore.');
+    }
+
+    private function validateBookMetadata(Request $request): array
     {
         return $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'about' => [
+            'title' => ['required', 'string', 'max:255'],
+            'publisher' => ['required', 'string', 'max:255'],
+            'author' => ['required', 'string', 'max:255'],
+            'category' => ['nullable', 'string', 'max:255'],
+            'pages' => ['nullable', 'integer', 'min:1', 'max:100000'],
+            'size' => ['nullable', 'string', 'max:255'],
+            'isbn' => ['nullable', 'string', 'max:255'],
+            'publish_year' => [
                 'nullable',
-                'string',
+                'integer',
+                'min:1900',
+                'max:' . (now()->year + 2),
             ],
-
-            'logo_or_cover' => [
+            'description' => ['nullable', 'string', 'max:100000'],
+            'cover' => [
                 'nullable',
                 'image',
                 'mimes:jpeg,jpg,png,webp',
-                'max:2048',
+                'max:8192',
             ],
         ], [
-            'name.required' =>
-                'Nama publisher wajib diisi.',
-
-            'name.max' =>
-                'Nama publisher maksimal 255 karakter.',
-
-            'logo_or_cover.image' =>
-                'Logo atau cover harus berupa gambar.',
-
-            'logo_or_cover.mimes' =>
-                'Format gambar harus JPG, JPEG, PNG, atau WebP.',
-
-            'logo_or_cover.max' =>
-                'Ukuran gambar maksimal 2 MB.',
+            'title.required' => 'Judul buku wajib diisi.',
+            'publisher.required' => 'Nama penerbit wajib diisi.',
+            'author.required' => 'Nama penulis wajib diisi.',
+            'cover.image' => 'Cover harus berupa gambar.',
+            'cover.mimes' => 'Cover harus JPG, JPEG, PNG, atau WebP.',
+            'cover.max' => 'Ukuran cover maksimal 8 MB.',
         ]);
+    }
+
+    private function ensurePublisherReady(Book $book): void
+    {
+        $missing = [];
+
+        if (!trim((string) $book->title)) {
+            $missing[] = 'judul';
+        }
+
+        if (!trim((string) $book->author)) {
+            $missing[] = 'penulis';
+        }
+
+        if (!trim((string) $book->publisher)) {
+            $missing[] = 'penerbit';
+        }
+
+        if ($missing) {
+            throw ValidationException::withMessages([
+                'approval' => 'Belum bisa approve. Lengkapi: ' . implode(', ', $missing) . '.',
+            ]);
+        }
     }
 }

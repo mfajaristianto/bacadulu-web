@@ -12,6 +12,11 @@ class Book extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_NOT_LISTED = 'not_listed';
+
 
     protected $fillable = [
 
@@ -97,6 +102,27 @@ class Book extends Model
 
         'publish_year',
 
+        /*
+        |--------------------------------------------------------------------------
+        | WORKFLOW / API SOURCE
+        |--------------------------------------------------------------------------
+        */
+
+        'source',
+        'external_id',
+        'external_cover_url',
+        'publisher_status',
+        'publisher_review_note',
+        'publisher_approved_at',
+        'store_status',
+        'store_review_note',
+        'store_approved_at',
+        'last_synced_at',
+        'source_updated_at',
+        'api_payload',
+        'pending_api_payload',
+        'has_pending_sync',
+
     ];
 
 
@@ -167,7 +193,66 @@ class Book extends Model
         'ebook_discount_expires_at' =>
             'datetime',
 
+        'publisher_approved_at' =>
+            'datetime',
+
+        'store_approved_at' =>
+            'datetime',
+
+        'last_synced_at' =>
+            'datetime',
+
+        'source_updated_at' =>
+            'datetime',
+
+        'api_payload' =>
+            'array',
+
+        'pending_api_payload' =>
+            'array',
+
+        'has_pending_sync' =>
+            'boolean',
+
     ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | WORKFLOW STATUS
+    |--------------------------------------------------------------------------
+    */
+
+    public function scopePublisherApproved($query)
+    {
+        return $query->where(
+            'publisher_status',
+            self::STATUS_APPROVED
+        );
+    }
+
+    public function scopeStoreApproved($query)
+    {
+        return $query->where(
+            'store_status',
+            self::STATUS_APPROVED
+        );
+    }
+
+    public function isPublisherApproved(): bool
+    {
+        return $this->publisher_status === self::STATUS_APPROVED;
+    }
+
+    public function isStoreApproved(): bool
+    {
+        return $this->store_status === self::STATUS_APPROVED;
+    }
+
+    public function getIsExternalSourceAttribute(): bool
+    {
+        return !empty($this->source) && $this->source !== 'manual';
+    }
 
 
     /*

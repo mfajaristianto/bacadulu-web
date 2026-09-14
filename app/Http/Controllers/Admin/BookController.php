@@ -19,7 +19,7 @@ class BookController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function index()
+    public function index(Request $request)
     {
         Book::query()
             ->where(function ($query) {
@@ -37,11 +37,31 @@ class BookController extends Controller
                 $book->save();
             });
 
-        $books = Book::latest()->get();
+        $status = (string) $request->query('status', 'all');
+
+        if (!in_array($status, ['pending', 'approved', 'rejected', 'all'], true)) {
+            $status = 'all';
+        }
+
+        $books = Book::query()
+            ->when(
+                $status !== 'all',
+                fn ($query) => $query->where('store_status', $status)
+            )
+            ->orderByRaw("CASE WHEN store_status = 'pending' THEN 0 WHEN store_status = 'rejected' THEN 1 ELSE 2 END")
+            ->latest('updated_at')
+            ->get();
+
+        $counts = [
+            'pending' => Book::query()->where('store_status', Book::STATUS_PENDING)->count(),
+            'approved' => Book::query()->where('store_status', Book::STATUS_APPROVED)->count(),
+            'rejected' => Book::query()->where('store_status', Book::STATUS_REJECTED)->count(),
+            'all' => Book::query()->count(),
+        ];
 
         return view(
             'admin.books.index',
-            compact('books')
+            compact('books', 'status', 'counts')
         );
     }
 
@@ -265,6 +285,27 @@ class BookController extends Controller
 
                     'cover' =>
                         $coverPath,
+
+                    /*
+                    |--------------------------------------------------------------
+                    | WORKFLOW
+                    |--------------------------------------------------------------
+                    */
+
+                    'source' =>
+                        'manual',
+
+                    'publisher_status' =>
+                        Book::STATUS_APPROVED,
+
+                    'publisher_approved_at' =>
+                        now(),
+
+                    'store_status' =>
+                        Book::STATUS_APPROVED,
+
+                    'store_approved_at' =>
+                        now(),
 
                     /*
                     |--------------------------------------------------------------
@@ -900,6 +941,80 @@ class BookController extends Controller
                 );
         }
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | BOOKSTORE APPROVAL
+    |--------------------------------------------------------------------------
+    */
+
+    public function approveStore(Book $book)
+    {
+        $hasSellableFormat = (
+            $book->has_print &&
+            $book->print_price !== null
+        ) || (
+            $book->has_ebook &&
+            $book->ebook_price !== null
+        );
+
+        if (!$hasSellableFormat) {
+            throw ValidationException::withMessages([
+                'approval' =>
+                    'Belum bisa approve Bookstore. Edit buku terlebih dahulu dan aktifkan minimal satu format beserta harganya.',
+            ]);
+        }
+
+        $book->update([
+            'store_status' => Book::STATUS_APPROVED,
+            'store_review_note' => null,
+            'store_approved_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('admin.books.index', ['status' => 'pending'])
+            ->with(
+                'success',
+                "\"{$book->title}\" sudah di-approve dan sekarang tampil di Bookstore."
+            );
+    }
+
+    public function rejectStore(Request $request, Book $book)
+    {
+        $validated = $request->validate([
+            'note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $book->update([
+            'store_status' => Book::STATUS_REJECTED,
+            'store_review_note' => $validated['note'] ?? 'Ditolak oleh admin.',
+            'store_approved_at' => null,
+        ]);
+
+        return redirect()
+            ->route('admin.books.index', ['status' => 'rejected'])
+            ->with(
+                'success',
+                "\"{$book->title}\" dipindahkan ke status Rejected Bookstore."
+            );
+    }
+
+    public function markStorePending(Book $book)
+    {
+        $book->update([
+            'store_status' => Book::STATUS_PENDING,
+            'store_review_note' => null,
+            'store_approved_at' => null,
+        ]);
+
+        return redirect()
+            ->route('admin.books.index', ['status' => 'pending'])
+            ->with(
+                'success',
+                "\"{$book->title}\" dikembalikan ke Pending Bookstore."
+            );
+    }
+
 
     /*
     |--------------------------------------------------------------------------
