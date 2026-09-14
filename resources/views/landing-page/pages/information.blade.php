@@ -763,7 +763,7 @@
                     <span>Total Informasi</span>
 
                     <small>
-                        Update · {{ $lastUpdateText }}
+                        Update 路 {{ $lastUpdateText }}
                     </small>
                 </div>
             </div>
@@ -907,7 +907,7 @@
                         </span>
 
                         <h2>
-                            Informasi terbaru.
+                            Informasi terbaru
                         </h2>
                     </div>
                 </header>
