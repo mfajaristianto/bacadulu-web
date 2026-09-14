@@ -5,10 +5,11 @@
 @section('content')
 
 @php
-    $publishedDate = $information->created_at
-        ? $information->created_at
-            ->timezone('Asia/Jakarta')
-            ->translatedFormat('d F Y')
+    $publishedDateSource = $information->published_at
+        ?? $information->created_at;
+
+    $publishedDate = $publishedDateSource
+        ? $publishedDateSource->translatedFormat('d F Y')
         : null;
 
     $hasImage = !empty($information->image);
@@ -32,6 +33,12 @@
     --amber: #E58A2B;
     --gold: #F0A52E;
     --yellow: #F2C94C;
+
+    /* Palette dinamis; nilai default mempertahankan warna V4. */
+    --detail-accent-1-rgb: 201,79,53;
+    --detail-accent-2-rgb: 217,106,43;
+    --detail-accent-3-rgb: 240,165,46;
+    --detail-accent-text: rgb(217 106 43);
 
     --ink: #29292F;
     --body: #555A63;
@@ -66,7 +73,7 @@
 }
 
 .bd-detail-container {
-    width: min(calc(100% - 40px), 980px);
+    width: min(calc(100% - 40px), 1180px);
     margin-inline: auto;
 }
 
@@ -90,9 +97,9 @@
     height: 100%;
     background: linear-gradient(
         90deg,
-        var(--orange-dark),
-        var(--orange),
-        var(--gold)
+        rgb(var(--detail-accent-1-rgb)),
+        rgb(var(--detail-accent-2-rgb)),
+        rgb(var(--detail-accent-3-rgb))
     );
 }
 
@@ -131,7 +138,7 @@
     color: var(--navy) !important;
     background: #FFFFFF;
 
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 750;
 
     box-shadow: 0 3px 10px rgba(36,27,82,.035);
@@ -172,7 +179,7 @@
 
     color: var(--soft-text);
 
-    font-size: 7px;
+    font-size: 9px;
     font-weight: 800;
     letter-spacing: .11em;
     text-transform: uppercase;
@@ -187,8 +194,8 @@
 
     background: linear-gradient(
         135deg,
-        var(--orange),
-        var(--gold)
+        rgb(var(--detail-accent-2-rgb)),
+        rgb(var(--detail-accent-3-rgb))
     );
 }
 
@@ -235,9 +242,9 @@
     z-index: 2;
 
     display: grid;
-    grid-template-columns: minmax(0,1fr) 300px;
+    grid-template-columns: minmax(0,1fr) minmax(380px,460px);
     align-items: center;
-    gap: 42px;
+    gap: 52px;
 }
 
 .bd-detail-hero-grid.no-image {
@@ -267,9 +274,9 @@
 
     background: linear-gradient(
         180deg,
-        var(--orange-dark),
-        var(--orange),
-        var(--gold)
+        rgb(var(--detail-accent-1-rgb)),
+        rgb(var(--detail-accent-2-rgb)),
+        rgb(var(--detail-accent-3-rgb))
     );
 }
 
@@ -295,7 +302,7 @@
 
     border-radius: 999px;
 
-    font-size: 7px;
+    font-size: 9px;
     font-weight: 850;
     letter-spacing: .09em;
     text-transform: uppercase;
@@ -303,7 +310,7 @@
 
 .bd-detail-category {
     border: 1px solid rgba(217,106,43,.16);
-    color: var(--orange);
+    color: var(--detail-accent-text);
     background: #FFF7EF;
 }
 
@@ -328,12 +335,12 @@
     height: 4px;
     flex: 0 0 4px;
     border-radius: 50%;
-    background: var(--gold);
+    background: rgb(var(--detail-accent-3-rgb));
 }
 
 .bd-detail-date {
     color: var(--muted);
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 600;
 }
 
@@ -405,7 +412,7 @@
     color: var(--navy);
     background: #FFFFFF;
 
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 750;
 
     cursor: pointer;
@@ -427,7 +434,7 @@
 
     border-radius: 6px;
 
-    color: var(--orange);
+    color: var(--detail-accent-text);
     background: #FFF3E9;
 }
 
@@ -448,8 +455,8 @@
 
     background: linear-gradient(
         105deg,
-        var(--orange-dark),
-        var(--orange)
+        rgb(var(--detail-accent-1-rgb)),
+        rgb(var(--detail-accent-2-rgb))
     );
 
     box-shadow: 0 8px 18px rgba(217,106,43,.16);
@@ -469,7 +476,7 @@
 .bd-detail-media-wrap {
     position: relative;
     width: 100%;
-    max-width: 300px;
+    max-width: 460px;
     justify-self: end;
     padding: 8px 8px 0 0;
 }
@@ -483,8 +490,8 @@
     width: 52px;
     height: 52px;
 
-    border-top: 2px solid var(--orange);
-    border-right: 2px solid var(--gold);
+    border-top: 2px solid rgb(var(--detail-accent-2-rgb));
+    border-right: 2px solid rgb(var(--detail-accent-3-rgb));
     border-radius: 0 13px 0 0;
 
     opacity: .75;
@@ -515,27 +522,34 @@
     z-index: 2;
 
     width: 100%;
-    aspect-ratio: 4 / 3;
-
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
+    padding: 12px;
 
     border: 1px solid #EEE8E2;
     border-radius: 13px;
 
-    background: var(--soft);
+    background:
+        radial-gradient(circle at 15% 20%, rgba(var(--detail-accent-1-rgb),.24), transparent 46%),
+        radial-gradient(circle at 85% 18%, rgba(var(--detail-accent-2-rgb),.20), transparent 45%),
+        linear-gradient(135deg, rgba(var(--detail-accent-3-rgb),.11), rgba(var(--detail-accent-1-rgb),.04));
     box-shadow: 0 13px 30px rgba(36,27,82,.065);
 }
 
 .bd-detail-image {
-    position: absolute;
+    position: relative;
     z-index: 2;
-    inset: 0;
 
-    width: 100%;
-    height: 100%;
     display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 620px;
 
-    object-fit: cover;
+    object-fit: contain;
 
     transition:
         transform .7s
@@ -543,7 +557,7 @@
 }
 
 .bd-detail-media:hover .bd-detail-image {
-    transform: scale(1.035);
+    transform: scale(1.012);
 }
 
 .bd-detail-fallback {
@@ -577,7 +591,7 @@
     width: 8px;
     height: 8px;
     transform: rotate(45deg);
-    background: var(--gold);
+    background: rgb(var(--detail-accent-3-rgb));
 }
 
 
@@ -606,8 +620,8 @@
 
     background: linear-gradient(
         90deg,
-        var(--orange),
-        var(--gold)
+        rgb(var(--detail-accent-2-rgb)),
+        rgb(var(--detail-accent-3-rgb))
     );
 }
 
@@ -621,7 +635,7 @@
 }
 
 .bd-detail-reading-inner {
-    width: min(calc(100% - 32px),700px);
+    width: min(calc(100% - 32px),820px);
     margin-inline: auto;
 }
 
@@ -632,8 +646,8 @@
 
     color: var(--body);
 
-    font-size: 15px;
-    line-height: 1.86;
+    font-size: 18px;
+    line-height: 1.9;
 
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -661,8 +675,8 @@
 
 .bd-detail-content > p:first-child {
     color: #363940;
-    font-size: 16px;
-    line-height: 1.82;
+    font-size: 19px;
+    line-height: 1.86;
 }
 
 
@@ -687,22 +701,22 @@
 
 .bd-detail-content h1 {
     margin: 42px 0 14px;
-    font-size: 28px;
+    font-size: 32px;
 }
 
 .bd-detail-content h2 {
     margin: 37px 0 14px;
-    font-size: 24px;
+    font-size: 28px;
 }
 
 .bd-detail-content h3 {
     margin: 31px 0 12px;
-    font-size: 20px;
+    font-size: 23px;
 }
 
 .bd-detail-content h4 {
     margin: 27px 0 10px;
-    font-size: 17px;
+    font-size: 20px;
 }
 
 
@@ -750,7 +764,7 @@
     color: var(--navy);
 
     font-family: 'Poppins', sans-serif;
-    font-size: 17px;
+    font-size: 20px;
     font-weight: 500;
     line-height: 1.58;
 }
@@ -770,7 +784,7 @@
     max-width: 100% !important;
 
     height: auto !important;
-    max-height: 500px;
+    max-height: 720px;
 
     margin: 27px auto !important;
 
@@ -840,7 +854,7 @@
 
     border-collapse: collapse;
 
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .bd-detail-content th,
@@ -918,9 +932,9 @@
 
     background: linear-gradient(
         90deg,
-        var(--orange-dark),
-        var(--orange),
-        var(--gold)
+        rgb(var(--detail-accent-1-rgb)),
+        rgb(var(--detail-accent-2-rgb)),
+        rgb(var(--detail-accent-3-rgb))
     );
 }
 
@@ -941,7 +955,7 @@
 
     color: var(--orange);
 
-    font-size: 7px;
+    font-size: 9px;
     font-weight: 850;
     letter-spacing: .12em;
     text-transform: uppercase;
@@ -953,7 +967,7 @@
     color: var(--navy);
 
     font-family: 'Poppins', sans-serif;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 700;
 }
 
@@ -964,8 +978,8 @@
 
     color: var(--muted);
 
-    font-size: 8px;
-    line-height: 1.55;
+    font-size: 12px;
+    line-height: 1.65;
 }
 
 
@@ -992,7 +1006,7 @@
 
     border-radius: 9px;
 
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
 
     cursor: pointer;
@@ -1015,9 +1029,9 @@
 
     background: linear-gradient(
         105deg,
-        var(--orange-dark),
-        var(--orange),
-        var(--gold)
+        rgb(var(--detail-accent-1-rgb)),
+        rgb(var(--detail-accent-2-rgb)),
+        rgb(var(--detail-accent-3-rgb))
     );
 
     background-size: 170% 100%;
@@ -1129,7 +1143,7 @@
 
     border-radius: 50%;
 
-    background: var(--gold);
+    background: rgb(var(--detail-accent-3-rgb));
 }
 
 
@@ -1149,12 +1163,12 @@
 
 @media (max-width: 860px) {
     .bd-detail-hero-grid {
-        grid-template-columns: minmax(0,1fr) 260px;
-        gap: 28px;
+        grid-template-columns: minmax(0,1fr) minmax(300px,360px);
+        gap: 32px;
     }
 
     .bd-detail-media-wrap {
-        max-width: 260px;
+        max-width: 360px;
     }
 
     .bd-detail-title {
@@ -1196,7 +1210,7 @@
     }
 
     .bd-detail-media {
-        aspect-ratio: 16 / 9;
+        min-height: 240px;
     }
 
     .bd-detail-after-inner {
@@ -1226,9 +1240,9 @@
     }
 
     .bd-detail-back {
-        min-height: 35px;
-        padding: 0 10px;
-        font-size: 9px;
+        min-height: 38px;
+        padding: 0 11px;
+        font-size: 11px;
     }
 
     .bd-detail-hero {
@@ -1245,12 +1259,12 @@
 
     .bd-detail-category,
     .bd-detail-pinned {
-        min-height: 24px;
-        font-size: 6.5px;
+        min-height: 25px;
+        font-size: 8px;
     }
 
     .bd-detail-date {
-        font-size: 8px;
+        font-size: 10px;
     }
 
     .bd-detail-title {
@@ -1277,8 +1291,8 @@
     }
 
     .bd-detail-share {
-        min-height: 36px;
-        font-size: 8px;
+        min-height: 38px;
+        font-size: 10px;
     }
 
     .bd-detail-media-wrap {
@@ -1286,7 +1300,8 @@
     }
 
     .bd-detail-media {
-        aspect-ratio: 16 / 9;
+        min-height: 220px;
+        padding: 9px;
         border-radius: 11px;
     }
 
@@ -1295,16 +1310,16 @@
     }
 
     .bd-detail-content {
-        font-size: 14px;
-        line-height: 1.83;
+        font-size: 16px;
+        line-height: 1.86;
     }
 
     .bd-detail-content > p:first-child {
-        font-size: 15px;
+        font-size: 17px;
     }
 
     .bd-detail-content h1 {
-        font-size: 24px;
+        font-size: 28px;
     }
 
     .bd-detail-content h2 {
@@ -1335,7 +1350,7 @@
     }
 
     .bd-detail-after p {
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .bd-detail-actions {
@@ -1449,7 +1464,7 @@
 
                             <time
                                 class="bd-detail-date"
-                                datetime="{{ $information->created_at->toDateString() }}"
+                                datetime="{{ $publishedDateSource?->toDateString() }}"
                             >
                                 {{ $publishedDate }}
                             </time>
@@ -1631,6 +1646,241 @@
         const reducedMotion = window.matchMedia(
             '(prefers-reduced-motion: reduce)'
         ).matches;
+
+        /* =====================================================
+           IMAGE PALETTE
+           Sama persis dengan cara ambil warna Baca Jurnal / Conference.
+           Hanya warna V4 yang diisi ulang; layout/ukuran tetap V4.
+        ====================================================== */
+
+        const paletteClamp = (value, min, max) =>
+            Math.min(max, Math.max(min, value));
+
+        const paletteRgbToHsl = (r, g, b) => {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h = 0;
+            let s = 0;
+            const l = (max + min) / 2;
+
+            if (max !== min) {
+                const delta = max - min;
+                s = l > .5
+                    ? delta / (2 - max - min)
+                    : delta / (max + min);
+
+                switch (max) {
+                    case r:
+                        h = (g - b) / delta + (g < b ? 6 : 0);
+                        break;
+                    case g:
+                        h = (b - r) / delta + 2;
+                        break;
+                    default:
+                        h = (r - g) / delta + 4;
+                }
+
+                h /= 6;
+            }
+
+            return [h, s, l];
+        };
+
+        const paletteHslToRgb = (h, s, l) => {
+            let r;
+            let g;
+            let b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < .5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+
+            return [
+                Math.round(r * 255),
+                Math.round(g * 255),
+                Math.round(b * 255)
+            ];
+        };
+
+        const paletteColorDistance = (a, b) =>
+            Math.sqrt(
+                ((a[0] - b[0]) ** 2) +
+                ((a[1] - b[1]) ** 2) +
+                ((a[2] - b[2]) ** 2)
+            );
+
+        const paletteNormalizeTone = (rgb, lightnessMin, lightnessMax) => {
+            const [h, s, l] = paletteRgbToHsl(...rgb);
+            const normalizedS = paletteClamp(s, .42, .82);
+            const normalizedL = paletteClamp(l, lightnessMin, lightnessMax);
+            return paletteHslToRgb(h, normalizedS, normalizedL);
+        };
+
+        const extractDetailPalette = image => {
+            try {
+                const canvas = document.createElement('canvas');
+                const size = 42;
+                canvas.width = size;
+                canvas.height = size;
+
+                const context = canvas.getContext('2d', {
+                    willReadFrequently: true
+                });
+
+                if (!context) {
+                    return null;
+                }
+
+                context.drawImage(image, 0, 0, size, size);
+                const pixels = context.getImageData(0, 0, size, size).data;
+                const buckets = new Map();
+
+                for (let i = 0; i < pixels.length; i += 16) {
+                    const alpha = pixels[i + 3];
+                    if (alpha < 210) continue;
+
+                    const r = pixels[i];
+                    const g = pixels[i + 1];
+                    const b = pixels[i + 2];
+                    const max = Math.max(r, g, b);
+                    const min = Math.min(r, g, b);
+                    const brightness = (r + g + b) / 3;
+                    const chroma = max - min;
+
+                    if (brightness > 242 || brightness < 18 || chroma < 12) {
+                        continue;
+                    }
+
+                    const qr = Math.round(r / 32) * 32;
+                    const qg = Math.round(g / 32) * 32;
+                    const qb = Math.round(b / 32) * 32;
+                    const key = `${qr},${qg},${qb}`;
+                    const current = buckets.get(key) || {
+                        count: 0,
+                        r: 0,
+                        g: 0,
+                        b: 0
+                    };
+
+                    current.count += 1;
+                    current.r += r;
+                    current.g += g;
+                    current.b += b;
+                    buckets.set(key, current);
+                }
+
+                const candidates = [...buckets.values()]
+                    .map(bucket => {
+                        const rgb = [
+                            Math.round(bucket.r / bucket.count),
+                            Math.round(bucket.g / bucket.count),
+                            Math.round(bucket.b / bucket.count)
+                        ];
+                        const [, s, l] = paletteRgbToHsl(...rgb);
+                        const score =
+                            bucket.count *
+                            (.6 + s * 1.6) *
+                            (1 - Math.abs(l - .5) * .45);
+
+                        return { rgb, score };
+                    })
+                    .sort((a, b) => b.score - a.score);
+
+                if (!candidates.length) return null;
+
+                const primary = candidates[0].rgb;
+                let secondary = null;
+                let secondaryScore = -1;
+
+                candidates.slice(1, 18).forEach(candidate => {
+                    const distance = paletteColorDistance(primary, candidate.rgb);
+                    if (distance < 72) return;
+
+                    const score = candidate.score * (1 + distance / 441);
+                    if (score > secondaryScore) {
+                        secondaryScore = score;
+                        secondary = candidate.rgb;
+                    }
+                });
+
+                if (!secondary) {
+                    secondary = candidates[Math.min(1, candidates.length - 1)].rgb;
+                }
+
+                const tone1 = paletteNormalizeTone(primary, .20, .33);
+                const tone2 = paletteNormalizeTone(secondary, .27, .42);
+                const primaryHsl = paletteRgbToHsl(...primary);
+                const secondaryHsl = paletteRgbToHsl(...secondary);
+                const accentSource = secondaryHsl[2] >= primaryHsl[2]
+                    ? secondary
+                    : primary;
+                const accent = paletteNormalizeTone(accentSource, .40, .55);
+
+                return { tone1, tone2, accent };
+            } catch (error) {
+                return null;
+            }
+        };
+
+        const applyDetailPalette = image => {
+            if (!image || !image.complete || !image.naturalWidth) {
+                return;
+            }
+
+            const palette = extractDetailPalette(image);
+            if (!palette) return;
+
+            page.style.setProperty(
+                '--detail-accent-1-rgb',
+                palette.tone1.join(',')
+            );
+            page.style.setProperty(
+                '--detail-accent-2-rgb',
+                palette.tone2.join(',')
+            );
+            page.style.setProperty(
+                '--detail-accent-3-rgb',
+                palette.accent.join(',')
+            );
+            page.style.setProperty(
+                '--detail-accent-text',
+                `rgb(${palette.accent[0]} ${palette.accent[1]} ${palette.accent[2]})`
+            );
+        };
+
+        const detailPaletteImage = page.querySelector('.bd-detail-image');
+
+        if (detailPaletteImage) {
+            if (detailPaletteImage.complete && detailPaletteImage.naturalWidth) {
+                applyDetailPalette(detailPaletteImage);
+            } else {
+                detailPaletteImage.addEventListener(
+                    'load',
+                    () => applyDetailPalette(detailPaletteImage),
+                    { once: true }
+                );
+            }
+        }
 
 
         /* =====================================================

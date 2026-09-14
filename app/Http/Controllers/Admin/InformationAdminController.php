@@ -16,7 +16,8 @@ class InformationAdminController extends Controller
         $informations = Information::query()
             ->orderByDesc('is_pinned')
             ->orderByDesc('pinned_at')
-            ->latest('created_at')
+            ->orderByRaw('COALESCE(published_at, DATE(created_at)) DESC')
+            ->orderByDesc('created_at')
             ->get();
 
         return view(
@@ -215,6 +216,10 @@ class InformationAdminController extends Controller
                 'string',
                 'max:255',
             ],
+            'published_at' => [
+                'required',
+                'date',
+            ],
             'content' => [
                 'required',
                 'string',
@@ -233,6 +238,8 @@ class InformationAdminController extends Controller
         ], [
             'title.required' => 'Judul informasi wajib diisi.',
             'title.max' => 'Judul informasi maksimal 255 karakter.',
+            'published_at.required' => 'Tanggal informasi wajib diisi.',
+            'published_at.date' => 'Tanggal informasi tidak valid.',
             'content.required' => 'Isi informasi wajib diisi.',
             'content.max' => 'Isi informasi terlalu panjang.',
             'image.image' => 'Gambar informasi harus berupa file gambar.',

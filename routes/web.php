@@ -57,8 +57,28 @@ Route::get('/', function () {
 */
 
 Route::get('/login', function () {
+    request()->session()->put('_oauth_session_ready', true);
+
     return view('auth.login');
 })->name('login');
+
+Route::get('/__debug/session-test', function () {
+    request()->session()->put('oauth_probe', 'bacadulu-ok');
+
+    return response('BACADULU_SESSION_TEST_20260913')
+        ->header('X-Bacadulu-Debug', 'session-test')
+        ->cookie(
+            'bacadulu_probe',
+            '1',
+            5,
+            '/',
+            null,
+            true,
+            true,
+            false,
+            'lax'
+        );
+});
 
 Route::get('/auth/google', [
     GoogleController::class,
@@ -378,6 +398,18 @@ Route::get('/tentang/visi-misi', function () {
 Route::get('/tentang/kontak', function () {
     return view('landing-page.pages.kontak');
 })->name('tentang.kontak');
+
+/*
+|--------------------------------------------------------------------------
+| LEGAL
+|--------------------------------------------------------------------------
+*/
+
+Route::view('/privacy-policy', 'legal.privacy-policy')
+    ->name('privacy-policy');
+
+Route::view('/terms', 'legal.terms')
+    ->name('terms');
 
 /*
 |--------------------------------------------------------------------------

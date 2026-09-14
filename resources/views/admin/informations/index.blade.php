@@ -94,6 +94,10 @@
                             Konten
                         </th>
 
+                        <th class="px-4 py-3 text-left font-semibold text-slate-700">
+                            Tanggal Informasi
+                        </th>
+
                         <th class="px-4 py-3 text-center font-semibold text-slate-700">
                             Status
                         </th>
@@ -129,7 +133,7 @@
                                             <img
                                                 src="{{ asset('storage/' . $item->image) }}"
                                                 alt="{{ $item->title }}"
-                                                class="h-full w-full object-cover"
+                                                class="h-full w-full object-contain p-1"
                                             >
                                         @else
                                             <div class="grid h-full w-full place-items-center bg-gradient-to-br from-orange-500 to-amber-400 text-[9px] font-bold uppercase tracking-wider text-white">
@@ -166,7 +170,7 @@
 
 
                                         <span class="mt-1 block text-[11px] text-slate-400">
-                                            {{ $item->created_at?->timezone('Asia/Jakarta')->translatedFormat('d M Y · H:i') }}
+                                            Diunggah {{ $item->created_at?->timezone('Asia/Jakarta')->translatedFormat('d M Y · H:i') }}
                                         </span>
 
                                     </div>
@@ -184,6 +188,24 @@
                                             100
                                         )
                                     }}
+                                </div>
+                            </td>
+
+
+                            {{-- Tanggal Informasi --}}
+                            <td class="px-4 py-4">
+                                @php
+                                    $displayDate = $item->published_at ?? $item->created_at;
+                                @endphp
+
+                                <div class="min-w-[135px]">
+                                    <strong class="block text-sm font-semibold text-slate-800">
+                                        {{ $displayDate?->translatedFormat('d M Y') ?? '-' }}
+                                    </strong>
+
+                                    <span class="mt-1 block text-[11px] text-slate-400">
+                                        Tanggal yang tampil di website
+                                    </span>
                                 </div>
                             </td>
 
@@ -280,7 +302,7 @@
 
                         <tr>
                             <td
-                                colspan="4"
+                                colspan="5"
                                 class="px-4 py-12 text-center text-sm text-slate-500"
                             >
                                 Belum ada data informasi.

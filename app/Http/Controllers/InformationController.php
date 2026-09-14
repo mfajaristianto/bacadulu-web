@@ -11,6 +11,7 @@ class InformationController extends Controller
         $pinnedInformation = Information::query()
             ->where('is_pinned', true)
             ->orderByDesc('pinned_at')
+            ->orderByRaw('COALESCE(published_at, DATE(created_at)) DESC')
             ->orderByDesc('created_at')
             ->first();
 
@@ -23,7 +24,8 @@ class InformationController extends Controller
                     $pinnedInformation->id
                 )
             )
-            ->latest()
+            ->orderByRaw('COALESCE(published_at, DATE(created_at)) DESC')
+            ->orderByDesc('created_at')
             ->take(3)
             ->get();
 
@@ -43,14 +45,22 @@ class InformationController extends Controller
                     $excludedIds
                 )
             )
-            ->latest()
+            ->orderByRaw('COALESCE(published_at, DATE(created_at)) DESC')
+            ->orderByDesc('created_at')
             ->get();
 
         $totalInformations = Information::count();
 
-        $lastUpdate = Information::query()
-            ->latest('created_at')
-            ->value('created_at');
+        $lastInformation = Information::query()
+            ->orderByRaw('COALESCE(published_at, DATE(created_at)) DESC')
+            ->orderByDesc('created_at')
+            ->first([
+                'published_at',
+                'created_at',
+            ]);
+
+        $lastUpdate = $lastInformation?->published_at
+            ?? $lastInformation?->created_at;
 
         return view(
             'landing-page.pages.information',

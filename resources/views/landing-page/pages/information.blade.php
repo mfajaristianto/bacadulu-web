@@ -24,11 +24,13 @@
         $lastUpdateText = \Illuminate\Support\Carbon::parse($lastUpdate)
             ->timezone('Asia/Jakarta')
             ->translatedFormat('d M Y');
-    } elseif ($latestInformations->first()?->created_at) {
-        $lastUpdateText = $latestInformations->first()
-            ->created_at
-            ->timezone('Asia/Jakarta')
-            ->translatedFormat('d M Y');
+    } else {
+        $latestDateSource = $latestInformations->first()?->published_at
+            ?? $latestInformations->first()?->created_at;
+
+        if ($latestDateSource) {
+            $lastUpdateText = $latestDateSource->translatedFormat('d M Y');
+        }
     }
 @endphp
 
@@ -58,7 +60,7 @@
 .bd-information *::before,
 .bd-information *::after{box-sizing:border-box}
 .bd-information a{text-decoration:none}
-.bd-info-shell{width:min(calc(100% - 40px),1080px);margin-inline:auto}
+.bd-info-shell{width:min(calc(100% - 40px),1240px);margin-inline:auto}
 
 /* BRAND */
 .bd-info-brandbar{
@@ -150,7 +152,7 @@
     max-width:565px;
     margin:0;
     color:var(--muted);
-    font-size:11px;
+    font-size:14px;
     line-height:1.75;
 }
 .bd-info-stat{text-align:right}
@@ -167,7 +169,7 @@
     display:block;
     margin-top:5px;
     color:var(--navy);
-    font-size:7.5px;
+    font-size:10px;
     font-weight:850;
     letter-spacing:.1em;
     text-transform:uppercase;
@@ -199,14 +201,14 @@
     align-items:flex-end;
     justify-content:space-between;
     gap:25px;
-    width:min(100%,1000px);
+    width:min(100%,1140px);
     margin:0 auto 20px;
 }
 .bd-info-section-kicker{
     display:block;
     margin-bottom:4px;
     color:var(--orange);
-    font-size:7.5px;
+    font-size:10px;
     font-weight:850;
     letter-spacing:.14em;
     text-transform:uppercase;
@@ -215,7 +217,7 @@
     margin:0;
     color:var(--navy);
     font-family:'Poppins',sans-serif;
-    font-size:22px;
+    font-size:30px;
     font-weight:700;
     line-height:1.25;
     letter-spacing:-.025em;
@@ -224,22 +226,27 @@
     max-width:330px;
     margin:0;
     color:var(--muted);
-    font-size:8.5px;
-    line-height:1.6;
+    font-size:13px;
+    line-height:1.65;
     text-align:right;
 }
 
 /* PINNED */
-.bd-info-pinned-wrap{width:min(100%,900px);margin-inline:auto}
+.bd-info-pinned-wrap{width:min(100%,1080px);margin-inline:auto}
 .bd-info-pinned{
+    --card-accent-1-rgb:239,88,67;
+    --card-accent-2-rgb:247,170,53;
+    --card-accent-3-rgb:36,27,82;
+    --card-accent-text:#C74632;
+    --card-accent-contrast:#FFFFFF;
     position:relative;
     display:grid;
-    grid-template-columns:minmax(270px,340px) minmax(0,1fr);
-    min-height:230px;
+    grid-template-columns:minmax(320px,460px) minmax(0,1fr);
+    min-height:320px;
     overflow:hidden;
-    border:1px solid rgba(239,88,67,.19);
+    border:1px solid rgba(var(--card-accent-1-rgb),.28);
     border-radius:18px;
-    background:#fff;
+    background:linear-gradient(145deg,rgba(var(--card-accent-1-rgb),.08),rgba(var(--card-accent-2-rgb),.045) 34%,#fff 66%);
     box-shadow:0 15px 40px rgba(36,27,82,.065);
 }
 .bd-info-pinned::before{
@@ -250,31 +257,42 @@
     left:0;
     right:0;
     height:3px;
-    background:linear-gradient(90deg,var(--orange),var(--orange-soft),var(--gold));
+    background:linear-gradient(90deg,rgb(var(--card-accent-1-rgb)),rgb(var(--card-accent-2-rgb)),rgb(var(--card-accent-3-rgb)));
 }
 .bd-info-pinned-media{
     position:relative;
-    min-height:230px;
+    min-height:320px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     overflow:hidden;
-    background:linear-gradient(145deg,var(--orange),var(--gold));
+    padding:14px;
+    background:radial-gradient(circle at 18% 15%,rgba(var(--card-accent-1-rgb),.24),transparent 48%),radial-gradient(circle at 86% 18%,rgba(var(--card-accent-2-rgb),.20),transparent 46%),linear-gradient(135deg,rgba(var(--card-accent-3-rgb),.12),rgba(var(--card-accent-1-rgb),.045));
 }
 .bd-info-pinned-media img{
-    position:absolute;
-    inset:0;
+    position:relative;
     z-index:2;
-    width:100%;
-    height:100%;
     display:block;
-    object-fit:cover;
+    width:auto;
+    max-width:100%;
+    height:auto;
+    max-height:520px;
+    object-fit:contain;
     transition:transform .65s cubic-bezier(.22,1,.36,1);
 }
-.bd-info-pinned:hover .bd-info-pinned-media img{transform:scale(1.035)}
+.bd-info-pinned:hover .bd-info-pinned-media img{transform:scale(1.015)}
 .bd-info-image-fallback{
     position:absolute;
     inset:0;
     display:grid;
     place-items:center;
-    background:linear-gradient(135deg,var(--orange),var(--orange-soft),var(--gold));
+    /*
+     * Jangan beri warna orange tetap di layer fallback.
+     * Saat gambar memakai object-fit: contain, area kosong di sekeliling
+     * gambar akan memperlihatkan background adaptive dari media parent,
+     * yang warnanya berasal dari cover/gambar yang di-upload.
+     */
+    background:transparent;
 }
 .bd-info-image-fallback span{
     color:#fff;
@@ -289,7 +307,7 @@
     flex-direction:column;
     justify-content:center;
     min-width:0;
-    padding:27px 29px;
+    padding:34px 36px;
 }
 .bd-info-pin-label{
     display:inline-flex;
@@ -298,11 +316,11 @@
     width:max-content;
     margin-bottom:11px;
     padding:6px 9px;
-    border:1px solid rgba(239,88,67,.15);
+    border:1px solid rgba(var(--card-accent-1-rgb),.25);
     border-radius:999px;
-    color:var(--orange);
-    background:#FFF5EC;
-    font-size:7px;
+    color:var(--card-accent-text);
+    background:linear-gradient(135deg,rgba(var(--card-accent-1-rgb),.11),rgba(var(--card-accent-2-rgb),.07));
+    font-size:9px;
     font-weight:850;
     letter-spacing:.09em;
     text-transform:uppercase;
@@ -320,18 +338,18 @@
     display:flex;
     align-items:center;
     gap:7px;
-    margin-bottom:7px;
+    margin-bottom:9px;
     color:#999CA2;
-    font-size:7px;
+    font-size:11px;
     font-weight:700;
 }
-.bd-info-pinned-meta span:first-child{color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
-.bd-info-dot{width:3px;height:3px;border-radius:50%;background:var(--gold)}
+.bd-info-pinned-meta span:first-child{color:var(--card-accent-text);text-transform:uppercase;letter-spacing:.08em}
+.bd-info-dot{width:4px;height:4px;border-radius:50%;background:rgb(var(--card-accent-2-rgb))}
 .bd-info-pinned-title{
     margin:0;
     color:var(--navy);
     font-family:'Poppins',sans-serif;
-    font-size:21px;
+    font-size:27px;
     font-weight:720;
     line-height:1.35;
     letter-spacing:-.025em;
@@ -340,8 +358,8 @@
     max-width:480px;
     margin:10px 0 17px;
     color:var(--muted);
-    font-size:9.5px;
-    line-height:1.68;
+    font-size:14px;
+    line-height:1.75;
     display:-webkit-box;
     overflow:hidden;
     -webkit-line-clamp:3;
@@ -353,7 +371,7 @@
     gap:9px;
     width:max-content;
     color:var(--navy)!important;
-    font-size:8px;
+    font-size:12px;
     font-weight:850;
 }
 .bd-info-pinned-link span{
@@ -363,7 +381,8 @@
     place-items:center;
     border-radius:8px;
     color:#fff;
-    background:linear-gradient(135deg,var(--orange),var(--gold));
+    background:linear-gradient(135deg,rgb(var(--card-accent-1-rgb)),rgb(var(--card-accent-2-rgb)) 55%,rgb(var(--card-accent-3-rgb)));
+    color:var(--card-accent-contrast);
     transition:transform .25s ease;
 }
 .bd-info-pinned-link svg{
@@ -379,24 +398,37 @@
 .bd-info-latest-grid{
     display:grid;
     grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:16px;
-    width:min(100%,1000px);
+    gap:20px;
+    width:min(100%,1140px);
     margin-inline:auto;
+}
+.bd-info-latest-grid.is-single{
+    grid-template-columns:minmax(0,520px);
+    justify-content:start;
+}
+.bd-info-latest-grid.is-double{
+    grid-template-columns:repeat(2,minmax(0,520px));
+    justify-content:start;
 }
 
 /* STANDARD CARD */
 .bd-info-card{
+    --card-accent-1-rgb:239,88,67;
+    --card-accent-2-rgb:247,170,53;
+    --card-accent-3-rgb:36,27,82;
+    --card-accent-text:#C74632;
+    --card-accent-contrast:#FFFFFF;
     position:relative;
     display:flex;
     flex-direction:column;
     min-width:0;
     width:100%;
-    max-width:323px;
+    max-width:none;
     justify-self:center;
     overflow:hidden;
-    border:1px solid var(--border);
+    border:1px solid rgba(var(--card-accent-1-rgb),.25);
     border-radius:15px;
-    background:#fff;
+    background:linear-gradient(180deg,rgba(var(--card-accent-1-rgb),.065),rgba(var(--card-accent-2-rgb),.025) 28%,#fff 54%);
     box-shadow:0 4px 14px rgba(36,27,82,.045);
     transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease;
 }
@@ -410,34 +442,42 @@
     height:3px;
     opacity:0;
     border-radius:0 0 6px 6px;
-    background:linear-gradient(90deg,var(--orange),var(--gold));
+    background:linear-gradient(90deg,rgb(var(--card-accent-1-rgb)),rgb(var(--card-accent-2-rgb)),rgb(var(--card-accent-3-rgb)));
     transition:opacity .25s ease;
 }
 .bd-info-card:hover{
     transform:translateY(-4px);
-    border-color:rgba(239,88,67,.30);
-    box-shadow:0 15px 30px rgba(36,27,82,.085);
+    border-color:rgba(var(--card-accent-1-rgb),.50);
+    box-shadow:0 15px 32px rgba(var(--card-accent-1-rgb),.14),0 5px 18px rgba(var(--card-accent-2-rgb),.08);
 }
 .bd-info-card:hover::before{opacity:1}
 .bd-info-card-media{
     position:relative;
-    display:block;
-    aspect-ratio:16/10;
-    max-height:190px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    min-height:0;
+    aspect-ratio:4/3;
     overflow:hidden;
+    padding:12px;
     border-bottom:1px solid var(--border);
-    background:#F4F1ED;
+    background:
+        radial-gradient(circle at 15% 20%,rgba(var(--card-accent-1-rgb),.24),transparent 46%),radial-gradient(circle at 85% 18%,rgba(var(--card-accent-2-rgb),.20),transparent 45%),linear-gradient(135deg,rgba(var(--card-accent-3-rgb),.11),rgba(var(--card-accent-1-rgb),.04));
 }
 .bd-info-card-media img{
     position:relative;
     z-index:2;
+    display:block;
     width:100%;
     height:100%;
-    display:block;
-    object-fit:cover;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    object-position:center;
     transition:transform .6s cubic-bezier(.22,1,.36,1);
 }
-.bd-info-card:hover .bd-info-card-media img{transform:scale(1.04)}
+.bd-info-card:hover .bd-info-card-media img{transform:scale(1.015)}
 .bd-info-number{
     position:absolute;
     z-index:4;
@@ -451,17 +491,18 @@
     border:1px solid rgba(255,255,255,.34);
     border-radius:7px;
     color:#fff;
-    background:rgba(36,27,82,.64);
+    background:linear-gradient(135deg,rgba(var(--card-accent-1-rgb),.96),rgba(var(--card-accent-2-rgb),.92) 55%,rgba(var(--card-accent-3-rgb),.90));
+    color:var(--card-accent-contrast);
     backdrop-filter:blur(7px);
-    font-size:7px;
+    font-size:9px;
     font-weight:850;
 }
 .bd-info-card-body{
     display:flex;
     flex:1;
     flex-direction:column;
-    min-height:167px;
-    padding:15px;
+    min-height:220px;
+    padding:22px;
 }
 .bd-info-meta{
     display:flex;
@@ -470,10 +511,10 @@
     gap:6px;
     margin-bottom:7px;
     color:#999CA2;
-    font-size:6.7px;
+    font-size:11px;
 }
 .bd-info-meta-category{
-    color:var(--orange);
+    color:var(--card-accent-text);
     font-weight:850;
     letter-spacing:.08em;
     text-transform:uppercase;
@@ -482,7 +523,7 @@
     margin:0 0 7px;
     color:var(--navy);
     font-family:'Poppins',sans-serif;
-    font-size:14px;
+    font-size:18px;
     font-weight:680;
     line-height:1.42;
     letter-spacing:-.015em;
@@ -494,8 +535,8 @@
 .bd-info-card-excerpt{
     margin:0 0 13px;
     color:var(--muted);
-    font-size:8.7px;
-    line-height:1.65;
+    font-size:14px;
+    line-height:1.72;
     display:-webkit-box;
     overflow:hidden;
     -webkit-line-clamp:2;
@@ -507,10 +548,10 @@
     justify-content:space-between;
     gap:10px;
     margin-top:auto;
-    padding-top:11px;
+    padding-top:13px;
     border-top:1px solid #F0ECE8;
     color:var(--navy)!important;
-    font-size:7.5px;
+    font-size:12px;
     font-weight:850;
 }
 .bd-info-card-read span:last-child{
@@ -518,10 +559,10 @@
     height:27px;
     display:grid;
     place-items:center;
-    border:1px solid rgba(239,88,67,.16);
+    border:1px solid rgba(var(--card-accent-1-rgb),.24);
     border-radius:8px;
-    color:var(--orange);
-    background:#FFF7EF;
+    color:var(--card-accent-text);
+    background:linear-gradient(135deg,rgba(var(--card-accent-1-rgb),.11),rgba(var(--card-accent-2-rgb),.07));
     transition:background .25s ease,color .25s ease,transform .25s ease;
 }
 .bd-info-card-read svg{
@@ -532,8 +573,8 @@
     stroke-width:1.8;
 }
 .bd-info-card:hover .bd-info-card-read span:last-child{
-    color:#fff;
-    background:linear-gradient(135deg,var(--orange),var(--gold));
+    color:var(--card-accent-contrast);
+    background:linear-gradient(135deg,rgb(var(--card-accent-1-rgb)),rgb(var(--card-accent-2-rgb)) 55%,rgb(var(--card-accent-3-rgb)));
     transform:translateX(2px);
 }
 
@@ -579,19 +620,19 @@
     font-weight:850;
 }
 .bd-info-all-viewport{
-    width:min(100%,1000px);
+    width:min(100%,1140px);
     margin-inline:auto;
     overflow:hidden;
 }
 .bd-info-all-track{
     display:flex;
     align-items:stretch;
-    gap:16px;
+    gap:20px;
     width:100%;
     will-change:transform;
 }
 .bd-info-all-card{
-    flex:0 0 calc((100% - 32px)/3);
+    flex:0 0 calc((100% - 40px)/3);
     max-width:none;
 }
 .bd-info-empty{
@@ -603,7 +644,7 @@
     color:var(--muted);
     background:#fff;
     text-align:center;
-    font-size:10px;
+    font-size:14px;
 }
 
 /* TABLET */
@@ -613,19 +654,19 @@
     .bd-info-hero-layout{gap:28px}
     .bd-info-latest-grid{
         grid-template-columns:repeat(2,minmax(0,1fr));
-        max-width:670px;
+        max-width:760px;
     }
     .bd-info-latest-grid .bd-info-card:last-child:nth-child(odd){
         grid-column:1/-1;
         justify-self:center;
     }
-    .bd-info-card{max-width:327px}
+    .bd-info-card{max-width:none}
     .bd-info-pinned-wrap{max-width:670px}
     .bd-info-pinned{grid-template-columns:minmax(230px,280px) minmax(0,1fr)}
     .bd-info-pinned-body{padding:23px}
     .bd-info-pinned-title{font-size:18px}
     .bd-info-all-viewport{max-width:670px}
-    .bd-info-all-card{flex-basis:calc((100% - 16px)/2)}
+    .bd-info-all-card{flex-basis:calc((100% - 20px)/2)}
 }
 
 /* MOBILE */
@@ -641,35 +682,35 @@
     .bd-info-spectrum{margin-top:21px}
     .bd-info-section{padding:37px 0}
     .bd-info-section-head{
-        width:min(100%,360px);
+        width:min(100%,420px);
         align-items:flex-start;
         flex-direction:column;
         gap:6px;
         margin-bottom:17px;
     }
     .bd-info-section-head p{text-align:left}
-    .bd-info-pinned-wrap{max-width:360px}
+    .bd-info-pinned-wrap{max-width:420px}
     .bd-info-pinned{grid-template-columns:1fr}
-    .bd-info-pinned-media{min-height:0;aspect-ratio:16/9}
+    .bd-info-pinned-media{min-height:240px;padding:10px}
     .bd-info-pinned-body{padding:20px}
     .bd-info-pinned-title{font-size:17px}
     .bd-info-latest-grid{
         grid-template-columns:1fr;
-        max-width:350px;
+        max-width:420px;
         gap:14px;
     }
     .bd-info-latest-grid .bd-info-card:last-child:nth-child(odd){grid-column:auto}
-    .bd-info-card{max-width:350px}
-    .bd-info-card-media{aspect-ratio:16/9;max-height:190px}
+    .bd-info-card{max-width:100%}
+    .bd-info-card-media{aspect-ratio:4/3;min-height:0;padding:9px}
     .bd-info-all-head{
-        width:min(100%,360px);
+        width:min(100%,420px);
         flex-direction:row;
         align-items:flex-end;
         gap:12px;
     }
     .bd-info-all-head p{display:none}
     .bd-info-slider-controls{margin-left:auto}
-    .bd-info-all-viewport{max-width:350px}
+    .bd-info-all-viewport{max-width:420px}
     .bd-info-all-card{flex-basis:100%}
 }
 
@@ -750,10 +791,11 @@
                 190
             );
 
-            $pinDate = $pinnedInformation->created_at
-                ? $pinnedInformation->created_at
-                    ->timezone('Asia/Jakarta')
-                    ->translatedFormat('d M Y')
+            $pinDateSource = $pinnedInformation->published_at
+                ?? $pinnedInformation->created_at;
+
+            $pinDate = $pinDateSource
+                ? $pinDateSource->translatedFormat('d M Y')
                 : null;
         @endphp
 
@@ -778,7 +820,7 @@
                 </header>
 
                 <div class="bd-info-pinned-wrap">
-                    <article class="bd-info-pinned" data-info-pinned>
+                    <article class="bd-info-pinned" data-info-pinned data-adaptive-card>
 
                         <a
                             href="{{ url('/information/' . $pinnedInformation->slug) }}"
@@ -794,6 +836,7 @@
                                     src="{{ asset('storage/' . $pinnedInformation->image) }}"
                                     alt="{{ $pinnedInformation->title }}"
                                     loading="eager"
+                                    data-card-image
                                     onerror="this.style.display='none';"
                                 >
                             @endif
@@ -867,15 +910,9 @@
                             Informasi terbaru.
                         </h2>
                     </div>
-
-                    <p>
-                        Tiga pembaruan terbaru yang baru saja
-                        diterbitkan oleh Baca Dulu.
-                    </p>
                 </header>
 
-
-                <div class="bd-info-latest-grid">
+                <div class="bd-info-latest-grid {{ $latestInformations->count() === 1 ? 'is-single' : ($latestInformations->count() === 2 ? 'is-double' : '') }}">
 
                     @foreach($latestInformations as $index => $information)
                         @php
@@ -892,14 +929,15 @@
                                 105
                             );
 
-                            $date = $information->created_at
-                                ? $information->created_at
-                                    ->timezone('Asia/Jakarta')
-                                    ->translatedFormat('d M Y')
+                            $dateSource = $information->published_at
+                                ?? $information->created_at;
+
+                            $date = $dateSource
+                                ? $dateSource->translatedFormat('d M Y')
                                 : null;
                         @endphp
 
-                        <article class="bd-info-card" data-info-latest-card>
+                        <article class="bd-info-card" data-info-latest-card data-adaptive-card>
 
                             <a
                                 href="{{ url('/information/' . $information->slug) }}"
@@ -915,6 +953,7 @@
                                         src="{{ asset('storage/' . $information->image) }}"
                                         alt="{{ $information->title }}"
                                         loading="lazy"
+                                        data-card-image
                                         onerror="this.style.display='none';"
                                     >
                                 @endif
@@ -1065,14 +1104,15 @@
                                     100
                                 );
 
-                                $date = $information->created_at
-                                    ? $information->created_at
-                                        ->timezone('Asia/Jakarta')
-                                        ->translatedFormat('d M Y')
+                                $dateSource = $information->published_at
+                                    ?? $information->created_at;
+
+                                $date = $dateSource
+                                    ? $dateSource->translatedFormat('d M Y')
                                     : null;
                             @endphp
 
-                            <article class="bd-info-card bd-info-all-card" data-all-card>
+                            <article class="bd-info-card bd-info-all-card" data-all-card data-adaptive-card>
 
                                 <a
                                     href="{{ url('/information/' . $information->slug) }}"
@@ -1088,6 +1128,7 @@
                                             src="{{ asset('storage/' . $information->image) }}"
                                             alt="{{ $information->title }}"
                                             loading="lazy"
+                                            data-card-image
                                             onerror="this.style.display='none';"
                                         >
                                     @endif
@@ -1442,6 +1483,314 @@
             }
 
         }
+
+
+        /* =====================================================
+           ADAPTIVE CARD COLOR
+           Pengambilan warna memakai algoritma yang sama dengan
+           Baca Jurnal / Conference. Tampilan card tetap V4.
+        ====================================================== */
+
+        const clamp = (value, min, max) =>
+            Math.min(max, Math.max(min, value));
+
+        const rgbToHsl = (r, g, b) => {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h = 0;
+            let s = 0;
+            const l = (max + min) / 2;
+
+            if (max !== min) {
+                const d = max - min;
+                s = l > .5
+                    ? d / (2 - max - min)
+                    : d / (max + min);
+
+                switch (max) {
+                    case r:
+                        h = (g - b) / d + (g < b ? 6 : 0);
+                        break;
+                    case g:
+                        h = (b - r) / d + 2;
+                        break;
+                    default:
+                        h = (r - g) / d + 4;
+                }
+
+                h /= 6;
+            }
+
+            return [h, s, l];
+        };
+
+        const hslToRgb = (h, s, l) => {
+            let r;
+            let g;
+            let b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < .5
+                    ? l * (1 + s)
+                    : l + s - l * s;
+
+                const p = 2 * l - q;
+
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+
+            return [
+                Math.round(r * 255),
+                Math.round(g * 255),
+                Math.round(b * 255)
+            ];
+        };
+
+        const rgbToCss = rgb =>
+            `rgb(${rgb[0]} ${rgb[1]} ${rgb[2]})`;
+
+        const colorDistance = (a, b) =>
+            Math.sqrt(
+                ((a[0] - b[0]) ** 2) +
+                ((a[1] - b[1]) ** 2) +
+                ((a[2] - b[2]) ** 2)
+            );
+
+        const normalizeTone = (rgb, lightnessMin, lightnessMax) => {
+            const [h, s, l] = rgbToHsl(...rgb);
+            const normalizedS = clamp(s, .42, .82);
+            const normalizedL = clamp(l, lightnessMin, lightnessMax);
+
+            return hslToRgb(h, normalizedS, normalizedL);
+        };
+
+        const getAdaptivePalette = image => {
+            try {
+                const canvas = document.createElement('canvas');
+                const size = 42;
+
+                canvas.width = size;
+                canvas.height = size;
+
+                const context = canvas.getContext('2d', {
+                    willReadFrequently: true
+                });
+
+                if (!context) {
+                    return null;
+                }
+
+                context.drawImage(image, 0, 0, size, size);
+
+                const pixels = context.getImageData(
+                    0,
+                    0,
+                    size,
+                    size
+                ).data;
+
+                const buckets = new Map();
+
+                /* Sama seperti Baca Jurnal / Conference:
+                   sampling tiap 4 pixel (RGBA = langkah 16), buang putih,
+                   hitam ekstrem, dan abu-abu datar, lalu kuantisasi /32. */
+                for (let i = 0; i < pixels.length; i += 16) {
+                    const alpha = pixels[i + 3];
+
+                    if (alpha < 210) {
+                        continue;
+                    }
+
+                    const r = pixels[i];
+                    const g = pixels[i + 1];
+                    const b = pixels[i + 2];
+
+                    const max = Math.max(r, g, b);
+                    const min = Math.min(r, g, b);
+                    const brightness = (r + g + b) / 3;
+                    const chroma = max - min;
+
+                    if (
+                        brightness > 242 ||
+                        brightness < 18 ||
+                        chroma < 12
+                    ) {
+                        continue;
+                    }
+
+                    const qr = Math.round(r / 32) * 32;
+                    const qg = Math.round(g / 32) * 32;
+                    const qb = Math.round(b / 32) * 32;
+                    const key = `${qr},${qg},${qb}`;
+
+                    const current = buckets.get(key) || {
+                        count: 0,
+                        r: 0,
+                        g: 0,
+                        b: 0
+                    };
+
+                    current.count += 1;
+                    current.r += r;
+                    current.g += g;
+                    current.b += b;
+                    buckets.set(key, current);
+                }
+
+                const candidates = [...buckets.values()]
+                    .map(bucket => {
+                        const rgb = [
+                            Math.round(bucket.r / bucket.count),
+                            Math.round(bucket.g / bucket.count),
+                            Math.round(bucket.b / bucket.count)
+                        ];
+
+                        const [, s, l] = rgbToHsl(...rgb);
+                        const score =
+                            bucket.count *
+                            (.6 + s * 1.6) *
+                            (1 - Math.abs(l - .5) * .45);
+
+                        return { rgb, score };
+                    })
+                    .sort((a, b) => b.score - a.score);
+
+                if (!candidates.length) {
+                    return null;
+                }
+
+                const primary = candidates[0].rgb;
+                let secondary = null;
+                let secondaryScore = -1;
+
+                candidates.slice(1, 18).forEach(candidate => {
+                    const distance = colorDistance(
+                        primary,
+                        candidate.rgb
+                    );
+
+                    if (distance < 72) {
+                        return;
+                    }
+
+                    const score = candidate.score * (1 + distance / 441);
+
+                    if (score > secondaryScore) {
+                        secondaryScore = score;
+                        secondary = candidate.rgb;
+                    }
+                });
+
+                if (!secondary) {
+                    secondary = candidates[
+                        Math.min(1, candidates.length - 1)
+                    ].rgb;
+                }
+
+                const tone1 = normalizeTone(primary, .20, .33);
+                const tone2 = normalizeTone(secondary, .27, .42);
+
+                const primaryHsl = rgbToHsl(...primary);
+                const secondaryHsl = rgbToHsl(...secondary);
+                const accentSource = secondaryHsl[2] >= primaryHsl[2]
+                    ? secondary
+                    : primary;
+
+                const accent = normalizeTone(accentSource, .40, .55);
+
+                /* V4 memang memakai tiga slot warna. Slot ketiga cukup
+                   memakai accent hasil algoritma Jurnal/Conference; UI V4
+                   lainnya tidak diubah. */
+                return {
+                    color1: `${tone1[0]},${tone1[1]},${tone1[2]}`,
+                    color2: `${tone2[0]},${tone2[1]},${tone2[2]}`,
+                    color3: `${accent[0]},${accent[1]},${accent[2]}`,
+                    text: rgbToCss(accent),
+                    contrast: '#FFFFFF'
+                };
+            } catch (error) {
+                return null;
+            }
+        };
+
+        const getAdaptiveCardImage = card =>
+            card.querySelector(
+                '[data-card-image], .bd-info-card-media img, .bd-info-pinned-media img'
+            );
+
+        const applyAdaptiveCardColor = card => {
+            const image = getAdaptiveCardImage(card);
+
+            if (!image || !image.complete || !image.naturalWidth) {
+                return;
+            }
+
+            const palette = getAdaptivePalette(image);
+
+            if (!palette) {
+                return;
+            }
+
+            card.style.setProperty(
+                '--card-accent-1-rgb',
+                palette.color1
+            );
+
+            card.style.setProperty(
+                '--card-accent-2-rgb',
+                palette.color2
+            );
+
+            card.style.setProperty(
+                '--card-accent-3-rgb',
+                palette.color3
+            );
+
+            card.style.setProperty(
+                '--card-accent-text',
+                palette.text
+            );
+
+            card.style.setProperty(
+                '--card-accent-contrast',
+                palette.contrast
+            );
+        };
+
+        page.querySelectorAll('[data-adaptive-card]').forEach(card => {
+            const image = getAdaptiveCardImage(card);
+
+            if (!image) {
+                return;
+            }
+
+            if (image.complete && image.naturalWidth) {
+                applyAdaptiveCardColor(card);
+            } else {
+                image.addEventListener(
+                    'load',
+                    () => applyAdaptiveCardColor(card),
+                    { once: true }
+                );
+            }
+        });
 
 
         /* =====================================================

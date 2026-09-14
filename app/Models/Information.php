@@ -16,11 +16,13 @@ class Information extends Model
         'content',
         'image',
         'slug',
+        'published_at',
         'is_pinned',
         'pinned_at',
     ];
 
     protected $casts = [
+        'published_at' => 'date',
         'is_pinned' => 'boolean',
         'pinned_at' => 'datetime',
     ];

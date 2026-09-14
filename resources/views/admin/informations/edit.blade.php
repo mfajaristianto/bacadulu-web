@@ -63,6 +63,32 @@
             </div>
 
 
+            {{-- Tanggal Informasi --}}
+            <div>
+                <label
+                    for="published_at"
+                    class="mb-2 block text-sm font-semibold text-slate-700"
+                >
+                    Tanggal Informasi
+                    <span class="text-red-500">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="published_at"
+                    name="published_at"
+                    value="{{ old('published_at', ($information->published_at ?? $information->created_at)?->format('Y-m-d')) }}"
+                    required
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-100"
+                >
+
+                <p class="mt-2 text-xs leading-relaxed text-slate-400">
+                    Tanggal ini yang akan tampil di katalog dan halaman detail,
+                    bukan tanggal saat data diedit atau di-upload.
+                </p>
+            </div>
+
+
             {{-- Konten --}}
             <div>
                 @include('admin.partials.rich-text-editor', [
@@ -83,15 +109,23 @@
                 </label>
 
 
-                @if($information->image)
-                    <div class="mb-3 w-44 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                <div
+                    id="imagePreviewWrap"
+                    class="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 {{ $information->image ? '' : 'hidden' }}"
+                >
+                    <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Preview Gambar
+                    </p>
+
+                    <div class="flex min-h-52 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-3">
                         <img
-                            src="{{ asset('storage/' . $information->image) }}"
+                            id="imagePreview"
+                            src="{{ $information->image ? asset('storage/' . $information->image) : '' }}"
                             alt="{{ $information->title }}"
-                            class="aspect-video w-full object-cover"
+                            class="max-h-[420px] max-w-full object-contain"
                         >
                     </div>
-                @endif
+                </div>
 
 
                 <input
@@ -102,8 +136,9 @@
                     class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:font-semibold file:text-orange-700"
                 >
 
-                <p class="mt-2 text-xs text-slate-400">
-                    Kosongkan jika tidak ingin mengganti gambar.
+                <p class="mt-2 text-xs leading-relaxed text-slate-400">
+                    Kosongkan jika tidak ingin mengganti gambar. Maksimal 4 MB.
+                    Gambar portrait maupun landscape akan ditampilkan utuh tanpa crop paksa.
                 </p>
             </div>
 
@@ -192,4 +227,39 @@
     </form>
 
 </div>
+
+<script>
+(() => {
+    const input = document.getElementById('image');
+    const wrap = document.getElementById('imagePreviewWrap');
+    const preview = document.getElementById('imagePreview');
+    let objectUrl = null;
+
+    input?.addEventListener('change', () => {
+        const file = input.files?.[0];
+
+        if (!file) {
+            return;
+        }
+
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+        }
+
+        objectUrl = URL.createObjectURL(file);
+
+        if (preview) {
+            preview.src = objectUrl;
+        }
+
+        wrap?.classList.remove('hidden');
+    });
+
+    window.addEventListener('beforeunload', () => {
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+        }
+    });
+})();
+</script>
 @endsection
