@@ -1090,6 +1090,60 @@
 
 
                 {{-- ===============================
+                     PUBLISHER
+                ================================ --}}
+
+                <div class="cms-section-label">
+                    Penerbitan
+                </div>
+
+
+
+                {{-- =================================================
+                     PUBLISHER
+                ================================================== --}}
+
+                <a
+                    href="{{ route('admin.publishers.index') }}"
+                    class="cms-nav-link {{ request()->routeIs('admin.publishers.*') ? 'active' : '' }}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M4 5.5A2.5 2.5 0 016.5 3H11v16H6.5A2.5 2.5 0 004 21.5v-16z"
+                            />
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M20 5.5A2.5 2.5 0 0017.5 3H13v16h4.5a2.5 2.5 0 012.5 2.5v-16z"
+                            />
+
+                        </svg>
+
+                    </span>
+
+
+                    <span class="flex-1">
+                        Publisher
+                    </span>
+
+                </a>
+
+
+
+                {{-- ===============================
                      BOOKSTORE
                 ================================ --}}
 
