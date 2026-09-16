@@ -26,6 +26,10 @@
         <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ session('success') }}</div>
     @endif
 
+    @if(session('error'))
+        <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ session('error') }}</div>
+    @endif
+
     @if($errors->any())
         <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             <ul class="list-disc space-y-1 pl-5">
@@ -50,6 +54,79 @@
             <div class="mt-1 font-semibold text-slate-800">{{ ucfirst($book->store_status ?: 'pending') }}</div>
         </div>
     </div>
+
+    @if($book->has_pending_sync && !empty($book->pending_api_payload))
+        <section class="mb-5 overflow-hidden rounded-2xl border border-violet-200 bg-violet-50/60 shadow-sm">
+            <div class="border-b border-violet-100 bg-white/70 px-5 py-4">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-[.16em] text-violet-600">Update dari API</span>
+                        <h2 class="mt-1 text-lg font-bold text-slate-900">Perubahan BacaPublisher menunggu review</h2>
+                        <p class="mt-1 text-xs leading-relaxed text-slate-600">
+                            Sync tidak langsung menimpa edit admin. Cek perbedaannya, lalu terapkan atau abaikan.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <form action="{{ route('admin.publishers.api-update.apply', $book->slug) }}" method="POST" onsubmit="return confirm('Terapkan metadata terbaru dari BacaPublisher? Status Publisher akan kembali Pending untuk direview.')">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="rounded-xl bg-violet-600 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-violet-700">
+                                Terapkan Update API
+                            </button>
+                        </form>
+
+                        <form action="{{ route('admin.publishers.api-update.ignore', $book->slug) }}" method="POST" onsubmit="return confirm('Abaikan update ini dan pertahankan data edit admin?')">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="rounded-xl border border-violet-200 bg-white px-4 py-2.5 text-xs font-semibold text-violet-700 transition hover:bg-violet-100">
+                                Abaikan Update
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5">
+                @if(!empty($pendingApiDiff))
+                    <div class="grid gap-3 md:grid-cols-2">
+                        @foreach($pendingApiDiff as $diff)
+                            <div class="rounded-xl border border-violet-100 bg-white p-4">
+                                <div class="text-[10px] font-bold uppercase tracking-wide text-violet-500">{{ $diff['label'] }}</div>
+                                <div class="mt-3 grid gap-3 text-xs">
+                                    <div>
+                                        <span class="font-semibold text-slate-400">Sekarang</span>
+                                        <div class="mt-1 break-words leading-relaxed text-slate-700">
+                                            {{ \Illuminate\Support\Str::limit(trim(strip_tags((string) ($diff['current'] ?? '-'))) ?: '-', 220) }}
+                                        </div>
+                                    </div>
+                                    <div class="border-t border-slate-100 pt-3">
+                                        <span class="font-semibold text-violet-500">Dari Publisher</span>
+                                        <div class="mt-1 break-words leading-relaxed text-slate-900">
+                                            {{ \Illuminate\Support\Str::limit(trim(strip_tags((string) ($diff['incoming'] ?? '-'))) ?: '-', 220) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-xs text-slate-600">Snapshot API berubah, tetapi tidak ada perubahan pada field utama yang ditampilkan.</p>
+                @endif
+
+                @if(!empty($book->pending_api_payload['source_url']))
+                    <a
+                        href="{{ $book->pending_api_payload['source_url'] }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-4 inline-flex text-xs font-semibold text-violet-700 hover:underline"
+                    >
+                        Buka katalog asli di BacaPublisher ↗
+                    </a>
+                @endif
+            </div>
+        </section>
+    @endif
 
     <form method="POST" action="{{ route('admin.publishers.update', $book->slug) }}" enctype="multipart/form-data" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         @csrf

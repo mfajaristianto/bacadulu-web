@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Services\BacaPublisher\BacaPublisherSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -12,8 +13,10 @@ use Throwable;
 
 class PublisherAdminController extends Controller
 {
-    public function index(Request $request)
-    {
+    public function index(
+        Request $request,
+        BacaPublisherSyncService $syncService
+    ) {
         $status = (string) $request->query('status', 'pending');
 
         if (!in_array($status, ['pending', 'approved', 'rejected', 'all'], true)) {
@@ -25,6 +28,7 @@ class PublisherAdminController extends Controller
                 $status !== 'all',
                 fn ($query) => $query->where('publisher_status', $status)
             )
+            ->orderByRaw("CASE WHEN has_pending_sync = 1 THEN 0 ELSE 1 END")
             ->orderByRaw("CASE WHEN publisher_status = 'pending' THEN 0 WHEN publisher_status = 'rejected' THEN 1 ELSE 2 END")
             ->latest('updated_at')
             ->get();
@@ -36,9 +40,24 @@ class PublisherAdminController extends Controller
             'all' => Book::query()->count(),
         ];
 
+        $integration = [
+            'configured' => $syncService->configured(),
+            'external_books' => Book::query()
+                ->where('source', 'bacapublisher')
+                ->count(),
+            'pending_updates' => Book::query()
+                ->where('source', 'bacapublisher')
+                ->where('has_pending_sync', true)
+                ->count(),
+            'last_sync' => Book::query()
+                ->where('source', 'bacapublisher')
+                ->whereNotNull('last_synced_at')
+                ->max('last_synced_at'),
+        ];
+
         return view(
             'admin.publishers.index',
-            compact('books', 'status', 'counts')
+            compact('books', 'status', 'counts', 'integration')
         );
     }
 
@@ -74,8 +93,6 @@ class PublisherAdminController extends Controller
                     'cover' => $coverPath,
 
                     // Kolom legacy price masih NOT NULL pada database lama.
-                    // Nilai ini tidak pernah tampil di Bookstore selama format
-                    // penjualan belum dipilih dan store_status belum approved.
                     'price' => 0,
                     'has_print' => false,
                     'print_stock' => 0,
@@ -106,11 +123,15 @@ class PublisherAdminController extends Controller
             );
     }
 
-    public function edit(Book $book)
-    {
+    public function edit(
+        Book $book,
+        BacaPublisherSyncService $syncService
+    ) {
+        $pendingApiDiff = $syncService->pendingDiff($book);
+
         return view(
             'admin.publishers.edit',
-            compact('book')
+            compact('book', 'pendingApiDiff')
         );
     }
 
@@ -205,6 +226,100 @@ class PublisherAdminController extends Controller
             ->with('success', "\"{$book->title}\" dikembalikan ke Pending Review.");
     }
 
+    public function sync(BacaPublisherSyncService $syncService)
+    {
+        try {
+            $result = $syncService->sync();
+
+            $message = sprintf(
+                'Sync selesai: %d data diterima, %d buku baru, %d tanpa perubahan, %d update menunggu review, %d dilewati, %d gagal.',
+                $result['received'],
+                $result['created'],
+                $result['unchanged'],
+                $result['pending_updates'],
+                $result['skipped'],
+                $result['failed'],
+            );
+
+            return redirect()
+                ->route('admin.publishers.index', ['status' => 'pending'])
+                ->with('success', $message)
+                ->with('sync_result', $result);
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('admin.publishers.index')
+                ->with('error', 'Sync BacaPublisher gagal: ' . $e->getMessage());
+        }
+    }
+
+    public function testConnection(BacaPublisherSyncService $syncService)
+    {
+        try {
+            $result = $syncService->testConnection();
+
+            return redirect()
+                ->route('admin.publishers.index')
+                ->with(
+                    'success',
+                    'Koneksi BacaPublisher berhasil. API merespons dan mendeteksi sekitar '
+                    . $result['items_max']
+                    . ' submission.'
+                );
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('admin.publishers.index')
+                ->with('error', 'Tes koneksi gagal: ' . $e->getMessage());
+        }
+    }
+
+    public function applyApiUpdate(
+        Book $book,
+        BacaPublisherSyncService $syncService
+    ) {
+        try {
+            $syncService->applyPendingUpdate($book);
+
+            return redirect()
+                ->route('admin.publishers.edit', $book->slug)
+                ->with(
+                    'success',
+                    'Update dari BacaPublisher diterapkan. Status Publisher dikembalikan ke Pending untuk diperiksa sebelum Approve.'
+                );
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('admin.publishers.edit', $book->slug)
+                ->with('error', 'Update API tidak dapat diterapkan: ' . $e->getMessage());
+        }
+    }
+
+    public function ignoreApiUpdate(
+        Book $book,
+        BacaPublisherSyncService $syncService
+    ) {
+        try {
+            $syncService->ignorePendingUpdate($book);
+
+            return redirect()
+                ->route('admin.publishers.edit', $book->slug)
+                ->with(
+                    'success',
+                    'Update API diabaikan. Data hasil edit admin tetap dipertahankan.'
+                );
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('admin.publishers.edit', $book->slug)
+                ->with('error', 'Update API tidak dapat diabaikan: ' . $e->getMessage());
+        }
+    }
+
     public function destroy(Book $book)
     {
         // Publisher dan Bookstore memakai record Book yang sama.
@@ -262,7 +377,8 @@ class PublisherAdminController extends Controller
             $missing[] = 'judul';
         }
 
-        if (!trim((string) $book->author)) {
+        $author = trim((string) $book->author);
+        if ($author === '' || mb_strtolower($author) === 'belum tersedia') {
             $missing[] = 'penulis';
         }
 

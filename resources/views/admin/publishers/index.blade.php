@@ -25,18 +25,64 @@
             </p>
         </div>
 
-        <a
-            href="{{ route('admin.publishers.create') }}"
-            class="inline-flex items-center justify-center rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-700"
-        >
-            + Tambah Buku Manual
-        </a>
+        <div class="flex flex-wrap gap-2">
+            @if($integration['configured'])
+                <form action="{{ route('admin.publishers.test-connection') }}" method="POST">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+                    >
+                        Tes API
+                    </button>
+                </form>
+
+                <form action="{{ route('admin.publishers.sync') }}" method="POST" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerText='Sinkronisasi...';">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-70"
+                    >
+                        Sync BacaPublisher
+                    </button>
+                </form>
+            @endif
+
+            <a
+                href="{{ route('admin.publishers.create') }}"
+                class="inline-flex items-center justify-center rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-700"
+            >
+                + Tambah Buku Manual
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
         <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             {{ session('success') }}
         </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if(session('sync_result'))
+        @php
+            $syncResult = session('sync_result');
+        @endphp
+        @if(!empty($syncResult['warnings']) || !empty($syncResult['errors']))
+            <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
+                @foreach(($syncResult['warnings'] ?? []) as $warning)
+                    <div>• {{ $warning }}</div>
+                @endforeach
+                @foreach(($syncResult['errors'] ?? []) as $syncError)
+                    <div class="text-red-700">• {{ $syncError }}</div>
+                @endforeach
+            </div>
+        @endif
     @endif
 
     @if($errors->any())
@@ -48,6 +94,48 @@
             </ul>
         </div>
     @endif
+
+    <div class="mb-5 overflow-hidden rounded-2xl border {{ $integration['configured'] ? 'border-indigo-200 bg-indigo-50/50' : 'border-slate-200 bg-slate-50' }}">
+        <div class="grid gap-4 p-5 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <strong class="text-sm text-slate-900">Integrasi BacaPublisher API</strong>
+                    <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide {{ $integration['configured'] ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600' }}">
+                        {{ $integration['configured'] ? 'Siap digunakan' : 'Menunggu URL & API Key' }}
+                    </span>
+                </div>
+
+                <p class="mt-2 max-w-3xl text-xs leading-relaxed text-slate-600">
+                    Buku Published dari OMP akan masuk sebagai Pending. Sync berikutnya tidak menimpa hasil edit admin;
+                    perubahan sumber disimpan sebagai update API yang harus direview terlebih dahulu.
+                </p>
+
+                @if(!$integration['configured'])
+                    <div class="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2 font-mono text-[11px] leading-relaxed text-slate-500">
+                        BACAPUBLISHER_API_URL=...<br>
+                        BACAPUBLISHER_API_KEY=...
+                    </div>
+                @endif
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="min-w-[92px] rounded-xl border border-white/80 bg-white px-3 py-3 shadow-sm">
+                    <div class="text-lg font-bold text-slate-900">{{ $integration['external_books'] }}</div>
+                    <div class="text-[9px] font-bold uppercase tracking-wide text-slate-400">Dari API</div>
+                </div>
+                <div class="min-w-[92px] rounded-xl border border-white/80 bg-white px-3 py-3 shadow-sm">
+                    <div class="text-lg font-bold text-violet-700">{{ $integration['pending_updates'] }}</div>
+                    <div class="text-[9px] font-bold uppercase tracking-wide text-slate-400">Update</div>
+                </div>
+                <div class="min-w-[120px] rounded-xl border border-white/80 bg-white px-3 py-3 shadow-sm">
+                    <div class="text-xs font-bold text-slate-900">
+                        {{ $integration['last_sync'] ? \Illuminate\Support\Carbon::parse($integration['last_sync'])->timezone('Asia/Jakarta')->translatedFormat('d M Y H:i') : '-' }}
+                    </div>
+                    <div class="mt-1 text-[9px] font-bold uppercase tracking-wide text-slate-400">Sync terakhir</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="mb-5 rounded-2xl border border-orange-200 bg-orange-50/60 p-4">
         <div class="flex items-start gap-3">

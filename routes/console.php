@@ -30,3 +30,20 @@ Schedule::command('backup:files')
     ->dailyAt('02:10')
     ->timezone('Asia/Jakarta')
     ->withoutOverlapping();
+
+
+/*
+|--------------------------------------------------------------------------
+| BacaPublisher Automatic Sync
+|--------------------------------------------------------------------------
+|
+| Default OFF. Setelah URL + API Key valid dan sync manual berhasil, set
+| BACAPUBLISHER_AUTO_SYNC=true untuk menjalankan sync setiap jam.
+|
+*/
+
+if (config('bacapublisher.auto_sync')) {
+    Schedule::command('publisher:sync')
+        ->hourly()
+        ->withoutOverlapping(30);
+}

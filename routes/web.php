@@ -784,6 +784,16 @@ Route::resource(
             'index',
         ])->name('publishers.index');
 
+        Route::post('publishers/sync', [
+            PublisherAdminController::class,
+            'sync',
+        ])->name('publishers.sync');
+
+        Route::post('publishers/test-connection', [
+            PublisherAdminController::class,
+            'testConnection',
+        ])->name('publishers.test-connection');
+
         Route::get('publishers/create', [
             PublisherAdminController::class,
             'create',
@@ -818,6 +828,16 @@ Route::resource(
             PublisherAdminController::class,
             'markPending',
         ])->name('publishers.pending');
+
+        Route::patch('publishers/{book:slug}/api-update/apply', [
+            PublisherAdminController::class,
+            'applyApiUpdate',
+        ])->name('publishers.api-update.apply');
+
+        Route::patch('publishers/{book:slug}/api-update/ignore', [
+            PublisherAdminController::class,
+            'ignoreApiUpdate',
+        ])->name('publishers.api-update.ignore');
 
         Route::delete('publishers/{book:slug}', [
             PublisherAdminController::class,
