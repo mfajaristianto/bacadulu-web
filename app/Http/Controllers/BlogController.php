@@ -253,7 +253,8 @@ class BlogController extends Controller
             'user',
             'comments' => function ($query) {
                 $query
-                    ->with('user')
+                    ->whereNull('parent_id')
+                    ->with(['user', 'replies'])
                     ->latest();
             },
         ]);

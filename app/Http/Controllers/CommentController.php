@@ -39,18 +39,36 @@ class CommentController extends Controller
                 'min:2',
                 'max:2000',
             ],
+            'parent_id' => [
+                'nullable',
+                'integer',
+                'exists:comments,id',
+            ],
         ], [
             'content.required' => 'Komentar tidak boleh kosong.',
             'content.min' => 'Komentar terlalu pendek.',
             'content.max' => 'Komentar maksimal 2000 karakter.',
+            'parent_id.exists' => 'Komentar yang ingin dibalas sudah tidak tersedia.',
         ]);
 
         $content = trim($validated['content']);
+        $parentId = isset($validated['parent_id'])
+            ? (int) $validated['parent_id']
+            : null;
+
+        if ($parentId) {
+            $parent = Comment::query()->findOrFail($parentId);
+
+            if ((int) $parent->post_id !== (int) $post->id) {
+                abort(422, 'Balasan tidak sesuai dengan artikel ini.');
+            }
+        }
 
         $duplicate = Comment::query()
             ->where('post_id', $post->id)
             ->where('user_id', $userId)
             ->where('body', $content)
+            ->where('parent_id', $parentId)
             ->where('created_at', '>=', now()->subMinute())
             ->exists();
 
@@ -75,6 +93,7 @@ class CommentController extends Controller
 
         $comment = $post->comments()->create([
             'user_id' => $userId,
+            'parent_id' => $parentId,
             'content' => $content,
         ]);
 
@@ -88,6 +107,7 @@ class CommentController extends Controller
                     'id' => $comment->id,
                     'content' => $comment->content,
                     'user_id' => $comment->user_id,
+                    'parent_id' => $comment->parent_id,
                     'user_name' => $comment->user->name ?? 'User',
                     'initial' => strtoupper(
                         mb_substr(
@@ -103,9 +123,13 @@ class CommentController extends Controller
             ]);
         }
 
+        $message = $parentId
+            ? 'Balasan berhasil ditambahkan.'
+            : 'Komentar berhasil ditambahkan.';
+
         return redirect()
-            ->route('blog.show', $post->slug)
-            ->with('success', 'Komentar berhasil ditambahkan.');
+            ->to(route('blog.show', $post->slug) . '#comment-' . $comment->id)
+            ->with('success', $message);
     }
 
     public function update(Request $request, Comment $comment)

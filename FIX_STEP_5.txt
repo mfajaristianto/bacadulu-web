@@ -1,0 +1,17 @@
+BacaDulu Fix Step 5 - Mobile Swipe Reply
+
+Perubahan:
+- Tombol Balas tetap tampil di mobile dan desktop.
+- Di layar <= 640px, komentar dapat digeser ke kanan untuk membuka form balasan.
+- Saat swipe, indikator "Balas" muncul di sisi kiri.
+- Threshold swipe dibuat cukup jauh agar tidak mudah terpicu tanpa sengaja.
+- Scroll vertikal tetap diprioritaskan.
+- Gesture tidak aktif saat user menyentuh tombol/link/input/textarea/form.
+- Tidak ada migration/database baru.
+
+Instalasi:
+1. Extract ZIP ke root project dan replace file yang sama.
+2. Jalankan: php artisan optimize:clear (local)
+   Staging cPanel: ea-php84 artisan optimize:clear
+
+Tidak perlu npm run build karena CSS/JS berada langsung di Blade.

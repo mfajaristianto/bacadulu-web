@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Comment extends Model
 {
@@ -12,6 +13,7 @@ class Comment extends Model
     protected $fillable = [
         'post_id',
         'user_id',
+        'parent_id',
         'body',
         'content',
     ];
@@ -30,6 +32,22 @@ class Comment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * Balasan langsung. Relasi ini ikut memuat user + balasan berikutnya
+     * supaya thread komentar bisa dirender rekursif tanpa mengubah tabel lain.
+     */
+    public function replies(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id')
+            ->with(['user', 'replies'])
+            ->oldest();
     }
 
     /*

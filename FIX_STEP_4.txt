@@ -1,0 +1,38 @@
+BACADULU - FIX STEP 4: BALAS KOMENTAR BLOGGING
+================================================
+
+Fitur:
+- User login dapat membalas komentar tertentu, bukan hanya membuat komentar baru.
+- Tombol "Balas" tersedia pada setiap komentar dan setiap balasan.
+- Thread balasan tampil bertingkat di bawah komentar yang dibalas.
+- Balasan lama/baru tetap ikut dihitung dalam jumlah komentar.
+- Pemilik komentar/balasan tetap dapat edit dan hapus komentarnya sendiri.
+- Jika komentar induk dihapus, seluruh balasan di bawahnya ikut terhapus (cascade).
+- Tidak mengubah Publisher / Bookstore / BacaPublisher sync.
+
+FILE YANG BERUBAH:
+- app/Models/Comment.php
+- app/Http/Controllers/CommentController.php
+- app/Http/Controllers/BlogController.php
+- database/migrations/2026_09_24_120000_add_parent_id_to_comments_table.php
+- resources/views/blog/show.blade.php
+- resources/views/blog/partials/comment.blade.php (baru)
+
+LOCAL:
+1. Extract ZIP ke root project dan replace file.
+2. Jalankan:
+   php artisan migrate
+   php artisan optimize:clear
+3. Tes artikel Blogging yang sudah approved:
+   - Login user A -> tulis komentar.
+   - Login user B -> klik Balas pada komentar user A.
+   - Balasan harus tampil di bawah komentar A.
+   - Klik Balas pada balasan untuk memastikan nested reply juga jalan.
+
+STAGING CPANEL SETELAH GIT PULL:
+   ea-php84 artisan migrate --force
+   ea-php84 artisan optimize:clear
+
+CATATAN:
+- Tidak perlu npm run build untuk patch ini karena CSS/JS berada langsung di Blade show.blade.php.
+- Migration baru wajib dijalankan.
