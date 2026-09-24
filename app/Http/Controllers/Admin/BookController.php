@@ -85,6 +85,7 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $coverPath = null;
+        $previewPath = null;
 
         try {
             $this->validateBook($request);
@@ -220,6 +221,12 @@ class BookController extends Controller
                 );
             }
 
+            if ($request->hasFile('preview_pdf')) {
+                $previewPath = $request
+                    ->file('preview_pdf')
+                    ->store('book-previews', 'public');
+            }
+
             /*
             |--------------------------------------------------------------------------
             | SAVE
@@ -246,7 +253,8 @@ class BookController extends Controller
                 $legacyDiscountedPrice,
                 $legacyDiscountExpiresAt,
                 $legacyIsbn,
-                $coverPath
+                $coverPath,
+                $previewPath
             ) {
                 $book = Book::create([
                     /*
@@ -265,9 +273,7 @@ class BookController extends Controller
 
                     'publisher' =>
                         trim($request->publisher),
-
-                    'author' =>
-                        trim($request->author),
+                    ...$this->contributorFields($request),
 
                     'category' =>
                         $request->filled('category')
@@ -285,6 +291,9 @@ class BookController extends Controller
 
                     'cover' =>
                         $coverPath,
+
+                    'preview_pdf' =>
+                        $previewPath,
 
                     /*
                     |--------------------------------------------------------------
@@ -426,6 +435,11 @@ class BookController extends Controller
                     ->delete($coverPath);
             }
 
+            if ($previewPath) {
+                Storage::disk('public')
+                    ->delete($previewPath);
+            }
+
             return back()
                 ->withErrors(
                     $e->errors()
@@ -434,12 +448,18 @@ class BookController extends Controller
                     $request->except([
                         '_token',
                         'cover',
+                        'preview_pdf',
                     ])
                 );
         } catch (Throwable $e) {
             if ($coverPath) {
                 Storage::disk('public')
                     ->delete($coverPath);
+            }
+
+            if ($previewPath) {
+                Storage::disk('public')
+                    ->delete($previewPath);
             }
 
             report($e);
@@ -455,6 +475,7 @@ class BookController extends Controller
                     $request->except([
                         '_token',
                         'cover',
+                        'preview_pdf',
                     ])
                 );
         }
@@ -506,6 +527,15 @@ class BookController extends Controller
 
         $newCoverPath =
             null;
+
+        $oldPreviewPath =
+            $book->preview_pdf;
+
+        $newPreviewPath =
+            null;
+
+        $removePreview =
+            $request->boolean('remove_preview_pdf');
 
         try {
             $this->validateBook($request);
@@ -695,6 +725,22 @@ class BookController extends Controller
                     $newCoverPath;
             }
 
+            $previewPath =
+                $oldPreviewPath;
+
+            if ($request->hasFile('preview_pdf')) {
+                $newPreviewPath = $request
+                    ->file('preview_pdf')
+                    ->store('book-previews', 'public');
+
+                $previewPath =
+                    $newPreviewPath;
+
+                $removePreview = false;
+            } elseif ($removePreview) {
+                $previewPath = null;
+            }
+
             /*
             |--------------------------------------------------------------------------
             | UPDATE DATABASE
@@ -723,7 +769,8 @@ class BookController extends Controller
                 $legacyDiscountedPrice,
                 $legacyDiscountExpiresAt,
                 $legacyIsbn,
-                $coverPath
+                $coverPath,
+                $previewPath
             ) {
                 $book->update([
                     /*
@@ -743,9 +790,7 @@ class BookController extends Controller
 
                     'publisher' =>
                         trim($request->publisher),
-
-                    'author' =>
-                        trim($request->author),
+                    ...$this->contributorFields($request),
 
                     'category' =>
                         $request->filled('category')
@@ -763,6 +808,9 @@ class BookController extends Controller
 
                     'cover' =>
                         $coverPath,
+
+                    'preview_pdf' =>
+                        $previewPath,
 
                     /*
                     |--------------------------------------------------------------
@@ -890,6 +938,15 @@ class BookController extends Controller
                     );
             }
 
+            if (
+                ($newPreviewPath || $removePreview) &&
+                $oldPreviewPath &&
+                $oldPreviewPath !== $newPreviewPath
+            ) {
+                Storage::disk('public')
+                    ->delete($oldPreviewPath);
+            }
+
             return redirect()
                 ->route('admin.books.index')
                 ->with(
@@ -904,6 +961,10 @@ class BookController extends Controller
                     );
             }
 
+            if ($newPreviewPath) {
+                Storage::disk('public')->delete($newPreviewPath);
+            }
+
             return back()
                 ->withErrors(
                     $e->errors()
@@ -913,6 +974,7 @@ class BookController extends Controller
                         '_token',
                         '_method',
                         'cover',
+                        'preview_pdf',
                     ])
                 );
         } catch (Throwable $e) {
@@ -921,6 +983,10 @@ class BookController extends Controller
                     ->delete(
                         $newCoverPath
                     );
+            }
+
+            if ($newPreviewPath) {
+                Storage::disk('public')->delete($newPreviewPath);
             }
 
             report($e);
@@ -937,6 +1003,7 @@ class BookController extends Controller
                         '_token',
                         '_method',
                         'cover',
+                        'preview_pdf',
                     ])
                 );
         }
@@ -965,17 +1032,32 @@ class BookController extends Controller
             ]);
         }
 
-        $book->update([
-            'store_status' => Book::STATUS_APPROVED,
-            'store_review_note' => null,
-            'store_approved_at' => now(),
-        ]);
+        DB::transaction(function () use ($book) {
+            $approvedAt = now();
+
+            $updates = [
+                'store_status' => Book::STATUS_APPROVED,
+                'store_review_note' => null,
+                'store_approved_at' => $approvedAt,
+            ];
+
+            // Buku yang sudah layak dijual harus ikut tampil di katalog
+            // BacaPublisher. Status rejected tetap dihormati karena berarti
+            // admin sengaja melepas buku dari Publisher.
+            if ($book->publisher_status !== Book::STATUS_REJECTED) {
+                $updates['publisher_status'] = Book::STATUS_APPROVED;
+                $updates['publisher_review_note'] = null;
+                $updates['publisher_approved_at'] = $book->publisher_approved_at ?: $approvedAt;
+            }
+
+            $book->update($updates);
+        });
 
         return redirect()
             ->route('admin.books.index', ['status' => 'pending'])
             ->with(
                 'success',
-                "\"{$book->title}\" sudah di-approve dan sekarang tampil di Bookstore."
+                "\"{$book->title}\" sudah di-approve dan sekarang tampil di Bookstore serta katalog BacaPublisher."
             );
     }
 
@@ -1199,6 +1281,9 @@ class BookController extends Controller
         $coverPath =
             $book->cover;
 
+        $previewPath =
+            $book->preview_pdf;
+
         DB::transaction(function () use ($book) {
             $book->delete();
         });
@@ -1208,6 +1293,10 @@ class BookController extends Controller
                 ->delete(
                     $coverPath
                 );
+        }
+
+        if ($previewPath) {
+            Storage::disk('public')->delete($previewPath);
         }
 
         return redirect()
@@ -1239,9 +1328,29 @@ class BookController extends Controller
 
             'publisher' =>
                 'required|string|max:255',
+            'authors' =>
+                'required|array|min:1',
 
-            'author' =>
-                'required|string|max:255',
+            'authors.*' =>
+                'nullable|string|max:255',
+
+            'author_display_mode' =>
+                'required|in:inline,stacked,primary',
+
+            'primary_author' =>
+                'nullable|string|max:255',
+
+            'editors' =>
+                'nullable|array',
+
+            'editors.*' =>
+                'nullable|string|max:255',
+
+            'editor_display_mode' =>
+                'required|in:inline,stacked,primary',
+
+            'primary_editor' =>
+                'nullable|string|max:255',
 
             'category' =>
                 'nullable|string|max:255',
@@ -1322,6 +1431,16 @@ class BookController extends Controller
                 'mimes:jpeg,jpg,png,webp',
                 'max:8192',
             ],
+
+            'preview_pdf' => [
+                'nullable',
+                'file',
+                'mimes:pdf',
+                'max:51200',
+            ],
+
+            'remove_preview_pdf' =>
+                'nullable|boolean',
         ], [
             'title.required' =>
                 'Judul buku wajib diisi.',
@@ -1329,8 +1448,8 @@ class BookController extends Controller
             'publisher.required' =>
                 'Penerbit wajib diisi.',
 
-            'author.required' =>
-                'Penulis wajib diisi.',
+            'authors.required' =>
+                'Minimal satu penulis wajib diisi.',
 
             'print_price.required_if' =>
                 'Harga Buku Cetak wajib diisi.',
@@ -1365,6 +1484,12 @@ class BookController extends Controller
             'cover.max' =>
                 'Ukuran file cover maksimal 8 MB.',
 
+            'preview_pdf.mimes' =>
+                'Preview buku harus berupa file PDF.',
+
+            'preview_pdf.max' =>
+                'Ukuran PDF preview maksimal 50 MB.',
+
             'publish_year.min' =>
                 'Tahun terbit tidak valid.',
 
@@ -1373,6 +1498,53 @@ class BookController extends Controller
                 (now()->year + 2) .
                 '.',
         ]);
+    }
+
+    private function contributorFields(Request $request): array
+    {
+        $authors = Book::normalizeContributorNames($request->input('authors', []));
+        $editors = Book::normalizeContributorNames($request->input('editors', []));
+
+        if ($authors === []) {
+            throw ValidationException::withMessages([
+                'authors' => 'Minimal satu nama penulis wajib diisi.',
+            ]);
+        }
+
+        $authorMode = in_array($request->input('author_display_mode'), ['inline', 'stacked', 'primary'], true)
+            ? (string) $request->input('author_display_mode')
+            : 'inline';
+        $editorMode = in_array($request->input('editor_display_mode'), ['inline', 'stacked', 'primary'], true)
+            ? (string) $request->input('editor_display_mode')
+            : 'inline';
+
+        $primaryAuthor = trim((string) $request->input('primary_author'));
+        if ($authorMode !== 'primary' || !in_array($primaryAuthor, $authors, true)) {
+            $primaryAuthor = $authorMode === 'primary' ? ($authors[0] ?? null) : null;
+        }
+
+        $primaryEditor = trim((string) $request->input('primary_editor'));
+        if ($editorMode !== 'primary' || !in_array($primaryEditor, $editors, true)) {
+            $primaryEditor = $editorMode === 'primary' ? ($editors[0] ?? null) : null;
+        }
+
+        return [
+            'author' => implode(', ', $authors),
+            'author_2' => null,
+            'author_3' => null,
+            'show_authors' => true,
+            'author_names' => $authors,
+            'author_display_mode' => $authorMode,
+            'primary_author' => $primaryAuthor,
+            'editor' => $editors !== [] ? implode(', ', $editors) : null,
+            'editor_2' => null,
+            'editor_3' => null,
+            'show_editor' => $editors !== [],
+            'show_editors' => $editors !== [],
+            'editor_names' => $editors,
+            'editor_display_mode' => $editorMode,
+            'primary_editor' => $primaryEditor,
+        ];
     }
 
     /*

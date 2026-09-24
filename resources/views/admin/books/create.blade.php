@@ -90,44 +90,14 @@
                 </div>
 
 
-                {{-- AUTHOR + PUBLISHER --}}
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-
                     <div>
-
-                        <label class="mb-1.5 block text-sm font-semibold text-slate-700">
-                            Penulis
-                        </label>
-
-                        <input
-                            type="text"
-                            name="author"
-                            value="{{ old('author') }}"
-                            required
-                            class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
-                        >
-
+                        <label class="mb-1.5 block text-sm font-semibold text-slate-700">Penerbit</label>
+                        <input type="text" name="publisher" value="{{ old('publisher') }}" required class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100">
                     </div>
-
-
-                    <div>
-
-                        <label class="mb-1.5 block text-sm font-semibold text-slate-700">
-                            Penerbit
-                        </label>
-
-                        <input
-                            type="text"
-                            name="publisher"
-                            value="{{ old('publisher') }}"
-                            required
-                            class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
-                        >
-
-                    </div>
-
                 </div>
 
+                @include('admin.partials.book-contributors', ['book' => $book ?? null])
 
                 {{-- CATEGORY + PAGE + YEAR --}}
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -222,6 +192,25 @@
                         Minimal 900 × 1200 px. Disarankan 1200 × 1600 px.
                     </p>
 
+                </div>
+
+
+                {{-- PDF PREVIEW --}}
+                <div class="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4">
+                    <label class="mb-1.5 block text-sm font-semibold text-slate-700">
+                        PDF Preview Buku <span class="font-normal text-slate-400">(opsional)</span>
+                    </label>
+
+                    <input
+                        type="file"
+                        name="preview_pdf"
+                        accept="application/pdf,.pdf"
+                        class="w-full rounded-xl border border-indigo-100 bg-white p-2 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700"
+                    >
+
+                    <p class="mt-1.5 text-[10px] leading-relaxed text-slate-500">
+                        Maksimal 50 MB. PDF ini hanya untuk preview dan terpisah dari e-book yang dijual.
+                    </p>
                 </div>
 
             </div>

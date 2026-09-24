@@ -36,6 +36,7 @@ class BacaPublisherSyncService
             'created' => 0,
             'unchanged' => 0,
             'pending_updates' => 0,
+            'covers_refreshed' => 0,
             'skipped' => 0,
             'failed' => 0,
             'warnings' => [],
@@ -107,6 +108,14 @@ class BacaPublisherSyncService
                     $this->createFromPayload($payload, $result);
                     $result['created']++;
                     continue;
+                }
+
+                // Perbaiki cover lama yang terlanjur tersimpan dari thumbnail OMP.
+                // Hanya cover yang dikelola BacaPublisher yang boleh diganti; cover
+                // hasil upload manual admin tetap dipertahankan.
+                if ($this->refreshThumbnailCover($book, $payload)) {
+                    $result['covers_refreshed']++;
+                    $book->refresh();
                 }
 
                 $book->forceFill([
@@ -307,6 +316,9 @@ class BacaPublisherSyncService
                 'slug' => Book::makeSlug((string) $payload['title']),
                 'publisher' => trim((string) ($payload['publisher'] ?? config('bacapublisher.publisher_name'))),
                 'author' => $author,
+                'author_names' => Book::splitContributorString($author),
+                'author_display_mode' => 'inline',
+                'primary_author' => null,
                 'category' => $payload['category'] ?: 'Umum',
                 'pages' => $payload['pages'] ?? null,
                 'size' => $payload['size'] ?? null,
@@ -374,6 +386,11 @@ class BacaPublisherSyncService
             $updates[$bookKey] = $value;
         }
 
+        if (array_key_exists('author', $updates)) {
+            $updates['author_names'] = Book::splitContributorString((string) $updates['author']);
+            $updates['primary_author'] = null;
+        }
+
         return $updates;
     }
 
@@ -385,7 +402,8 @@ class BacaPublisherSyncService
             return null;
         }
 
-        $hash = substr(hash('sha256', $url . '|' . strlen($image['body'])), 0, 12);
+        $sourceUrl = trim((string) ($image['source_url'] ?? $url));
+        $hash = substr(hash('sha256', $sourceUrl . '|' . strlen($image['body'])), 0, 12);
         $safeExternal = Str::slug($externalId) ?: 'book';
         $safePublication = Str::slug($publicationId) ?: 'publication';
 
@@ -401,6 +419,90 @@ class BacaPublisherSyncService
         Storage::disk('public')->put($path, $image['body']);
 
         return $path;
+    }
+
+    /**
+     * Perbaiki cover existing yang dahulu diambil dari thumbnail OMP (`*_t.ext`).
+     * Tidak mengubah cover manual admin dan tidak melewati workflow review untuk
+     * perubahan cover yang benar-benar berbeda.
+     */
+    private function refreshThumbnailCover(Book $book, array $payload): bool
+    {
+        if (!(bool) config('bacapublisher.download_covers', true)) {
+            return false;
+        }
+
+        $incomingUrl = trim((string) ($payload['cover_url'] ?? ''));
+        if ($incomingUrl === '' || !$this->canReplaceCoverFromApi($book)) {
+            return false;
+        }
+
+        $oldExternalUrl = trim((string) $book->external_cover_url);
+        $oldWasThumbnail = $this->isThumbnailCoverUrl($oldExternalUrl);
+
+        // Kalau cover belum ada, boleh dipulihkan dari sumber yang sama.
+        $missingManagedCover = !$book->cover;
+
+        if (!$oldWasThumbnail && !$missingManagedCover) {
+            return false;
+        }
+
+        // Untuk repair thumbnail, pastikan URL lama dan baru sebenarnya adalah
+        // cover yang sama setelah suffix `_t` dihilangkan. Dengan begitu cover
+        // baru yang berbeda tetap masuk workflow pending seperti sebelumnya.
+        if (
+            $oldWasThumbnail
+            && $this->normalizedCoverUrl($oldExternalUrl) !== $this->normalizedCoverUrl($incomingUrl)
+        ) {
+            return false;
+        }
+
+        $oldCoverPath = (string) $book->cover;
+        $newCoverPath = $this->saveRemoteCover(
+            $incomingUrl,
+            (string) $book->external_id,
+            (string) ($payload['publication_id'] ?? 'publication')
+        );
+
+        if (!$newCoverPath) {
+            return false;
+        }
+
+        $baseline = is_array($book->api_payload) ? $book->api_payload : [];
+        if (
+            isset($baseline['cover_url'])
+            && $this->normalizedCoverUrl((string) $baseline['cover_url']) === $this->normalizedCoverUrl($incomingUrl)
+        ) {
+            $baseline['cover_url'] = $incomingUrl;
+        }
+
+        $book->forceFill([
+            'cover' => $newCoverPath,
+            'external_cover_url' => $incomingUrl,
+            'api_payload' => $baseline !== [] ? $baseline : $book->api_payload,
+        ])->save();
+
+        if (
+            $oldCoverPath !== ''
+            && $oldCoverPath !== $newCoverPath
+            && str_starts_with($oldCoverPath, 'book-covers/bacapublisher-')
+        ) {
+            Storage::disk('public')->delete($oldCoverPath);
+        }
+
+        return true;
+    }
+
+    private function isThumbnailCoverUrl(string $url): bool
+    {
+        $path = (string) (parse_url(trim($url), PHP_URL_PATH) ?? '');
+
+        return (bool) preg_match('/_t\.(?:jpe?g|png|webp|gif)$/i', $path);
+    }
+
+    private function normalizedCoverUrl(string $url): string
+    {
+        return $this->client->preferOriginalCoverUrl(trim($url));
     }
 
     private function canReplaceCoverFromApi(Book $book): bool
@@ -436,7 +538,16 @@ class BacaPublisherSyncService
 
         $stable = [];
         foreach ($keys as $key) {
-            $stable[$key] = $payload[$key] ?? null;
+            $value = $payload[$key] ?? null;
+
+            // Thumbnail `_t` dan file original adalah representasi visual dari
+            // cover yang sama; perbedaan URL ini tidak perlu membuat metadata
+            // masuk status pending update.
+            if ($key === 'cover_url' && is_string($value)) {
+                $value = $this->normalizedCoverUrl($value);
+            }
+
+            $stable[$key] = $value;
         }
 
         return hash('sha256', json_encode($stable, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));

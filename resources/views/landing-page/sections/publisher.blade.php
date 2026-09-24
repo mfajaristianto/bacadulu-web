@@ -23,7 +23,7 @@
         return [
             'id' => $book->id ?? null,
             'title' => $book->title ?? 'Tanpa Judul',
-            'author' => $book->author ?? '-',
+            'author' => $book->displayedAuthorsText() ?: '-',
             'year' => $book->publish_year ?? '-',
             'isbn' => $book->isbn ?? '-',
             'pages' => $book->pages ?? null,

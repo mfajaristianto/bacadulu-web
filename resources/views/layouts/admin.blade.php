@@ -614,6 +614,32 @@
                 'pending'
             )->count();
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | PUBLISHER PENDING
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingPublishers =
+            \App\Models\Book::where(
+                'publisher_status',
+                \App\Models\Book::STATUS_PENDING
+            )->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | BOOKSTORE PENDING
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingBookstore =
+            \App\Models\Book::where(
+                'store_status',
+                \App\Models\Book::STATUS_PENDING
+            )->count();
+
     @endphp
 
 
@@ -1139,6 +1165,16 @@
                         Publisher
                     </span>
 
+                    @if($pendingPublishers > 0)
+                        <span
+                            class="cms-pending-badge"
+                            title="{{ $pendingPublishers }} buku menunggu persetujuan Publisher"
+                            aria-label="{{ $pendingPublishers }} buku menunggu persetujuan Publisher"
+                        >
+                            {{ $pendingPublishers > 99 ? '99+' : $pendingPublishers }}
+                        </span>
+                    @endif
+
                 </a>
 
 
@@ -1191,6 +1227,16 @@
                     <span class="flex-1">
                         Kelola Buku
                     </span>
+
+                    @if($pendingBookstore > 0)
+                        <span
+                            class="cms-pending-badge"
+                            title="{{ $pendingBookstore }} buku menunggu persetujuan Bookstore"
+                            aria-label="{{ $pendingBookstore }} buku menunggu persetujuan Bookstore"
+                        >
+                            {{ $pendingBookstore > 99 ? '99+' : $pendingBookstore }}
+                        </span>
+                    @endif
 
                 </a>
 

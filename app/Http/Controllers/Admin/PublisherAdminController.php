@@ -70,6 +70,7 @@ class PublisherAdminController extends Controller
     {
         $data = $this->validateBookMetadata($request);
         $coverPath = null;
+        $previewPath = null;
 
         if ($request->hasFile('cover')) {
             $coverPath = $request
@@ -77,13 +78,19 @@ class PublisherAdminController extends Controller
                 ->store('book-covers', 'public');
         }
 
+        if ($request->hasFile('preview_pdf')) {
+            $previewPath = $request
+                ->file('preview_pdf')
+                ->store('book-previews', 'public');
+        }
+
         try {
-            $book = DB::transaction(function () use ($data, $coverPath) {
+            $book = DB::transaction(function () use ($data, $coverPath, $previewPath) {
                 return Book::create([
                     'title' => trim($data['title']),
                     'slug' => Book::makeSlug($data['title']),
                     'publisher' => trim($data['publisher']),
-                    'author' => trim($data['author']),
+                    ...$this->contributorFields($data),
                     'category' => $data['category'] ?? 'Umum',
                     'pages' => $data['pages'] ?? null,
                     'size' => $data['size'] ?? null,
@@ -91,6 +98,7 @@ class PublisherAdminController extends Controller
                     'publish_year' => $data['publish_year'] ?? null,
                     'description' => $data['description'] ?? null,
                     'cover' => $coverPath,
+                    'preview_pdf' => $previewPath,
 
                     // Kolom legacy price masih NOT NULL pada database lama.
                     'price' => 0,
@@ -110,6 +118,10 @@ class PublisherAdminController extends Controller
         } catch (Throwable $e) {
             if ($coverPath) {
                 Storage::disk('public')->delete($coverPath);
+            }
+
+            if ($previewPath) {
+                Storage::disk('public')->delete($previewPath);
             }
 
             throw $e;
@@ -140,6 +152,9 @@ class PublisherAdminController extends Controller
         $data = $this->validateBookMetadata($request);
         $oldCover = $book->cover;
         $newCover = null;
+        $oldPreview = $book->preview_pdf;
+        $newPreview = null;
+        $removePreview = !empty($data['remove_preview_pdf']);
 
         if ($request->hasFile('cover')) {
             $newCover = $request
@@ -149,12 +164,23 @@ class PublisherAdminController extends Controller
             $data['cover'] = $newCover;
         }
 
+        if ($request->hasFile('preview_pdf')) {
+            $newPreview = $request
+                ->file('preview_pdf')
+                ->store('book-previews', 'public');
+
+            $data['preview_pdf'] = $newPreview;
+            $removePreview = false;
+        } elseif ($removePreview) {
+            $data['preview_pdf'] = null;
+        }
+
         try {
             DB::transaction(function () use ($book, $data) {
                 $book->update([
                     'title' => trim($data['title']),
                     'publisher' => trim($data['publisher']),
-                    'author' => trim($data['author']),
+                    ...$this->contributorFields($data),
                     'category' => $data['category'] ?? 'Umum',
                     'pages' => $data['pages'] ?? null,
                     'size' => $data['size'] ?? null,
@@ -162,6 +188,9 @@ class PublisherAdminController extends Controller
                     'publish_year' => $data['publish_year'] ?? null,
                     'description' => $data['description'] ?? null,
                     'cover' => $data['cover'] ?? $book->cover,
+                    'preview_pdf' => array_key_exists('preview_pdf', $data)
+                        ? $data['preview_pdf']
+                        : $book->preview_pdf,
                 ]);
             });
         } catch (Throwable $e) {
@@ -169,11 +198,19 @@ class PublisherAdminController extends Controller
                 Storage::disk('public')->delete($newCover);
             }
 
+            if ($newPreview) {
+                Storage::disk('public')->delete($newPreview);
+            }
+
             throw $e;
         }
 
         if ($newCover && $oldCover && $oldCover !== $newCover) {
             Storage::disk('public')->delete($oldCover);
+        }
+
+        if (($newPreview || $removePreview) && $oldPreview && $oldPreview !== $newPreview) {
+            Storage::disk('public')->delete($oldPreview);
         }
 
         return redirect()
@@ -338,10 +375,17 @@ class PublisherAdminController extends Controller
 
     private function validateBookMetadata(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'publisher' => ['required', 'string', 'max:255'],
-            'author' => ['required', 'string', 'max:255'],
+            'authors' => ['required', 'array', 'min:1'],
+            'authors.*' => ['nullable', 'string', 'max:255'],
+            'author_display_mode' => ['required', 'in:inline,stacked,primary'],
+            'primary_author' => ['nullable', 'string', 'max:255'],
+            'editors' => ['nullable', 'array'],
+            'editors.*' => ['nullable', 'string', 'max:255'],
+            'editor_display_mode' => ['required', 'in:inline,stacked,primary'],
+            'primary_editor' => ['nullable', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:255'],
             'pages' => ['nullable', 'integer', 'min:1', 'max:100000'],
             'size' => ['nullable', 'string', 'max:255'],
@@ -359,14 +403,76 @@ class PublisherAdminController extends Controller
                 'mimes:jpeg,jpg,png,webp',
                 'max:8192',
             ],
+            'preview_pdf' => [
+                'nullable',
+                'file',
+                'mimes:pdf',
+                'max:51200',
+            ],
+            'remove_preview_pdf' => ['nullable', 'boolean'],
         ], [
             'title.required' => 'Judul buku wajib diisi.',
             'publisher.required' => 'Nama penerbit wajib diisi.',
-            'author.required' => 'Nama penulis wajib diisi.',
+            'authors.required' => 'Minimal satu penulis wajib diisi.',
+            'authors.array' => 'Data penulis tidak valid.',
             'cover.image' => 'Cover harus berupa gambar.',
             'cover.mimes' => 'Cover harus JPG, JPEG, PNG, atau WebP.',
             'cover.max' => 'Ukuran cover maksimal 8 MB.',
+            'preview_pdf.file' => 'PDF preview gagal dibaca sebagai file upload. Pilih ulang file PDF lalu coba lagi.',
+            'preview_pdf.mimes' => 'Preview buku harus berupa file PDF (.pdf).',
+            'preview_pdf.max' => 'Ukuran PDF preview maksimal 50 MB.',
         ]);
+
+        $data['remove_preview_pdf'] = $request->boolean('remove_preview_pdf');
+
+        return $data;
+    }
+
+    private function contributorFields(array $data): array
+    {
+        $authors = Book::normalizeContributorNames($data['authors'] ?? []);
+        $editors = Book::normalizeContributorNames($data['editors'] ?? []);
+
+        if ($authors === []) {
+            throw ValidationException::withMessages([
+                'authors' => 'Minimal satu nama penulis wajib diisi.',
+            ]);
+        }
+
+        $authorMode = in_array($data['author_display_mode'] ?? null, ['inline', 'stacked', 'primary'], true)
+            ? $data['author_display_mode']
+            : 'inline';
+        $editorMode = in_array($data['editor_display_mode'] ?? null, ['inline', 'stacked', 'primary'], true)
+            ? $data['editor_display_mode']
+            : 'inline';
+
+        $primaryAuthor = trim((string) ($data['primary_author'] ?? ''));
+        if ($authorMode !== 'primary' || !in_array($primaryAuthor, $authors, true)) {
+            $primaryAuthor = $authorMode === 'primary' ? ($authors[0] ?? null) : null;
+        }
+
+        $primaryEditor = trim((string) ($data['primary_editor'] ?? ''));
+        if ($editorMode !== 'primary' || !in_array($primaryEditor, $editors, true)) {
+            $primaryEditor = $editorMode === 'primary' ? ($editors[0] ?? null) : null;
+        }
+
+        return [
+            'author' => implode(', ', $authors),
+            'author_2' => null,
+            'author_3' => null,
+            'show_authors' => true,
+            'author_names' => $authors,
+            'author_display_mode' => $authorMode,
+            'primary_author' => $primaryAuthor,
+            'editor' => $editors !== [] ? implode(', ', $editors) : null,
+            'editor_2' => null,
+            'editor_3' => null,
+            'show_editor' => $editors !== [],
+            'show_editors' => $editors !== [],
+            'editor_names' => $editors,
+            'editor_display_mode' => $editorMode,
+            'primary_editor' => $primaryEditor,
+        ];
     }
 
     private function ensurePublisherReady(Book $book): void

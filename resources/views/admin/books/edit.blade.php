@@ -159,44 +159,14 @@
                 </div>
 
 
-                {{-- AUTHOR + PUBLISHER --}}
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-
                     <div>
-
-                        <label class="mb-1.5 block text-sm font-semibold text-slate-700">
-                            Penulis
-                        </label>
-
-                        <input
-                            type="text"
-                            name="author"
-                            value="{{ old('author', $book->author) }}"
-                            required
-                            class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
-                        >
-
+                        <label class="mb-1.5 block text-sm font-semibold text-slate-700">Penerbit</label>
+                        <input type="text" name="publisher" value="{{ old('publisher', $book->publisher) }}" required class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100">
                     </div>
-
-
-                    <div>
-
-                        <label class="mb-1.5 block text-sm font-semibold text-slate-700">
-                            Penerbit
-                        </label>
-
-                        <input
-                            type="text"
-                            name="publisher"
-                            value="{{ old('publisher', $book->publisher) }}"
-                            required
-                            class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
-                        >
-
-                    </div>
-
                 </div>
 
+                @include('admin.partials.book-contributors', ['book' => $book ?? null])
 
                 {{-- CATEGORY + PAGE + YEAR --}}
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -308,6 +278,38 @@
                         Kosongkan jika cover tidak ingin diganti.
                     </p>
 
+                </div>
+
+
+                {{-- PDF PREVIEW --}}
+                <div class="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4">
+                    <label class="mb-1.5 block text-sm font-semibold text-slate-700">
+                        PDF Preview Buku <span class="font-normal text-slate-400">(opsional)</span>
+                    </label>
+
+                    @if($book->preview_pdf)
+                        <div class="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-indigo-100 bg-white p-3">
+                            <span class="text-xs font-semibold text-indigo-700">PDF preview sudah tersedia</span>
+                            @if($book->isPublisherApproved())
+                                <a href="{{ route('publisher.books.preview', $book->slug) }}" target="_blank" rel="noopener" class="text-xs font-semibold text-indigo-600 hover:underline">Lihat preview ↗</a>
+                            @endif
+                            <label class="ml-auto flex cursor-pointer items-center gap-2 text-xs font-semibold text-red-600">
+                                <input type="checkbox" name="remove_preview_pdf" value="1" class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
+                                Hapus PDF preview
+                            </label>
+                        </div>
+                    @endif
+
+                    <input
+                        type="file"
+                        name="preview_pdf"
+                        accept="application/pdf,.pdf"
+                        class="w-full rounded-xl border border-indigo-100 bg-white p-2 text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700"
+                    >
+
+                    <p class="mt-1.5 text-[10px] leading-relaxed text-slate-500">
+                        Upload untuk menambah/mengganti preview. Maksimal 50 MB dan terpisah dari file e-book.
+                    </p>
                 </div>
 
             </div>

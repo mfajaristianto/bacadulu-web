@@ -173,6 +173,11 @@ class BacaPublisherClient
 
     /**
      * Download image bytes tanpa resize atau recompress.
+     *
+     * OMP sering menampilkan thumbnail dengan suffix `_t` pada halaman
+     * katalog. Sebelum mendownload URL yang diterima, coba dulu file original
+     * tanpa suffix `_t`. Thumbnail hanya dipakai sebagai fallback jika file
+     * original memang tidak tersedia.
      */
     public function downloadImage(string $url): ?array
     {
@@ -182,53 +187,60 @@ class BacaPublisherClient
             return null;
         }
 
-        try {
-            $response = Http::timeout((int) config('bacapublisher.timeout', 25))
-                ->connectTimeout((int) config('bacapublisher.connect_timeout', 8))
-                ->retry(2, 400, throw: false)
-                ->withHeaders([
-                    'User-Agent' => 'BacaDulu-Publisher-Sync/1.0',
-                    'Accept' => 'image/*,*/*;q=0.8',
-                ])
-                ->get($url);
+        foreach ($this->coverDownloadCandidates($url) as $candidateUrl) {
+            try {
+                $response = Http::timeout((int) config('bacapublisher.timeout', 25))
+                    ->connectTimeout((int) config('bacapublisher.connect_timeout', 8))
+                    ->retry(2, 400, throw: false)
+                    ->withHeaders([
+                        'User-Agent' => 'BacaDulu-Publisher-Sync/1.0',
+                        'Accept' => 'image/*,*/*;q=0.8',
+                    ])
+                    ->get($candidateUrl);
 
-            if (!$response->successful()) {
-                return null;
+                if (!$response->successful()) {
+                    continue;
+                }
+
+                $body = $response->body();
+                if ($body === '') {
+                    continue;
+                }
+
+                $maxBytes = (int) config('bacapublisher.max_cover_bytes', 15 * 1024 * 1024);
+                if (strlen($body) > $maxBytes) {
+                    continue;
+                }
+
+                $contentType = strtolower((string) $response->header('Content-Type'));
+                $contentType = trim(explode(';', $contentType)[0] ?? '');
+
+                $extension = match ($contentType) {
+                    'image/jpeg', 'image/jpg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/webp' => 'webp',
+                    'image/gif' => 'gif',
+                    default => $this->extensionFromUrl($candidateUrl),
+                };
+
+                if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
+                    continue;
+                }
+
+                return [
+                    'body' => $body,
+                    'extension' => $extension === 'jpeg' ? 'jpg' : $extension,
+                    'content_type' => $contentType,
+                    'source_url' => $candidateUrl,
+                    'bytes' => strlen($body),
+                ];
+            } catch (Throwable) {
+                // Coba kandidat berikutnya.
+                continue;
             }
-
-            $body = $response->body();
-            if ($body === '') {
-                return null;
-            }
-
-            $maxBytes = (int) config('bacapublisher.max_cover_bytes', 15 * 1024 * 1024);
-            if (strlen($body) > $maxBytes) {
-                return null;
-            }
-
-            $contentType = strtolower((string) $response->header('Content-Type'));
-            $contentType = trim(explode(';', $contentType)[0] ?? '');
-
-            $extension = match ($contentType) {
-                'image/jpeg', 'image/jpg' => 'jpg',
-                'image/png' => 'png',
-                'image/webp' => 'webp',
-                'image/gif' => 'gif',
-                default => $this->extensionFromUrl($url),
-            };
-
-            if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
-                return null;
-            }
-
-            return [
-                'body' => $body,
-                'extension' => $extension === 'jpeg' ? 'jpg' : $extension,
-                'content_type' => $contentType,
-            ];
-        } catch (Throwable) {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -237,38 +249,112 @@ class BacaPublisherClient
      */
     public function coverUrl(array $submission, array $publication, array $catalog = []): ?string
     {
-        $catalogCover = trim((string) ($catalog['cover_url'] ?? ''));
-        if ($catalogCover !== '') {
-            return $catalogCover;
-        }
-
+        /*
+         * Prioritaskan metadata cover dari API karena `uploadName` menunjuk
+         * file asli. Halaman katalog OMP sering memberikan versi thumbnail
+         * (`*_t.jpg` / `*_t.png`) yang terlihat buram jika dipakai sebagai
+         * cover utama.
+         */
         $cover = $publication['coverImage'] ?? null;
         $coverEntry = $this->firstLocalizedArray($cover, (string) ($publication['locale'] ?? $submission['locale'] ?? 'en'));
 
         if (is_array($coverEntry)) {
-            foreach (['url', 'href', 'src', 'imageUrl', 'fileUrl', 'temporaryFileUrl'] as $key) {
-                $value = trim((string) ($coverEntry[$key] ?? ''));
-                if ($value !== '') {
-                    return $this->absoluteUrl($value, (string) ($publication['urlPublished'] ?? $submission['urlPublished'] ?? ''));
-                }
-            }
-
             $uploadName = trim((string) ($coverEntry['uploadName'] ?? ''));
             $contextId = $submission['contextId'] ?? null;
 
             if ($uploadName !== '' && $contextId) {
                 $root = $this->siteRoot();
                 if ($root !== '') {
-                    return $root
-                        . '/public/presses/'
-                        . rawurlencode((string) $contextId)
-                        . '/'
-                        . rawurlencode($uploadName);
+                    return $this->preferOriginalCoverUrl(
+                        $root
+                            . '/public/presses/'
+                            . rawurlencode((string) $contextId)
+                            . '/'
+                            . rawurlencode($uploadName)
+                    );
+                }
+            }
+
+            foreach (['url', 'href', 'src', 'imageUrl', 'fileUrl', 'temporaryFileUrl'] as $key) {
+                $value = trim((string) ($coverEntry[$key] ?? ''));
+                if ($value !== '') {
+                    return $this->preferOriginalCoverUrl(
+                        $this->absoluteUrl(
+                            $value,
+                            (string) ($publication['urlPublished'] ?? $submission['urlPublished'] ?? '')
+                        )
+                    );
                 }
             }
         }
 
+        $catalogCover = trim((string) ($catalog['cover_url'] ?? ''));
+        if ($catalogCover !== '') {
+            return $this->preferOriginalCoverUrl($catalogCover);
+        }
+
         return null;
+    }
+
+    /**
+     * Ubah URL thumbnail OMP menjadi kandidat file original.
+     */
+    public function preferOriginalCoverUrl(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return '';
+        }
+
+        $parts = parse_url($url);
+        if (!is_array($parts) || empty($parts['path'])) {
+            return $url;
+        }
+
+        $originalPath = preg_replace(
+            '/_t(?=\.(?:jpe?g|png|webp|gif)$)/i',
+            '',
+            (string) $parts['path']
+        );
+
+        if (!is_string($originalPath) || $originalPath === $parts['path']) {
+            return $url;
+        }
+
+        $rebuilt = '';
+        if (!empty($parts['scheme'])) {
+            $rebuilt .= $parts['scheme'] . '://';
+        }
+        if (!empty($parts['user'])) {
+            $rebuilt .= $parts['user'];
+            if (!empty($parts['pass'])) {
+                $rebuilt .= ':' . $parts['pass'];
+            }
+            $rebuilt .= '@';
+        }
+        $rebuilt .= $parts['host'] ?? '';
+        if (!empty($parts['port'])) {
+            $rebuilt .= ':' . $parts['port'];
+        }
+        $rebuilt .= $originalPath;
+        if (isset($parts['query']) && $parts['query'] !== '') {
+            $rebuilt .= '?' . $parts['query'];
+        }
+        if (isset($parts['fragment']) && $parts['fragment'] !== '') {
+            $rebuilt .= '#' . $parts['fragment'];
+        }
+
+        return $rebuilt !== '' ? $rebuilt : $url;
+    }
+
+    private function coverDownloadCandidates(string $url): array
+    {
+        $original = $this->preferOriginalCoverUrl($url);
+
+        return array_values(array_unique(array_filter([
+            $original,
+            $url,
+        ], static fn ($candidate) => is_string($candidate) && trim($candidate) !== '')));
     }
 
     public function testConnection(): array

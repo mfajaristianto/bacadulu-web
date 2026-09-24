@@ -1,5 +1,26 @@
 @php
+    /*
+    |--------------------------------------------------------------------------
+    | Terbitan terbaru = hanya buku yang SUDAH APPROVED di Bookstore
+    |--------------------------------------------------------------------------
+    | Buku yang masih Pending/Rejected tidak boleh bocor ke katalog home.
+    | Syarat format + harga dibuat sama dengan BookstoreController.
+    */
     $bukuTerbaru = \App\Models\Book::query()
+        ->storeApproved()
+        ->where(function ($query) {
+            $query
+                ->where(function ($print) {
+                    $print
+                        ->where('has_print', true)
+                        ->whereNotNull('print_price');
+                })
+                ->orWhere(function ($ebook) {
+                    $ebook
+                        ->where('has_ebook', true)
+                        ->whereNotNull('ebook_price');
+                });
+        })
         ->latest()
         ->take(5)
         ->get();

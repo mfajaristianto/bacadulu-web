@@ -23,7 +23,13 @@
         return [
             'id' => $book->id ?? null,
             'title' => $book->title ?? 'Tanpa Judul',
-            'author' => $book->author ?? '-',
+            'author' => $book->displayedAuthorsText() ?: '-',
+            'authors' => $book->authors(),
+            'editors' => $book->editors(),
+            'author_mode' => $book->authorDisplayMode(),
+            'editor_mode' => $book->editorDisplayMode(),
+            'primary_author' => $book->primaryAuthorName(),
+            'primary_editor' => $book->primaryEditorName(),
             'year' => $book->publish_year ?? '-',
             'isbn' => $book->isbn ?? '-',
             'pages' => $book->pages ?? null,
@@ -1060,7 +1066,8 @@
     position:fixed;
     z-index:9998;
     inset:0;
-    background:rgba(22,17,48,.44);
+    background:rgba(23,19,46,.50);
+    backdrop-filter:blur(3px);
     opacity:0;
     pointer-events:none;
     transition:opacity .28s ease;
@@ -1076,15 +1083,17 @@
     z-index:9999;
     top:0;
     right:0;
-    width:470px;
-    max-width:94vw;
-    height:100%;
+    width:min(680px,96vw);
+    height:100dvh;
     overflow-y:auto;
+    overscroll-behavior:contain;
     transform:translateX(100%);
-    border-left:1px solid var(--line);
-    background:#fff;
-    box-shadow:-30px 0 70px rgba(36,27,82,.14);
-    transition:transform .35s ease;
+    border-left:1px solid rgba(36,27,82,.08);
+    background:#FCFBF9;
+    box-shadow:-36px 0 90px rgba(23,19,46,.18);
+    transition:transform .38s cubic-bezier(.22,.8,.24,1);
+    scrollbar-width:thin;
+    scrollbar-color:rgba(36,27,82,.22) transparent;
 }
 
 .bd-publisher-drawer.open{transform:translateX(0)}
@@ -1093,62 +1102,92 @@
     position:sticky;
     z-index:4;
     top:0;
-    min-height:64px;
+    min-height:74px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 24px;
-    border-bottom:1px solid var(--line);
-    background:#fff;
+    padding:0 30px;
+    border-bottom:1px solid rgba(36,27,82,.08);
+    background:rgba(252,251,249,.94);
+    backdrop-filter:blur(14px);
 }
 
 .bd-publisher-drawer-label{
-    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--navy);
     font-size:9px;
     font-weight:700;
-    letter-spacing:.1em;
+    letter-spacing:.14em;
     text-transform:uppercase;
 }
 
+.bd-publisher-drawer-label::before{
+    content:"";
+    width:24px;
+    height:2px;
+    background:var(--orange);
+}
+
 .bd-publisher-close{
-    width:34px;
-    height:34px;
-    border:1px solid var(--line);
-    border-radius:50%;
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(36,27,82,.12);
+    border-radius:12px;
     background:#fff;
     color:var(--navy);
+    font-size:19px;
+    line-height:1;
     cursor:pointer;
+    transition:transform .2s ease,border-color .2s ease,background .2s ease;
+}
+
+.bd-publisher-close:hover{
+    transform:rotate(5deg);
+    border-color:rgba(239,88,67,.35);
+    background:#FFF7F4;
 }
 
 .bd-publisher-drawer-body{
-    padding:31px 34px 48px;
+    padding:30px 32px 54px;
 }
 
 .bd-publisher-drawer-book{
     display:grid;
-    grid-template-columns:126px minmax(0,1fr);
-    gap:24px;
-    align-items:end;
-    margin-bottom:32px;
+    grid-template-columns:170px minmax(0,1fr);
+    gap:30px;
+    align-items:start;
+    margin-bottom:24px;
+    padding:22px;
+    border:1px solid rgba(36,27,82,.08);
+    border-radius:24px;
+    background:linear-gradient(145deg,#fff 0%,#FAF7F2 100%);
+    box-shadow:0 14px 40px rgba(36,27,82,.07);
 }
 
 .bd-publisher-drawer-cover-card{
-    padding:8px;
-    border:1px solid rgba(var(--book-rgb),.13);
-    border-radius:6px;
+    width:100%;
+    padding:9px;
+    border:1px solid rgba(var(--book-rgb),.14);
+    border-radius:18px;
     background:rgba(var(--book-rgb),.055);
+    box-shadow:0 14px 28px rgba(23,19,46,.10);
 }
 
 .bd-publisher-drawer-cover{
     position:relative;
-    width:108px;
+    width:100%;
     aspect-ratio:3/4;
     overflow:hidden;
-    border-radius:2px;
+    border-radius:12px;
     background:var(--navy);
 }
 
 .bd-publisher-drawer-cover img{
+    display:block;
     width:100%;
     height:100%;
     object-fit:cover;
@@ -1160,78 +1199,196 @@
     display:flex;
     flex-direction:column;
     justify-content:space-between;
-    padding:14px;
+    padding:16px;
     color:#fff;
 }
 
 .bd-publisher-drawer-cover-category{
     font-size:7px;
+    font-weight:700;
+    letter-spacing:.09em;
     text-transform:uppercase;
 }
 
 .bd-publisher-drawer-cover-title{
     font-family:'Fraunces',serif;
-    font-size:13px;
+    font-size:16px;
+    line-height:1.15;
 }
 
-.bd-publisher-drawer-status{
-    margin-bottom:9px;
-    color:var(--orange);
-    font-size:8px;
+.bd-publisher-drawer-copy{
+    min-width:0;
+    padding:4px 0 2px;
+}
+
+.bd-publisher-drawer-badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-bottom:14px;
+}
+
+.bd-publisher-drawer-status,
+.bd-publisher-drawer-category{
+    display:inline-flex;
+    align-items:center;
+    min-height:25px;
+    padding:0 10px;
+    border-radius:999px;
+    font-size:7.5px;
     font-weight:700;
+    letter-spacing:.07em;
     text-transform:uppercase;
 }
 
-.bd-publisher-drawer-title{
-    margin:0 0 8px;
-    color:var(--navy);
-    font-family:'Fraunces',serif;
-    font-size:27px;
+.bd-publisher-drawer-status{
+    color:#A33424;
+    border:1px solid rgba(239,88,67,.18);
+    background:rgba(239,88,67,.09);
 }
 
-.bd-publisher-drawer-author{
-    color:var(--body);
+.bd-publisher-drawer-status::before{
+    content:"";
+    width:6px;
+    height:6px;
+    margin-right:7px;
+    border-radius:50%;
+    background:var(--orange);
+}
+
+.bd-publisher-drawer-category{
+    color:var(--navy);
+    border:1px solid rgba(36,27,82,.10);
+    background:rgba(36,27,82,.045);
+}
+
+.bd-publisher-drawer-title{
+    margin:0 0 16px;
+    color:var(--navy);
+    font-family:'Fraunces',serif;
+    font-size:clamp(27px,2.2vw,36px);
+    font-weight:600;
+    line-height:1.08;
+    letter-spacing:-.025em;
+    overflow-wrap:anywhere;
+}
+
+.bd-publisher-contributors{
+    display:grid;
+    gap:12px;
+}
+
+.bd-publisher-contributor{
+    min-width:0;
+}
+
+.bd-publisher-contributor-label{
+    display:block;
+    margin-bottom:4px;
+    color:var(--muted);
+    font-size:7.5px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.bd-publisher-contributor-value{
+    color:#3D3948;
     font-size:11px;
+    font-weight:500;
+    line-height:1.55;
+}
+
+.bd-publisher-contributor-lines{
+    display:grid;
+    gap:2px;
+}
+
+.bd-publisher-contributor-lines span{
+    display:block;
+}
+
+.bd-publisher-contributor-primary + .bd-publisher-contributor-secondary{
+    margin-top:9px;
+}
+
+.bd-publisher-drawer-section{
+    margin-top:18px;
+    padding:22px;
+    border:1px solid rgba(36,27,82,.08);
+    border-radius:20px;
+    background:#fff;
+}
+
+.bd-publisher-drawer-section-heading{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+    color:var(--navy);
+    font-size:8px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+
+.bd-publisher-drawer-section-heading::before{
+    content:"";
+    width:18px;
+    height:2px;
+    background:var(--orange);
 }
 
 .bd-publisher-meta{
     display:grid;
-    grid-template-columns:1fr 1fr;
-    margin-bottom:31px;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin:0;
 }
 
 .bd-publisher-meta-item{
-    padding:17px 12px;
+    min-width:0;
+    padding:14px 15px;
+    border:1px solid rgba(36,27,82,.07);
+    border-radius:13px;
+    background:#FAFAFB;
+}
+
+.bd-publisher-meta-item:last-child{
+    grid-column:1/-1;
 }
 
 .bd-publisher-meta-label{
     display:block;
-    margin-bottom:6px;
+    margin-bottom:7px;
     color:var(--muted);
-    font-size:8px;
+    font-size:7px;
+    font-weight:700;
+    letter-spacing:.07em;
     text-transform:uppercase;
 }
 
 .bd-publisher-meta-value{
+    display:block;
     color:var(--ink);
     font-size:11px;
+    font-weight:600;
+    line-height:1.45;
+    overflow-wrap:anywhere;
 }
 
 .bd-publisher-synopsis-label{
-    margin-bottom:12px;
-    color:var(--orange);
-    font-size:8px;
-    font-weight:700;
-    text-transform:uppercase;
+    display:none;
 }
 
 .bd-publisher-synopsis{
-    color:var(--body);
+    color:#575260;
     font-size:12px;
-    line-height:1.8;
+    line-height:1.85;
 }
+
+.bd-publisher-synopsis > :first-child{margin-top:0}
+.bd-publisher-synopsis > :last-child{margin-bottom:0}
 
 .bd-publisher-empty{
     display:none;
@@ -1379,7 +1536,7 @@
     }
 
     .bd-publisher-drawer{
-        width:100%;
+        width:min(680px,100%);
         max-width:100%;
     }
 
@@ -1450,21 +1607,81 @@
         font-size:8.5px;
     }
 
-    .bd-publisher-drawer-book{
-        grid-template-columns:105px minmax(0,1fr);
-        gap:17px;
-    }
-
-    .bd-publisher-drawer-cover{
-        width:89px;
+    .bd-publisher-drawer-top{
+        min-height:66px;
+        padding:0 18px;
     }
 
     .bd-publisher-drawer-body{
-        padding:25px 22px 40px;
+        padding:18px 14px 34px;
+    }
+
+    .bd-publisher-drawer-book{
+        grid-template-columns:112px minmax(0,1fr);
+        gap:16px;
+        padding:15px;
+        border-radius:18px;
+    }
+
+    .bd-publisher-drawer-cover-card{
+        padding:6px;
+        border-radius:13px;
+    }
+
+    .bd-publisher-drawer-cover{
+        border-radius:9px;
     }
 
     .bd-publisher-drawer-title{
-        font-size:22px;
+        margin-bottom:12px;
+        font-size:23px;
+    }
+
+    .bd-publisher-drawer-section{
+        padding:17px;
+        border-radius:17px;
+    }
+
+    .bd-publisher-meta{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+    }
+
+    .bd-publisher-meta-item{
+        padding:12px;
+    }
+}
+
+@media(max-width:520px){
+    .bd-publisher-drawer-book{
+        grid-template-columns:92px minmax(0,1fr);
+        gap:13px;
+        padding:13px;
+    }
+
+    .bd-publisher-drawer-badges{margin-bottom:10px}
+
+    .bd-publisher-drawer-status,
+    .bd-publisher-drawer-category{
+        min-height:22px;
+        padding:0 8px;
+        font-size:6.5px;
+    }
+
+    .bd-publisher-drawer-title{
+        font-size:20px;
+        line-height:1.1;
+    }
+
+    .bd-publisher-contributor-label{font-size:6.5px}
+    .bd-publisher-contributor-value{font-size:10px}
+
+    .bd-publisher-meta{
+        grid-template-columns:1fr;
+    }
+
+    .bd-publisher-meta-item:last-child{
+        grid-column:auto;
     }
 }
 
@@ -1909,6 +2126,77 @@
             .replaceAll('>','&gt;')
             .replaceAll('"','&quot;')
             .replaceAll("'",'&#039;');
+
+    const renderContributor = (
+        role,
+        names = [],
+        mode = 'inline',
+        primary = null
+    ) => {
+        const cleanNames = Array.isArray(names)
+            ? names.map(name => String(name || '').trim()).filter(Boolean)
+            : [];
+
+        if (!cleanNames.length) {
+            return '';
+        }
+
+        const safeRole = escapeHtml(role);
+        const selectedPrimary = cleanNames.includes(primary)
+            ? primary
+            : cleanNames[0];
+
+        if (mode === 'primary') {
+            const others = cleanNames.filter(name => name !== selectedPrimary);
+
+            return `
+                <div class="bd-publisher-contributor">
+                    <div class="bd-publisher-contributor-primary">
+                        <span class="bd-publisher-contributor-label">
+                            ${safeRole} Utama
+                        </span>
+                        <div class="bd-publisher-contributor-value">
+                            ${escapeHtml(selectedPrimary)}
+                        </div>
+                    </div>
+                    ${others.length ? `
+                        <div class="bd-publisher-contributor-secondary">
+                            <span class="bd-publisher-contributor-label">
+                                ${safeRole} Lainnya
+                            </span>
+                            <div class="bd-publisher-contributor-value bd-publisher-contributor-lines">
+                                ${others.map(name => `<span>${escapeHtml(name)}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        if (mode === 'stacked') {
+            return `
+                <div class="bd-publisher-contributor">
+                    <span class="bd-publisher-contributor-label">
+                        ${safeRole}
+                    </span>
+                    <div class="bd-publisher-contributor-value bd-publisher-contributor-lines">
+                        ${cleanNames.map(name => `<span>${escapeHtml(name)}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="bd-publisher-contributor">
+                <span class="bd-publisher-contributor-label">
+                    ${safeRole}
+                </span>
+                <div class="bd-publisher-contributor-value">
+                    ${cleanNames.map(escapeHtml).join(', ')}
+                </div>
+            </div>
+        `;
+    };
 
     const categories = [
         ...new Set(
@@ -3271,6 +3559,21 @@
                     </div>
                 `;
 
+        const contributors = [
+            renderContributor(
+                'Penulis',
+                book.authors || [],
+                book.author_mode || 'inline',
+                book.primary_author || null
+            ),
+            renderContributor(
+                'Editor',
+                book.editors || [],
+                book.editor_mode || 'inline',
+                book.primary_editor || null
+            )
+        ].filter(Boolean).join('');
+
         body.innerHTML = `
             <div class="bd-publisher-drawer-book">
 
@@ -3286,91 +3589,86 @@
                     </div>
                 </div>
 
-                <div>
-                    <div class="bd-publisher-drawer-status">
-                        Sudah terbit
+                <div class="bd-publisher-drawer-copy">
+                    <div class="bd-publisher-drawer-badges">
+                        <span class="bd-publisher-drawer-status">
+                            Sudah terbit
+                        </span>
+                        <span class="bd-publisher-drawer-category">
+                            ${escapeHtml(book.category || 'Umum')}
+                        </span>
                     </div>
 
                     <h2 class="bd-publisher-drawer-title">
                         ${escapeHtml(book.title)}
                     </h2>
 
-                    <p class="bd-publisher-drawer-author">
-                        ${escapeHtml(book.author || '-')}
-                    </p>
+                    <div class="bd-publisher-contributors">
+                        ${contributors || `
+                            <div class="bd-publisher-contributor">
+                                <span class="bd-publisher-contributor-label">Penulis</span>
+                                <div class="bd-publisher-contributor-value">
+                                    ${escapeHtml(book.author || '-')}
+                                </div>
+                            </div>
+                        `}
+                    </div>
                 </div>
 
             </div>
 
-            <div class="bd-publisher-meta">
-
-                <div class="bd-publisher-meta-item">
-                    <span class="bd-publisher-meta-label">
-                        ISBN
-                    </span>
-
-                    <span class="bd-publisher-meta-value">
-                        ${escapeHtml(book.isbn || '-')}
-                    </span>
+            <section class="bd-publisher-drawer-section">
+                <div class="bd-publisher-drawer-section-heading">
+                    Informasi Buku
                 </div>
 
-                <div class="bd-publisher-meta-item">
-                    <span class="bd-publisher-meta-label">
-                        Tahun Terbit
-                    </span>
+                <div class="bd-publisher-meta">
+                    <div class="bd-publisher-meta-item">
+                        <span class="bd-publisher-meta-label">ISBN</span>
+                        <span class="bd-publisher-meta-value">
+                            ${escapeHtml(book.isbn || '-')}
+                        </span>
+                    </div>
 
-                    <span class="bd-publisher-meta-value">
-                        ${escapeHtml(book.year || '-')}
-                    </span>
+                    <div class="bd-publisher-meta-item">
+                        <span class="bd-publisher-meta-label">Tahun Terbit</span>
+                        <span class="bd-publisher-meta-value">
+                            ${escapeHtml(book.year || '-')}
+                        </span>
+                    </div>
+
+                    <div class="bd-publisher-meta-item">
+                        <span class="bd-publisher-meta-label">Halaman</span>
+                        <span class="bd-publisher-meta-value">
+                            ${book.pages ? escapeHtml(book.pages) + ' halaman' : '-'}
+                        </span>
+                    </div>
+
+                    <div class="bd-publisher-meta-item">
+                        <span class="bd-publisher-meta-label">Jenis Buku</span>
+                        <span class="bd-publisher-meta-value">
+                            ${escapeHtml(book.category || 'Umum')}
+                        </span>
+                    </div>
+
+                    <div class="bd-publisher-meta-item">
+                        <span class="bd-publisher-meta-label">Penerbit</span>
+                        <span class="bd-publisher-meta-value">
+                            ${escapeHtml(book.publisher || 'BacaDulu Publisher')}
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bd-publisher-drawer-section">
+                <div class="bd-publisher-drawer-section-heading">
+                    Sinopsis
                 </div>
 
-                <div class="bd-publisher-meta-item">
-                    <span class="bd-publisher-meta-label">
-                        Halaman
-                    </span>
-
-                    <span class="bd-publisher-meta-value">
-                        ${
-                            book.pages
-                                ? escapeHtml(book.pages) +
-                                  ' halaman'
-                                : '-'
-                        }
-                    </span>
+                <div class="bd-publisher-synopsis">
+                    ${book.synopsis || '<p>Sinopsis belum tersedia.</p>'}
                 </div>
-
-                <div class="bd-publisher-meta-item">
-                    <span class="bd-publisher-meta-label">
-                        Jenis Buku
-                    </span>
-
-                    <span class="bd-publisher-meta-value">
-                        ${escapeHtml(book.category || 'Umum')}
-                    </span>
-                </div>
-
-                <div class="bd-publisher-meta-item">
-                    <span class="bd-publisher-meta-label">
-                        Penerbit
-                    </span>
-
-                    <span class="bd-publisher-meta-value">
-                        ${escapeHtml(book.publisher || 'BacaDulu Publisher')}
-                    </span>
-                </div>
-
-            </div>
-
-            <div class="bd-publisher-synopsis-label">
-                Sinopsis
-            </div>
-
-            <div class="bd-publisher-synopsis">
-                ${
-                    book.synopsis ||
-                    '<p>Sinopsis belum tersedia.</p>'
-                }
-            </div>
+            </section>
         `;
 
         overlay.classList.add(

@@ -30,12 +30,13 @@ class SyncBacaPublisher extends Command
         }
 
         $this->table(
-            ['Diterima', 'Buku Baru', 'Tetap', 'Update Pending', 'Dilewati', 'Gagal'],
+            ['Diterima', 'Buku Baru', 'Tetap', 'Update Pending', 'Cover HD', 'Dilewati', 'Gagal'],
             [[
                 $result['received'],
                 $result['created'],
                 $result['unchanged'],
                 $result['pending_updates'],
+                $result['covers_refreshed'] ?? 0,
                 $result['skipped'],
                 $result['failed'],
             ]]

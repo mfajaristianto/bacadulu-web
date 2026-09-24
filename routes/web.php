@@ -354,6 +354,11 @@ Route::get('/publisher/books/{book}', [
     'show',
 ])->name('publisher.books.show');
 
+Route::get('/publisher/books/{book}/preview', [
+    PublisherController::class,
+    'preview',
+])->name('publisher.books.preview');
+
 /*
 |--------------------------------------------------------------------------
 | KONSULTASI

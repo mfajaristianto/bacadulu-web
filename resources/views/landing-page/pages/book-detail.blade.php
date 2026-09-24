@@ -287,6 +287,28 @@
 }
 .detail-author strong{color:#334155}
 
+.detail-preview-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin-top:14px;
+    padding:10px 15px;
+    border:1px solid #ef5843;
+    border-radius:10px;
+    background:#fff7f5;
+    color:#d94b39 !important;
+    font-size:11px;
+    font-weight:800;
+    text-decoration:none !important;
+    transition:.2s ease;
+}
+.detail-preview-link:hover{background:#ef5843;color:#fff !important;transform:translateY(-1px)}
+.detail-preview-link--side{
+    width:100%;
+    margin-top:-8px;
+}
+
 .detail-info-grid{
     position:relative;
     z-index:2;
@@ -627,12 +649,22 @@
 
                                 <div class="detail-cover-fallback">
                                     <strong>{{ $book->title }}</strong>
-                                    <span>{{ $book->author }}</span>
+                                    <span>{{ $book->displayedAuthorsText() ?: $book->author }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                @if($book->isPublisherApproved() && !empty($book->preview_pdf))
+                    <a
+                        href="{{ route('publisher.books.preview', $book->slug) }}"
+                        class="detail-preview-link detail-preview-link--side"
+                        data-detail-intro
+                    >
+                        Preview Buku PDF
+                    </a>
+                @endif
 
                 <div class="bibliography-card" data-detail-intro>
                     <h3 class="bibliography-title">Informasi Bibliografi</h3>
@@ -645,8 +677,15 @@
 
                         <div>
                             <span class="biblio-label">Penulis</span>
-                            <span class="biblio-value">{{ $book->author }}</span>
+                            <div class="biblio-value">@include('landing-page.partials.contributor-display', ['names' => $book->authors(), 'mode' => $book->authorDisplayMode(), 'primary' => $book->primaryAuthorName()])</div>
                         </div>
+
+                        @if($book->displayedEditorsText() !== '')
+                            <div>
+                                <span class="biblio-label">Editor</span>
+                                <div class="biblio-value">@include('landing-page.partials.contributor-display', ['names' => $book->editors(), 'mode' => $book->editorDisplayMode(), 'primary' => $book->primaryEditorName()])</div>
+                            </div>
+                        @endif
 
                         <div>
                             <span class="biblio-label">Penerbit</span>
@@ -701,9 +740,26 @@
 
                     <h1 class="detail-title">{{ $book->title }}</h1>
 
-                    <p class="detail-author">
-                        Oleh <strong>{{ $book->author }}</strong>
-                    </p>
+                    <div class="detail-author">
+                        @if($book->authorDisplayMode() === 'primary')
+                            @include('landing-page.partials.contributor-display', [
+                                'names' => $book->authors(),
+                                'mode' => $book->authorDisplayMode(),
+                                'primary' => $book->primaryAuthorName(),
+                                'role' => 'Penulis',
+                                'showRoleLabels' => true,
+                            ])
+                        @else
+                            <span>Oleh</span>
+                            <strong>
+                                @include('landing-page.partials.contributor-display', [
+                                    'names' => $book->authors(),
+                                    'mode' => $book->authorDisplayMode(),
+                                    'primary' => $book->primaryAuthorName(),
+                                ])
+                            </strong>
+                        @endif
+                    </div>
 
                     <div class="detail-info-grid">
                         <div class="detail-info-box">
@@ -761,7 +817,7 @@
                                             data-book-id="{{ $book->id }}"
                                             data-format="Buku Cetak"
                                             data-title="{{ $book->title }}"
-                                            data-author="{{ $book->author }}"
+                                            data-author="{{ $book->displayedAuthorsText() ?: $book->author }}"
                                             data-publisher="{{ $book->publisher }}"
                                             data-price="{{ (float)$book->effective_print_price }}"
                                             data-stock="{{ (int) $book->print_stock }}"
@@ -825,7 +881,7 @@
                                         data-book-id="{{ $book->id }}"
                                         data-format="E-book"
                                         data-title="{{ $book->title }}"
-                                        data-author="{{ $book->author }}"
+                                        data-author="{{ $book->displayedAuthorsText() ?: $book->author }}"
                                         data-publisher="{{ $book->publisher }}"
                                         data-price="{{ (float)$book->effective_ebook_price }}"
                                         data-stock=""

@@ -28,6 +28,34 @@ class Book extends Model
 
         'author',
 
+        'author_2',
+
+        'author_3',
+
+        'show_authors',
+
+        'author_names',
+
+        'author_display_mode',
+
+        'primary_author',
+
+        'editor',
+
+        'editor_2',
+
+        'editor_3',
+
+        'show_editor',
+
+        'show_editors',
+
+        'editor_names',
+
+        'editor_display_mode',
+
+        'primary_editor',
+
 
         /*
         |--------------------------------------------------------------------------
@@ -90,6 +118,8 @@ class Book extends Model
 
         'cover',
 
+        'preview_pdf',
+
         'description',
 
         'pages',
@@ -128,6 +158,139 @@ class Book extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | KONTRIBUTOR BUKU DINAMIS
+    |--------------------------------------------------------------------------
+    |
+    | author/editor legacy tetap dipertahankan untuk kompatibilitas API dan
+    | kode lama. Sumber tampilan utama menggunakan author_names/editor_names.
+    |
+    */
+
+    public static function normalizeContributorNames(mixed $value): array
+    {
+        $items = is_array($value) ? $value : [$value];
+        $names = [];
+
+        foreach ($items as $item) {
+            if (!is_string($item) || trim($item) === '') {
+                continue;
+            }
+
+            // Data lama dari BacaPublisher lazimnya satu string dipisah koma.
+            foreach (preg_split('/\s*(?:,|;|\r?\n)\s*/u', trim($item)) ?: [] as $name) {
+                $name = trim($name);
+                if ($name !== '' && !in_array($name, $names, true)) {
+                    $names[] = $name;
+                }
+            }
+        }
+
+        return $names;
+    }
+
+    public static function splitContributorString(?string $value): array
+    {
+        return static::normalizeContributorNames($value);
+    }
+
+    public function authors(): array
+    {
+        $stored = static::normalizeContributorNames($this->author_names ?? []);
+
+        if ($stored !== []) {
+            return $stored;
+        }
+
+        return static::normalizeContributorNames([
+            $this->author,
+            $this->author_2,
+            $this->author_3,
+        ]);
+    }
+
+    public function editors(): array
+    {
+        $stored = static::normalizeContributorNames($this->editor_names ?? []);
+
+        if ($stored !== []) {
+            return $stored;
+        }
+
+        return static::normalizeContributorNames([
+            $this->editor,
+            $this->editor_2,
+            $this->editor_3,
+        ]);
+    }
+
+    public function displayedAuthors(): array
+    {
+        return $this->authors();
+    }
+
+    public function displayedEditors(): array
+    {
+        return $this->editors();
+    }
+
+    public function displayedAuthorsText(): string
+    {
+        return implode(', ', $this->authors());
+    }
+
+    public function displayedEditorsText(): string
+    {
+        return implode(', ', $this->editors());
+    }
+
+    public function authorDisplayMode(): string
+    {
+        return in_array($this->author_display_mode, ['inline', 'stacked', 'primary'], true)
+            ? $this->author_display_mode
+            : 'inline';
+    }
+
+    public function editorDisplayMode(): string
+    {
+        return in_array($this->editor_display_mode, ['inline', 'stacked', 'primary'], true)
+            ? $this->editor_display_mode
+            : 'inline';
+    }
+
+    public function primaryAuthorName(): ?string
+    {
+        $authors = $this->authors();
+        $primary = trim((string) $this->primary_author);
+
+        return $primary !== '' && in_array($primary, $authors, true)
+            ? $primary
+            : ($authors[0] ?? null);
+    }
+
+    public function primaryEditorName(): ?string
+    {
+        $editors = $this->editors();
+        $primary = trim((string) $this->primary_editor);
+
+        return $primary !== '' && in_array($primary, $editors, true)
+            ? $primary
+            : ($editors[0] ?? null);
+    }
+
+    public function otherAuthors(): array
+    {
+        $primary = $this->primaryAuthorName();
+        return array_values(array_filter($this->authors(), fn ($name) => $name !== $primary));
+    }
+
+    public function otherEditors(): array
+    {
+        $primary = $this->primaryEditorName();
+        return array_values(array_filter($this->editors(), fn ($name) => $name !== $primary));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | DESCRIPTION SANITIZER
     |--------------------------------------------------------------------------
     |
@@ -153,6 +316,21 @@ class Book extends Model
 
         'has_ebook' =>
             'boolean',
+
+        'show_authors' =>
+            'boolean',
+
+        'author_names' =>
+            'array',
+
+        'show_editor' =>
+            'boolean',
+
+        'show_editors' =>
+            'boolean',
+
+        'editor_names' =>
+            'array',
 
 
         'price' =>

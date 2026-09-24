@@ -224,6 +224,33 @@
     background: #47A873;
 }
 
+.bd-book-detail-actions {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+}
+
+.bd-book-detail-preview {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 15px;
+    border:1px solid #EF5843;
+    background:#EF5843;
+    color:#fff !important;
+    font-size:10px;
+    font-weight:750;
+    text-decoration:none !important;
+    transition:.2s ease;
+}
+
+.bd-book-detail-preview:hover {
+    transform:translateY(-1px);
+    background:#d94b39;
+    border-color:#d94b39;
+}
+
 
 /* META */
 
@@ -471,14 +498,16 @@
                 </h1>
 
 
-                @if(!empty($book->author))
-
+                @if($book->authors() !== [])
                     <div class="bd-book-detail-author">
-
-                        {{ $book->author }}
-
+                        @include('landing-page.partials.contributor-display', [
+                            'names' => $book->authors(),
+                            'mode' => $book->authorDisplayMode(),
+                            'primary' => $book->primaryAuthorName(),
+                            'role' => 'Penulis',
+                            'showRoleLabels' => true,
+                        ])
                     </div>
-
                 @endif
 
 
@@ -486,12 +515,27 @@
                     Sudah Terbit
                 </div>
 
+                @if(!empty($book->preview_pdf))
+                    <div class="bd-book-detail-actions">
+                        <a href="{{ route('publisher.books.preview', $book->slug) }}" class="bd-book-detail-preview">
+                            Preview Buku PDF
+                        </a>
+                    </div>
+                @endif
+
 
 
                 {{-- META --}}
 
                 <div class="bd-book-detail-meta">
 
+
+                    @if(!$book->has_print && !$book->has_ebook && !empty($book->isbn))
+                        <div class="bd-book-detail-meta-item">
+                            <div class="bd-book-detail-meta-label">ISBN</div>
+                            <div class="bd-book-detail-meta-value">{{ $book->isbn }}</div>
+                        </div>
+                    @endif
 
                     @if($book->has_print)
 
@@ -531,12 +575,12 @@
                     @endif
 
 
-                    @if($book->has_print && !empty($book->size))
+                    @if(!empty($book->size))
 
                         <div class="bd-book-detail-meta-item">
 
                             <div class="bd-book-detail-meta-label">
-                                Ukuran Buku Cetak
+                                Ukuran Buku
                             </div>
 
                             <div class="bd-book-detail-meta-value">
@@ -601,6 +645,21 @@
                         </div>
 
                     </div>
+
+
+                    @if($book->displayedEditorsText() !== '')
+                        <div class="bd-book-detail-meta-item">
+
+                            <div class="bd-book-detail-meta-label">
+                                Editor
+                            </div>
+
+                            <div class="bd-book-detail-meta-value">
+                                @include('landing-page.partials.contributor-display', ['names' => $book->editors(), 'mode' => $book->editorDisplayMode(), 'primary' => $book->primaryEditorName()])
+                            </div>
+
+                        </div>
+                    @endif
 
 
                     <div class="bd-book-detail-meta-item">
