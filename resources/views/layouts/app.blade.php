@@ -709,26 +709,45 @@
     @endif
 
     <style>
-        .bd-skip-link{
-            position:fixed;
-            top:12px;
-            left:12px;
-            z-index:100000;
-            padding:12px 16px;
-            border-radius:10px;
-            background:#241B52;
-            color:#fff;
-            font-weight:800;
-            text-decoration:none;
-            transform:translateY(-160%);
-            transition:transform .16s ease;
-        }
+            .bd-skip-link{
+    position:fixed;
+    top:12px;
+    left:12px;
+    z-index:100000;
+    padding:12px 16px;
+    border-radius:10px;
+    background:#241B52;
+    color:#fff;
+    font-weight:800;
+    text-decoration:none;
 
-        .bd-skip-link:focus{
-            transform:translateY(0);
-            outline:3px solid #F0A52E;
-            outline-offset:3px;
-        }
+    transform:translateY(-220%);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+
+    transition:
+        transform .16s ease,
+        opacity .16s ease,
+        visibility .16s ease;
+}
+
+.bd-skip-link:focus-visible{
+    transform:translateY(0);
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+
+    outline:3px solid #F0A52E;
+    outline-offset:3px;
+}
+
+.bd-skip-link:focus:not(:focus-visible){
+    transform:translateY(-220%);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+}
 
         :focus-visible{
             outline:3px solid #F0A52E;

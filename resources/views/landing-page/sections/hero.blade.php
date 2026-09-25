@@ -1,49 +1,36 @@
 <section id="home" class="bd-hero">
-
     {{-- =========================================================
          BACKGROUND SLIDER
     ========================================================== --}}
     <div class="bd-hero-bg">
-
         <img
             src="{{ asset('img/transisi-1.jpeg') }}"
             class="bd-hero-slide bd-hero-active"
             alt=""
         >
-
         <img
             src="{{ asset('img/transisi-2.jpeg') }}"
             class="bd-hero-slide"
             alt=""
         >
-
         <img
             src="{{ asset('img/transisi-3.jpeg') }}"
             class="bd-hero-slide"
             alt=""
         >
-
         <div class="bd-hero-overlay"></div>
-
         <div class="bd-hero-grid"></div>
-
         <div class="bd-hero-glow"></div>
-
     </div>
-
-
     {{-- =========================================================
          CONTENT
     ========================================================== --}}
     <div class="bd-hero-container">
-
         {{-- =====================================================
              LEFT CONTENT
         ====================================================== --}}
         <div class="bd-hero-copy">
-
             <div class="bd-hero-badge">
-
                 <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -53,100 +40,70 @@
                     <path
                         d="M4 19.5A2.5 2.5 0 016.5 17H20"
                     />
-
                     <path
                         d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"
                     />
                 </svg>
-
                 <span>
                     Penerbitan Buku Akademik dan Ilmiah
                 </span>
-
             </div>
-
-
             <h1 class="bd-hero-title">
-
                 <span class="bd-hero-line">
                     <span>
                         Wujudkan Karya Ilmiah
                     </span>
                 </span>
-
                 <span class="bd-hero-line">
                     <span>
                         <em>Berkualitas</em>
                         dan Berdampak
                     </span>
                 </span>
-
             </h1>
-
-
             <p class="bd-hero-desc">
                 Kami membantu penerbitan Buku Ajar, Buku Referensi,
                 Monograf, Book Chapter, Jurnal Ilmiah hingga Proceeding
                 dalam bentuk Buku Cetak maupun E-Book.
             </p>
-
-
             <a
                 href="https://wa.me/{{ config('bacadulu.call_center_wa') }}?text={{ rawurlencode('Halo BacaDulu, saya ingin menanyakan layanan.') }}"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="bd-wa-btn"
             >
-
                 <img
                     src="{{ asset('img/waa.jpg') }}"
                     alt="WhatsApp"
                 >
-
                 <span>
                     Hubungi via WhatsApp
                 </span>
-
                 <svg
                     class="bd-wa-arrow"
                     viewBox="0 0 24 24"
                 >
                     <path d="M9 5l7 7-7 7"/>
                 </svg>
-
             </a>
-
         </div>
-
-
         {{-- =====================================================
              RIGHT VISUAL
         ====================================================== --}}
         <div class="bd-hero-visual-column">
-
             {{-- Wrapper khusus entrance animation --}}
             <div class="bd-hero-visual-shell">
-
                 <div class="bd-hero-visual">
-
                     {{-- ORBIT --}}
                     <div class="bd-hero-orbit bd-orbit-one"></div>
-
                     <div class="bd-hero-orbit bd-orbit-two"></div>
-
-
                     {{-- =================================================
                          BUKU UTAMA
                     ================================================== --}}
                     <div class="bd-floating-book">
-
                         <div class="bd-book-spine"></div>
-
                         <div class="bd-book-pages"></div>
-
-
                         <div class="bd-book-cover">
-
                             <svg
                                 class="bd-book-icon"
                                 viewBox="0 0 24 24"
@@ -157,116 +114,76 @@
                                 <path
                                     d="M4 19.5A2.5 2.5 0 016.5 17H20"
                                 />
-
                                 <path
                                     d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"
                                 />
                             </svg>
-
-
                             <span>
                                 BACA DULU
                             </span>
-
-
                             <strong>
                                 ACADEMIC<br>
                                 PUBLISHING
                             </strong>
-
-
                             <small>
                                 ISBN • HAKI • DISTRIBUSI
                             </small>
-
                         </div>
-
                     </div>
-
-
                     {{-- =================================================
                          ISBN
                     ================================================== --}}
                     <div class="bd-floating-card bd-card-isbn">
-
                         <div class="bd-card-icon">
-
                             <svg viewBox="0 0 24 24">
-
                                 <circle
                                     cx="12"
                                     cy="12"
                                     r="9"
                                 />
-
                                 <path
                                     d="M8.5 12l2.2 2.2L15.8 9"
                                 />
-
                             </svg>
-
                         </div>
-
                         <div>
-
                             <strong>
                                 ISBN
                             </strong>
-
                             <small>
                                 Perpusnas RI
                             </small>
-
                         </div>
-
                     </div>
-
-
                     {{-- =================================================
                          HAKI
                     ================================================== --}}
                     <div class="bd-floating-card bd-card-haki">
-
                         <div class="bd-card-icon">
-
                             <svg viewBox="0 0 24 24">
-
                                 <path
                                     d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"
                                 />
-
                                 <path
                                     d="M9 12l2 2 4-4"
                                 />
-
                             </svg>
-
                         </div>
-
                         <div>
-
                             <strong>
                                 HAKI
                             </strong>
-
                             <small>
                                 Perlindungan Karya
                             </small>
-
                         </div>
-
                     </div>
-
-
                     {{-- =================================================
                          E-BOOK
                     ================================================== --}}
                     <div class="bd-floating-card bd-card-ebook">
-
                         <div class="bd-card-icon">
-
                             <svg viewBox="0 0 24 24">
-
                                 <rect
                                     x="5"
                                     y="3"
@@ -274,69 +191,48 @@
                                     height="18"
                                     rx="2"
                                 />
-
                                 <path
                                     d="M9 7h6M9 11h6"
                                 />
-
                             </svg>
-
                         </div>
-
                         <div>
-
                             <strong>
                                 E-Book
                             </strong>
-
                             <small>
                                 Distribusi Digital
                             </small>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
-
     {{-- =========================================================
          SLIDER DOT
     ========================================================== --}}
     <div class="bd-hero-dots">
-
         <button
             type="button"
             class="bd-hero-dot active"
             data-slide="0"
             aria-label="Slide 1"
         ></button>
-
         <button
             type="button"
             class="bd-hero-dot"
             data-slide="1"
             aria-label="Slide 2"
         ></button>
-
         <button
             type="button"
             class="bd-hero-dot"
             data-slide="2"
             aria-label="Slide 3"
         ></button>
-
     </div>
-
 </section>
-
-
 <style>
 /* ================================================================
    ROOT
@@ -345,7 +241,6 @@
     --navy:#241B52;
     --orange:#EF5843;
     --gold:#F7AA35;
-
     position:relative;
     width:100%;
     max-width:100%;
@@ -356,14 +251,11 @@
     background:#111122;
     perspective:1400px;
 }
-
 .bd-hero *,
 .bd-hero *::before,
 .bd-hero *::after{
     box-sizing:border-box;
 }
-
-
 /* ================================================================
    BACKGROUND
 ================================================================ */
@@ -375,7 +267,6 @@
     transform-origin:center top;
     will-change:transform;
 }
-
 .bd-hero-slide{
     position:absolute;
     inset:0;
@@ -397,7 +288,6 @@
     pointer-events:none;
     will-change:opacity,transform;
 }
-
 .bd-hero-slide.bd-hero-active{
     z-index:1;
     opacity:1;
@@ -407,8 +297,6 @@
         saturate(1.10)
         contrast(1.03);
 }
-
-
 /* ================================================================
    OVERLAY
 ================================================================ */
@@ -425,8 +313,6 @@
             rgba(4,4,10,.13) 100%
         );
 }
-
-
 /* ================================================================
    GRID
 ================================================================ */
@@ -449,8 +335,6 @@
     background-size:55px 55px;
     will-change:transform;
 }
-
-
 /* ================================================================
    GLOW
 ================================================================ */
@@ -474,8 +358,6 @@
     animation:bdGlowFloat 7s ease-in-out infinite;
     will-change:transform;
 }
-
-
 /* ================================================================
    CONTAINER
 ================================================================ */
@@ -492,8 +374,6 @@
     align-items:center;
     padding:60px 0 68px;
 }
-
-
 /* ================================================================
    COPY
 ================================================================ */
@@ -502,8 +382,6 @@
     color:#fff;
     will-change:transform,opacity;
 }
-
-
 /* ================================================================
    BADGE
 ================================================================ */
@@ -522,14 +400,12 @@
         inset 0 1px 0
         rgba(255,255,255,.08);
 }
-
 .bd-hero-badge svg{
     width:16px;
     height:16px;
     flex:0 0 auto;
     color:#FFC145;
 }
-
 .bd-hero-badge span{
     min-width:0;
     color:#fff;
@@ -538,8 +414,6 @@
     line-height:1.3;
     overflow-wrap:anywhere;
 }
-
-
 /* ================================================================
    TITLE
 ================================================================ */
@@ -555,18 +429,15 @@
         0 3px 18px
         rgba(0,0,0,.15);
 }
-
 .bd-hero-line{
     display:block;
     overflow:hidden;
     padding-bottom:4px;
 }
-
 .bd-hero-line > span{
     display:block;
     will-change:transform,opacity;
 }
-
 .bd-hero-line em{
     position:relative;
     color:#FFC145;
@@ -575,7 +446,6 @@
         0 5px 22px
         rgba(247,170,53,.13);
 }
-
 .bd-hero-line em::after{
     content:"";
     position:absolute;
@@ -594,8 +464,6 @@
     transform-origin:left;
     opacity:.95;
 }
-
-
 /* ================================================================
    DESCRIPTION
 ================================================================ */
@@ -610,8 +478,6 @@
         0 2px 10px
         rgba(0,0,0,.16);
 }
-
-
 /* ================================================================
    WHATSAPP
 ================================================================ */
@@ -636,7 +502,6 @@
         transform .25s ease,
         box-shadow .25s ease;
 }
-
 .bd-wa-btn img{
     width:26px;
     height:26px;
@@ -645,12 +510,10 @@
     border-radius:50%;
     object-fit:cover;
 }
-
 .bd-wa-btn span{
     min-width:0;
     white-space:normal;
 }
-
 .bd-wa-arrow{
     width:14px;
     height:14px;
@@ -660,8 +523,6 @@
     stroke-width:2;
     transition:transform .25s ease;
 }
-
-
 /* ================================================================
    DESKTOP HOVER
 ================================================================ */
@@ -673,14 +534,11 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
         0 17px 35px
         rgba(247,170,53,.26);
 }
-
 html[data-baca-device="desktop"][data-baca-input="fine"]
 .bd-wa-btn:hover
 .bd-wa-arrow{
     transform:translateX(3px);
 }
-
-
 /* ================================================================
    VISUAL COLUMN GUARD
 ================================================================ */
@@ -695,8 +553,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     visibility:visible!important;
     transform:none!important;
 }
-
-
 /* ================================================================
    VISUAL SHELL
    Entrance animation ditempatkan di wrapper ini.
@@ -715,8 +571,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
         .12s both;
     will-change:transform;
 }
-
-
 /* ================================================================
    VISUAL CORE
    Tidak boleh tersisa opacity 0 / visibility hidden.
@@ -733,8 +587,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     visibility:visible!important;
     transform:none!important;
 }
-
-
 /* ================================================================
    CHILD VISIBILITY GUARD
 ================================================================ */
@@ -744,8 +596,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     opacity:1!important;
     visibility:visible!important;
 }
-
-
 /* ================================================================
    ORBITS
 ================================================================ */
@@ -755,12 +605,10 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     border-radius:50%;
     pointer-events:none;
 }
-
 .bd-orbit-one{
     inset:25px 45px;
     animation:bdOrbit 14s linear infinite;
 }
-
 .bd-orbit-two{
     inset:65px 85px;
     border-style:dashed;
@@ -768,8 +616,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
         rgba(247,170,53,.22);
     animation:bdOrbitReverse 19s linear infinite;
 }
-
-
 /* ================================================================
    BOOK
 ================================================================ */
@@ -786,8 +632,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
         5.5s ease-in-out infinite;
     will-change:transform;
 }
-
-
 /* ================================================================
    BOOK FRONT
 ================================================================ */
@@ -818,7 +662,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
         22px 28px 55px
         rgba(0,0,0,.35);
 }
-
 .bd-book-cover::before{
     content:"";
     position:absolute;
@@ -834,7 +677,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
             rgba(0,0,0,.15)
         );
 }
-
 .bd-book-cover::after{
     content:"";
     position:absolute;
@@ -848,14 +690,12 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
         rgba(255,255,255,.08);
     border-radius:50%;
 }
-
 .bd-book-icon{
     position:relative;
     z-index:2;
     width:28px;
     height:28px;
 }
-
 .bd-book-cover > span{
     position:relative;
     z-index:2;
@@ -864,7 +704,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     font-weight:800;
     letter-spacing:2px;
 }
-
 .bd-book-cover strong{
     position:relative;
     z-index:2;
@@ -873,7 +712,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     line-height:1.2;
     font-weight:900;
 }
-
 .bd-book-cover small{
     position:relative;
     z-index:2;
@@ -881,8 +719,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     font-size:7px;
     letter-spacing:1px;
 }
-
-
 /* ================================================================
    BOOK SPINE
 ================================================================ */
@@ -902,8 +738,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     transform-origin:left;
     transform:rotateY(-90deg);
 }
-
-
 /* ================================================================
    BOOK PAGES
 ================================================================ */
@@ -922,8 +756,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     transform-origin:right;
     transform:rotateY(90deg);
 }
-
-
 /* ================================================================
    FLOATING CARDS
 ================================================================ */
@@ -952,7 +784,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
         4.5s ease-in-out infinite;
     will-change:transform;
 }
-
 .bd-card-icon{
     width:32px;
     height:32px;
@@ -964,7 +795,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     background:#FFF0EB;
     color:#EF5843;
 }
-
 .bd-card-icon svg{
     width:18px;
     height:18px;
@@ -974,12 +804,10 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     stroke-linecap:round;
     stroke-linejoin:round;
 }
-
 .bd-floating-card > div:last-child{
     min-width:0;
     flex:1;
 }
-
 .bd-floating-card strong{
     display:block;
     color:#241B52;
@@ -987,7 +815,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     font-weight:900;
     line-height:1.2;
 }
-
 .bd-floating-card small{
     display:block;
     margin-top:3px;
@@ -997,25 +824,20 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     line-height:1.25;
     white-space:nowrap;
 }
-
 .bd-card-isbn{
     left:0;
     top:38px;
 }
-
 .bd-card-haki{
     right:0;
     top:100px;
     animation-delay:-1.4s;
 }
-
 .bd-card-ebook{
     left:8px;
     bottom:24px;
     animation-delay:-2.6s;
 }
-
-
 /* ================================================================
    DOTS
 ================================================================ */
@@ -1030,7 +852,6 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
     transform:translateX(-50%);
     pointer-events:auto;
 }
-
 .bd-hero-dot{
     width:7px;
     height:7px;
@@ -1044,94 +865,74 @@ html[data-baca-device="desktop"][data-baca-input="fine"]
         width .3s ease,
         background .3s ease;
 }
-
 .bd-hero-dot.active{
     width:25px;
     background:#FFC145;
 }
-
-
 /* ================================================================
    LAPTOP KECIL
 ================================================================ */
 @media(min-width:1024px) and (max-width:1199px){
-
     .bd-hero-container{
         grid-template-columns:
             minmax(0,7fr)
             minmax(340px,5fr);
         gap:28px;
     }
-
     .bd-hero-title{
         font-size:44px;
     }
-
     .bd-hero-desc{
         font-size:14px;
     }
-
     #home .bd-hero-visual-shell{
         width:400px;
         height:370px;
     }
-
     .bd-floating-book{
         left:133px;
         top:83px;
         width:140px;
         height:195px;
     }
-
     .bd-book-spine,
     .bd-book-pages{
         height:187px;
     }
-
     .bd-floating-card{
         width:130px;
         min-height:60px;
         padding:9px 10px;
         gap:7px;
     }
-
     .bd-card-icon{
         width:27px;
         height:27px;
         flex-basis:27px;
     }
-
     .bd-card-icon svg{
         width:16px;
         height:16px;
     }
-
     .bd-floating-card strong{
         font-size:10px;
     }
-
     .bd-floating-card small{
         font-size:7px;
     }
-
     .bd-card-isbn{
         left:0;
         top:40px;
     }
-
     .bd-card-haki{
         right:0;
         top:105px;
     }
-
     .bd-card-ebook{
         left:4px;
         bottom:25px;
     }
-
 }
-
-
 /* ================================================================
    TABLET / IPAD
 ================================================================ */
@@ -1139,7 +940,6 @@ html[data-baca-device="tablet"]
 .bd-hero{
     min-height:auto;
 }
-
 html[data-baca-device="tablet"]
 .bd-hero-overlay{
     background:
@@ -1150,7 +950,6 @@ html[data-baca-device="tablet"]
             rgba(4,4,10,.35) 100%
         );
 }
-
 html[data-baca-device="tablet"]
 .bd-hero-container{
     width:100%;
@@ -1158,27 +957,22 @@ html[data-baca-device="tablet"]
     gap:18px;
     padding:50px 24px 62px;
 }
-
 html[data-baca-device="tablet"]
 .bd-hero-copy{
     max-width:760px;
 }
-
 html[data-baca-device="tablet"]
 .bd-hero-title{
     font-size:clamp(39px,5vw,49px);
 }
-
 html[data-baca-device="tablet"]
 .bd-hero-desc{
     font-size:14px;
 }
-
 html[data-baca-device="tablet"]
 .bd-hero-visual-column{
     margin-top:5px;
 }
-
 html[data-baca-device="tablet"]
 .bd-hero-visual-shell{
     width:390px;
@@ -1186,7 +980,6 @@ html[data-baca-device="tablet"]
     max-width:100%;
     margin:0 auto;
 }
-
 html[data-baca-device="tablet"]
 .bd-hero-visual{
     width:100%;
@@ -1195,17 +988,14 @@ html[data-baca-device="tablet"]
     opacity:1!important;
     visibility:visible!important;
 }
-
 html[data-baca-device="tablet"]
 .bd-orbit-one{
     inset:20px 37px;
 }
-
 html[data-baca-device="tablet"]
 .bd-orbit-two{
     inset:54px 72px;
 }
-
 html[data-baca-device="tablet"]
 .bd-floating-book{
     left:132px;
@@ -1217,18 +1007,15 @@ html[data-baca-device="tablet"]
         rotateX(2deg);
     animation:none!important;
 }
-
 html[data-baca-device="tablet"]
 .bd-book-cover{
     padding:16px 13px;
 }
-
 html[data-baca-device="tablet"]
 .bd-book-cover strong{
     margin-top:14px;
     font-size:15px;
 }
-
 html[data-baca-device="tablet"]
 .bd-book-spine,
 html[data-baca-device="tablet"]
@@ -1236,7 +1023,6 @@ html[data-baca-device="tablet"]
     width:18px;
     height:166px;
 }
-
 html[data-baca-device="tablet"]
 .bd-floating-card{
     width:125px;
@@ -1245,49 +1031,40 @@ html[data-baca-device="tablet"]
     gap:7px;
     animation:none!important;
 }
-
 html[data-baca-device="tablet"]
 .bd-card-icon{
     width:27px;
     height:27px;
     flex-basis:27px;
 }
-
 html[data-baca-device="tablet"]
 .bd-card-icon svg{
     width:15px;
     height:15px;
 }
-
 html[data-baca-device="tablet"]
 .bd-floating-card strong{
     font-size:9px;
 }
-
 html[data-baca-device="tablet"]
 .bd-floating-card small{
     font-size:6.5px;
 }
-
 html[data-baca-device="tablet"]
 .bd-card-isbn{
     left:0;
     top:30px;
 }
-
 html[data-baca-device="tablet"]
 .bd-card-haki{
     right:0;
     top:86px;
 }
-
 html[data-baca-device="tablet"]
 .bd-card-ebook{
     left:4px;
     bottom:17px;
 }
-
-
 /* ================================================================
    PHONE
 ================================================================ */
@@ -1296,7 +1073,6 @@ html[data-baca-device="phone"]
     min-height:auto;
     align-items:flex-start;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-overlay{
     background:
@@ -1307,7 +1083,6 @@ html[data-baca-device="phone"]
             rgba(4,4,10,.34) 100%
         );
 }
-
 html[data-baca-device="phone"]
 .bd-hero-slide.bd-hero-active{
     filter:
@@ -1315,7 +1090,6 @@ html[data-baca-device="phone"]
         saturate(1.12)
         contrast(1.03);
 }
-
 html[data-baca-device="phone"]
 .bd-hero-container{
     width:100%;
@@ -1323,25 +1097,21 @@ html[data-baca-device="phone"]
     gap:13px;
     padding:40px 16px 54px;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-copy{
     width:100%;
     max-width:100%;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-badge{
     max-width:100%;
     margin-bottom:15px;
     padding:7px 11px;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-badge span{
     font-size:9px;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-title{
     width:100%;
@@ -1350,12 +1120,10 @@ html[data-baca-device="phone"]
     line-height:1.08;
     letter-spacing:-1px;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-line{
     overflow:visible;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-desc{
     width:100%;
@@ -1364,7 +1132,6 @@ html[data-baca-device="phone"]
     font-size:13px;
     line-height:1.65;
 }
-
 html[data-baca-device="phone"]
 .bd-wa-btn{
     max-width:100%;
@@ -1372,14 +1139,11 @@ html[data-baca-device="phone"]
     padding:10px 14px 10px 10px;
     font-size:11px;
 }
-
 html[data-baca-device="phone"]
 .bd-wa-btn img{
     width:25px;
     height:25px;
 }
-
-
 /* ================================================================
    PHONE VISUAL
 ================================================================ */
@@ -1393,7 +1157,6 @@ html[data-baca-device="phone"]
     opacity:1!important;
     visibility:visible!important;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-visual-shell{
     width:300px;
@@ -1407,7 +1170,6 @@ html[data-baca-device="phone"]
         .7s cubic-bezier(.16,1,.3,1)
         .08s both;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-visual{
     width:100%;
@@ -1417,8 +1179,6 @@ html[data-baca-device="phone"]
     opacity:1!important;
     visibility:visible!important;
 }
-
-
 /* ================================================================
    PHONE ORBIT
 ================================================================ */
@@ -1427,14 +1187,11 @@ html[data-baca-device="phone"]
     inset:17px 31px;
     animation:none!important;
 }
-
 html[data-baca-device="phone"]
 .bd-orbit-two{
     inset:43px 57px;
     animation:none!important;
 }
-
-
 /* ================================================================
    PHONE BOOK
 ================================================================ */
@@ -1452,7 +1209,6 @@ html[data-baca-device="phone"]
     opacity:1!important;
     visibility:visible!important;
 }
-
 html[data-baca-device="phone"]
 .bd-book-cover{
     padding:12px 10px;
@@ -1462,32 +1218,27 @@ html[data-baca-device="phone"]
         13px 18px 30px
         rgba(0,0,0,.30);
 }
-
 html[data-baca-device="phone"]
 .bd-book-icon{
     width:20px;
     height:20px;
 }
-
 html[data-baca-device="phone"]
 .bd-book-cover > span{
     margin-top:5px;
     font-size:5.5px;
     letter-spacing:1.2px;
 }
-
 html[data-baca-device="phone"]
 .bd-book-cover strong{
     margin-top:9px;
     font-size:11px;
     line-height:1.2;
 }
-
 html[data-baca-device="phone"]
 .bd-book-cover small{
     font-size:4.5px;
 }
-
 html[data-baca-device="phone"]
 .bd-book-spine,
 html[data-baca-device="phone"]
@@ -1495,8 +1246,6 @@ html[data-baca-device="phone"]
     width:15px;
     height:134px;
 }
-
-
 /* ================================================================
    PHONE FLOATING CARDS
 ================================================================ */
@@ -1511,7 +1260,6 @@ html[data-baca-device="phone"]
     opacity:1!important;
     visibility:visible!important;
 }
-
 html[data-baca-device="phone"]
 .bd-card-icon{
     width:22px;
@@ -1519,18 +1267,15 @@ html[data-baca-device="phone"]
     flex-basis:22px;
     border-radius:7px;
 }
-
 html[data-baca-device="phone"]
 .bd-card-icon svg{
     width:12px;
     height:12px;
 }
-
 html[data-baca-device="phone"]
 .bd-floating-card strong{
     font-size:7.5px;
 }
-
 html[data-baca-device="phone"]
 .bd-floating-card small{
     margin-top:2px;
@@ -1538,79 +1283,63 @@ html[data-baca-device="phone"]
     line-height:1.2;
     white-space:normal;
 }
-
 html[data-baca-device="phone"]
 .bd-card-isbn{
     left:0;
     top:24px;
 }
-
 html[data-baca-device="phone"]
 .bd-card-haki{
     right:0;
     top:70px;
 }
-
 html[data-baca-device="phone"]
 .bd-card-ebook{
     left:6px;
     bottom:9px;
 }
-
 html[data-baca-device="phone"]
 .bd-hero-dots{
     bottom:13px;
 }
-
-
 /* ================================================================
    SMALL PHONE
 ================================================================ */
 @media(max-width:390px){
-
     html[data-baca-device="phone"]
     .bd-hero-container{
         padding-left:14px;
         padding-right:14px;
     }
-
     html[data-baca-device="phone"]
     .bd-hero-title{
         font-size:clamp(29px,9.3vw,36px);
     }
-
     html[data-baca-device="phone"]
     .bd-hero-desc{
         font-size:12px;
     }
-
     html[data-baca-device="phone"]
     .bd-hero-visual-shell{
         width:275px;
         height:215px;
     }
-
     html[data-baca-device="phone"]
     .bd-floating-book{
         width:92px;
         height:132px;
     }
-
     html[data-baca-device="phone"]
     .bd-book-spine,
     html[data-baca-device="phone"]
     .bd-book-pages{
         height:124px;
     }
-
     html[data-baca-device="phone"]
     .bd-floating-card{
         width:94px;
     }
-
 }
-
-
 /* ================================================================
    TOUCH DEVICE
 ================================================================ */
@@ -1624,13 +1353,10 @@ html[data-baca-input="touch"]
 .bd-hero-glow{
     animation:none!important;
 }
-
-
 /* ================================================================
    ANIMATIONS
 ================================================================ */
 @keyframes bdHeroVisualEnter{
-
     0%{
         opacity:1;
         transform:
@@ -1642,7 +1368,6 @@ html[data-baca-input="touch"]
             scale(.965);
         filter:blur(3px);
     }
-
     100%{
         opacity:1;
         transform:
@@ -1654,29 +1379,22 @@ html[data-baca-input="touch"]
             scale(1);
         filter:blur(0);
     }
-
 }
-
 @keyframes bdHeroVisualEnterMobile{
-
     0%{
         opacity:1;
         transform:
             translateY(16px)
             scale(.975);
     }
-
     100%{
         opacity:1;
         transform:
             translateY(0)
             scale(1);
     }
-
 }
-
 @keyframes bdHeroBook{
-
     0%,
     100%{
         transform:
@@ -1684,47 +1402,33 @@ html[data-baca-input="touch"]
             rotateX(3deg)
             translateY(0);
     }
-
     50%{
         transform:
             rotateY(3deg)
             rotateX(-2deg)
             translateY(-11px);
     }
-
 }
-
 @keyframes bdFloatingCard{
-
     0%,
     100%{
         transform:translateY(0);
     }
-
     50%{
         transform:translateY(-8px);
     }
-
 }
-
 @keyframes bdOrbit{
-
     to{
         transform:rotate(360deg);
     }
-
 }
-
 @keyframes bdOrbitReverse{
-
     to{
         transform:rotate(-360deg);
     }
-
 }
-
 @keyframes bdGlowFloat{
-
     0%,
     100%{
         transform:
@@ -1734,7 +1438,6 @@ html[data-baca-input="touch"]
                 0
             );
     }
-
     50%{
         transform:
             translate3d(
@@ -1743,19 +1446,14 @@ html[data-baca-input="touch"]
                 0
             );
     }
-
 }
-
-
 /* ================================================================
    REDUCED MOTION
 ================================================================ */
 @media(prefers-reduced-motion:reduce){
-
     .bd-hero-slide{
         transition:none!important;
     }
-
     .bd-hero-visual-shell,
     .bd-floating-book,
     .bd-floating-card,
@@ -1763,7 +1461,6 @@ html[data-baca-input="touch"]
     .bd-hero-glow{
         animation:none!important;
     }
-
     #home .bd-hero-visual-shell,
     #home .bd-hero-visual,
     #home .bd-floating-book,
@@ -1772,14 +1469,51 @@ html[data-baca-input="touch"]
         opacity:1!important;
         visibility:visible!important;
     }
-
+}
+/* ================================================================
+   MOBILE HERO BACKGROUND — FULL IMAGE / NO CROP
+   Seluruh foto selalu terlihat di layar kecil.
+================================================================ */
+@media (max-width:767px){
+    html[data-baca-device="phone"] .bd-hero{
+        background:#111122;
+    }
+    html[data-baca-device="phone"] .bd-hero-bg{
+        background:#111122;
+    }
+    html[data-baca-device="phone"] .bd-hero-slide,
+    html[data-baca-device="phone"] .bd-hero-slide.bd-hero-active{
+        width:100%!important;
+        height:100%!important;
+        object-fit:contain!important;
+        object-position:center center!important;
+        transform:none!important;
+    }
+    html[data-baca-device="phone"] .bd-hero-slide{
+        filter:
+            brightness(.82)
+            saturate(1.06)
+            contrast(1.02)!important;
+    }
+    html[data-baca-device="phone"] .bd-hero-slide.bd-hero-active{
+        filter:
+            brightness(.88)
+            saturate(1.06)
+            contrast(1.02)!important;
+    }
+    html[data-baca-device="phone"] .bd-hero-overlay{
+        background:
+            linear-gradient(
+                180deg,
+                rgba(4,4,10,.48) 0%,
+                rgba(4,4,10,.32) 45%,
+                rgba(4,4,10,.48) 100%
+            );
+    }
 }
 </style>
-
-
 <script>
 (function () {
-
     /*
     |--------------------------------------------------------------------------
     | HERO VISUAL GUARD
@@ -1789,127 +1523,102 @@ html[data-baca-input="touch"]
     | animation/GSAP/page transition yang selesai tidak sempurna.
     |
     */
-
     function stabilizeHeroVisual() {
-
         const hero =
             document.getElementById('home');
-
         if (!hero) {
             return;
         }
-
         const column =
             hero.querySelector(
                 '.bd-hero-visual-column'
             );
-
         const shell =
             hero.querySelector(
                 '.bd-hero-visual-shell'
             );
-
         const visual =
             hero.querySelector(
                 '.bd-hero-visual'
             );
-
         if (column) {
             column.style.setProperty(
                 'display',
                 'flex',
                 'important'
             );
-
             column.style.setProperty(
                 'opacity',
                 '1',
                 'important'
             );
-
             column.style.setProperty(
                 'visibility',
                 'visible',
                 'important'
             );
         }
-
         if (shell) {
             shell.style.setProperty(
                 'display',
                 'block',
                 'important'
             );
-
             shell.style.setProperty(
                 'opacity',
                 '1',
                 'important'
             );
-
             shell.style.setProperty(
                 'visibility',
                 'visible',
                 'important'
             );
         }
-
         if (visual) {
             visual.style.setProperty(
                 'display',
                 'block',
                 'important'
             );
-
             visual.style.setProperty(
                 'opacity',
                 '1',
                 'important'
             );
-
             visual.style.setProperty(
                 'visibility',
                 'visible',
                 'important'
             );
         }
-
         hero
             .querySelectorAll(
                 '.bd-floating-book, .bd-floating-card, .bd-hero-orbit'
             )
             .forEach(function (element) {
-
                 element.style.setProperty(
                     'opacity',
                     '1',
                     'important'
                 );
-
                 element.style.setProperty(
                     'visibility',
                     'visible',
                     'important'
                 );
-
             });
-
     }
-
-
     /*
     |--------------------------------------------------------------------------
     | HERO SLIDER
     |--------------------------------------------------------------------------
     */
-
     function initHeroSlider() {
-
         const hero =
             document.getElementById(
                 'home'
             );
-
         if (
             !hero
             ||
@@ -1918,12 +1627,9 @@ html[data-baca-input="touch"]
             stabilizeHeroVisual();
             return;
         }
-
         hero.dataset.sliderReady =
             '1';
-
         stabilizeHeroVisual();
-
         /*
         |--------------------------------------------------------------------------
         | Guard beberapa frame setelah render.
@@ -1933,70 +1639,53 @@ html[data-baca-input="touch"]
         | setelah DOMContentLoaded, visual akan dipastikan kembali visible.
         |
         */
-
         requestAnimationFrame(
             function () {
-
                 stabilizeHeroVisual();
-
                 requestAnimationFrame(
                     stabilizeHeroVisual
                 );
-
             }
         );
-
         setTimeout(
             stabilizeHeroVisual,
             120
         );
-
         setTimeout(
             stabilizeHeroVisual,
             500
         );
-
-
         const slides =
             Array.from(
                 hero.querySelectorAll(
                     '.bd-hero-slide'
                 )
             );
-
         const dots =
             Array.from(
                 hero.querySelectorAll(
                     '.bd-hero-dot'
                 )
             );
-
         if (
             slides.length === 0
         ) {
             return;
         }
-
         let index =
             0;
-
         let timer =
             null;
-
         const reduceMotion =
             window.matchMedia(
                 '(prefers-reduced-motion:reduce)'
             ).matches;
-
-
         /*
         |--------------------------------------------------------------------------
         | INTERVAL
         |--------------------------------------------------------------------------
         */
-
         function getInterval() {
-
             if (
                 window.BacaDevice
                 &&
@@ -2004,22 +1693,16 @@ html[data-baca-input="touch"]
             ) {
                 return 8000;
             }
-
             return 7000;
-
         }
-
-
         /*
         |--------------------------------------------------------------------------
         | SHOW SLIDE
         |--------------------------------------------------------------------------
         */
-
         function showSlide(
             next
         ) {
-
             index =
                 (
                     next
@@ -2028,215 +1711,153 @@ html[data-baca-input="touch"]
                 )
                 %
                 slides.length;
-
             slides.forEach(
                 function (
                     slide,
                     slideIndex
                 ) {
-
                     slide.classList.toggle(
                         'bd-hero-active',
                         slideIndex === index
                     );
-
                 }
             );
-
             dots.forEach(
                 function (
                     dot,
                     dotIndex
                 ) {
-
                     dot.classList.toggle(
                         'active',
                         dotIndex === index
                     );
-
                 }
             );
-
         }
-
-
         /*
         |--------------------------------------------------------------------------
         | STOP
         |--------------------------------------------------------------------------
         */
-
         function stop() {
-
             if (
                 !timer
             ) {
                 return;
             }
-
             clearInterval(
                 timer
             );
-
             timer =
                 null;
-
         }
-
-
         /*
         |--------------------------------------------------------------------------
         | START
         |--------------------------------------------------------------------------
         */
-
         function start() {
-
             stop();
-
             if (
                 slides.length <= 1
             ) {
                 return;
             }
-
             timer =
                 setInterval(
                     function () {
-
                         showSlide(
                             index + 1
                         );
-
                     },
                     reduceMotion
                         ? 10000
                         : getInterval()
                 );
-
         }
-
-
         /*
         |--------------------------------------------------------------------------
         | DOT CLICK
         |--------------------------------------------------------------------------
         */
-
         dots.forEach(
             function (
                 dot,
                 dotIndex
             ) {
-
                 dot.addEventListener(
                     'click',
                     function () {
-
                         showSlide(
                             dotIndex
                         );
-
                         start();
-
                     }
                 );
-
             }
         );
-
-
         /*
         |--------------------------------------------------------------------------
         | TAB VISIBILITY
         |--------------------------------------------------------------------------
         */
-
         document.addEventListener(
             'visibilitychange',
             function () {
-
                 if (
                     document.hidden
                 ) {
-
                     stop();
-
                 }
                 else {
-
                     stabilizeHeroVisual();
-
                     start();
-
                 }
-
             }
         );
-
-
         /*
         |--------------------------------------------------------------------------
         | PAGE CACHE / BACK FORWARD
         |--------------------------------------------------------------------------
         */
-
         window.addEventListener(
             'pageshow',
             function () {
-
                 stabilizeHeroVisual();
-
                 start();
-
             }
         );
-
-
         /*
         |--------------------------------------------------------------------------
         | DEVICE CHANGE
         |--------------------------------------------------------------------------
         */
-
         window.addEventListener(
             'baca:devicechange',
             function () {
-
                 stabilizeHeroVisual();
-
                 start();
-
             }
         );
-
-
         /*
         |--------------------------------------------------------------------------
         | INITIAL
         |--------------------------------------------------------------------------
         */
-
         showSlide(
             0
         );
-
         start();
-
     }
-
-
     /*
     |--------------------------------------------------------------------------
     | INIT
     |--------------------------------------------------------------------------
     */
-
     if (
         document.readyState ===
         'loading'
     ) {
-
         document.addEventListener(
             'DOMContentLoaded',
             initHeroSlider,
@@ -2244,13 +1865,9 @@ html[data-baca-input="touch"]
                 once:true
             }
         );
-
     }
     else {
-
         initHeroSlider();
-
     }
-
 })();
 </script>
