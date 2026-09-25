@@ -97,7 +97,7 @@ class CommentController extends Controller
             'content' => $content,
         ]);
 
-        $comment->load('user');
+        $comment->load('user.authorVerification');
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -109,6 +109,9 @@ class CommentController extends Controller
                     'user_id' => $comment->user_id,
                     'parent_id' => $comment->parent_id,
                     'user_name' => $comment->user->name ?? 'User',
+                    'profile_url' => $comment->user
+                        ? route('profile.public', $comment->user)
+                        : null,
                     'initial' => strtoupper(
                         mb_substr(
                             $comment->user->name ?? 'U',
@@ -117,7 +120,8 @@ class CommentController extends Controller
                         )
                     ),
                     'time' => 'baru saja',
-                    'is_post_author' => $comment->user_id === $post->user_id,
+                    'is_post_author' => (int) $comment->user_id === (int) $post->user_id,
+                    'is_verified_author' => (bool) $comment->user?->isVerifiedAuthor(),
                 ],
                 'comments_count' => $post->comments()->count(),
             ]);

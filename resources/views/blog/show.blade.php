@@ -56,6 +56,8 @@
     border-radius:50%;background:var(--orange);color:#fff;font-size:13px;font-weight:800
 }
 .bd-author-name{color:#273247;font-size:13px;font-weight:800}
+.bd-author-name-link{color:inherit;text-decoration:none;transition:.2s}
+.bd-author-name-link:hover{color:var(--orange)}
 .bd-author-date{margin-top:2px;color:#94a3b8;font-size:11px}
 
 /* IMAGE */
@@ -141,46 +143,80 @@
     border-radius:16px;background:#fff
 }
 .bd-comment{display:flex;align-items:flex-start;gap:13px;padding:19px 20px;transition:.25s}
-.bd-comment+.bd-comment{border-top:1px solid #eef0f3}
+.bd-comment+.bd-comment{border-top:1px solid #f0f2f5}
 .bd-comment-avatar{
     width:38px;height:38px;display:grid;place-items:center;flex:0 0 38px;
     border-radius:50%;background:#fff1ec;color:#e44c37;font-size:11px;font-weight:800
 }
 .bd-comment-body{min-width:0;flex:1}
 .bd-comment-top{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}
-.bd-comment-meta{min-width:0}
+.bd-comment-meta{min-width:0;padding-top:1px}
 .bd-comment-author{
     display:flex;align-items:center;gap:7px;color:#273247;font-size:11px;font-weight:800
+}
+.bd-comment-author-link{color:inherit;text-decoration:none;transition:.2s}
+.bd-comment-author-link:hover{color:var(--orange)}
+.bd-author-name-row{
+    display:flex;align-items:center;flex-wrap:wrap;gap:6px
 }
 .bd-author-badge{
     padding:3px 6px;border-radius:999px;background:#fff2ed;
     color:#e34e38;font-size:7px;font-weight:800;text-transform:uppercase
 }
-.bd-comment-time{display:block;margin-top:3px;color:#a0a8b4;font-size:8px}
+.bd-verified-badge{
+    display:inline-flex;align-items:center;gap:3px;padding:3px 7px;
+    border:1px solid #bfe8d2;border-radius:999px;background:#ecfdf3;
+    color:#087443;font-size:7px;font-weight:800;text-transform:uppercase;
+    white-space:nowrap
+}
 .bd-comment-text{
-    margin:8px 0 0;color:#4b5565;font-size:12px;
+    margin:7px 0 0;color:#4b5565;font-size:12px;
     line-height:1.65;white-space:pre-line;overflow-wrap:anywhere
 }
-
+.bd-comment-mention{
+    display:inline;color:var(--orange);font-weight:800;margin-right:5px;
+    white-space:normal;text-decoration:none
+}
+.bd-comment-mention:hover{text-decoration:underline}
+.bd-comment-text-content{white-space:pre-line}
+.bd-comment-footer{
+    display:flex;align-items:center;gap:12px;margin-top:7px;min-height:24px
+}
+.bd-comment-time{color:#a0a8b4;font-size:8px;white-space:nowrap}
 
 /* COMMENT REPLY / THREAD */
 .bd-comment-reply{
-    min-height:30px;display:inline-flex;align-items:center;gap:5px;padding:0 8px;
-    border:0;border-radius:8px;background:transparent;color:#7b8799;
+    min-height:24px;display:inline-flex;align-items:center;padding:0;
+    border:0;background:transparent;color:#7b8799;
     font-family:inherit;font-size:9px;font-weight:800;cursor:pointer;transition:.2s
 }
-.bd-comment-reply:hover{background:#fff3ef;color:var(--orange)}
+.bd-comment-reply:hover{color:var(--orange)}
+.bd-replies-toggle{
+    display:inline-flex;align-items:center;gap:9px;margin-top:10px;padding:4px 0;
+    border:0;background:transparent;color:#7d8795;font-family:inherit;
+    font-size:9px;font-weight:700;cursor:pointer;transition:.2s
+}
+.bd-replies-toggle:hover{color:var(--orange)}
+.bd-replies-toggle-line{width:34px;height:1px;background:#cfd5dd;transition:.2s}
+.bd-replies-toggle:hover .bd-replies-toggle-line{background:#f0a294}
+.bd-replies-toggle-icon{transition:transform .2s ease}
+.bd-replies-toggle[aria-expanded="true"] .bd-replies-toggle-icon{transform:rotate(180deg)}
 .bd-comment-replies{
-    margin-top:14px;margin-left:10px;padding-left:17px;
-    border-left:2px solid #f0f2f5
+    margin-top:7px;margin-left:50px;padding-left:0;border-left:0
 }
+.bd-comment-replies[hidden]{display:none!important}
 .bd-comment-replies>.bd-comment{
-    padding:14px 0 14px 2px;border-top:1px solid #f0f2f5
+    padding:10px 0;border-top:0
 }
-.bd-comment-replies>.bd-comment:first-child{border-top:0;padding-top:2px}
+.bd-comment-replies>.bd-comment+.bd-comment{
+    border-top:0
+}
+.bd-comment-replies>.bd-comment:first-child{padding-top:5px}
 .bd-comment.is-reply .bd-comment-avatar{
-    width:32px;height:32px;flex-basis:32px;font-size:9px
+    width:30px;height:30px;flex-basis:30px;font-size:9px
 }
+.bd-comment.is-reply .bd-comment-text{margin-top:5px}
+.bd-comment.is-reply .bd-comment-footer{margin-top:4px}
 .bd-reply-form{
     display:none;margin-top:12px;padding:12px;border:1px solid #e7e9ee;
     border-radius:12px;background:#fafbfc
@@ -196,14 +232,23 @@
     color:#98a2b3;font-size:18px;line-height:1;cursor:pointer
 }
 .bd-reply-close:hover{background:#eef0f3;color:#596579}
-.bd-reply-textarea{
-    width:100%;min-height:76px;resize:vertical;padding:11px 12px;
-    border:1px solid #e6e9ee;border-radius:10px;outline:none;background:#fff;
-    color:#344054;font-family:inherit;font-size:11px;line-height:1.6;transition:.2s
+.bd-reply-composer{
+    display:flex;align-items:flex-start;gap:5px;padding:10px 11px;
+    border:1px solid #e6e9ee;border-radius:10px;background:#fff;transition:.2s
 }
-.bd-reply-textarea:focus{
+.bd-reply-composer:focus-within{
     border-color:rgba(239,88,67,.3);box-shadow:0 0 0 3px rgba(239,88,67,.08)
 }
+.bd-reply-mention{
+    flex:0 0 auto;padding-top:1px;color:var(--orange);font-size:11px;
+    font-weight:800;line-height:1.6;white-space:nowrap
+}
+.bd-reply-textarea{
+    width:100%;min-height:58px;resize:vertical;padding:0;border:0;outline:none;
+    background:transparent;color:#344054;font-family:inherit;font-size:11px;
+    line-height:1.6;transition:.2s
+}
+.bd-reply-textarea:focus{box-shadow:none}
 .bd-reply-form-footer{
     display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;
     color:#a0a8b4;font-size:8px
@@ -338,8 +383,14 @@
     .bd-compose-row>.bd-avatar{display:none}
     .bd-login-comment{align-items:flex-start;flex-direction:column}
     .bd-comment{position:relative;padding:17px 15px;touch-action:pan-y}
-    .bd-comment-replies{margin-left:2px;padding-left:11px}
-    .bd-comment-reply{min-width:58px;justify-content:center;padding-inline:7px}
+    .bd-comment-avatar{width:36px;height:36px;flex-basis:36px}
+    .bd-comment.is-reply .bd-comment-avatar{width:30px;height:30px;flex-basis:30px}
+    .bd-comment-replies{margin-left:42px;padding-left:0;border-left:0}
+    .bd-comment-reply{min-width:auto;justify-content:flex-start;padding:0}
+    .bd-replies-toggle{margin-top:8px;font-size:9px}
+    .bd-replies-toggle-line{width:30px}
+    .bd-comment-actions{gap:0}
+    .bd-comment-action{width:28px;height:28px}
 
     /* Mobile shortcut: swipe comment to the right to reply. */
     .bd-comment::before{
@@ -423,9 +474,44 @@
 </div>
 
 <div class="bd-author">
-    <div class="bd-avatar">{{ strtoupper(mb_substr($authorName,0,1)) }}</div>
+    @if($post->user)
+        <a
+            href="{{ route('profile.public', $post->user) }}"
+            class="bd-avatar"
+            title="Lihat profil {{ $authorName }}"
+            aria-label="Lihat profil {{ $authorName }}"
+            style="text-decoration:none"
+        >
+            {{ strtoupper(mb_substr($authorName,0,1)) }}
+        </a>
+    @else
+        <div class="bd-avatar">{{ strtoupper(mb_substr($authorName,0,1)) }}</div>
+    @endif
     <div>
-        <div class="bd-author-name">{{ $authorName }}</div>
+        <div class="bd-author-name-row">
+            @if($post->user)
+                <a
+                    href="{{ route('profile.public', $post->user) }}"
+                    class="bd-author-name bd-author-name-link"
+                    title="Lihat profil {{ $authorName }}"
+                >
+                    {{ $authorName }}
+                </a>
+            @else
+                <div class="bd-author-name">{{ $authorName }}</div>
+            @endif
+
+            <span class="bd-author-badge">Penulis Artikel</span>
+
+            @if($post->user?->isVerifiedAuthor())
+                <span
+                    class="bd-verified-badge"
+                    title="Identitas kepenulisan telah diverifikasi admin BacaDulu"
+                >
+                    ✓ Penulis Terverifikasi
+                </span>
+            @endif
+        </div>
         <div class="bd-author-date">{{ $post->created_at->translatedFormat('d F Y') }}</div>
     </div>
 </div>
@@ -739,34 +825,30 @@
 
     function newCommentMarkup(comment){
         return `
-        <article class="bd-comment" id="comment-${comment.id}" data-comment-id="${comment.id}">
+        <article class="bd-comment" id="comment-${comment.id}" data-comment-id="${comment.id}" data-parent-id="">
             <div class="bd-comment-avatar">${escapeHtml(comment.initial)}</div>
 
             <div class="bd-comment-body">
                 <div class="bd-comment-top">
                     <div class="bd-comment-meta">
                         <div class="bd-comment-author">
-                            <span>${escapeHtml(comment.user_name)}</span>
-                            ${comment.is_post_author?'<span class="bd-author-badge">Penulis</span>':''}
+                            ${comment.profile_url
+                                ? `<a href="${escapeHtml(comment.profile_url)}" class="bd-comment-author-link">${escapeHtml(comment.user_name)}</a>`
+                                : `<span>${escapeHtml(comment.user_name)}</span>`
+                            }
+                            ${comment.is_post_author?'<span class="bd-author-badge">Penulis Artikel</span>':''}
+                            ${comment.is_verified_author?'<span class="bd-verified-badge" title="Identitas kepenulisan telah diverifikasi admin BacaDulu">✓ Penulis Terverifikasi</span>':''}
                         </div>
-                        <time class="bd-comment-time">baru saja</time>
                     </div>
 
                     <div class="bd-comment-actions">
-                        <button type="button" class="bd-comment-reply js-comment-reply" title="Balas komentar" aria-expanded="false">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17l-5-5 5-5m-5 5h10a6 6 0 016 6v1"/>
-                            </svg>
-                            Balas
-                        </button>
-
-                        <button type="button" class="bd-comment-action js-comment-edit" title="Edit komentar">
+                        <button type="button" class="bd-comment-action js-comment-edit" title="Edit komentar" aria-label="Edit komentar">
                             <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L8 18l-4 1 1-4L16.5 3.5z"/>
                             </svg>
                         </button>
 
-                        <button type="button" class="bd-comment-action delete js-comment-delete" title="Hapus komentar">
+                        <button type="button" class="bd-comment-action delete js-comment-delete" title="Hapus komentar" aria-label="Hapus komentar">
                             <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12m-10 0l1 13h6l1-13m-6-3h4l1 3H9l1-3z"/>
                             </svg>
@@ -774,7 +856,12 @@
                     </div>
                 </div>
 
-                <p class="bd-comment-text">${escapeHtml(comment.content)}</p>
+                <p class="bd-comment-text"><span class="bd-comment-text-content">${escapeHtml(comment.content)}</span></p>
+
+                <div class="bd-comment-footer">
+                    <time class="bd-comment-time">baru saja</time>
+                    <button type="button" class="bd-comment-reply js-comment-reply" title="Balas komentar" aria-expanded="false">Balas</button>
+                </div>
 
                 <div class="bd-comment-edit">
                     <textarea class="bd-edit-textarea" maxlength="2000">${escapeHtml(comment.content)}</textarea>
@@ -788,17 +875,18 @@
                     <input type="hidden" name="_token" value="${escapeHtml(csrf)}">
                     <input type="hidden" name="parent_id" value="${comment.id}">
                     <div class="bd-reply-form-head">
-                        <span>Membalas <strong>${escapeHtml(comment.user_name)}</strong></span>
+                        <span>Membalas <strong>@${escapeHtml(comment.user_name)}</strong></span>
                         <button type="button" class="bd-reply-close js-comment-reply-cancel" aria-label="Batal membalas">×</button>
                     </div>
-                    <textarea name="content" class="bd-reply-textarea" maxlength="2000" placeholder="Tulis balasan..." required></textarea>
+                    <div class="bd-reply-composer">
+                        <span class="bd-reply-mention">@${escapeHtml(comment.user_name)}</span>
+                        <textarea name="content" class="bd-reply-textarea" maxlength="2000" placeholder="Tulis balasan..." required></textarea>
+                    </div>
                     <div class="bd-reply-form-footer">
                         <span>Maksimal 2000 karakter.</span>
                         <button type="submit" class="bd-reply-submit">Kirim Balasan</button>
                     </div>
                 </form>
-
-                <div class="bd-comment-replies"></div>
             </div>
         </article>`;
     }
@@ -892,7 +980,7 @@
         if(target.closest('button,a,input,textarea,select,form'))return;
 
         const comment=target.closest('.bd-comment');
-        const replyButton=comment?.querySelector(':scope > .bd-comment-body > .bd-comment-top .js-comment-reply');
+        const replyButton=comment?.querySelector(':scope > .bd-comment-body > .bd-comment-footer .js-comment-reply');
         if(!comment || !replyButton)return;
 
         const touch=e.touches[0];
@@ -951,13 +1039,60 @@
     document.addEventListener('touchend',finishReplySwipe,{passive:true});
     document.addEventListener('touchcancel',finishReplySwipe,{passive:true});
 
+    function setRepliesExpanded(toggle,expanded){
+        if(!toggle)return;
+        const repliesId=toggle.getAttribute('aria-controls');
+        const replies=repliesId?document.getElementById(repliesId):toggle.nextElementSibling;
+        if(!replies)return;
+
+        const count=Number(toggle.dataset.count||0);
+        const label=toggle.querySelector('.bd-replies-toggle-label');
+
+        toggle.setAttribute('aria-expanded',expanded?'true':'false');
+        replies.hidden=!expanded;
+
+        if(label){
+            label.textContent=expanded
+                ? 'Sembunyikan balasan'
+                : `Lihat ${count} balasan`;
+        }
+    }
+
+    function revealCommentFromHash(){
+        if(!location.hash || !location.hash.startsWith('#comment-'))return;
+        const target=document.querySelector(location.hash);
+        if(!target)return;
+
+        let parent=target.parentElement;
+        while(parent){
+            if(parent.classList?.contains('bd-comment-replies')){
+                const toggle=parent.previousElementSibling?.matches('.js-replies-toggle')
+                    ? parent.previousElementSibling
+                    : null;
+                if(toggle)setRepliesExpanded(toggle,true);
+            }
+            parent=parent.parentElement;
+        }
+
+        requestAnimationFrame(()=>{
+            target.scrollIntoView({behavior:'smooth',block:'center'});
+        });
+    }
+
     document.addEventListener('click',async e=>{
+        const repliesToggle=e.target.closest('.js-replies-toggle');
         const reply=e.target.closest('.js-comment-reply');
         const replyCancel=e.target.closest('.js-comment-reply-cancel');
         const edit=e.target.closest('.js-comment-edit');
         const cancel=e.target.closest('.js-comment-cancel');
         const save=e.target.closest('.js-comment-save');
         const remove=e.target.closest('.js-comment-delete');
+
+        if(repliesToggle){
+            const expanded=repliesToggle.getAttribute('aria-expanded')==='true';
+            setRepliesExpanded(repliesToggle,!expanded);
+            return;
+        }
 
         if(reply){
             const comment=reply.closest('.bd-comment');
@@ -992,7 +1127,7 @@
 
         if(cancel){
             const comment=cancel.closest('.bd-comment');
-            const text=comment.querySelector('.bd-comment-text')?.textContent.trim()??'';
+            const text=comment.querySelector('.bd-comment-text-content')?.textContent.trim()??'';
             comment.querySelector('.bd-edit-textarea').value=text;
             comment.classList.remove('editing');
             return;
@@ -1037,7 +1172,7 @@
                     throw new Error(validationMessage);
                 }
 
-                comment.querySelector('.bd-comment-text').textContent=data.comment.content;
+                comment.querySelector('.bd-comment-text-content').textContent=data.comment.content;
                 textarea.value=data.comment.content;
                 comment.classList.remove('editing');
 
@@ -1182,6 +1317,9 @@
             button.textContent='Hapus';
         }
     });
+
+    revealCommentFromHash();
+    window.addEventListener('hashchange',revealCommentFromHash);
 })();
 </script>
 @endpush

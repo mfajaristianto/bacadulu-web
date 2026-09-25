@@ -159,6 +159,45 @@
     color:#929baa;
     font-size:10px;
 }
+.bd-my-rejection{
+    margin-top:12px;
+    padding:12px 14px;
+    border:1px solid #ffd5d8;
+    border-radius:10px;
+    background:#fff6f7;
+    color:#9f3039;
+}
+.bd-my-rejection-title{
+    margin:0 0 5px;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.02em;
+}
+.bd-my-rejection-text{
+    margin:0;
+    font-size:10px;
+    line-height:1.6;
+}
+.bd-my-rejection-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 10px;
+    margin-top:8px;
+    color:#b34a53;
+    font-size:9px;
+    font-weight:700;
+}
+.bd-my-rejection-source{
+    display:inline-flex;
+    align-items:center;
+    margin-top:8px;
+    color:#a72f38;
+    font-size:9px;
+    font-weight:800;
+    text-decoration:underline;
+    text-underline-offset:2px;
+}
+
 .bd-my-actions{
     display:flex;
     align-items:center;
@@ -311,6 +350,56 @@
                         <p class="bd-my-description">
                             {{ $statusDescription }}
                         </p>
+
+                        @if(
+                            $post->status === 'rejected'
+                            && $post->rejection_reason
+                        )
+                            <div class="bd-my-rejection">
+
+                                <p class="bd-my-rejection-title">
+                                    Alasan Penolakan
+                                </p>
+
+                                <p class="bd-my-rejection-text">
+                                    {{ $post->rejection_reason }}
+                                </p>
+
+                                @if(!is_null($post->similarity_score))
+                                    <div class="bd-my-rejection-meta">
+                                        <span>
+                                            Similarity internal:
+                                            {{ number_format((float) $post->similarity_score, 1, ',', '.') }}%
+                                        </span>
+
+                                        <span>
+                                            Batas:
+                                            {{ number_format((float) config('bacadulu.originality.max_similarity', 20), 1, ',', '.') }}%
+                                        </span>
+                                    </div>
+                                @endif
+
+                                @php
+                                    $sourcePost = $post->similaritySourcePost;
+                                @endphp
+
+                                @if(
+                                    $sourcePost
+                                    && $sourcePost->status === 'approved'
+                                )
+                                    <a
+                                        href="{{ route('blog.show', $sourcePost->slug) }}"
+                                        class="bd-my-rejection-source"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        Lihat artikel sumber:
+                                        {{ \Illuminate\Support\Str::limit($sourcePost->title, 65) }}
+                                    </a>
+                                @endif
+
+                            </div>
+                        @endif
                     </div>
 
                     <div class="bd-my-actions">

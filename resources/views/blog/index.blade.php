@@ -125,12 +125,18 @@
 
     <div class="min-w-0">
 
-        <p class="text-sm font-bold text-slate-800 truncate">
-            {{ $post->user->name
-                ?? $post->author
-                ?? 'Penulis'
-            }}
-        </p>
+        @if($post->user)
+            <a
+                href="{{ route('profile.public', $post->user) }}"
+                class="block truncate text-sm font-bold text-slate-800 transition hover:text-orange-600"
+            >
+                {{ $post->user->name }}
+            </a>
+        @else
+            <p class="text-sm font-bold text-slate-800 truncate">
+                {{ $post->author ?? 'Penulis' }}
+            </p>
+        @endif
 
         <p class="text-xs text-slate-400 mt-0.5">
             {{ $post

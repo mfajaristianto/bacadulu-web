@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\PostAuditEvent;
+use App\Services\PostOriginalityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -179,6 +181,21 @@ class BlogController extends Controller
             ],
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Pemeriksaan similarity internal
+        |--------------------------------------------------------------------------
+        |
+        | Artikel tetap boleh masuk sebagai PENDING agar admin dapat melihat
+        | hasil pemeriksaannya. Namun artikel yang melebihi batas tidak dapat
+        | disetujui sebelum diperbaiki.
+        */
+        $originality = app(
+            PostOriginalityService::class
+        )->inspect(
+            $validated['content']
+        );
+
         $imagePath = null;
 
         try {
@@ -192,7 +209,7 @@ class BlogController extends Controller
                 $validated['title']
             );
 
-            Post::create([
+            $post = Post::create([
                 'user_id' => auth()->id(),
                 'author' => auth()->user()->name,
                 'title' => trim($validated['title']),
@@ -203,6 +220,18 @@ class BlogController extends Controller
                 'status' => 'pending',
                 'views' => 0,
             ]);
+
+            PostAuditEvent::create([
+                'post_id' => $post->id,
+                'actor_user_id' => auth()->id(),
+                'event' => 'submitted',
+                'manuscript_hash' => $originality['manuscript_hash'],
+                'metadata' => [
+                    'coverage' => $originality['coverage'],
+                    'source_count' => $originality['source_count'],
+                ],
+                'created_at' => now(),
+            ]);
         } catch (Throwable $e) {
             if ($imagePath) {
                 Storage::disk('public')->delete($imagePath);
@@ -211,11 +240,29 @@ class BlogController extends Controller
             throw $e;
         }
 
+        $score = number_format(
+            (float) $originality['score'],
+            1,
+            ',',
+            '.'
+        );
+
+        $limit = number_format(
+            (float) $originality['limit'],
+            1,
+            ',',
+            '.'
+        );
+
+        $message = $originality['blocked']
+            ? "Artikel berhasil dikirim sebagai PENDING. Similarity internal terdeteksi {$score}% dan melebihi batas maksimal {$limit}%. Artikel perlu diperbaiki sebelum dapat disetujui admin."
+            : "Artikel berhasil dikirim dan sedang menunggu persetujuan admin. Similarity internal terdeteksi {$score}% dari batas maksimal {$limit}%.";
+
         return redirect()
             ->route('blog.myPosts')
             ->with(
                 'success',
-                'Artikel berhasil dikirim dan sedang menunggu persetujuan admin.'
+                $message
             );
     }
 
@@ -250,11 +297,14 @@ class BlogController extends Controller
         */
 
         $post->load([
-            'user',
+            'user.authorVerification',
             'comments' => function ($query) {
                 $query
                     ->whereNull('parent_id')
-                    ->with(['user', 'replies'])
+                    ->with([
+                        'user.authorVerification',
+                        'replies',
+                    ])
                     ->latest();
             },
         ]);
@@ -372,6 +422,22 @@ class BlogController extends Controller
             ],
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Pemeriksaan similarity internal saat user mengedit
+        |--------------------------------------------------------------------------
+        |
+        | Sama seperti submit baru: artikel tetap disimpan sebagai PENDING agar
+        | dapat direview admin. Status APPROVED tidak diberikan jika masih
+        | melebihi batas.
+        */
+        $originality = app(
+            PostOriginalityService::class
+        )->inspect(
+            $validated['content'],
+            $post->id
+        );
+
         $data = [
             'title' => trim($validated['title']),
             'author' => auth()->user()->name,
@@ -381,6 +447,15 @@ class BlogController extends Controller
             // Artikel yang diedit user harus dimoderasi ulang.
             // Tanpa ini artikel approved dapat diubah setelah lolos review.
             'status' => 'pending',
+
+            // Setelah user memperbaiki artikel, keputusan penolakan lama
+            // dibersihkan dan artikel masuk review ulang.
+            'rejection_reason' => null,
+            'similarity_score' => null,
+            'similarity_source_post_id' => null,
+            'similarity_source_title' => null,
+            'similarity_source_author' => null,
+            'rejected_at' => null,
         ];
 
         if ($post->title !== $validated['title']) {
@@ -411,6 +486,19 @@ class BlogController extends Controller
             throw $e;
         }
 
+        PostAuditEvent::create([
+            'post_id' => $post->id,
+            'actor_user_id' => auth()->id(),
+            'event' => 'content_revised_by_author',
+            'manuscript_hash' => $originality['manuscript_hash'],
+            'metadata' => [
+                'coverage' => $originality['coverage'],
+                'source_count' => $originality['source_count'],
+                'status_after_edit' => 'pending',
+            ],
+            'created_at' => now(),
+        ]);
+
         if (
             $newImagePath &&
             $oldImage &&
@@ -421,11 +509,29 @@ class BlogController extends Controller
 
         $post->refresh();
 
+        $score = number_format(
+            (float) $originality['score'],
+            1,
+            ',',
+            '.'
+        );
+
+        $limit = number_format(
+            (float) $originality['limit'],
+            1,
+            ',',
+            '.'
+        );
+
+        $message = $originality['blocked']
+            ? "Artikel berhasil diperbarui sebagai PENDING. Similarity internal terdeteksi {$score}% dan melebihi batas maksimal {$limit}%. Perbaiki naskah sebelum admin dapat menyetujuinya."
+            : "Artikel berhasil diperbarui dan menunggu persetujuan admin kembali. Similarity internal {$score}% dari batas maksimal {$limit}%.";
+
         return redirect()
             ->route('blog.show', $post->slug)
             ->with(
                 'success',
-                'Artikel berhasil diperbarui dan sedang menunggu persetujuan admin kembali.'
+                $message
             );
     }
 

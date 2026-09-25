@@ -640,6 +640,19 @@
                 \App\Models\Book::STATUS_PENDING
             )->count();
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | VERIFIKASI PENULIS PENDING
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingAuthorVerifications =
+            \App\Models\AuthorVerification::where(
+                'status',
+                'pending'
+            )->count();
+
     @endphp
 
 
@@ -932,6 +945,55 @@
 
                 </a>
 
+
+
+                {{-- =================================================
+                     VERIFIKASI PENULIS
+                ================================================== --}}
+
+                <a
+                    href="{{ route('admin.author-verifications.index') }}"
+                    class="cms-nav-link {{ request()->routeIs('admin.author-verifications.*') ? 'active' : '' }}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 3l7 3v5c0 4.5-2.9 8.1-7 10-4.1-1.9-7-5.5-7-10V6l7-3z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 12l2 2 4-4"
+                            />
+                        </svg>
+
+                    </span>
+
+                    <span class="flex-1">
+                        Verifikasi Penulis
+                    </span>
+
+                    @if($pendingAuthorVerifications > 0)
+                        <span
+                            class="cms-pending-badge"
+                            title="{{ $pendingAuthorVerifications }} pengajuan penulis menunggu review"
+                            aria-label="{{ $pendingAuthorVerifications }} pengajuan penulis menunggu review"
+                        >
+                            {{ $pendingAuthorVerifications > 99 ? '99+' : $pendingAuthorVerifications }}
+                        </span>
+                    @endif
+
+                </a>
 
 
                 {{-- =================================================

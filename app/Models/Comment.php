@@ -46,7 +46,7 @@ class Comment extends Model
     public function replies(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')
-            ->with(['user', 'replies'])
+            ->with(['user.authorVerification', 'parent.user', 'replies'])
             ->oldest();
     }
 

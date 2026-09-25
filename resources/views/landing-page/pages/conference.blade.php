@@ -848,8 +848,20 @@
         min-height:60px;
     }
 
+    /*
+     * PENTING:
+     * Jangan sembunyikan "Conference" pada mobile.
+     * Supaya branding kiri atas tetap:
+     * BacaDulu CONFERENCE
+     */
     .bd-conference-brand-type{
-        display:none;
+        display:inline-block;
+        color:#8D8993;
+        font-size:10px;
+        line-height:1;
+        font-weight:700;
+        letter-spacing:.11em;
+        text-transform:uppercase;
     }
 
     .bd-conference-hero{

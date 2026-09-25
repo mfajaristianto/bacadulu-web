@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 
@@ -35,7 +36,11 @@ use App\Http\Controllers\Admin\InformationAdminController;
 use App\Http\Controllers\Admin\JurnalAdminController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PublisherAdminController;
+use App\Http\Controllers\Admin\AuthorVerificationAdminController;
+use App\Http\Controllers\AuthorVerificationController;  
 
+
+use App\Models\User;
 /*
 |--------------------------------------------------------------------------
 | HOME
@@ -101,6 +106,38 @@ Route::post('/logout', function () {
     ->middleware('auth')
     ->name('logout');
 
+
+/*
+|--------------------------------------------------------------------------
+| LOCAL DEV LOGIN
+|--------------------------------------------------------------------------
+|
+| KHUSUS LOCAL untuk testing beberapa user tanpa banyak akun Google.
+| Route ini TIDAK aktif jika APP_ENV bukan "local".
+|
+| Contoh:
+| http://127.0.0.1:8000/dev/login/2
+| http://127.0.0.1:8000/dev/login/3
+|
+*/
+
+if (app()->environment('local')) {
+
+    Route::get('/dev/login/{user}', function (User $user) {
+
+        Auth::login($user);
+
+        request()->session()->regenerate();
+
+        return redirect()->route('blog.index');
+
+    })
+        ->whereNumber('user')
+        ->name('dev.login');
+
+}
+
+
 /*
 |--------------------------------------------------------------------------
 | USER PROFILE
@@ -111,6 +148,14 @@ Route::get('/avatar/google/{user}', [
     ProfileController::class,
     'googleAvatar',
 ])->name('profile.google-avatar');
+
+
+Route::get('/pengguna/{user}', [
+    ProfileController::class,
+    'showPublic',
+])
+    ->whereNumber('user')
+    ->name('profile.public');
 
 Route::middleware('auth')
     ->prefix('profil')
@@ -136,8 +181,19 @@ Route::middleware('auth')
             ProfileController::class,
             'useInitials',
         ])->name('photo.initials');
-    });
 
+        Route::get('/verifikasi-penulis', [
+            AuthorVerificationController::class,
+            'show',
+        ])->name('author-verification');
+
+        Route::post('/verifikasi-penulis', [
+            AuthorVerificationController::class,
+            'store',
+        ])
+            ->middleware('throttle:5,10')
+            ->name('author-verification.store');
+    });
 /*
 |--------------------------------------------------------------------------
 | ADMIN AUTH & RECOVERY
@@ -866,35 +922,58 @@ Route::resource(
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/posts', [
-            PostController::class,
-            'index',
-        ])->name('posts.index');
+Route::get('/posts', [
+    PostController::class,
+    'index',
+])->name('posts.index');
 
-        Route::get('/posts/{post}/edit', [
-            PostController::class,
-            'edit',
-        ])->name('posts.edit');
 
-        Route::put('/posts/{post}', [
-            PostController::class,
-            'update',
-        ])->name('posts.update');
+Route::get('/posts/{post}/edit', [
+    PostController::class,
+    'edit',
+])->name('posts.edit');
 
-        Route::delete('/posts/{post}', [
-            PostController::class,
-            'destroy',
-        ])->name('posts.destroy');
 
-        Route::post('/posts/{post}/approve', [
-            PostController::class,
-            'approve',
-        ])->name('posts.approve');
+Route::put('/posts/{post}', [
+    PostController::class,
+    'update',
+])->name('posts.update');
 
-        Route::post('/posts/{post}/reject', [
-            PostController::class,
-            'reject',
-        ])->name('posts.reject');
+
+Route::delete('/posts/{post}', [
+    PostController::class,
+    'destroy',
+])->name('posts.destroy');
+
+
+Route::post('/posts/{post}/approve', [
+    PostController::class,
+    'approve',
+])->name('posts.approve');
+
+
+Route::post('/posts/{post}/reject', [
+    PostController::class,
+    'reject',
+])->name('posts.reject');
+
+
+/*
+|--------------------------------------------------------------------------
+| Originality Review
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/posts/{post}/originality', [
+    PostController::class,
+    'originality',
+])->name('posts.originality');
+
+
+Route::post('/posts/{post}/originality/review', [
+    PostController::class,
+    'reviewOriginality',
+])->name('posts.originality.review');
 
         /*
         |--------------------------------------------------------------------------
@@ -927,6 +1006,32 @@ Route::resource(
             AdminCommunityController::class,
             'reject',
         ])->name('communities.reject');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Author Verifications
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/author-verifications', [
+            AuthorVerificationAdminController::class,
+            'index',
+        ])->name('author-verifications.index');
+
+        Route::get('/author-verifications/{verification}/evidence', [
+            AuthorVerificationAdminController::class,
+            'evidence',
+        ])->name('author-verifications.evidence');
+
+        Route::patch('/author-verifications/{verification}/approve', [
+            AuthorVerificationAdminController::class,
+            'approve',
+        ])->name('author-verifications.approve');
+
+        Route::patch('/author-verifications/{verification}/reject', [
+            AuthorVerificationAdminController::class,
+            'reject',
+        ])->name('author-verifications.reject');
 
         /*
         |--------------------------------------------------------------------------

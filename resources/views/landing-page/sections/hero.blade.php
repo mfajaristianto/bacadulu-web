@@ -6,19 +6,19 @@
     <div class="bd-hero-bg">
 
         <img
-            src="{{ asset('img/home.jpg') }}"
+            src="{{ asset('img/transisi-1.jpeg') }}"
             class="bd-hero-slide bd-hero-active"
             alt=""
         >
 
         <img
-            src="{{ asset('img/transisi-1.jpg') }}"
+            src="{{ asset('img/transisi-2.jpeg') }}"
             class="bd-hero-slide"
             alt=""
         >
 
         <img
-            src="{{ asset('img/transisi-2.jpg') }}"
+            src="{{ asset('img/transisi-3.jpeg') }}"
             class="bd-hero-slide"
             alt=""
         >

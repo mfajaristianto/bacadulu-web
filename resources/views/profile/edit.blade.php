@@ -26,6 +26,12 @@
 
     $hasCustomAvatar =
         !empty($user->profile_photo);
+
+    $authorVerification =
+        $user->authorVerification;
+
+    $verificationStatus =
+        $authorVerification?->status;
 @endphp
 
 <div class="min-h-[calc(100vh-80px)] bg-slate-50 py-10">
@@ -125,6 +131,116 @@
                     </p>
 
                 </div>
+
+            </div>
+
+        </section>
+
+
+        {{-- =====================================================
+             AUTHOR VERIFICATION
+        ====================================================== --}}
+
+        <section class="mb-6 rounded-2xl border border-orange-200 bg-white p-6 shadow-sm">
+
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+                <div class="min-w-0">
+
+                    <div class="flex flex-wrap items-center gap-2">
+
+                        <h2 class="font-extrabold text-slate-900">
+                            Verifikasi Penulis
+                        </h2>
+
+                        @if($verificationStatus === 'approved')
+
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-700">
+                                ✓ Penulis Terverifikasi
+                            </span>
+
+                        @elseif($verificationStatus === 'pending')
+
+                            <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-amber-700">
+                                Menunggu Review
+                            </span>
+
+                        @elseif($verificationStatus === 'rejected')
+
+                            <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-red-700">
+                                Perlu Diperbaiki
+                            </span>
+
+                        @else
+
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-slate-500">
+                                Belum Diverifikasi
+                            </span>
+
+                        @endif
+
+                    </div>
+
+                    <p class="mt-2 max-w-xl text-sm leading-relaxed text-slate-500">
+
+                        @if($verificationStatus === 'approved')
+
+                            Identitas kepenulisan Anda telah diperiksa dan disetujui oleh admin BacaDulu.
+
+                        @elseif($verificationStatus === 'pending')
+
+                            Pengajuan Anda sedang menunggu pemeriksaan admin. Anda tidak perlu mengirim ulang.
+
+                        @elseif($verificationStatus === 'rejected')
+
+                            Pengajuan sebelumnya perlu diperbaiki. Buka halaman verifikasi untuk melihat catatan admin dan kirim ulang bukti.
+
+                        @else
+
+                            Ajukan bukti kepenulisan untuk memperoleh badge Penulis Terverifikasi setelah diperiksa admin.
+
+                        @endif
+
+                    </p>
+
+                </div>
+
+                <a
+                    href="{{ route('profile.author-verification') }}"
+                    class="
+                        inline-flex
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-[#241B52]
+                        px-4
+                        py-2.5
+                        text-sm
+                        font-bold
+                        text-white
+                        transition
+                        hover:bg-[#31256e]
+                    "
+                >
+                    @if($verificationStatus === 'approved')
+
+                        Lihat Verifikasi
+
+                    @elseif($verificationStatus === 'pending')
+
+                        Lihat Status
+
+                    @elseif($verificationStatus === 'rejected')
+
+                        Perbaiki Pengajuan
+
+                    @else
+
+                        Ajukan Verifikasi
+
+                    @endif
+                </a>
 
             </div>
 

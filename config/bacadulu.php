@@ -70,4 +70,51 @@ return [
     'call_center_wa' =>
         $whatsappNumber,
 
+    /*
+    |--------------------------------------------------------------------------
+    | BATAS MAKSIMAL KEMIRIPAN INTERNAL ARTIKEL
+    |--------------------------------------------------------------------------
+    |
+    | Nilai ini adalah batas similarity internal BacaDulu, bukan skor
+    | Turnitin/iThenticate. Default 20%. Bisa diubah melalui .env:
+    |
+    | BACA_ORIGINALITY_MAX_SIMILARITY=20
+    |
+    */
+
+    'originality' => [
+        /*
+        | Di atas batas ini artikel wajib Originality Review manual.
+        | Tepat 20% masih tidak otomatis dikunci.
+        */
+        'max_similarity' => (float) env(
+            'BACA_ORIGINALITY_MAX_SIMILARITY',
+            20
+        ),
+
+        /*
+        | Di atas batas ini CMS menampilkan peringatan kuning.
+        */
+        'warning_similarity' => (float) env(
+            'BACA_ORIGINALITY_WARNING_SIMILARITY',
+            10
+        ),
+
+        /*
+        | Maksimal sumber teratas yang ditampilkan ke admin.
+        */
+        'top_sources' => (int) env(
+            'BACA_ORIGINALITY_TOP_SOURCES',
+            5
+        ),
+
+        /*
+        | Maksimal artikel terdahulu yang diperiksa per scan.
+        */
+        'candidate_limit' => (int) env(
+            'BACA_ORIGINALITY_CANDIDATE_LIMIT',
+            1000
+        ),
+    ],
+
 ];

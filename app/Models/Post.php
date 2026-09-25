@@ -27,8 +27,23 @@ class Post extends Model
         'image',
         'category',
         'status',
+        'rejection_reason',
+        'similarity_score',
+        'similarity_source_post_id',
+        'similarity_source_title',
+        'similarity_source_author',
+        'rejected_at',
         'views',
     ];
+
+
+    protected function casts(): array
+    {
+        return [
+            'similarity_score' => 'decimal:2',
+            'rejected_at' => 'datetime',
+        ];
+    }
 
 
     /*
@@ -99,6 +114,47 @@ class Post extends Model
         return $this->belongsTo(
             User::class
         );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Similarity Source Post
+    |--------------------------------------------------------------------------
+    |
+    | Artikel/naskah lain yang menjadi pembanding tertinggi pada saat artikel
+    | ini ditolak karena similarity internal.
+    |
+    */
+    public function similaritySourcePost()
+    {
+        return $this->belongsTo(
+            Post::class,
+            'similarity_source_post_id'
+        );
+    }
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Originality Audit
+    |--------------------------------------------------------------------------
+    */
+
+    public function originalityChecks()
+    {
+        return $this->hasMany(
+            PostOriginalityCheck::class
+        );
+    }
+
+    public function latestOriginalityCheck()
+    {
+        return $this->hasOne(
+            PostOriginalityCheck::class
+        )->latestOfMany();
     }
 
 

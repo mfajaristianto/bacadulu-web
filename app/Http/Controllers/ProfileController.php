@@ -20,6 +20,36 @@ class ProfileController extends Controller
         ]);
     }
 
+
+    public function showPublic(User $user)
+    {
+        $user->load('authorVerification');
+
+        $posts = $user->posts()
+            ->where('status', 'approved')
+            ->withCount([
+                'likes',
+                'comments',
+            ])
+            ->latest()
+            ->paginate(9);
+
+        $publishedCount = $user->posts()
+            ->where('status', 'approved')
+            ->count();
+
+        $totalViews = (int) $user->posts()
+            ->where('status', 'approved')
+            ->sum('views');
+
+        return view('profile.public', [
+            'profileUser' => $user,
+            'posts' => $posts,
+            'publishedCount' => $publishedCount,
+            'totalViews' => $totalViews,
+        ]);
+    }
+
     public function updatePhoto(Request $request)
     {
         $request->validate([
