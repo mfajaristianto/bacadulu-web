@@ -35,7 +35,7 @@
             'pages' => $book->pages ?? null,
             'category' => !empty($book->category) ? $book->category : 'Umum',
             'publisher' => !empty($book->publisher) ? $book->publisher : 'BacaDulu Publisher',
-            'cover' => !empty($book->cover) ? asset('storage/' . $book->cover) : null,
+            'cover' => !empty($book->cover) ? $book->public_cover_url : null,
 
             'excerpt' => $plainDescription !== ''
                 ? \Illuminate\Support\Str::limit($plainDescription, 145)

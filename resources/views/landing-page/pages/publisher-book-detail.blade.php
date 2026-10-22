@@ -466,7 +466,7 @@
                 @if(!empty($book->cover))
 
                     <img
-                        src="{{ asset('storage/' . $book->cover) }}"
+                        src="{{ $book->public_cover_url }}"
                         alt="{{ $book->title }}"
                     >
 

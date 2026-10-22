@@ -186,7 +186,7 @@
 
                 @if($book->cover)
                     <div class="mb-4 inline-flex max-w-sm rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                        <img src="{{ asset('storage/' . $book->cover) }}" alt="{{ $book->title }}" class="max-h-72 w-auto max-w-full object-contain">
+                        <img src="{{ $book->public_cover_url }}" alt="{{ $book->title }}" class="max-h-72 w-auto max-w-full object-contain">
                     </div>
                 @endif
 

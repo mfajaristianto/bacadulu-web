@@ -131,7 +131,7 @@
 
                                         @if($item->image)
                                             <img
-                                                src="{{ asset('storage/' . $item->image) }}"
+                                                src="{{ $item->public_image_url }}"
                                                 alt="{{ $item->title }}"
                                                 class="h-full w-full object-contain p-1"
                                             >

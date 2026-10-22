@@ -156,6 +156,32 @@ class Book extends Model
     ];
 
 
+
+    /**
+     * URL cover publik tanpa bergantung pada public/storage symlink.
+     */
+    protected function publicCoverUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->cover
+                ? route('media.public', ['path' => $this->cover])
+                : null,
+        );
+    }
+
+
+    /**
+     * URL preview PDF publik tanpa bergantung pada public/storage symlink.
+     */
+    protected function publicPreviewUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->preview_pdf
+                ? route('media.public', ['path' => $this->preview_pdf])
+                : null,
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | KONTRIBUTOR BUKU DINAMIS

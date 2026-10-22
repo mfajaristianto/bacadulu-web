@@ -208,7 +208,7 @@
                                     <div class="grid h-24 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                                         @if($book->cover)
                                             <img
-                                                src="{{ asset('storage/' . $book->cover) }}"
+                                                src="{{ $book->public_cover_url }}"
                                                 alt="{{ $book->title }}"
                                                 class="h-full w-full object-contain"
                                             >

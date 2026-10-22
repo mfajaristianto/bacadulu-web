@@ -416,7 +416,11 @@ class BacaPublisherSyncService
             . '.'
             . $image['extension'];
 
-        Storage::disk('public')->put($path, $image['body']);
+        $stored = Storage::disk('public')->put($path, $image['body']);
+
+        if (!$stored || !Storage::disk('public')->exists($path)) {
+            return null;
+        }
 
         return $path;
     }
@@ -440,8 +444,10 @@ class BacaPublisherSyncService
         $oldExternalUrl = trim((string) $book->external_cover_url);
         $oldWasThumbnail = $this->isThumbnailCoverUrl($oldExternalUrl);
 
-        // Kalau cover belum ada, boleh dipulihkan dari sumber yang sama.
-        $missingManagedCover = !$book->cover;
+        // Kalau nilai cover kosong ATAU path ada di DB tetapi file fisiknya
+        // hilang (misalnya record lama dari Vercel /tmp), download ulang.
+        $missingManagedCover = !$book->cover
+            || !Storage::disk('public')->exists((string) $book->cover);
 
         if (!$oldWasThumbnail && !$missingManagedCover) {
             return false;
@@ -508,6 +514,16 @@ class BacaPublisherSyncService
     private function canReplaceCoverFromApi(Book $book): bool
     {
         if (!$book->cover) {
+            return true;
+        }
+
+        // Path lama bisa masih tercatat di database walaupun file fisiknya
+        // sudah tidak ada setelah migrasi hosting. Untuk source BacaPublisher
+        // kondisi ini aman dipulihkan otomatis dari API.
+        if (
+            $book->source === 'bacapublisher'
+            && !Storage::disk('public')->exists((string) $book->cover)
+        ) {
             return true;
         }
 

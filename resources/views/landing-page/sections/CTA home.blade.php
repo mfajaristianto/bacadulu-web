@@ -76,7 +76,7 @@
                         @php
                             $judul = $item->title ?? $item->judul ?? 'Informasi Baca Dulu';
                             $gambar = !empty($item->image)
-                                ? asset('storage/' . $item->image)
+                                ? $item->public_image_url
                                 : null;
 
                             $kategori = $item->category ?? $item->type ?? 'Informasi';

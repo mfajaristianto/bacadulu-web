@@ -1521,7 +1521,7 @@
                             </div>
 
                             <img
-                                src="{{ asset('storage/' . $information->image) }}"
+                                src="{{ $information->public_image_url }}"
                                 alt="{{ $information->title }}"
                                 class="bd-detail-image"
                                 loading="eager"

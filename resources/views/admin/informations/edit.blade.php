@@ -120,7 +120,7 @@
                     <div class="flex min-h-52 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-3">
                         <img
                             id="imagePreview"
-                            src="{{ $information->image ? asset('storage/' . $information->image) : '' }}"
+                            src="{{ $information->image ? $information->public_image_url : '' }}"
                             alt="{{ $information->title }}"
                             class="max-h-[420px] max-w-full object-contain"
                         >

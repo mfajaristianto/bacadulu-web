@@ -78,10 +78,20 @@ class PublisherAdminController extends Controller
                 ->store('book-covers', 'public');
         }
 
+        if ($request->hasFile('cover')) {
+            if (!$coverPath || !Storage::disk('public')->exists($coverPath)) {
+                throw new \RuntimeException('Upload cover gagal disimpan ke storage public. Periksa permission folder storage/app/public.');
+            }
+        }
+
         if ($request->hasFile('preview_pdf')) {
             $previewPath = $request
                 ->file('preview_pdf')
                 ->store('book-previews', 'public');
+
+            if (!$previewPath || !Storage::disk('public')->exists($previewPath)) {
+                throw new \RuntimeException('Upload preview PDF gagal disimpan ke storage public. Periksa permission folder storage/app/public.');
+            }
         }
 
         try {
@@ -161,6 +171,10 @@ class PublisherAdminController extends Controller
                 ->file('cover')
                 ->store('book-covers', 'public');
 
+            if (!$newCover || !Storage::disk('public')->exists($newCover)) {
+                throw new \RuntimeException('Upload cover gagal disimpan ke storage public. Periksa permission folder storage/app/public.');
+            }
+
             $data['cover'] = $newCover;
         }
 
@@ -168,6 +182,10 @@ class PublisherAdminController extends Controller
             $newPreview = $request
                 ->file('preview_pdf')
                 ->store('book-previews', 'public');
+
+            if (!$newPreview || !Storage::disk('public')->exists($newPreview)) {
+                throw new \RuntimeException('Upload preview PDF gagal disimpan ke storage public. Periksa permission folder storage/app/public.');
+            }
 
             $data['preview_pdf'] = $newPreview;
             $removePreview = false;

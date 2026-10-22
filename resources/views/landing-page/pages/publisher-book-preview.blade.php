@@ -90,11 +90,11 @@
         <div class="bd-preview-frame-wrap">
             <iframe
                 class="bd-preview-frame"
-                src="{{ asset('storage/' . $book->preview_pdf) }}#view=FitH"
+                src="{{ $book->public_preview_url }}#view=FitH"
                 title="Preview PDF {{ $book->title }}"
             ></iframe>
             <div class="bd-preview-fallback">
-                Jika PDF tidak tampil di browser, <a href="{{ asset('storage/' . $book->preview_pdf) }}" target="_blank" rel="noopener">buka PDF langsung</a>.
+                Jika PDF tidak tampil di browser, <a href="{{ $book->public_preview_url }}" target="_blank" rel="noopener">buka PDF langsung</a>.
             </div>
         </div>
     </div>

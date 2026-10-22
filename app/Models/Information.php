@@ -47,6 +47,19 @@ class Information extends Model
         );
     }
 
+
+    /**
+     * URL publik gambar informasi tanpa bergantung pada public/storage symlink.
+     */
+    protected function publicImageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->image
+                ? route('media.public', ['path' => $this->image])
+                : null,
+        );
+    }
+
     protected static function booted(): void
     {
         static::saving(function (Information $information) {

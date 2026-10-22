@@ -20,6 +20,7 @@ use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicMediaController;
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminGoogleVerificationController;
@@ -54,6 +55,24 @@ Route::get('/', function () {
 
     return view('landing-page.index');
 })->name('home');
+
+
+/*
+|--------------------------------------------------------------------------
+| PUBLIC MEDIA
+|--------------------------------------------------------------------------
+|
+| File upload publik disimpan di storage/app/public. Route ini membuat file
+| tetap bisa dibaca di shared hosting/cPanel walaupun symbolic link
+| public/storage belum tersedia atau dibatasi oleh provider hosting.
+|
+*/
+Route::get('/media/{path}', [
+    PublicMediaController::class,
+    'show',
+])
+    ->where('path', '.*')
+    ->name('media.public');
 
 /*
 |--------------------------------------------------------------------------

@@ -833,7 +833,7 @@
 
                             @if(!empty($pinnedInformation->image))
                                 <img
-                                    src="{{ asset('storage/' . $pinnedInformation->image) }}"
+                                    src="{{ $pinnedInformation->public_image_url }}"
                                     alt="{{ $pinnedInformation->title }}"
                                     loading="eager"
                                     data-card-image
@@ -950,7 +950,7 @@
 
                                 @if(!empty($information->image))
                                     <img
-                                        src="{{ asset('storage/' . $information->image) }}"
+                                        src="{{ $information->public_image_url }}"
                                         alt="{{ $information->title }}"
                                         loading="lazy"
                                         data-card-image
@@ -1125,7 +1125,7 @@
 
                                     @if(!empty($information->image))
                                         <img
-                                            src="{{ asset('storage/' . $information->image) }}"
+                                            src="{{ $information->public_image_url }}"
                                             alt="{{ $information->title }}"
                                             loading="lazy"
                                             data-card-image

@@ -42,6 +42,10 @@ class InformationAdminController extends Controller
                 ->file('image')
                 ->store('uploads/informations', 'public');
 
+            if (!$newImagePath || !Storage::disk('public')->exists($newImagePath)) {
+                throw new \RuntimeException('Upload gambar gagal disimpan ke storage public. Periksa permission folder storage/app/public.');
+            }
+
             $data['image'] = $newImagePath;
         }
 
@@ -104,6 +108,10 @@ class InformationAdminController extends Controller
             $newImagePath = $request
                 ->file('image')
                 ->store('uploads/informations', 'public');
+
+            if (!$newImagePath || !Storage::disk('public')->exists($newImagePath)) {
+                throw new \RuntimeException('Upload gambar gagal disimpan ke storage public. Periksa permission folder storage/app/public.');
+            }
 
             $data['image'] = $newImagePath;
         }
